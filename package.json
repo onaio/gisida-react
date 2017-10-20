@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "gisida": "file:../gisida",
+    "mapbox-gl": "^0.41.0",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-redux": "^5.0.6",

@@ -5,10 +5,10 @@ const Layer = ({ mapTargetId, layer, layerData, onLayerChange = f => f }) =>
   (<li className={`layer ${mapTargetId}`}>
     <input
       type="checkbox"
-      data-layer={layer}
+      data-layer={layer.name}
       onChange={e => onLayerChange(layer, e.target.checked, mapTargetId)}
     />
-    <label htmlFor={layer} >{layerData[layer].label}</label>
+    <label htmlFor={layer.name} >{layer.label}</label>
   </li>);
 
 Layer.propTypes = {
