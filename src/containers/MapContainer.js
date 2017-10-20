@@ -3,9 +3,11 @@ import { connect } from 'react-redux'
 import Map from '../components/Map/Map'
 
 const mapStateToProps = (state, ownProps) => {
+  
   return {
-    mapConfig: state.appState.APP.mapConfig,
-    accessToken: state.appState.APP.accessToken
+    mapConfig: state.APP.mapConfig,
+    accessToken: state.APP.accessToken,
+    layers: state.NODES
   }
 }
 
