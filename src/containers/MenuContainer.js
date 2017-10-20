@@ -7,13 +7,13 @@ const mapStateToProps = (state, ownProps) => {
   const categories = [];
   const grouped = groupBy(state.NODES, 'category');
   grouped.map((group) => {
-    if (group[0].hasOwnProperty('category')) {
+    if (group.hasOwnProperty('category')) {
       categories.push({
         layers: group,
         sector: group[0].category
       });
     } else categories.push({
-      layers: [],
+      layers: group,
       sector: "Default"
     });
   });
