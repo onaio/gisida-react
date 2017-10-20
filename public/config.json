@@ -15,7 +15,9 @@
   },
   "NODES": [
     "/nodes/district-labels",
-    "/nodes/region-labels"
+    "/nodes/region-labels",
+    "/nodes/district-boundaries",
+    "/nodes/region-boundaries"
   ],
   "STYLES": [
     {
