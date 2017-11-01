@@ -6,13 +6,14 @@ import registerServiceWorker from './registerServiceWorker';
 import MapContainer from './containers/MapContainer';
 import MenuContainer from './containers/MenuContainer'
 import StyleSelectorContainer from './containers/StyleSelectorContainer';
+import { MAP } from './reducers/Reducers';
 
 
 import Menu from './components/Menu/Menu';
 
 import { initStore } from 'gisida';
 
-const store = initStore(); // pass in any additional reducers
+const store = initStore({ MAP });
 
 ReactDOM.render(
   (
