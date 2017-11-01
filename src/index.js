@@ -12,15 +12,18 @@ import Menu from './components/Menu/Menu';
 
 import { initStore } from 'gisida';
 
-const store = initStore();
+const store = initStore(); // pass in any additional reducers
 
 ReactDOM.render(
-  <Provider store={store}>
-    <App>
-      <MapContainer />
-      <MenuContainer />
-      <StyleSelectorContainer />
-    </App>
-  </Provider>,
-  document.getElementById('root'));
+  (
+    <Provider store={store}>
+      <App>
+        <MapContainer />
+        <MenuContainer />
+        <StyleSelectorContainer />
+      </App>
+    </Provider>
+  ),
+  document.getElementById('root')
+);
 registerServiceWorker();

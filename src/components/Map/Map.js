@@ -10,6 +10,9 @@ class Map extends Component {
 
   constructor(props) {
     super(props);
+
+    // todo - bind all the functions
+    // todo - move state to store
     this.state = 
     {
       loaded: false
@@ -22,12 +25,15 @@ class Map extends Component {
       this.map = new mapboxgl.Map(mapConfig);
       this.map.addControl(new mapboxgl.NavigationControl());
       this.map.on('load', () => {
-        this.addDefaultLayers();
-        this.addMousemoveEvent(); 
+        this.addMouseEvents();
+        // todo - dispatch MAP_LOADED action, triggering default layers to process
       });
     }  
   }
 
+  // todo - break out layer types (addCircleLayer, addLineLayer, etc)
+  // todo - MOVE LAYERS TO STORE!!
+  // TODO - CREATE MAP REDUCER (extended from this repo)
   addLayer(layer) {
 
     const self = this;
@@ -276,10 +282,11 @@ class Map extends Component {
     return null;
   }
 
-  addDefaultLayers() {
-  }
 
-  addMousemoveEvent() {
+  addMouseEvents() {
+    // this.addMapClickEvents()
+    // this.addMouseMoveEvents()
+    // etc
   }
 
   changeStyle(style) {
@@ -310,12 +317,15 @@ class Map extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    // todo - remove this
     if (!this.state.loaded) {
       this.initMap(nextProps.accessToken, nextProps.mapConfig);
     }
+    // todo - handle adding and removing layers based on props
   }
 
   componentDidUpdate(prevProps, prevState) {
+    // todo - handle this is in componentWillReceiveProps
     if (this.state.loaded) {
       this.props.layers.map((layer) => {
         this.addLayer(layer)
@@ -326,6 +336,13 @@ class Map extends Component {
   componentDidMount() {
     this.initMap(this.props.accessToken, this.props.mapConfig);
   }
+
+  // todo - handle removing layers
+  // todo - handle timeseries changes
+  // todo - create timeseriesSliderContainer
+  // todo - create legendContainer
+
+  // todo - HANDLE THIS.PROPS.CHILDREN
 
   render() {
     return (

@@ -12,12 +12,15 @@ const mapStateToProps = (state, ownProps) => {
         layers: group,
         sector: group[0].category
       });
-    } else categories.push({
-      layers: group,
-      sector: "Default"
-    });
+    } else {
+      categories.push({
+        layers: group,
+        sector: "Default"
+      });
+    }
   });
   
+  // todo - change to { categories: categories }
   return {
     sectorData: categories
   }
@@ -25,7 +28,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-
+    // onToggleSectors: (e) => { ... },
+    // onSectorClick: (e) => { ... }
   }
 }
 
@@ -34,4 +38,4 @@ const StyleSelctorContainer = connect(
   mapDispatchToProps
 )(Menu);
 
-export default StyleSelctorContainer
+export default StyleSelctorContainer;

@@ -3,7 +3,7 @@ import './Menu.css';
 import PropTypes from 'prop-types';
 import Layers from '../Layers/Layers';
 
-
+// todo - convert this to a class
 const Menu = ({ sectorMenuId,
   mapTargetId,
   sectorData,
@@ -20,6 +20,9 @@ const Menu = ({ sectorMenuId,
         sectorData.map((sector, i) =>
           // eslint-disable-next-line react/no-array-index-key
           (<li className="sector" key={i}><a href="#" onClick={e => onSectorClick(e)}>{sector.sector} <span className="caret" /></a>
+            {
+              // todo - create LayersContainer to handle layer related state changes
+            }
             <Layers
               onLayerChange={onLayerChange}
               mapTargetId={mapTargetId}
