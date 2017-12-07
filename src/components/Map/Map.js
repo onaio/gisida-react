@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { formatNum, getLastIndex } from '../../lib/utils'
-import { processNode, generateStops } from 'gisida';
+import { processLayer, generateStops } from 'gisida';
 
 import './Map.css';
 
@@ -48,22 +48,7 @@ class Map extends Component {
       stops = generateStops(layer, timefield);
     }
 
-    if (stops) {
-      this.setState({ stops: { stops, id: layer.id } });
-      const colorStops = timefield ? stops[0][stops[0].length - 1] : stops[0][0];
-      const radiusStops = stops[1][0];
-      const stopsData = layer.type === 'circle' ? radiusStops : colorStops;
-      const breaks = stops[3];
-      const colors = stops[4];
-      const currPeriod = stops[2][stops[2].length - 1];
-      const currData = layer.source.data.filter(data => data[timefield] === currPeriod);
-      const Data = timefield ? currData : layer.source.data;
-
-      this.addLegend(layer, stopsData, Data, breaks, colors);
-      this.addLabels(layer, Data);
-    } else if (layer.credit && layer.categories.breaks === 'no') {
-      this.addLegend(layer);
-    }
+   
 
     /*
      * CIRCLE ==========================================================

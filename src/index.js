@@ -2,18 +2,15 @@ import React from 'react'
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import App from './components/App/App';
-import registerServiceWorker from './registerServiceWorker';
+import Menu from './components/Menu/Menu';
 import MapContainer from './containers/MapContainer';
 import MenuContainer from './containers/MenuContainer'
 import StyleSelectorContainer from './containers/StyleSelectorContainer';
-import { MAP } from './reducers/Reducers';
-
-
-import Menu from './components/Menu/Menu';
+import registerServiceWorker from './registerServiceWorker';
 
 import { initStore } from 'gisida';
 
-const store = initStore({ MAP });
+const store = initStore();
 
 ReactDOM.render(
   (

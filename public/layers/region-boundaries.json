@@ -11,5 +11,6 @@
     "line-color": "#444",
     "line-opacity": 0.6
   },
-  "visible": true
+  "visible": true,
+  "category": "Boundaries"
 }

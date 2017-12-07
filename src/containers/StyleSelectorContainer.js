@@ -14,9 +14,4 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   }
 }
 
-const StyleSelctorContainer = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(StyleSelector);
-
-export default StyleSelctorContainer
+export default connect(mapStateToProps, mapDispatchToProps)(StyleSelector);

@@ -4,20 +4,20 @@
       "container": "map",
       "style": "mapbox://styles/ona/cj13lidxb00062rpd2o5vph3q",
       "center": [
-        42.516,
-        5.550
+        -10.80754635834262,
+        6.325478251964455
       ],
-      "zoom": 5
+      "zoom": 14
     },
     "accessToken": "pk.eyJ1Ijoib25hIiwiYSI6IlVYbkdyclkifQ.0Bz-QOOXZZK01dq4MuMImQ",
     "appIcon": "gisida-sample.png",
     "appName": "React Gisida"
   },
-  "NODES": [
-    "/nodes/district-labels",
-    "/nodes/region-labels",
-    "/nodes/district-boundaries",
-    "/nodes/region-boundaries"
+  "LAYERS": [
+    "/layers/district-labels",
+    "/layers/region-labels",
+    "/layers/district-boundaries",
+    "/layers/region-boundaries"
   ],
   "STYLES": [
     {

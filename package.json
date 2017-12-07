@@ -1,7 +1,6 @@
 {
-  "name": "react-gisida",
-  "version": "0.1.0",
-  "private": true,
+  "name": "gisida-react",
+  "version": "0.0.1",
   "dependencies": {
     "gisida": "file:../gisida",
     "mapbox-gl": "^0.41.0",

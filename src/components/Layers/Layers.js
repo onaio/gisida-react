@@ -1,16 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
+import LayerContainer from '../../containers/LayerContainer'
 
-const Layers = ({ mapTargetId, layers, layerData, onLayerChange = f => f }) =>
+const Layers = ({ mapTargetId, layers}) =>
   (<ul className="layers">
     {layers.map(layer =>
-      (<Layer
-        onLayerChange={onLayerChange}
+      (<LayerContainer
         key={layer}
         mapTargetId={mapTargetId}
         layer={layer}
-        layerData={layerData}
       />))
   }
   </ul>);
@@ -18,8 +17,7 @@ const Layers = ({ mapTargetId, layers, layerData, onLayerChange = f => f }) =>
 Layers.propTypes = {
   mapTargetId: PropTypes.string.isRequired,
   layers: PropTypes.arrayOf(PropTypes.any).isRequired,
-  layerData: PropTypes.objectOf(PropTypes.any).isRequired,
-  onLayerChange: PropTypes.func.isRequired,
+ 
 };
 
 export default Layers;

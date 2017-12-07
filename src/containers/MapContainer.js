@@ -7,7 +7,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     mapConfig: state.APP.mapConfig,
     accessToken: state.APP.accessToken,
-    layers: state.NODES
+    layers: state.LAYERS
   }
 }
 

@@ -4,46 +4,41 @@ import PropTypes from 'prop-types';
 import Layers from '../Layers/Layers';
 
 // todo - convert this to a class
-const Menu = ({ sectorMenuId,
+const Menu = ({ menuId,
   mapTargetId,
-  sectorData,
-  layerData,
-  onToggleSectors = f => f,
-  onSectorClick = f => f,
-  onLayerChange = f => f }) =>
-  (<div id={`${sectorMenuId}-wrapper`} className="sectors-menu-wrapper">
-    <a href="#" onClick={e => onToggleSectors(e)} className="open-btn"><span className="glyphicon glyphicon-list" /></a>
-    <div id={sectorMenuId} className="sectors-menu">
-      <a className="open-btn" onClick={e => onToggleSectors(e)} href="#"><span className="glyphicon glyphicon-remove" /></a>
+  categories,
+  onToggleMenu = f => f,
+  onCategoryClick = f => f, }) =>
+  (<div id={`${menuId}-wrapper`} className="sectors-menu-wrapper">
+    <a href="#" onClick={e => onToggleMenu(e)} className="open-btn"><span className="glyphicon glyphicon-list" /></a>
+    <div id={menuId} className="sectors-menu">
+      <a className="open-btn" onClick={e => onToggleMenu(e)} href="#"><span className="glyphicon glyphicon-remove" /></a>
       <ul className="sectors">
-        {(sectorData && sectorData.length) > 0 ?
-        sectorData.map((sector, i) =>
+        {(categories && categories.length) > 0 ?
+          categories.map((category, i) =>
           // eslint-disable-next-line react/no-array-index-key
-          (<li className="sector" key={i}><a href="#" onClick={e => onSectorClick(e)}>{sector.sector} <span className="caret" /></a>
+            (<li className="sector" key={i}><a href="#" onClick={e => onCategoryClick(e)}>{category.category} <span className="caret" /></a>
             {
               // todo - create LayersContainer to handle layer related state changes
             }
             <Layers
-              onLayerChange={onLayerChange}
               mapTargetId={mapTargetId}
-              layers={sector.layers}
-              layerData={layerData}
+              layers={category.layers}
             />
             </li>)) :
-          <li>No categores defined</li>
+          <li>No categories defined</li>
         }
       </ul>
     </div>
   </div>);
 
 Menu.propTypes = {
-  sectorMenuId: PropTypes.string.isRequired,
+  menuId: PropTypes.string.isRequired,
   mapTargetId: PropTypes.string.isRequired,
-  sectorData: PropTypes.arrayOf(PropTypes.any).isRequired,
-  layerData: PropTypes.objectOf(PropTypes.any).isRequired,
-  onToggleSectors: PropTypes.func.isRequired,
-  onSectorClick: PropTypes.func.isRequired,
-  onLayerChange: PropTypes.func.isRequired,
+  categories: PropTypes.arrayOf(PropTypes.any).isRequired,
+  onToggleMenu: PropTypes.func.isRequired,
+  onCategoryClick: PropTypes.func.isRequired,
+ 
 };
 
 export default Menu;

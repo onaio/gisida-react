@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Layer = ({ mapTargetId, layer, layerData, onLayerChange = f => f }) =>
+const Layer = ({ mapTargetId, layer, onLayerChange = f => f }) =>
   (<li className={`layer ${mapTargetId}`}>
     <input
       type="checkbox"
@@ -13,8 +13,7 @@ const Layer = ({ mapTargetId, layer, layerData, onLayerChange = f => f }) =>
 
 Layer.propTypes = {
   mapTargetId: PropTypes.string.isRequired,
-  layer: PropTypes.string.isRequired,
-  layerData: PropTypes.objectOf(PropTypes.any).isRequired,
+  layer: PropTypes.arrayOf(PropTypes.any).isRequired,
   onLayerChange: PropTypes.func.isRequired,
 };
 

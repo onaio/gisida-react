@@ -5,37 +5,40 @@ import { groupBy } from '../lib/utils'
 const mapStateToProps = (state, ownProps) => {
 
   const categories = [];
-  const grouped = groupBy(state.NODES, 'category');
+  const grouped = groupBy(state.LAYERS, 'category'); 
   grouped.map((group) => {
-    if (group.hasOwnProperty('category')) {
+    if (group[0].hasOwnProperty('category')) {
       categories.push({
         layers: group,
-        sector: group[0].category
+        category: group[0].category
       });
     } else {
       categories.push({
         layers: group,
-        sector: "Default"
+        category: "Default"
       });
     }
   });
-  
-  // todo - change to { categories: categories }
+
   return {
-    sectorData: categories
+    categories: categories,
+    // todo: provide missing props
+
+    // menuId: '',
+    // mapTargetId: '',
   }
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    // onToggleSectors: (e) => { ... },
-    // onSectorClick: (e) => { ... }
+    onToggleMenu: (e) => {
+     e.preventDefault();
+      // todo: Show/Hide Menu
+    },
+    onCategoryClick: (e) => { 
+      //todo: Expand/Collapes layer categories sub-menu
+    }
   }
 }
 
-const StyleSelctorContainer = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Menu);
-
-export default StyleSelctorContainer;
+export default connect(mapStateToProps,mapDispatchToProps)(Menu);
