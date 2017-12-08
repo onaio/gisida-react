@@ -19,20 +19,17 @@ const mapStateToProps = (state, ownProps) => {
       });
     }
   });
-
   return {
     categories: categories,
     // todo: provide missing props
-
-    // menuId: '',
-    // mapTargetId: '',
+    menuId: '',
+    mapTargetId: '',
   }
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     onToggleMenu: (e) => {
-     e.preventDefault();
       // todo: Show/Hide Menu
     },
     onCategoryClick: (e) => { 

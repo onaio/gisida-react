@@ -8,6 +8,10 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
+    onLayerToggle: (e) => {
+      //todo: Toggle set layer visible
+      console.log('Toggle set layer visible');
+    }
   }
 }
 

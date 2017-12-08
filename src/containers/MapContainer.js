@@ -1,9 +1,8 @@
 import { connect } from 'react-redux'
-//import { loadLayer } from 'gisida` // import gisida action
+import { Actions } from 'gisida'
 import Map from '../components/Map/Map'
 
 const mapStateToProps = (state, ownProps) => {
-  
   return {
     mapConfig: state.APP.mapConfig,
     accessToken: state.APP.accessToken,
@@ -17,9 +16,4 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   }
 }
 
-const MapContainer = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Map)
-
-export default MapContainer
+export default connect(mapStateToProps, mapDispatchToProps)(Map);

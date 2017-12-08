@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import Layers from '../Layers/Layers';
 
 // todo - convert this to a class
-const Menu = ({ menuId,
+const Menu = ({
+  menuId,
   mapTargetId,
   categories,
   onToggleMenu = f => f,
@@ -33,8 +34,8 @@ const Menu = ({ menuId,
   </div>);
 
 Menu.propTypes = {
-  menuId: PropTypes.string.isRequired,
-  mapTargetId: PropTypes.string.isRequired,
+  // menuId: PropTypes.string.isRequired,
+  // mapTargetId: PropTypes.string.isRequired,
   categories: PropTypes.arrayOf(PropTypes.any).isRequired,
   onToggleMenu: PropTypes.func.isRequired,
   onCategoryClick: PropTypes.func.isRequired,

@@ -11,13 +11,15 @@
     },
     "accessToken": "pk.eyJ1Ijoib25hIiwiYSI6IlVYbkdyclkifQ.0Bz-QOOXZZK01dq4MuMImQ",
     "appIcon": "gisida-sample.png",
-    "appName": "React Gisida"
+    "appName": "React Gisida",
+    "layersPath": "/layers"
   },
   "LAYERS": [
-    "/layers/district-labels",
-    "/layers/region-labels",
-    "/layers/district-boundaries",
-    "/layers/region-boundaries"
+    "district-labels",
+    "region-labels",
+    "district-boundaries",
+    "region-boundaries",
+    "monrovia"
   ],
   "STYLES": [
     {

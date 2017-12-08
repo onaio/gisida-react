@@ -1,0 +1,15 @@
+{
+  "label": "Monrovia",
+  "source": {
+    "type": "geojson",
+    "data": "data/monrovia.geojson"
+  },
+  "type": "line",
+  "paint": {
+    "line-width": 3,
+    "line-color": "red",
+    "line-opacity": 0.6
+  },
+  "visible": true,
+  "category": "Settlments"
+}
