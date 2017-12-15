@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import LayerContainer from '../../containers/LayerContainer'
+import Layer from '../Layer/Layer'
 
 const Layers = ({ mapTargetId, layers}) =>
   (<ul className="layers">
     {layers.map(layer =>
-      (<LayerContainer
+      (<Layer
         key={layer.id}
         mapTargetId={mapTargetId}
         layer={layer}

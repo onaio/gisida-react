@@ -3,9 +3,8 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import App from './components/App/App';
 import Menu from './components/Menu/Menu';
-import MapContainer from './containers/MapContainer';
-import MenuContainer from './containers/MenuContainer'
-import StyleSelectorContainer from './containers/StyleSelectorContainer';
+import Map from './components/Map/Map';
+import StyleSelector from './components/StyleSelector/StyleSelector';
 import registerServiceWorker from './registerServiceWorker';
 
 import { initStore } from 'gisida';
@@ -16,9 +15,9 @@ ReactDOM.render(
   (
     <Provider store={store}>
       <App>
-        <MapContainer />
-        <MenuContainer />
-        <StyleSelectorContainer />
+        <Map />
+        <Menu />
+        <StyleSelector />
       </App>
     </Provider>
   ),
