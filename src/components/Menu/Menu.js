@@ -7,7 +7,15 @@ import { groupBy } from '../../utils'
 
 const mapStateToProps = (state, ownProps) => {
   const categories = [];
-  const grouped = groupBy(state.LAYERS, 'category');
+  const layers = [];
+  // Get list of layers in state.LAYERS;
+  for (var key in state.LAYERS) {
+    layers.push(state.LAYERS[key]);
+  } 
+  // Group layers using category property
+  const grouped = groupBy(layers, 'category');
+  
+  // Add layers to categories
   grouped.map((group) => {
     if (group[0].hasOwnProperty('category')) {
       categories.push({

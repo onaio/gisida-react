@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
+import { Actions, addLayer } from 'gisida';
 import { formatNum, getLastIndex } from '../../utils'
-import { processLayer,   } from 'gisida';
+
 import './Map.css';
 
 const mapboxgl = require('mapbox-gl');
@@ -10,22 +11,12 @@ const mapStateToProps = (state, ownProps) => {
   return {
     mapConfig: state.APP.mapConfig,
     accessToken: state.APP.accessToken,
-    layers: state.LAYERS
+    layers: state.LAYERS,
+    isLoaded: state.MAP.isLoaded,
   }
 }
 
 class Map extends Component {
-
-  constructor(props) {
-    super(props);
-
-    // todo - bind all the functions
-    // todo - move state to store
-    this.state = 
-    {
-      loaded: false
-    }
-  }
 
   initMap(accessToken, mapConfig) {
     if (accessToken && mapConfig) {
@@ -34,7 +25,7 @@ class Map extends Component {
       this.map.addControl(new mapboxgl.NavigationControl());
       this.map.on('load', () => {
         this.addMouseEvents();
-        // todo - dispatch MAP_LOADED action, triggering default layers to process
+        this.props.dispatch(Actions.mapLoaded(true));
       });
     }  
   }
@@ -46,28 +37,27 @@ class Map extends Component {
   }
   
   componentWillReceiveProps(nextProps) {
-    // todo - remove this
-    if (!this.state.loaded) {
-      this.initMap(nextProps.accessToken, nextProps.mapConfig);
+    const isLoaded = nextProps.isLoaded;
+    const layers = nextProps.layers;
+    const accessToken = nextProps.accessToken
+    const mapConfig = nextProps.mapConfig;
+  
+    // Check if map isLoad and initialize.
+    if (!isLoaded) {
+      this.initMap(accessToken, mapConfig);
     }
-    // todo - handle adding and removing layers based on props
+
+    // Add Layers to map from props
+    if (isLoaded && layers && Object.keys(layers).length > 0) {
+      Object.keys(layers).forEach((key) => {
+        const layer = layers[key];
+        console.log(layer, " - is lodaed = ", layer.loaded);
+        if (layer.loaded) {
+          addLayer(this.map, layer);
+        }
+      }); 
+    }
   }
-
-  componentDidUpdate(prevProps, prevState) {
-    // todo - handle this is in componentWillReceiveProps
-   
-  }
-
-  componentDidMount() {
-    this.initMap(this.props.accessToken, this.props.mapConfig);
-  }
-
-  // todo - handle removing layers
-  // todo - handle timeseries changes
-  // todo - create timeseriesSliderContainer
-  // todo - create legendContainer
-
-  // todo - HANDLE THIS.PROPS.CHILDREN
 
   render() {
     return (
