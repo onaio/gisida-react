@@ -1,0 +1,42 @@
+{
+  "label": "% of People with Fever or Malaria",
+  "source": {
+    "type": "vector",
+    "layer": "ken_adm1_centroids-1b1p68",
+    "url": "mapbox://ona.1wfeceam",
+    "data": "data/health_spending_per_capita.csv",
+    "join": [
+      "Adm1Name",
+      "County"
+    ]
+  },
+  "property": "malaria",
+  "type": "circle",
+  "minZoom": 0,
+  "radius-range": ["6", "9", "12", "15", "18", "21", "24", "27", "30"],
+  "categories": {
+    "shape": true,
+    "breaks": "no",
+    "color": [
+      "#2ca25f",
+      "#feb24c",
+      "#f03b20"
+    ],
+    "limit": [
+      0.15,
+      0.3,
+      1
+    ],
+    "label": [
+      "Below 15%",
+      "15% - 30%",
+      "Above 30%"
+    ]
+  },
+  "popup": {
+    "header": "region",
+    "body": "Malaria Incidence: {{malaria}}"
+  },
+  "credit": "MoH Kenya 2017",
+  "visible": false
+}

@@ -2,33 +2,47 @@
   "APP": {
     "mapConfig": {
       "container": "map",
-      "style": "mapbox://styles/ona/cj13lidxb00062rpd2o5vph3q",
+      "style": "mapbox://styles/mapbox/light-v9",
       "center": [
-        -10.80854635834262,
-        6.326478251964455
+        36.25523246528451,
+        0.3479203009165701
       ],
-      "zoom": 16
+      "zoom": 5.731788351807636
     },
     "accessToken": "pk.eyJ1Ijoib25hIiwiYSI6ImNqYjJudzFtcDhnNmkycXFlY3ZoMW9scGsifQ.Q9YHAvRPKAzxycV_rQ4_zg",
-    "appIcon": "gisida-sample.png",
-    "appName": "React Gisida",
+    "appIcon": "/assets/img/gisida-logo.png",
+    "appName": "GISIDA",
+    "appNameDesc": "This is a demo site for Gisida",
+    "appColor": "darkslategrey",
     "layersPath": "/layers"
   },
-  "LAYERS": [
-    "district-labels",
-    "region-labels",
-    "district-boundaries",
-    "region-boundaries",
-    "monrovia"
-  ],
   "STYLES": [
     {
-      "label": "Satelitte",
+      "label": "Light",
+      "style": "mapbox://styles/mapbox/light-v9"
+    },
+    {
+      "label": "Streets",
+      "style": "mapbox://styles/mapbox/streets-v9"
+    },
+    {
+      "label": "Satellite",
       "style": "mapbox://styles/mapbox/satellite-v9"
     },
     {
-      "label": "Satelitte Streets",
+      "label": "Satellite Streets",
       "style": "mapbox://styles/mapbox/satellite-streets-v9"
     }
+  ],
+  "LAYERS": [
+    "county-boundaries",
+    "county-labels",
+    "ken-health-sites",
+    "health-spending",
+    "bednets",
+    "ken-health-sites-completeness",
+    "health-spending",
+    "health-spending-circles",
+    "malaria"
   ]
 }

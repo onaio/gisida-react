@@ -51,7 +51,6 @@ class Map extends Component {
     if (isLoaded && layers && Object.keys(layers).length > 0) {
       Object.keys(layers).forEach((key) => {
         const layer = layers[key];
-        console.log(layer, " - is lodaed = ", layer.loaded);
         if (layer.loaded) {
           addLayer(this.map, layer);
         }
