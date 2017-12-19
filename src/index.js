@@ -5,6 +5,7 @@ import App from './components/App/App';
 import Menu from './components/Menu/Menu';
 import Map from './components/Map/Map';
 import StyleSelector from './components/StyleSelector/StyleSelector';
+import Legend from './components/Legend/Legend';
 import registerServiceWorker from './registerServiceWorker';
 
 import { initStore } from 'gisida';
@@ -18,6 +19,7 @@ ReactDOM.render(
         <Map />
         <Menu />
         <StyleSelector />
+        <Legend />
       </App>
     </Provider>
   ),

@@ -52,7 +52,7 @@ class Map extends Component {
       Object.keys(layers).forEach((key) => {
         const layer = layers[key];
         if (layer.loaded) {
-          addLayer(this.map, layer);
+          addLayer(this.map, layer, mapConfig);
         }
       }); 
     }
