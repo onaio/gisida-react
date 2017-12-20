@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './TimeSeriesSlider.css';
+import './TimeSeriesSlider.scss';
 
 function TimeSeriesSlider(props) {
   return (

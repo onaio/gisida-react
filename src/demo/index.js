@@ -1,13 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import App from './components/App/App';
-import Menu from './components/Menu/Menu';
-import Map from './components/Map/Map';
-import StyleSelector from './components/StyleSelector/StyleSelector';
-import Legend from './components/Legend/Legend';
+import App from '../lib/components/App/App';
+import Menu from '../lib/components/Menu/Menu';
+import Map from '../lib/components/Map/Map';
+import StyleSelector from '../lib/components/StyleSelector/StyleSelector';
+import Legend from '../lib/components/Legend/Legend';
 import registerServiceWorker from './registerServiceWorker';
-
 import { initStore } from 'gisida';
 
 const store = initStore();

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Actions, addLayer } from 'gisida';
 import { formatNum, getLastIndex } from '../../utils'
 
-import './Map.css';
+import './Map.scss';
 
 const mapboxgl = require('mapbox-gl');
 
