@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import './Menu.css';
 import PropTypes from 'prop-types';
 import Layers from '../Layers/Layers';
 import { groupBy } from '../../utils'
+import './Menu.scss';
 
 const mapStateToProps = (state, ownProps) => {
   const categories = [];
