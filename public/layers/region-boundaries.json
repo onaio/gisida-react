@@ -1,0 +1,16 @@
+{
+  "label": "Region boundaries",
+  "source": {
+    "type": "vector",
+    "layer": "som_adm_1-6k13xf",
+    "url": "mapbox://ona.bnc2rzsw"
+  },
+  "type": "line",
+  "paint": {
+    "line-width": 2,
+    "line-color": "#444",
+    "line-opacity": 0.6
+  },
+  "visible": true,
+  "category": "Boundaries"
+}

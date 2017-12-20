@@ -1,7 +1,6 @@
 {
-  "name": "react-gisida",
-  "version": "0.1.0",
-  "private": true,
+  "name": "gisida-react",
+  "version": "0.0.1",
   "dependencies": {
     "gisida": "file:../gisida",
     "mapbox-gl": "^0.41.0",
@@ -16,5 +15,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "node-sass": "^4.7.2",
+    "sass-loader": "^6.0.6"
   }
 }

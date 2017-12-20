@@ -2,26 +2,24 @@ import React from 'react'
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import App from './components/App/App';
-import registerServiceWorker from './registerServiceWorker';
-import MapContainer from './containers/MapContainer';
-import MenuContainer from './containers/MenuContainer'
-import StyleSelectorContainer from './containers/StyleSelectorContainer';
-import { MAP } from './reducers/Reducers';
-
-
 import Menu from './components/Menu/Menu';
+import Map from './components/Map/Map';
+import StyleSelector from './components/StyleSelector/StyleSelector';
+import Legend from './components/Legend/Legend';
+import registerServiceWorker from './registerServiceWorker';
 
 import { initStore } from 'gisida';
 
-const store = initStore({ MAP });
+const store = initStore();
 
 ReactDOM.render(
   (
     <Provider store={store}>
       <App>
-        <MapContainer />
-        <MenuContainer />
-        <StyleSelectorContainer />
+        <Map />
+        <Menu />
+        <StyleSelector />
+        <Legend />
       </App>
     </Provider>
   ),

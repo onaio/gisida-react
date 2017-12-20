@@ -1,0 +1,45 @@
+{
+  "label": "% People Sleeping Under Bednets",
+  "source": {
+    "type": "vector",
+    "layer": "KEN_Adm1-1rmsg5",
+    "url": "mapbox://ona.0daagepb",
+    "data": "data/health_spending_per_capita.csv",
+    "join": [
+      "Adm1Name",
+      "County"
+    ]
+  },
+  "type": "fill",
+  "property": "bednet",
+  "categories": {
+    "breaks": "yes",
+    "color": "Blues",
+    "clusters": 7
+  },
+  "labels": {
+    "data": "data/health_spending_per_capita.csv",
+    "label": "{{Heath_Spending_Per_Person_}}",
+    "join": [
+      "Adm1Name",
+      "County"
+    ],
+    "coordinates": [
+      "longitude",
+      "latitude"
+    ],
+    "minZoom": 4.5,
+    "height": 30,
+    "width": 30,
+    "offset": [
+      -18,
+      10
+    ]
+  },
+  "popup": {
+    "header": "region",
+    "body": " Health Spending per person: {{Heath_Spending_Per_Person_}}%"
+  },
+  "visible": false,
+  "credit": "Health Spending Per Capita"
+}
