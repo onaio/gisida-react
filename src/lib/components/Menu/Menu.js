@@ -63,9 +63,9 @@ class Menu extends Component {
     const categories = this.props.categories;
     return (
       <div id={`${menuId}-wrapper`} className="sectors-menu-wrapper">
-        <a href="#" onClick={e => this.onToggleMenu(e)} className="open-btn"><span className="glyphicon glyphicon-list" /></a>
+        <a href="#" onClick={e => this.onToggleMenu(e)} className="open-btn"><i className="fa fa-bars" aria-hidden="true" /></a>
         <div id={menuId} className="sectors-menu">
-          <a className="open-btn" onClick={e => this.onToggleMenu(e)} href="#"><span className="glyphicon glyphicon-remove" /></a>
+          <a className="close-btn" onClick={e => this.onToggleMenu(e)} href="#"><i className="fa fa-remove" aria-hidden="true" /></a>
           <ul className="sectors">
             {(categories && categories.length) > 0 ?
               categories.map((category, i) =>

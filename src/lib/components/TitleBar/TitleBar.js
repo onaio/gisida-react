@@ -26,7 +26,7 @@ const TitleBar = ({ appConfig = f => f }) =>
         <span className="white">{appConfig.appName}</span>&nbsp;&nbsp; {appConfig.appNameDesc}</div>
     </div>
     {appConfig.password ?
-      <a className="sign-out" onClick={logOut} role="button" tabIndex={0}><span className="glyphicon glyphicon-log-out" /></a>
+      <a className="sign-out" onClick={logOut} role="button" tabIndex={0}><i className="fa fa-sign-out" aria-hidden="true" /></a>
       : ''}
     <a
       className="ona-logo"
