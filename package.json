@@ -110,7 +110,7 @@
     "extends": "react-app"
   },
   "dependencies": {
-    "gisida": "file:../gisida",
+    "gisida": "0.0.1",
     "react-redux": "^5.0.6"
   }
 }
