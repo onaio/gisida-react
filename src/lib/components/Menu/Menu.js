@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types';
+import $ from 'jquery';
 import Layers from '../Layers/Layers';
 import { groupBy } from '../../utils'
 import './Menu.scss';
@@ -32,7 +33,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     categories: categories,
     // todo: provide missing props
-    menuId: '',
+    menuId: 'sector-menu-1',
     mapTargetId: '',
   }
 }
@@ -41,10 +42,19 @@ class Menu extends Component {
 
   onToggleMenu = (e) => {
     // todo: Show/Hide Menu
+    const mapId  = 'map-1'
+    e.preventDefault();
+    const $wrapper = $(e.target).parents('.sectors-menu-wrapper');
+    $wrapper.find('.sectors-menu').toggle();
+    $wrapper.find('.open-btn').toggle();
+    // todo - move this into the state....
+    $(window).trigger('toggleSector', { mapId, sectorsId: $wrapper.attr('id') });
   }
 
   onCategoryClick= (e) => {
     //todo: Expand/Collapes layer categories sub-menu
+    e.preventDefault();
+    $(e.target).parent('li').find('.layers').toggle();
   }
 
   render() {
@@ -53,9 +63,9 @@ class Menu extends Component {
     const categories = this.props.categories;
     return (
       <div id={`${menuId}-wrapper`} className="sectors-menu-wrapper">
-        <a href="#" onClick={e => this.onToggleMenu(e)} className="open-btn"><span className="glyphicon glyphicon-list" /></a>
+        <a href="#" onClick={e => this.onToggleMenu(e)} className="open-btn"><i className="fa fa-bars" aria-hidden="true" /></a>
         <div id={menuId} className="sectors-menu">
-          <a className="open-btn" onClick={e => this.onToggleMenu(e)} href="#"><span className="glyphicon glyphicon-remove" /></a>
+          <a className="close-btn" onClick={e => this.onToggleMenu(e)} href="#"><i className="fa fa-remove" aria-hidden="true" /></a>
           <ul className="sectors">
             {(categories && categories.length) > 0 ?
               categories.map((category, i) =>
@@ -79,7 +89,7 @@ class Menu extends Component {
 }
 
 Menu.propTypes = {
-  // menuId: PropTypes.string.isRequired,
+  menuId: PropTypes.string.isRequired,
   // mapTargetId: PropTypes.string.isRequired,
   categories: PropTypes.arrayOf(PropTypes.any).isRequired,
 };

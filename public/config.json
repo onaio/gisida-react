@@ -10,9 +10,9 @@
       "zoom": 5.731788351807636
     },
     "accessToken": "pk.eyJ1Ijoib25hIiwiYSI6ImNqYjJudzFtcDhnNmkycXFlY3ZoMW9scGsifQ.Q9YHAvRPKAzxycV_rQ4_zg",
-    "appIcon": "/assets/img/gisida-logo.png",
+    "appIcon": "/img/gisida-logo.png",
     "appName": "GISIDA",
-    "appNameDesc": "This is a demo site for Gisida",
+    "appNameDesc": "This is a demo site for Gisida React Components",
     "appColor": "darkslategrey",
     "layersPath": "/layers"
   },

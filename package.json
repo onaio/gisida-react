@@ -54,6 +54,7 @@
     "react": "^16.2",
     "react-dev-utils": "^4.2.1",
     "react-dom": "^16.2.0",
+    "react-error-overlay": "1.0.10",
     "sass-loader": "^6.0.6",
     "style-loader": "0.18.2",
     "sw-precache-webpack-plugin": "0.11.4",
@@ -110,7 +111,6 @@
   },
   "dependencies": {
     "gisida": "file:../gisida",
-    "react-error-overlay": "1.0.10",
     "react-redux": "^5.0.6"
   }
 }
