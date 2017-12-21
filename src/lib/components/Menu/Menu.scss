@@ -4,68 +4,69 @@
   height: 100%;
   color: #555;
   z-index: 1000;
-  overflow-y: scroll;
   background: #f7f6ef;
   box-shadow: 0 1px 7px rgba(0, 0, 0, 0.4);
-}
 
-.sectors-menu .close-btn {
-  position: absolute;
-  right: 15px;
-  top: 15px;
-  z-index: 1000;
-  color: #555;
-  display: block;
-}
-
-.sectors-menu ul {
-  list-style-type: none;
-}
-
-.sectors-menu .sectors {
-  padding: 0;
-  overflow-y: scroll;
-}
-
-.sectors-menu .sectors li.sector a {
+  .close-btn {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    z-index: 1000;
     color: #555;
     display: block;
-    font-weight: 600;
-    padding: 25px 15px;
-    background: rgba(255, 255, 255, 0.4);
-    border-bottom: 1px solid #eee;
-}
+  }
 
-.sectors-menu .sectors li.sector a:hover,
-.sectors-menu.sectors li.sector a:focus {
-   text-decoration: none;
-   color: #555;
-}
+  ul {
+    list-style-type: none;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
 
-.sectors-menu .layers {
-  padding: 20px 0 20px 20px;
-  /* display: none; */
-}
+  .sectors {
+    padding: 0;
 
- .sectors-menu .layers  li.layer {
-    position: relative;
+    li.sector a {
+      color: #555;
+      display: block;
+      font-weight: 600;
+      padding: 25px 15px;
+      background: rgba(255, 255, 255, 0.4);
+      border-bottom: 1px solid #eee;
+      text-decoration: none;
+
+      &:hover,
+      &:focus {
+        text-decoration: none;
+        color: #555;
+      }
+    }
+  }
+
+  .layers {
+    padding: 20px 0 20px 20px;
+    display: none;
+
+    li.layer {
+      position: relative;
+      display: block;
+      width: 100%;
+    }
+  }
+
+  label {
+    color: #555;
+    font-weight: normal;
+    font-size: 12px;
+    width: 80%;
     display: block;
-    width: 100%;
-}
+    margin: 0 0 10px 20px;
+  }
 
-.sectors-menu label {
-  color: #555;
-  font-weight: normal;
-  font-size: 12px;
-  width: 80%;
-  display: block;
-  margin: 0 0 10px 20px;
-}
-
- .sectors-menu input[type='checkbox'] {
-  position: absolute;
-  left: 0;
-  top: -2px;
+  input[type='checkbox'] {
+    position: absolute;
+    left: 0;
+    top: -2px;
+  }
 }
 
 .open-btn {
@@ -94,6 +95,7 @@
   height: 100%;
   top: 0;
   left: 80px;
+  overflow: auto;
 }
 
 #sector-menu-2 {
@@ -102,4 +104,3 @@
   left: 52%;
   display: none;
 }
-
