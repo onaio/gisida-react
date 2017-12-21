@@ -3657,8 +3657,9 @@ getpass@^0.1.1:
   dependencies:
     assert-plus "^1.0.0"
 
-"gisida@file:../gisida":
+gisida@0.0.1:
   version "0.0.1"
+  resolved "https://registry.yarnpkg.com/gisida/-/gisida-0.0.1.tgz#c66e63e3c2852614365c74cc35da1456ffa239fb"
   dependencies:
     babel-core v6.25.0
     babel-loader v6.4.1
