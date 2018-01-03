@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types';
-import $ from 'jquery';
 import Layers from '../Layers/Layers';
 import { groupBy } from '../../utils'
 import './Menu.scss';
@@ -17,7 +16,7 @@ const mapStateToProps = (state, ownProps) => {
   const grouped = groupBy(layers, 'category');
   
   // Add layers to categories
-  grouped.map((group) => {
+  grouped.forEach(group => {
     if (group[0].hasOwnProperty('category')) {
       categories.push({
         layers: group,
@@ -63,23 +62,27 @@ class Menu extends Component {
     const categories = this.props.categories;
     return (
       <div id={`${menuId}-wrapper`} className="sectors-menu-wrapper">
-        <a href="#" onClick={e => this.onToggleMenu(e)} className="open-btn"><i className="fa fa-bars" aria-hidden="true" /></a>
+        <a onClick={e => this.onToggleMenu(e)} className="open-btn">
+          <i className="fa fa-bars" aria-hidden="true" />
+        </a>
         <div id={menuId} className="sectors-menu">
-          <a className="close-btn" onClick={e => this.onToggleMenu(e)} href="#"><i className="fa fa-remove" aria-hidden="true" /></a>
+          <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
+            <i className="fa fa-remove" aria-hidden="true" />
+          </a>
           <ul className="sectors">
             {(categories && categories.length) > 0 ?
               categories.map((category, i) =>
                 // eslint-disable-next-line react/no-array-index-key
-                (<li className="sector" key={i}><a href="#" onClick={e => this.onCategoryClick(e)}>{category.category} <span className="caret" /></a>
-                  {
-                    // todo - create LayersContainer to handle layer related state changes
-                  }
+                (<li className="sector" key={i}>
+                  <a onClick={e => this.onCategoryClick(e)}>{category.category}
+                    <span className="caret" />
+                  </a>
                   <Layers
                     mapTargetId={mapTargetId}
                     layers={category.layers}
                   />
                 </li>)) :
-              <li>No categories defined</li>
+              <li></li>
             }
           </ul>
         </div>
