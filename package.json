@@ -107,7 +107,11 @@
     ]
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "globals": {
+      "mapboxgl": true,
+      "$": true
+    }
   },
   "dependencies": {
     "gisida": "0.0.1",

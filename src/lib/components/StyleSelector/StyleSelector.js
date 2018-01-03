@@ -23,7 +23,7 @@ class StyleSelector extends Component {
     return (
       <div className="leaflet-left leaflet-top leaflet-right layer-selector">
         <div aria-haspopup="true" className="leaflet-control leaflet-control-layers">
-          <a title="styles" className="leaflet-control-layers-toggle" />
+          <a title="styles" className="leaflet-control-layers-toggle"> </a>
           <form className="leaflet-control-layers-list">
             <div className="leaflet-control-layers-base">
               {(style && styles.length) ?
