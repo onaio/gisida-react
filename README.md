@@ -1,4 +1,10 @@
-## Gisida-react
+## gisida-react
+ <h1 align="center">
+<img src="http://gisida.onalabs.org/resources/img/gisida-logo.png" width="90" />
+<img src="http://icons.veryicon.com/ico/System/Icons8%20Metro%20Style/Mathematic%20Plus2.ico" width="100" />
+<img src="https://raw.githubusercontent.com/rexxars/react-hexagon/HEAD/logo/react-hexagon.png" width="85" />
+</h1>
+ 
  React Dashboard library for [gisida](https://github.com/onaio/gisida). Includes a collection of standard componets used to build a Map Dashboard and provides functionality to also render custom components. 
 
  ## Installation
@@ -47,8 +53,8 @@ Example:
 
 ```javascript
 class CustomComponent extends React.Component {
-	render() {
-		return (
+  render() {
+    return (
       <div>
         <h1>A Simple React Component Example</h1>
       </div>
