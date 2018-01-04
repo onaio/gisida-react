@@ -71,3 +71,37 @@ class CustomComponent extends React.Component {
 ```
 
 - To have your compoent use the gisida state as props use [redux connect](https://github.com/reactjs/react-redux/blob/master/docs/api.md#connectmapstatetoprops-mapdispatchtoprops-mergeprops-options). Gisida-react componets also provide a good example of how to achieve this.
+
+
+
+## Development
+
+
+### Local development
+- Clone repo:
+```
+$ git clone git@github.com:onaio/gisida-react.git
+```
+
+- Run development server:
+
+```
+$ npm start
+```
+or 
+```
+$ yarn start
+```
+
+### Prodcution build 
+
+- Build production distribution
+```
+$ npm build
+```
+
+or 
+
+```
+$ yarn build
+```
