@@ -9,6 +9,7 @@ const mapStateToProps = (state, ownProps) => {
     accessToken: state.APP.accessToken,
     layers: state.LAYERS,
     isLoaded: state.MAP.isLoaded,
+    regions: state.REGIONS
   }
 }
 
@@ -37,6 +38,7 @@ class Map extends Component {
     const layers = nextProps.layers;
     const accessToken = nextProps.accessToken
     const mapConfig = nextProps.mapConfig;
+    const regions = nextProps.regions
   
     // Check if map isLoad and initialize.
     if (!isLoaded) {
@@ -50,8 +52,15 @@ class Map extends Component {
         if (layer.loaded) {
           addLayer(this.map, layer, mapConfig);
         }
-      }); 
+      });
     }
+    // Check if there is a change in regions
+    regions.forEach((region) => {
+      if (region.current) {
+        this.map.setCenter(region.center);
+        this.map.setZoom(region.zoom);
+      }
+    });
   }
 
   render() {

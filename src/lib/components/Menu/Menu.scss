@@ -51,6 +51,15 @@
       display: block;
       width: 100%;
     }
+
+    li.region {
+      margin-bottom: 5px;
+      
+      label {
+        display: inline;
+        margin: 0 0 10px 5px;
+      }
+    }
   }
 
   label {
