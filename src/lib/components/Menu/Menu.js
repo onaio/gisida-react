@@ -93,7 +93,7 @@ class Menu extends Component {
                         type="radio"
                         value={region.name}
                         checked={!!region.current}
-                        onClick={e => this.onRegionClick(e)}
+                        onChange={e => this.onRegionClick(e)}
                       />
                       <label htmlFor={region.name}>{region.name}</label>
                     </li>)) :
