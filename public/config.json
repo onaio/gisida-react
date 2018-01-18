@@ -44,5 +44,23 @@
     "health-spending",
     "health-spending-circles",
     "malaria"
+  ],
+  "REGIONS": [
+    {
+      "name": "Kenya",
+      "center": [
+        36.25523246528451,
+        0.3479203009165701
+      ],
+      "zoom": 5.731788351807636
+    },
+    {
+      "name": "USA",
+      "center": [
+        -98,
+        38.88
+      ],
+      "zoom": 3
+    }
   ]
 }
