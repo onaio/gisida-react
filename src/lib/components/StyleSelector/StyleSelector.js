@@ -36,7 +36,7 @@ class StyleSelector extends Component {
                       type="radio"
                       name="leaflet-base-layers"
                       className="leaflet-control-layers-selector"
-                      value={s.style}
+                      value={s.url}
                       onClick={e => this.changeStyle(e)}
                       checked={!!s.current}
                     />
