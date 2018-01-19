@@ -8,22 +8,13 @@
  React Dashboard library for [gisida](https://github.com/onaio/gisida). Includes a collection of standard componets used to build a Map Dashboard and provides functionality to also render custom components. 
 
  ## Installation
-
 ```
 $ npm install gisida-react
 ```
-
-or
-
-```
-$ yarn add gisida-react
-```
-### Depencies
- - Gisida `$ npm install gisida` or `$ yarn add gisida-react`
+**NOTE:** You can alternetively use [`yarn`](https://yarnpkg.com/en/docs/getting-started) to manage your node packages.
 
 
 ## Usage
-
  ```javascript
 import React from 'react'
 import ReactDOM from 'react-dom';
@@ -66,7 +57,7 @@ class CustomComponent extends React.Component {
     <App>
       <Map />
       <CustomComponent />
-      </ App>
+      </App>
   </Provider>
 ```
 
@@ -83,14 +74,17 @@ class CustomComponent extends React.Component {
 $ git clone git@github.com:onaio/gisida-react.git
 ```
 
-- Run development server:
+#### Run development server:
 
 ```
 $ npm start
 ```
-or 
+
+
+#### Run development build without server:
+
 ```
-$ yarn start
+$ npm develop
 ```
 
 ### Prodcution build 
@@ -100,8 +94,7 @@ $ yarn start
 $ npm build
 ```
 
-or 
-
+- Publish to npm
 ```
-$ yarn build
+$ npm publish
 ```
