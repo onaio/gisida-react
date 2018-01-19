@@ -6,7 +6,6 @@ import './Map.scss';
 const mapStateToProps = (state, ownProps) => {
   return {
     APP: state.APP,
-    LAYERS: state.LAYERS,
     STYLES: state.STYLES,
     REGIONS: state.REGIONS,
     MAP: state.MAP
