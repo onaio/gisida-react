@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, addLayer } from 'gisida';
+import { Actions, addLayer, addPopUp } from 'gisida';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -47,6 +47,7 @@ class Map extends Component {
   }
 
   addMouseEvents() {
+    addPopUp(this);
     // this.addMapClickEvents()
     // this.addMouseMoveEvents()
     // etc
