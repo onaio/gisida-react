@@ -62,7 +62,7 @@ class Map extends Component {
     const reloadLayers = nextProps.MAP.reloadLayers;
 
 
-    const layers = nextProps.LAYERS;
+    const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES;
     const regions = nextProps.REGIONS;
 

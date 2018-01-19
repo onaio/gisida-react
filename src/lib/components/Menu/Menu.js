@@ -10,8 +10,8 @@ const mapStateToProps = (state, ownProps) => {
   const categories = [];
   const layers = [];
   // Get list of layers in state.LAYERS;
-  for (var key in state.LAYERS) {
-    layers.push(state.LAYERS[key]);
+  for (var key in state.MAP.layers) {
+    layers.push(state.MAP.layers[key]);
   } 
   // Group layers using category property
   const grouped = groupBy(layers, 'category');
