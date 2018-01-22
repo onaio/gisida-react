@@ -71,39 +71,39 @@ class Menu extends Component {
     return (
       <div id={`${menuId}-wrapper`} className="sectors-menu-wrapper">
         <a onClick={e => this.onToggleMenu(e)} className="open-btn">
-          <i className="fa fa-bars" aria-hidden="true" />
+          <span className="glyphicon glyphicon-menu-hamburger"></span>
         </a>
         <div id={menuId} className="sectors-menu">
           <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
-            <i className="fa fa-remove" aria-hidden="true" />
+            <span className="glyphicon glyphicon-remove"></span>  
           </a>
           <ul className="sectors">
-            <li className="sector">
-              <a onClick={e => this.onCategoryClick(e)}>Regions
+            {regions && regions.length ?
+              <li className="sector">
+                <a onClick={e => this.onCategoryClick(e)}>Regions
                 <span className="caret" />
-              </a>
-              <ul className="layers">
-                {(regions && regions.length) > 0 ?
-                  regions.map((region, i) =>
-                    (<li className={`region ${mapTargetId}`} key={region.name}>
-                      <input
-                        id={region.name}
-                        key={region.name}  
-                        name="region"
-                        type="radio"
-                        value={region.name}
-                        checked={!!region.current}
-                        onChange={e => this.onRegionClick(e)}
-                      />
-                      <label htmlFor={region.name}>{region.name}</label>
-                    </li>)) :
-                  <li></li>
-                }  
-              </ul>
-            </li>  
+                </a>
+                <ul className="layers">
+                  {regions && regions.length ?
+                    regions.map((region, i) =>
+                      (<li className={`region ${mapTargetId}`} key={region.name}>
+                        <input
+                          id={region.name}
+                          key={region.name}
+                          name="region"
+                          type="radio"
+                          value={region.name}
+                          checked={!!region.current}
+                          onChange={e => this.onRegionClick(e)}
+                        />
+                        <label htmlFor={region.name}>{region.name}</label>
+                      </li>)) :
+                    <li></li>
+                  }
+                </ul>
+              </li>: <li/> }
             {(categories && categories.length) > 0 ?
               categories.map((category, i) =>
-                // eslint-disable-next-line react/no-array-index-key
                 (<li className="sector" key={i}>
                   <a onClick={e => this.onCategoryClick(e)}>{category.category}
                     <span className="caret" />
