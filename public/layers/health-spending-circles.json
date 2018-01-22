@@ -34,5 +34,6 @@
     ]
   },
   "credit": "% Health spending per person",
-  "visible": false
+  "visible": false,
+  "category": "Indicators"
 }
