@@ -9,11 +9,11 @@ import './Menu.scss';
 const mapStateToProps = (state, ownProps) => {
   const categories = [];
   const layers = [];
-  // Get list of layers in state.LAYERS;
+  // populate layers array with layer objects in state.MAP.layers;
   for (var key in state.MAP.layers) {
     layers.push(state.MAP.layers[key]);
   } 
-  // Group layers using category property
+  // Group layers by category property
   const grouped = groupBy(layers, 'category');
   
   // Add layers to categories
