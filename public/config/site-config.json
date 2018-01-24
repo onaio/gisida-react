@@ -10,7 +10,7 @@
       "zoom": 5.731788351807636
     },
     "accessToken": "pk.eyJ1Ijoib25hIiwiYSI6ImNqYjJudzFtcDhnNmkycXFlY3ZoMW9scGsifQ.Q9YHAvRPKAzxycV_rQ4_zg",
-    "appIcon": "/img/gisida-logo.png",
+    "appIcon": "/assets/img/gisida-logo.png",
     "appName": "GISIDA",
     "appNameDesc": "This is a demo site for Gisida",
     "appColor": "darkslategrey",
