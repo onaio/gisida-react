@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, addLayer } from 'gisida';
+import { Actions, addLayer, addPopUp } from 'gisida';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
   return {
     APP: state.APP,
-    LAYERS: state.LAYERS,
     STYLES: state.STYLES,
     REGIONS: state.REGIONS,
     MAP: state.MAP
@@ -30,7 +29,7 @@ class Map extends Component {
         this.props.dispatch(Actions.mapLoaded(true));
       });
 
-      //Handle Style Change Event
+      // Handle Style Change Event
       this.map.on('style.load', (e) => {
         let mapLoad = false;
         // Render Event listner function for style load
@@ -47,6 +46,7 @@ class Map extends Component {
   }
 
   addMouseEvents() {
+    addPopUp(this.map, this.props.dispatch);
     // this.addMapClickEvents()
     // this.addMouseMoveEvents()
     // etc
@@ -62,7 +62,7 @@ class Map extends Component {
     const reloadLayers = nextProps.MAP.reloadLayers;
 
 
-    const layers = nextProps.LAYERS;
+    const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES;
     const regions = nextProps.REGIONS;
 
@@ -73,14 +73,14 @@ class Map extends Component {
     // Check if rendererd map has finished loading
     if (isLoaded) {
 
-      // Set current Style
+      // Set current style (basemap)
       styles.forEach((style) => {
         if (style.current && this.props.MAP.currentStyle !== currentStyle) {
           this.map.setStyle(style.url);
         }
       });
 
-      // Zoom to current region
+      // Zoom to current region (center and zoom)
       regions.forEach((region) => {
         if (region.current) {
           this.map.easeTo({
@@ -101,6 +101,7 @@ class Map extends Component {
         });
       }
     }
+    // Assign global variable for debugging purposes.
     window.GisidaMap = this.map;
   }
 

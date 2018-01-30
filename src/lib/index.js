@@ -8,4 +8,3 @@ import Legend from './components/Legend/Legend';
 export {
  App, TitleBar, Menu, Map, StyleSelector, Legend
 };
-

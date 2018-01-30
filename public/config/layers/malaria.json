@@ -38,5 +38,6 @@
     "body": "Malaria Incidence: {{malaria}}"
   },
   "credit": "MoH Kenya 2017",
-  "visible": false
+  "visible": false,
+  "category": "Indicators"
 }

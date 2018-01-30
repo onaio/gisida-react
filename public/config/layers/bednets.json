@@ -41,5 +41,6 @@
     "body": " Health Spending per person: {{Heath_Spending_Per_Person_}}%"
   },
   "visible": false,
-  "credit": "Health Spending Per Capita"
+  "credit": "Health Spending Per Capita",
+  "category": "Indicators"
 }

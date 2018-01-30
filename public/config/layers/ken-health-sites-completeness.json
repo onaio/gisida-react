@@ -72,5 +72,6 @@
     ]
   },
   "credit": "% Completeness",
-  "visible": false
+  "visible": false,
+  "category": "Indicators"
 }
