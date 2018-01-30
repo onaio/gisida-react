@@ -46,7 +46,7 @@ class Map extends Component {
   }
 
   addMouseEvents() {
-    addPopUp(this);
+    addPopUp(this.map, this.props.dispatch);
     // this.addMapClickEvents()
     // this.addMouseMoveEvents()
     // etc
