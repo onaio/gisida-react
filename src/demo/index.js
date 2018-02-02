@@ -7,6 +7,7 @@ import Menu from '../lib/components/Menu/Menu';
 import Map from '../lib/components/Map/Map';
 import StyleSelector from '../lib/components/StyleSelector/StyleSelector';
 import Legend from '../lib/components/Legend/Legend';
+import FilterSelector from '../lib/components/FilterSelector/FilterSelector';
 import registerServiceWorker from './registerServiceWorker';
 import { initStore } from 'gisida';
 

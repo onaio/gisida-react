@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, addLayer, addPopUp } from 'gisida';
+import { Actions, addLayers, addPopUp } from 'gisida';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -93,12 +93,9 @@ class Map extends Component {
 
       // Add current layers to map
       if (this.props.MAP.reloadLayers !== reloadLayers) {
-        Object.keys(layers).forEach((key) => {
-          const layer = layers[key];
-          if (layer.loaded) {
-            addLayer(this.map, layer, mapConfig);
-          }
-        });
+        addLayers(this.map, layers, mapConfig)
+        // Action sort layers should come here
+        // sortLayers(map);
       }
     }
     // Assign global variable for debugging purposes.

@@ -30,12 +30,18 @@ const mapStateToProps = (state, ownProps) => {
       });
     }
   });
+
+  // Get current region
+  const currentRegion = state.REGIONS && state.REGIONS.length?
+    state.REGIONS.filter(region => region.current)[0].name: false;
+
   return {
     categories: categories,
     // todo: provide missing props
     menuId: 'sector-menu-1',
     mapTargetId: '',
-    regions: state.REGIONS
+    regions: state.REGIONS,
+    currentRegion: currentRegion,
   }
 }
 
@@ -68,6 +74,7 @@ class Menu extends Component {
     const mapTargetId = this.props.mapTargetId;
     const categories = this.props.categories;
     const regions = this.props.regions;
+    const currentRegion = this.props.currentRegion;
     return (
       <div id={`${menuId}-wrapper`} className="sectors-menu-wrapper">
         <a onClick={e => this.onToggleMenu(e)} className="open-btn">
@@ -111,6 +118,7 @@ class Menu extends Component {
                   <Layers
                     mapTargetId={mapTargetId}
                     layers={category.layers}
+                    currentRegion={currentRegion}
                   />
                 </li>)) :
               <li></li>

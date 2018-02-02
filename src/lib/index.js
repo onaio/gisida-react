@@ -3,8 +3,9 @@ import TitleBar from './components/TitleBar/TitleBar';
 import Menu from './components/Menu/Menu';
 import Map from './components/Map/Map';
 import StyleSelector from './components/StyleSelector/StyleSelector';
+import FilterSelector from '../lib/components/FilterSelector/FilterSelector';
 import Legend from './components/Legend/Legend';
 
 export {
- App, TitleBar, Menu, Map, StyleSelector, Legend
+  App, TitleBar, Menu, Map, StyleSelector, Legend, FilterSelector
 };
