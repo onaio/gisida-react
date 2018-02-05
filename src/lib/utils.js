@@ -33,3 +33,27 @@ export function groupBy(collection, property) {
   }
   return result;
 }
+
+export function detectIE() {
+  var ua = window.navigator.userAgent;
+
+  // IE 10
+  // ua = 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)';
+
+  // IE 11
+  // ua = 'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko';
+
+  var msie = ua.indexOf('MSIE ');
+  if (msie > 0) {
+    // IE 10 or older => return true
+    return true;
+  }
+
+  var trident = ua.indexOf('Trident/');
+  if (trident > 0) {
+    // IE 11 => return true
+    return true;
+  }
+  // other browser
+  return false;
+}

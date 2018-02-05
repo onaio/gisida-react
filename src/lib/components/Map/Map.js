@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, addLayer, addPopUp } from 'gisida';
+import { detectIE } from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -11,6 +12,8 @@ const mapStateToProps = (state, ownProps) => {
     MAP: state.MAP
   }
 }
+
+const isIE = detectIE();
 
 class Map extends Component {
 
@@ -67,7 +70,7 @@ class Map extends Component {
     const regions = nextProps.REGIONS;
 
     // Check if map is initialized.
-    if (!isRendered) {
+    if (!isRendered && (!isIE || mapboxgl.supported())) {
       this.initMap(accessToken, mapConfig);
     }
     // Check if rendererd map has finished loading
@@ -107,9 +110,12 @@ class Map extends Component {
 
   render() {
     return (
-      <div>
-        <div id='map' />
-      </div>  
+        <div>
+        {isIE || !mapboxgl.supported() ?
+        (<div className="alert alert-info">Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
+        </div>):
+            ( <div id='map' />)}
+        </div>
     );
   }
 }
