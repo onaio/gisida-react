@@ -8,14 +8,17 @@ require('./FilterSelector.scss');
 const mapStateToProps = (state, ownProps) => {
   const layers = state.MAP.layers;
   let layerObj;
-
+  // Get visible layer 
   Object.keys(layers).forEach((key) => {
     const layer = layers[key];
     if (layer.filterOptions && layer.visible) {
       layerObj = layer;
     }
   });
- 
+
+  // Set layer to undefined of layer is fro diffrent region
+  const currentRegion = state.REGIONS.filter(region => region.current)[0];
+  layerObj = (layerObj && layerObj.region === currentRegion.name) ? layerObj : undefined;
   return {
     layerObj: layerObj
   }
@@ -29,10 +32,7 @@ class FilterSelector extends React.Component {
     window.GisidaMap.removeLayer(layer.id);
     window.GisidaMap.removeSource(layer.id);
     // // dispach prepare layer if layer data  has not been loaded into props
-    
       prepareLayer(layer, dispatch, filterOptions);
-    
-
   }
 
   componentWillReceiveProps(nextProps) {
