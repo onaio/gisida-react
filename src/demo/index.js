@@ -29,6 +29,11 @@ if(isLoggedIn()) {
   ),
   rootElement);
 } else {
-  ReactDOM.render((<Login />), rootElement);
+  ReactDOM.render((
+    <Provider store={store}>
+      <Login />
+    </Provider>
+    ),
+  rootElement);
 }
 registerServiceWorker();

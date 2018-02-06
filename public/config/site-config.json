@@ -9,6 +9,10 @@
       ],
       "zoom": 5.731788351807636
     },
+    "loginConfig": {
+      "password": "gisida",
+      "loginColor": "#fff"
+    },
     "accessToken": "pk.eyJ1Ijoib25hIiwiYSI6ImNqYjJudzFtcDhnNmkycXFlY3ZoMW9scGsifQ.Q9YHAvRPKAzxycV_rQ4_zg",
     "appIcon": "/assets/img/gisida-logo.png",
     "appName": "GISIDA",
