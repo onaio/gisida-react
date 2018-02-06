@@ -6,13 +6,16 @@ import TitleBar from '../lib/components/TitleBar/TitleBar';
 import Menu from '../lib/components/Menu/Menu';
 import Map from '../lib/components/Map/Map';
 import StyleSelector from '../lib/components/StyleSelector/StyleSelector';
+import Login, { isLoggedIn } from '../lib/components/Login/Login';
 import Legend from '../lib/components/Legend/Legend';
 import registerServiceWorker from './registerServiceWorker';
 import { initStore } from 'gisida';
 
 const store = initStore();
+const rootElement = document.getElementById('root');
 
-ReactDOM.render(
+if(isLoggedIn()) {
+  ReactDOM.render(
   (
     <Provider store={store}>
       <App>
@@ -24,6 +27,8 @@ ReactDOM.render(
       </App>
     </Provider>
   ),
-  document.getElementById('root')
-);
+  rootElement);
+} else {
+  ReactDOM.render((<Login />), rootElement);
+}
 registerServiceWorker();
