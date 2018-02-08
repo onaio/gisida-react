@@ -35,6 +35,18 @@ class FilterSelector extends React.Component {
       prepareLayer(layer, dispatch, filterOptions);
   }
 
+  showCheckboxes = () => {
+    var checkboxes = document.getElementById("checkboxes");
+    if (!this.state.expanded) {
+      checkboxes.style.display = "block";
+      this.setState({ expanded: true });
+      
+    } else {
+      checkboxes.style.display = "none";
+      this.setState({ expanded: false });
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.layerObj && nextProps.layerObj.filterOptions) {
       let filterOptions = nextProps.layerObj.filterOptions.map((opt) => {
@@ -45,7 +57,10 @@ class FilterSelector extends React.Component {
       if (this.state && this.state.options) {
         filterOptions = filterOptions.concat([this.state.options]);
       }
-      this.setState({ options: Object.assign.apply(this, filterOptions) });
+      this.setState({
+        options: Object.assign.apply(this, filterOptions),
+        name: nextProps.layerObj["filter-label"]
+      });
     } else this.setState({ options: {} });
   }
 
@@ -57,27 +72,33 @@ class FilterSelector extends React.Component {
   }
 
   render() {
-    if (this.state && this.state.options) {
+    if (this.state && this.state.options && Object.keys(this.state.options).length>0) {
+      console.log(this.state.options)
       return (
-        <nav id="filter-group" className="filter-group">
-          {Object.keys(this.state.options).map(val =>
-            (<span key={`label_${val}`}>
-              <input
-                type="checkbox"
-                id={val}
-                key={`input_${val}`}
-                value={val}
-                onChange={(e) => {
-                  this.updateOptions(e.target.value);
-                }}
-                checked={this.state.options[val]}
-              />
-              <label htmlFor={val} key={`label_${val}`}>
-                {val}
-              </label>
-            </span>))
-          }
-        </nav>
+          <div className="multiselect">
+          <div className="selectBox" onClick={(e) => this.showCheckboxes()}>
+              <select>
+              <option>{this.state.name}</option>
+              </select>
+              <div className="overSelect"></div>
+            </div>
+            <div id="checkboxes">
+              {Object.keys(this.state.options).map(val =>
+              (<label key={`label_${val}`} htmlFor={val}>
+                  <input
+                    type="checkbox"
+                    id={val}
+                    key={`input_${val}`}
+                    value={val}
+                    onChange={(e) => {
+                      this.updateOptions(e.target.value);
+                    }}
+                    checked={this.state.options[val]}
+                />{val}
+              </label>))
+              }
+            </div>
+          </div>
       );
     }
     return (<nav />);

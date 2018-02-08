@@ -12,7 +12,7 @@ class Layer extends Component {
 
   onLayerToggle = (layer) => {
     const dispatch = this.props.dispatch;
-    
+
     // dispatch toggle layer 
     dispatch(Actions.toggleLayer(layer.id));
 
