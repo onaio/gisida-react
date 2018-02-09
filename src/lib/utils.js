@@ -57,3 +57,10 @@ export function detectIE() {
   // other browser
   return false;
 }
+
+export function catchZeroCountClicks(e) {
+  if (e.currentTarget && e.currentTarget.dataset && !Number(e.currentTarget.dataset.count)) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+}
