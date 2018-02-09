@@ -44,6 +44,8 @@ class Map extends Component {
         // add render listener for current style.load event
         e.target.on('render', onStyleLoad);
       });
+
+      // Dispach map rendered to indicate map was rendered
       this.props.dispatch(Actions.mapRendered());
     }
   }

@@ -73,7 +73,6 @@ class FilterSelector extends React.Component {
 
   render() {
     if (this.state && this.state.options && Object.keys(this.state.options).length>0) {
-      console.log(this.state.options)
       return (
           <div className="multiselect">
           <div className="selectBox" onClick={(e) => this.showCheckboxes()}>

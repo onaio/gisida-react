@@ -5,7 +5,8 @@ import Map from './components/Map/Map';
 import StyleSelector from './components/StyleSelector/StyleSelector';
 import FilterSelector from '../lib/components/FilterSelector/FilterSelector';
 import Legend from './components/Legend/Legend';
+import SummaryChart from './components/Charts/SummaryChart';
 
 export {
-  App, TitleBar, Menu, Map, StyleSelector, Legend, FilterSelector
+  App, TitleBar, Menu, Map, StyleSelector, Legend, FilterSelector, SummaryChart
 };
