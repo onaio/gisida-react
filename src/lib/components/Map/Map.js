@@ -115,6 +115,9 @@ class Map extends Component {
         (<div className="alert alert-info">Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
         </div>):
             ( <div id='map' />)}
+          <button
+            className="filterButton glyphicon glyphicon-filter"
+          />
         </div>
     );
   }
