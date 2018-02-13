@@ -1,24 +1,21 @@
 'use strict';
 
-process.env.BABEL_ENV = 'production';
-process.env.NODE_ENV = 'production';
+process.env.BABEL_ENV = 'development';
+process.env.NODE_ENV = 'development';
 
 const autoprefixer = require('autoprefixer');
-const webpack = require('webpack');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const paths = require('./paths');
-
-const shouldUseSourceMap = false;
 
 module.exports = {
   // Don't attempt to continue if there are any errors.
   bail: true,
   // Generate source maps
-  devtool: shouldUseSourceMap ? 'source-map' : false,
+  devtool: 'eval-source-map',
   entry: paths.appLibIndexJs,
   output: {
     path: paths.appBuild,
-    filename: 'index.js',
+    filename: 'gisida_react.js',
     libraryTarget: 'umd'
   },
   resolve: {
@@ -63,7 +60,7 @@ module.exports = {
             include: paths.appLibSrc,
             loader: require.resolve('babel-loader'),
             options: {
-              compact: true,
+              compact: false,
             },
           },
           // The notation here is somewhat confusing.
@@ -129,11 +126,6 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"development"',
-    })
-  ],
   externals: {
     'react': 'react',
     'react-dom': 'react-dom'
@@ -146,5 +138,4 @@ module.exports = {
     net: 'empty',
     tls: 'empty',
   },
-  watch: true
 }
