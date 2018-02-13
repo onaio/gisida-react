@@ -64,3 +64,28 @@ export function catchZeroCountClicks(e) {
     e.stopPropagation();
   }
 }
+
+export function isFiltered(options, isOriginal) {
+    const optionKeys = Object.keys(options);
+    let hasEnabled = false;
+    let hasDisabled = false;
+    let i;
+
+    // if original check for BOTH enabled and disabled options
+    if (isOriginal || typeof isOriginal === 'undefined') {
+      for (i = 0; i < optionKeys.length; i += 1) {
+        if (options[optionKeys[i]].count && options[optionKeys[i]].enabled) {
+          hasEnabled = true;
+        } else if (options[optionKeys[i]].count) {
+          hasDisabled = true;
+        }
+      }
+      return hasEnabled && hasDisabled;
+    }
+
+    // if filtered check for a single enabled option
+    for (i = 0; i < optionKeys.length; i += 1) {
+      if (options[optionKeys[i]].enabled) return true;
+    }
+    return false;
+  }

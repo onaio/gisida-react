@@ -1,4 +1,4 @@
-import React { Component }from 'react';
+import React, { Component }from 'react';
 import { connect } from 'react-redux';
 import { catchZeroCountClicks } from '../../utils';
 import PropTypes from 'prop-types';
@@ -15,14 +15,13 @@ class FilterSelector extends Component {
     this.state = Object.assign({}, this.props.filter, {
       isLinux: (window.navigator.platform.indexOf('Linux') !== -1),
     });
-    this.onSearchClear = this.onSearchClear.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState(nextProps.filter);
   }
 
-  onSearchClear(e, filterKey) {
+  onSearchClear = (e, filterKey) => {
     this.searchEl.value = '';
     this.props.searchFilterOptions(e, filterKey);
   }
@@ -58,7 +57,7 @@ class FilterSelector extends Component {
             key={optionKeys[i]}
             data-count={option.count}
             className={`optionLabel${option.enabled ? ' enabled' : ''}`}
-            onClick={(e) => { FilterSelector.catchZeroCountClicks(e); }}
+            onClick={(e) => { catchZeroCountClicks(e); }}
             role="presentation"
             tabIndex="-1"
           >
