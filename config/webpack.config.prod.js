@@ -18,7 +18,7 @@ module.exports = {
   entry: paths.appLibIndexJs,
   output: {
     path: paths.appBuild,
-    filename: 'index.js',
+    filename: 'gisida_react.js',
     libraryTarget: 'umd'
   },
   resolve: {
