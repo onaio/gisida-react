@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, addLayer, addPopUp } from 'gisida';
 import { detectIE } from '../../utils';
+import Filter from '../Filter/Filter';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -54,7 +55,66 @@ class Map extends Component {
     // this.addMouseMoveEvents()
     // etc
   }
-  
+
+  /*getLayerFilter(layerId) {
+    let layerObj;
+    for (let i = 0; i < this.state.layersObj.length; i += 1) {
+      layerObj = this.state.layersObj[i];
+      if (layerObj.id === layerId) {
+        return layerObj.filters && layerObj.filters.layerFilters;
+      }
+    }
+    return null;
+  }
+
+  setLayerFilter(layerId, filters) {
+    let nextLayerObj;
+    let featureLayerObj;
+    const nextLayersObj = [];
+    for (let i = 0; i < this.state.layersObj.length; i += 1) {
+      nextLayerObj = this.state.layersObj[i];
+      if (nextLayerObj.id === layerId) {
+        nextLayerObj.filters.layerFilters = filters;
+        featureLayerObj = Object.assign({}, nextLayerObj);
+      }
+      nextLayersObj.push(nextLayerObj);
+    }
+    this.setState({
+      layerObj: nextLayerObj,
+      layersObj: nextLayersObj,
+    }, () => {
+      this.buildFilters(featureLayerObj);
+    });
+  }
+
+  buildFilters(layerObj) {
+    const layerId = layerObj.id;
+    const filterKeys = Object.keys(layerObj.filters);
+    let filter;
+    const combinedFilters = ['all'];
+
+    // loop through filters object
+    for (let f = 0; f < filterKeys.length; f += 1) {
+      filter = layerObj.filters[filterKeys[f]];
+
+      if (filterKeys[f] === 'highlight') {
+        // handle highlight filter seperately
+        this.applyFilters(`${layerId}-highlight`, filter);
+      } else if (filter) {
+        // build out combined filters
+        combinedFilters.push(filter);
+      }
+    }
+
+    if (combinedFilters.length > 2) {
+      // if there are multiple filters apply as is
+      this.applyFilters(layerId, combinedFilters);
+    } else if (combinedFilters.length === 2) {
+      // if there is only one filter, apply the only one
+      this.applyFilters(layerId, combinedFilters[1]);
+    }
+  }*/
+
   componentWillReceiveProps(nextProps){
     const accessToken = nextProps.APP.accessToken;
     const mapConfig = nextProps.APP.mapConfig;
@@ -109,6 +169,7 @@ class Map extends Component {
   }
 
   render() {
+    console.log("props", this.props);
     return (
         <div>
         {isIE || !mapboxgl.supported() ?
@@ -118,6 +179,7 @@ class Map extends Component {
           <button
             className="filterButton glyphicon glyphicon-filter"
           />
+          {/* <Filter /> */}
         </div>
     );
   }
