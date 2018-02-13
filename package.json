@@ -2,7 +2,7 @@
   "name": "gisida-react",
   "version": "0.0.1",
   "description": "React Components Library for Gisida",
-  "main": "build/index.js",
+  "main": "build/gisida_react.js",
   "scripts": {
     "start": "node scripts/start.js",
     "develop": "node scripts/develop.js",
@@ -106,7 +106,8 @@
   "babel": {
     "presets": [
       "react-app"
-    ]
+    ],
+    "retainLines": true
   },
   "eslintConfig": {
     "extends": "react-app",
