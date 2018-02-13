@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, addLayer, addPopUp } from 'gisida';
+import { Actions, addLayer, addPopUp, prepareLayer } from 'gisida';
 import { detectIE } from '../../utils';
 import Filter from '../Filter/Filter';
 import './Map.scss';
@@ -17,7 +17,6 @@ const mapStateToProps = (state, ownProps) => {
 const isIE = detectIE();
 
 class Map extends Component {
-
   initMap(accessToken, mapConfig) {
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;
@@ -56,7 +55,14 @@ class Map extends Component {
     // etc
   }
 
-  /*getLayerFilter(layerId) {
+  applyFilters(layerId, filters) {
+    if (this.map.getLayer(layerId)) {
+      this.map.setFilter(layerId, filters);
+    }
+  }
+
+  getLayerFilter(layerId) {
+    console.log("state", this);
     let layerObj;
     for (let i = 0; i < this.state.layersObj.length; i += 1) {
       layerObj = this.state.layersObj[i];
@@ -113,7 +119,7 @@ class Map extends Component {
       // if there is only one filter, apply the only one
       this.applyFilters(layerId, combinedFilters[1]);
     }
-  }*/
+  }
 
   componentWillReceiveProps(nextProps){
     const accessToken = nextProps.APP.accessToken;
@@ -128,6 +134,8 @@ class Map extends Component {
     const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES;
     const regions = nextProps.REGIONS;
+
+    console.log("nextlayers", layers);
 
     // Check if map is initialized.
     if (!isRendered && (!isIE || mapboxgl.supported())) {
@@ -158,6 +166,7 @@ class Map extends Component {
       if (this.props.MAP.reloadLayers !== reloadLayers) {
         Object.keys(layers).forEach((key) => {
           const layer = layers[key];
+          console.log("id", layer.id);
           if (layer.loaded) {
             addLayer(this.map, layer, mapConfig);
           }
@@ -169,17 +178,17 @@ class Map extends Component {
   }
 
   render() {
-    console.log("props", this.props);
+    console.log("state", this.props);
     return (
         <div>
         {isIE || !mapboxgl.supported() ?
         (<div className="alert alert-info">Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
         </div>):
             ( <div id='map' />)}
-          <button
+          {this.props.MAP.showFilterBtn ? <button
             className="filterButton glyphicon glyphicon-filter"
-          />
-          {/* <Filter /> */}
+          /> : ''}
+          {/*  <Filter /> */}
         </div>
     );
   }
