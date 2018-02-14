@@ -54,73 +54,6 @@ class Map extends Component {
     // this.addMouseMoveEvents()
     // etc
   }
-
-  applyFilters(layerId, filters) {
-    if (this.map.getLayer(layerId)) {
-      this.map.setFilter(layerId, filters);
-    }
-  }
-
-  getLayerFilter(layerId) {
-    console.log("state", this);
-    let layerObj;
-    for (let i = 0; i < this.state.layersObj.length; i += 1) {
-      layerObj = this.state.layersObj[i];
-      if (layerObj.id === layerId) {
-        return layerObj.filters && layerObj.filters.layerFilters;
-      }
-    }
-    return null;
-  }
-
-  setLayerFilter(layerId, filters) {
-    let nextLayerObj;
-    let featureLayerObj;
-    const nextLayersObj = [];
-    for (let i = 0; i < this.state.layersObj.length; i += 1) {
-      nextLayerObj = this.state.layersObj[i];
-      if (nextLayerObj.id === layerId) {
-        nextLayerObj.filters.layerFilters = filters;
-        featureLayerObj = Object.assign({}, nextLayerObj);
-      }
-      nextLayersObj.push(nextLayerObj);
-    }
-    this.setState({
-      layerObj: nextLayerObj,
-      layersObj: nextLayersObj,
-    }, () => {
-      this.buildFilters(featureLayerObj);
-    });
-  }
-
-  buildFilters(layerObj) {
-    const layerId = layerObj.id;
-    const filterKeys = Object.keys(layerObj.filters);
-    let filter;
-    const combinedFilters = ['all'];
-
-    // loop through filters object
-    for (let f = 0; f < filterKeys.length; f += 1) {
-      filter = layerObj.filters[filterKeys[f]];
-
-      if (filterKeys[f] === 'highlight') {
-        // handle highlight filter seperately
-        this.applyFilters(`${layerId}-highlight`, filter);
-      } else if (filter) {
-        // build out combined filters
-        combinedFilters.push(filter);
-      }
-    }
-
-    if (combinedFilters.length > 2) {
-      // if there are multiple filters apply as is
-      this.applyFilters(layerId, combinedFilters);
-    } else if (combinedFilters.length === 2) {
-      // if there is only one filter, apply the only one
-      this.applyFilters(layerId, combinedFilters[1]);
-    }
-  }
-
   componentWillReceiveProps(nextProps){
     const accessToken = nextProps.APP.accessToken;
     const mapConfig = nextProps.APP.mapConfig;
@@ -134,8 +67,6 @@ class Map extends Component {
     const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES;
     const regions = nextProps.REGIONS;
-
-    console.log("nextlayers", layers);
 
     // Check if map is initialized.
     if (!isRendered && (!isIE || mapboxgl.supported())) {
@@ -166,7 +97,6 @@ class Map extends Component {
       if (this.props.MAP.reloadLayers !== reloadLayers) {
         Object.keys(layers).forEach((key) => {
           const layer = layers[key];
-          console.log("id", layer.id);
           if (layer.loaded) {
             addLayer(this.map, layer, mapConfig);
           }
@@ -178,17 +108,13 @@ class Map extends Component {
   }
 
   render() {
-    console.log("state", this.props);
     return (
         <div>
         {isIE || !mapboxgl.supported() ?
-        (<div className="alert alert-info">Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
-        </div>):
-            ( <div id='map' />)}
-          {this.props.MAP.showFilterBtn ? <button
-            className="filterButton glyphicon glyphicon-filter"
-          /> : ''}
-          {/*  <Filter /> */}
+        (<div className="alert alert-info">
+          Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
+        </div>) :
+          (<div id='map' />)}
         </div>
     );
   }

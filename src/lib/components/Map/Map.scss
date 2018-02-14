@@ -25,27 +25,3 @@
   margin-top: 3px;
   margin-right: 3px;
 }
-
-.glyphicon.filterButton {
-  position: fixed;
-  right: 10px;
-  top: 155px;
-  height: 32px;
-  width: 32px;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
-  background-color: white;
-  border-radius: 5px;
-  border: none;
-
-  &.open {
-    background-color: #aaa;
-    cursor: default;
-    cursor: pointer;
-  }
-
-  &:hover,
-  &:focus,
-  &:active {
-    outline: none;
-  }
-}

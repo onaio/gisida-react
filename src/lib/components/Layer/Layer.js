@@ -16,7 +16,7 @@ class Layer extends Component {
     // dispatch toggle layer 
     dispatch(Actions.toggleLayer(layer.id));
 
-    // dispach prepare layer if layer data  has not been loaded into props
+    // dispach prepare layer if layer data has not been loaded into props
     if (!layer.loaded && !layer.isLoading) {
       prepareLayer(layer, dispatch);
     }

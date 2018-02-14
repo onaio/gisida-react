@@ -1,25 +1,35 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { buildFilters, mergeFilters, generateFilterOptions } from 'gisida';
+import { generateFilterOptions } from 'gisida';
 import PropTypes from 'prop-types';
 import FilterSelector from './FilterSelector';
-import { isFiltered } from '../../utils';
 import './Filter.scss';
-// import '../../ProfileView/ProfileView.scss';
 
 const mapStateToProps = (state, ownProps) => {
+  let layersObj = [];
+  Object.keys(state.MAP.layers).forEach((key) => {
+    const layer = state.MAP.layers[key];
+    if (layer.visible) {
+      layersObj.push(layer);
+    }
+  });
   return {
+    layerObj: state.MAP.layers[state.MAP.filter.layerId],
+    doShowProfile: state.MAP.showProfile,
+    layersObj: layersObj,
+    showFilterBtn: state.MAP.filter.layerId
   }
 }
 
 class Filter extends Component {
   constructor(props) {
     super(props);
-    const { layerObj } = this.props;
-    const { filterOptions, id } = {};
-    const layerFilters = this.props.getLayerFilter(id);
-    const filters = buildFilters(filterOptions, layerFilters);
-
+    const { layerObj } = this.props.layerObj || {
+      filterOptions: {}
+    }
+    const filters = null;
+    const filterOptions = {}
+    const id = null
     this.state = {
       isFiltered: false,
       prevFilters: null,
@@ -31,29 +41,274 @@ class Filter extends Component {
       isMac: (window.navigator.platform.indexOf('Mac') !== -1),
       isLinux: (window.navigator.platform.indexOf('Linux') !== -1),
       globalSearchField: false,
+      layersObj: []
     };
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { layerObj } = nextProps;
-    const { filterOptions, id } = layerObj;
-    const layerFilters = this.props.getLayerFilter(id);
-    const filters = this.state.isFiltered && this.state.prevFilters ? this.state.prevFilters
-      : buildFilters(filterOptions, layerFilters, this.state.filters);
+  buildFiltersMap(filters, layerFilters, prevFilters) {
+    const filterMap = {};
+    const filterKeys = Object.keys(filters);
+    let filterKey;
+    let options;
+    let optionKeys;
+    let optionKey;
+    let filter;
+    let f;
+    let o;
 
+    // todo - use this again to sort options
+    // const optionSort = (a, b) => {
+    //   if (typeof a === 'string' && typeof b === 'string') {
+    //     if (a.toUpperCase() < b.toUpperCase()) {
+    //       return -1;
+    //     }
+    //     if (a.toUpperCase() > b.toUpperCase()) {
+    //       return 1;
+    //     }
+    //   } else {
+    //     if (a < b) {
+    //       return -1;
+    //     }
+    //     if (a > b) {
+    //       return -1;
+    //     }
+    //   }
+    //   return 0;
+    // };
+
+    // loop over all filters
+    for (f = 0; f < filterKeys.length; f += 1) {
+      filterKey = filterKeys[f];
+      filter = {
+        label: filters[filterKey].label,
+        toggleAllOn: prevFilters
+          ? prevFilters[filterKey].toggleAllOn
+          : true, // controls toggle all functionality and text
+        isFiltered: prevFilters
+          ? prevFilters[filterKey].isFiltered
+          : false, // whether any options have been modified
+        isOriginal: true, // whether the filter has been filtered
+        options: {}, // actual filter options map
+        isOpen: prevFilters ? prevFilters[filterKey].isOpen : false,
+      };
+
+      options = filters[filterKey].filterValues;
+      optionKeys = Object.keys(options);
+      // loop over all options
+      for (o = 0; o < optionKeys.length; o += 1) {
+        optionKey = optionKeys[o];
+        // set filter option to true
+        filter.options[optionKey] = {
+          enabled: false,
+          count: options[optionKey],
+        };
+      }
+
+      // add filter to the filterMap
+      filterMap[filterKey] = filter;
+    }
+
+    if (layerFilters) {
+      for (f = 0; f < layerFilters.length; f += 1) {
+        if (layerFilters[f] instanceof Array) {
+          for (o = 0; o < layerFilters[f].length; o += 1) {
+            if (layerFilters[f][o] instanceof Array) {
+              filterKey = layerFilters[f][o][1];
+              optionKey = layerFilters[f][o][2];
+              filterMap[filterKey].options[optionKey].enabled = true;
+              filterMap[filterKey].options[optionKey].hidden = false;
+              if (!filterMap[filterKey]) filterMap[filterKey].isFiltered = true;
+            }
+          }
+        }
+      }
+    }
+
+    return filterMap;
+  }
+
+  isFiltered(options, isOriginal) {
+    const optionKeys = Object.keys(options);
+    let hasEnabled = false;
+    let hasDisabled = false;
+    let i;
+
+    // if original check for BOTH enabled and disabled options
+    if (isOriginal || typeof isOriginal === 'undefined') {
+      for (i = 0; i < optionKeys.length; i += 1) {
+        if (options[optionKeys[i]].count && options[optionKeys[i]].enabled) {
+          hasEnabled = true;
+        } else if (options[optionKeys[i]].count) {
+          hasDisabled = true;
+        }
+      }
+      return hasEnabled && hasDisabled;
+    }
+
+    // if filtered check for a single enabled option
+    for (i = 0; i < optionKeys.length; i += 1) {
+      if (options[optionKeys[i]].enabled) return true;
+    }
+    return false;
+  }
+
+  mergeFilters(originalFilters, filteredFilters, clickedFilterKey) {
+    if (!filteredFilters || !(Object.keys(filteredFilters).length)) {
+      return originalFilters;
+    }
+    // Define keys of all the filters and an obj to map merged filters into
+    const filterKeys = Object.keys(originalFilters);
+    const nextFilters = {};
+
+    let filterIsOpen;
+    let nextFilter;
+    let filterKey;
+    let oOptions;
+    let fOptions;
+    let ooKeys;
+    let ooKey;
+
+    // Loop through all the filters
+    for (let f = 0; f < filterKeys.length; f += 1) {
+      filterKey = filterKeys[f];
+      filterIsOpen = originalFilters[filterKey].isOpen;
+
+      if (filterKey === clickedFilterKey && originalFilters[filterKey].isFiltered) {
+        nextFilters[filterKey] = originalFilters[filterKey];
+      } else {
+        nextFilter = Object.assign(
+          {},
+          filteredFilters[filterKey],
+          {
+            isOriginal: false,
+            isFiltered: originalFilters[filterKey].isFiltered,
+            toggleAllOn: originalFilters[filterKey].toggleAllOn,
+            isOpen: filterIsOpen,
+          },
+        );
+        fOptions = filteredFilters[filterKey].options;
+        oOptions = originalFilters[filterKey].options;
+        ooKeys = Object.keys(oOptions);
+
+        // Loop through all of the original filter options
+        for (let o = 0; o < ooKeys.length; o += 1) {
+          ooKey = ooKeys[o];
+          // If the filtered filter doesn't have the option, add it
+          if (!fOptions[ooKey]) {
+            nextFilter.options[ooKey] = {
+              count: 0,
+              enabled: false,
+              hidden: false,
+            };
+          } else {
+            nextFilter.options[ooKey].enabled = oOptions[ooKey].enabled;
+          }
+        }
+        nextFilters[filterKey] = nextFilter;
+      }
+    }
+
+    return nextFilters;
+  }
+
+  // TODO: move filters list to Redux state and applyFilters to Map.js
+  applyFilters(layerId, filters) {
+    if (window.GisidaMap.getLayer(layerId)) {
+      window.GisidaMap.setFilter(layerId, filters);
+    }
+  }
+
+  getLayerFilter(layerId) {
+    let layerObj;
+    for (let i = 0; i < this.state.layersObj.length; i += 1) {
+      layerObj = this.state.layersObj[i];
+      if (layerObj.id === layerId) {
+        return layerObj.filters && layerObj.filters.layerFilters;
+      }
+    }
+    return null;
+  }
+
+  setLayerFilter(layerId, filters) {
+    let nextLayerObj;
+    let featureLayerObj;
+    const nextLayersObj = [];
+    for (let i = 0; i < this.state.layersObj.length; i += 1) {
+      nextLayerObj = this.state.layersObj[i];
+      if (nextLayerObj.id === layerId) {
+        nextLayerObj.filters.layerFilters = filters;
+        featureLayerObj = Object.assign({}, nextLayerObj);
+      }
+      nextLayersObj.push(nextLayerObj);
+    }
     this.setState({
-      filters,
-      filterOptions,
-      layerId: id,
-      doShowProfile: false,
+      layerObj: nextLayerObj,
+      layersObj: nextLayersObj,
+    }, () => {
+      this.buildFilters(featureLayerObj);
     });
+  }
+
+  buildFilters(layerObj) {
+    const layerId = layerObj.id;
+    const filterKeys = Object.keys(layerObj.filters);
+    let filter;
+    const combinedFilters = ['all'];
+
+    // loop through filters object
+    for (let f = 0; f < filterKeys.length; f += 1) {
+      filter = layerObj.filters[filterKeys[f]];
+
+      if (filterKeys[f] === 'highlight') {
+        // handle highlight filter seperately
+        this.applyFilters(`${layerId}-highlight`, filter);
+      } else if (filter) {
+        // build out combined filters
+        combinedFilters.push(filter);
+      }
+    }
+
+    if (combinedFilters.length > 2) {
+      // if there are multiple filters apply as is
+      this.applyFilters(layerId, combinedFilters);
+    } else if (combinedFilters.length === 2) {
+      // if there is only one filter, apply the only one
+      this.applyFilters(layerId, combinedFilters[1]);
+    }
+  }
+
+  handleFilterClick() {
+    this.setState({ isOpen: !this.state.isOpen });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const layerObj = nextProps.layerObj || {
+      filterOptions: {}
+    };
+    const { filterOptions, id } = layerObj;
+    if (filterOptions && Object.keys(filterOptions).length > 0) {
+      const layerFilters = this.getLayerFilter(id);
+      const filters = this.state.isFiltered && this.state.prevFilters ? this.state.prevFilters
+        : this.buildFiltersMap(filterOptions, layerFilters, this.state.filters);
+      
+      this.setState({
+        filters,
+        filterOptions,
+        layerId: id,
+        doShowProfile: false,
+        layersObj: nextProps.layersObj
+      });
+    }
   }
 
   onCloseClick = (e) => {
     e.preventDefault();
-    this.props.handleCloseClick();
+    //TODO dispach close action
+    // this.setState({
+    //   showFilterModal: false,
+    // });
   }
-
+  
   onFilterItemClick = (e, filterKey) => {
     e.preventDefault();
     if (e.target.getAttribute('data-type') === 'basic-filter') {
@@ -123,10 +378,10 @@ class Filter extends Component {
     const { layerId, filterOptions } = this.state;
     this.setState({
       isFiltered: false,
-      filters: buildFilters(filterOptions),
+      filters: this.buildFiltersMap(filterOptions),
       prevFilters: null,
     }, () => {
-      this.props.setLayerFilter(layerId, null);
+      this.setLayerFilter(layerId, null);
     });
     return true;
   }
@@ -176,7 +431,7 @@ class Filter extends Component {
       isFiltered: true,
       prevFilters: filters,
     }, () => {
-      this.props.setLayerFilter(layerId, nextFilters);
+      this.setLayerFilter(layerId, nextFilters);
     });
     return true;
   }
@@ -218,7 +473,7 @@ class Filter extends Component {
       this.state.filters,
       {
         [filterKey]: {
-          isFiltered: isFiltered(options),
+          isFiltered: this.isFiltered(options),
           toggleAllOn,
           options,
           isOpen: true,
@@ -255,7 +510,7 @@ class Filter extends Component {
       filters,
       {
         [filterKey]: {
-          isFiltered: isFiltered(options),
+          isFiltered: this.isFiltered(options),
           options,
           isOpen: false,
         },
@@ -306,7 +561,7 @@ class Filter extends Component {
       filters,
       {
         [filterKey]: {
-          isFiltered: isFiltered(options),
+          isFiltered: this.isFiltered(options),
           options,
           toggleAllOn,
           isOpen: true,
@@ -407,12 +662,12 @@ class Filter extends Component {
       type: 'filteredFilter',
     };
     const newLayerOptions = generateFilterOptions(newLayerObj);
-    const filteredFilters = buildFilters(newLayerOptions);
-    return mergeFilters(filters, filteredFilters, clickedFilterKey);
+    const filteredFilters = this.buildFiltersMap(newLayerOptions);
+    return this.mergeFilters(filters, filteredFilters, clickedFilterKey);
   }
 
   isMapFiltered = () => {
-    const layerFilters = this.props.getLayerFilter(this.state.layerId);
+    const layerFilters = this.getLayerFilter(this.state.layerId);
     if (!layerFilters) {
       return false;
     }
@@ -471,7 +726,7 @@ class Filter extends Component {
 
     for (let i = 0; i < filterKeys.length; i += 1) {
       nextFilter = nextFilters[filterKeys[i]];
-      nextFilter.isFiltered = isFiltered(nextFilter.options, nextFilter.isOriginal);
+      nextFilter.isFiltered = this.isFiltered(nextFilter.options, nextFilter.isOriginal);
 
       // todo - put all this logic in FilterModal.isFiltered()
       const queriedKeys = nextFilter.queriedOptionKeys;
@@ -489,8 +744,8 @@ class Filter extends Component {
     if (isFiltered) {
       nextFilters = this.buildFilteredFilters(filterKey, nextFilters);
     } else if (isResetable) {
-      const layerFilters = this.props.getLayerFilter(this.props.layerObj.id);
-      nextFilters = buildFilters(filterOptions, layerFilters, nextFilters);
+      const layerFilters = this.getLayerFilter(this.props.layerObj.id);
+      nextFilters = this.buildFiltersMap(filterOptions, layerFilters, nextFilters);
     }
 
     return { isFiltered, nextFilters };
@@ -514,7 +769,6 @@ class Filter extends Component {
     });
   }
 
-
   toggleAdvFilter = (e, filterKey) => {
     e.preventDefault();
     const { filters } = this.state;
@@ -526,14 +780,12 @@ class Filter extends Component {
     });
   }
 
-
   render() {
     const { filters, isMac, globalSearchField } = this.state;
-    const filterKeys = Object.keys(filters);
+    const filterKeys = filters ? Object.keys(filters) : {};
     const filterItems = [];
     let filter;
     let isFilterable = false;
-
     for (let f = 0; f < filterKeys.length; f += 1) {
       filter = filters[filterKeys[f]];
       const { isFiltered, toggleAllOn, queries, queriedOptionKeys } = filter;
@@ -589,93 +841,108 @@ class Filter extends Component {
     }
 
     const doClear = isFilterable || this.state.isFiltered || this.isMapFiltered();
-
+    const filterBtnPos = this.state.doShowProfile && this.props.isOpen || this.state.isOpen ? '360px' : '10px';
     return (
-      <div>
-        <div className={`profile-view-container filter-container${isMac ? ' mac' : ''}`}>
-          <a
-            className="filter-search"
-            href="google.com"
-            onClick={(e) => { this.showGlobalSearchField(e); }}
-          >
-            <span className="glyphicon glyphicon-search" />
-          </a>
-          <a
-            className="close-btn filter-close"
-            title="Close profile view"
-            onClick={(e) => { this.onCloseClick(e); }}
-            href="google.com"
-            role="button"
-          >
-            <span className="glyphicon glyphicon-remove" />
-          </a>
-          <div className="profile-basic-details filter-header-section">
-            <div className="profile-header-section filter-header">
-              <h5>LAYER FILTERS</h5>
-            </div>
-            {globalSearchField ?
-              <div className="search-column">
-                <span className="searchBtn" role="button">
+    <div>
+      {
+          this.props.showFilterBtn ?
+            <button
+            className={`filterButton glyphicon glyphicon-filter${this.state.isOpen ? ' open' : ''}`}
+            onClick={() => { this.handleFilterClick(); }}
+              style={{ right: this.state.isOpen ? '260px' : filterBtnPos }}
+          /> : ''
+        }
+
+        {
+          this.state.isOpen  ?
+            <div>
+              <div className={`profile-view-container filter-container${isMac ? ' mac' : ''}`}>
+                <button
+                  className="filter-search"
+                
+                  onClick={(e) => { this.showGlobalSearchField(e); }}
+                >
                   <span className="glyphicon glyphicon-search" />
-                </span>
-                <input
-                  ref={(el) => { this.searchEl = el; }}
-                  type="text"
-                  className="filterSearch"
-                  placeholder="Search All Filters"
-                  onChange={(e) => { this.allFiltersSearch(e); }}
-                />
-                {this.searchEl && this.searchEl.value !== '' ?
-                  (
-                    <span
-                      className="clearSearch"
-                      role="button"
-                      tabIndex="0"
-                      onClick={(e) => { this.clearAllFiltersSearch(e); }}
-                    >
-                      <span className="glyphicon glyphicon-remove" />
-                    </span>
-                ) : ''}
-              </div>
-            : ''}
-          </div>
-          <div className="profile-indicators filter-section-options">
-            <ul>
-              <li>
-                <ul className="indicators-list">
-                 
-                </ul>
-              </li>
-            </ul>
-          </div>
-          <div className="filter-footer">
-            <div className="filter-footer-section">
-              <div className="filter-footer-content">
-                <table className="filter-footer-controls">
-                  <tr>
-                    <td>
-                      <button
-                        className={`${doClear ? '' : 'disabled'}`}
-                        onClick={(e) => { this.onClearClick(e, doClear); }}
-                      >
-                        Clear Filters
+                </button>
+                <button
+                  className="close-btn filter-close"
+                  title="Close profile view"
+                  onClick={() => { this.handleFilterClick(); }}
+                >
+                  <span className="glyphicon glyphicon-remove" />
+                </button>
+                <div className="profile-basic-details filter-header-section">
+                  <div className="profile-header-section filter-header">
+                    <h5>LAYER FILTERS</h5>
+                  </div>
+                  {globalSearchField ?
+                    <div className="search-column">
+                      <span className="searchBtn" role="button">
+                        <span className="glyphicon glyphicon-search" />
+                      </span>
+                      <input
+                        ref={(el) => { this.searchEl = el; }}
+                        type="text"
+                        className="filterSearch"
+                        placeholder="Search All Filters"
+                        onChange={(e) => { this.allFiltersSearch(e); }}
+                      />
+                      {this.searchEl && this.searchEl.value !== '' ?
+                        (
+                          <span
+                            className="clearSearch"
+                            role="button"
+                            tabIndex="0"
+                            onClick={(e) => { this.clearAllFiltersSearch(e); }}
+                          >
+                            <span className="glyphicon glyphicon-remove" />
+                          </span>
+                        ) : ''}
+                    </div>
+                    : ''}
+                </div>
+                <div className="profile-indicators filter-section-options">
+                  <ul>
+                    <li>
+                      <ul className="indicators-list">
+                        {filterItems}
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+                <div className="filter-footer">
+                  <div className="filter-footer-section">
+                    <div className="filter-footer-content">
+                      <table className="filter-footer-controls">
+                        <tbody>
+                          <tr>
+                            <td>
+                              <button
+                                className={`${doClear ? '' : 'disabled'}`}
+                                onClick={(e) => { this.onClearClick(e, doClear); }}
+                              >
+                                Clear Filters
                       </button>
-                    </td>
-                    <td>
-                      <button
-                        className={`${isFilterable ? '' : 'disabled'}`}
-                        onClick={(e) => { this.onApplyClick(e, isFilterable); }}
-                      >
-                        Apply Filters
+                            </td>
+                            <td>
+                              <button
+                                className={`${isFilterable ? '' : 'disabled'}`}
+                                onClick={(e) => { this.onApplyClick(e, isFilterable); }}
+                              >
+                                Apply Filters
                       </button>
-                    </td>
-                  </tr>
-                </table>
+                            </td>
+                          </tr>
+                        </tbody>    
+                      </table>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            </div> : ''
+        }  
+      
+      </div>  
     );
   }
 }
