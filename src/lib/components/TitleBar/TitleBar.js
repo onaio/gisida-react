@@ -1,15 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types';
-// import Cookie from 'js-cookie';
+import Cookie from 'js-cookie';
 import './TitleBar.scss';
-
 
 const logOut = (e) => {
   e.preventDefault();
-  // Cookie.set('dsauth', false);
-  // location.reload();
-};
+  Cookie.set('dsauth', false);
+  window.location.reload();
+}
 
 
 const mapStateToProps = (state, ownProps) => {
@@ -25,11 +24,9 @@ const TitleBar = ({ appConfig = f => f }) =>
       <div className="brand-title">
         <span className="white">{appConfig.appName}</span>&nbsp;&nbsp; {appConfig.appNameDesc}</div>
     </div>
-    {appConfig.password ?
       <a className="sign-out" onClick={logOut} role="button" tabIndex={0}>
-        <i className="fa fa-sign-out" aria-hidden="true" />
+        <span className="glyphicon glyphicon-log-out" aria-hidden="true" />
       </a>
-      : ''}
     <a
       className="ona-logo"
       href="http://www.ona.io/"
