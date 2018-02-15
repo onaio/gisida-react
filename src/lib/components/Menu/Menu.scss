@@ -43,7 +43,6 @@
 
   .layers {
     padding: 20px 0 20px 20px;
-    display: none;
 
     li.layer {
       position: relative;
@@ -88,7 +87,6 @@
   font-size: 15px;
   text-align: center;
   top: 10px;
-  display: none;
 }
 
 #sector-menu-1-wrapper .open-btn {
@@ -113,6 +111,7 @@
   display: none;
 }
 
-.caret {
+.category {
   margin-left: 5px;
+  font-size: 80%;
 }

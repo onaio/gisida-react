@@ -33,7 +33,7 @@ const mapStateToProps = (state, ownProps) => {
 
   // Get current region
   const currentRegion = state.REGIONS && state.REGIONS.length?
-    state.REGIONS.filter(region => region.current)[0].name: false;
+    state.REGIONS.filter(region => region.current)[0].name: '';
 
   return {
     categories: categories,
@@ -46,22 +46,29 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 class Menu extends Component {
-
-  onToggleMenu = (e) => {
-    // todo: Show/Hide Menu
-    const mapId  = 'map-1'
-    e.preventDefault();
-    const $wrapper = $(e.target).parents('.sectors-menu-wrapper');
-    $wrapper.find('.sectors-menu').toggle();
-    $wrapper.find('.open-btn').toggle();
-    // todo - move this into the state....
-    $(window).trigger('toggleSector', { mapId, sectorsId: $wrapper.attr('id') });
+  constructor(props) {
+    super(props)
+    this.state = {
+      openCategories: [],
+      openMenu: true
+    }
   }
 
-  onCategoryClick = (e) => {
-    //todo: Expand/Collapes layer categories sub-menu
+  onToggleMenu = (e) => {
     e.preventDefault();
-    $(e.target).parent('li').find('.layers').toggle();
+    this.setState({ openMenu: !this.state.openMenu });
+  }
+
+  onCategoryClick = (e, category) => {
+    e.preventDefault();
+
+    const openCategories = this.state.openCategories;
+    const index = openCategories.indexOf(category);
+  
+    if (index > -1) {
+      openCategories.splice(openCategories.indexOf(category), 1);
+    } else openCategories.push(category);
+    this.setState({ openCategories });
   }
 
   onRegionClick = (e) => {
@@ -77,9 +84,11 @@ class Menu extends Component {
     const currentRegion = this.props.currentRegion;
     return (
       <div id={`${menuId}-wrapper`} className="sectors-menu-wrapper">
-        <a onClick={e => this.onToggleMenu(e)} className="open-btn">
-          <span className="glyphicon glyphicon-menu-hamburger"></span>
-        </a>
+        {!this.state.openMenu ?
+          <a onClick={e => this.onToggleMenu(e)} className="open-btn">
+            <span className="glyphicon glyphicon-menu-hamburger"></span>
+          </a> : ''}
+        {this.state.openMenu ?
         <div id={menuId} className="sectors-menu">
           <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
             <span className="glyphicon glyphicon-remove"></span>  
@@ -87,7 +96,7 @@ class Menu extends Component {
           <ul className="sectors">
             {regions && regions.length ?
               <li className="sector">
-                <a onClick={e => this.onCategoryClick(e)}>Regions
+                <a onClick={e => this.onCategoryClick(e, 'Regions')}>Regions
                 <span className="caret" />
                 </a>
                 <ul className="layers">
@@ -112,19 +121,27 @@ class Menu extends Component {
             {(categories && categories.length) > 0 ?
               categories.map((category, i) =>
                 (<li className="sector" key={i}>
-                  <a onClick={e => this.onCategoryClick(e)}>{category.category}
-                    <span className="caret" />
+                  <a onClick={e => this.onCategoryClick(e, category.category)}>{category.category}
+                    <span
+                      className={"category glyphicon " +
+                        (this.state.openCategories.includes(category.category) ?
+                        "glyphicon-chevron-down" : "glyphicon-chevron-right")}
+                    />
                   </a>
-                  <Layers
-                    mapTargetId={mapTargetId}
-                    layers={category.layers}
-                    currentRegion={currentRegion}
-                  />
+                  {
+                    this.state.openCategories.includes(category.category) ?
+                    <Layers
+                      mapTargetId={mapTargetId}
+                      layers={category.layers}
+                      currentRegion={currentRegion}
+                    />
+                    : <ul />}
                 </li>)) :
               <li></li>
             }
           </ul>
-        </div>
+        </div>: <div/>
+        }
       </div>
     );
   }
