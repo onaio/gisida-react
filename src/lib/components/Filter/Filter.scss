@@ -1,7 +1,7 @@
 .glyphicon.filterButton {
   position: fixed;
   right: 10px;
-  top: 194px;
+  top: 155px;
   height: 32px;
   width: 32px;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
@@ -179,6 +179,9 @@
 }
 
 .filter-close {
+  position: absolute;
+  background: none;
+  border: none;
   top: 14px !important;
   right: 15px !important;
   color: #fff !important;
@@ -280,6 +283,8 @@
     right: 40px;
     top: 14px;
     color: #fff;
+    background: none;
+    border: none;
   }
 }
 
@@ -533,6 +538,7 @@
   }
 
   .filter-option {
+    text-decoration: none;
     padding-left: 10px !important;
     padding-top: 10px !important;
     padding-bottom: 10px !important;
