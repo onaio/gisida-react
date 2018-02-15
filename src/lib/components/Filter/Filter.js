@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { generateFilterOptions } from 'gisida';
+import { Actions, generateFilterOptions } from 'gisida';
 import PropTypes from 'prop-types';
 import FilterSelector from './FilterSelector';
 import './Filter.scss';
@@ -16,6 +16,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     layerObj: state.MAP.layers[state.MAP.filter.layerId],
     doShowProfile: state.MAP.showProfile,
+    showFilterPanel: state.MAP.showFilterPanel,
     layersObj: layersObj,
     showFilterBtn: state.MAP.filter.layerId
   }
@@ -278,7 +279,8 @@ class Filter extends Component {
   }
 
   handleFilterClick() {
-    this.setState({ isOpen: !this.state.isOpen });
+    const dispatch = this.props.dispatch;
+    dispatch(Actions.toggleFilter());
   }
 
   componentWillReceiveProps(nextProps) {
@@ -847,14 +849,14 @@ class Filter extends Component {
       {
           this.props.showFilterBtn ?
             <button
-            className={`filterButton glyphicon glyphicon-filter${this.state.isOpen ? ' open' : ''}`}
+            className={`filterButton glyphicon glyphicon-filter${this.props.showFilterPanel ? ' open' : ''}`}
             onClick={() => { this.handleFilterClick(); }}
-              style={{ right: this.state.isOpen ? '260px' : filterBtnPos }}
+              style={{ right: this.props.showFilterPanel ? '260px' : filterBtnPos }}
           /> : ''
         }
 
         {
-          this.state.isOpen  ?
+          this.props.showFilterPanel  ?
             <div>
               <div className={`profile-view-container filter-container${isMac ? ' mac' : ''}`}>
                 <button
