@@ -100,8 +100,6 @@ class Map extends Component {
       // Add current layers to map
       if (this.props.MAP.reloadLayers !== reloadLayers) {
         addLayers(this.map, layers, mapConfig)
-        // Action sort layers should come here
-        // sortLayers(map);
       }
     }
     // Assign global variable for debugging purposes.

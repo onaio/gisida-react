@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import PieChart from './PieChart';
 import { hexToRgbA } from '../../utils';
-import colorbrewer from 'colorbrewer';
 
 class SumPieChart extends React.Component {
   static tooltipFormatter() {
@@ -22,13 +21,6 @@ class SumPieChart extends React.Component {
     };
   }
 
-  static getColorBrewerColor = function getColorBrewerColor(c, numColors) {
-    if (colorbrewer[c]) {
-      return colorbrewer[c][numColors];
-    }
-    return c;
-  };
-
   static buildPieData(layerData, chartSpec, layer) {
     if (!chartSpec) return [];
 
@@ -39,7 +31,7 @@ class SumPieChart extends React.Component {
     let datum = null;
     let dBreak;
     const column = chartSpec.column; // column name definied by host
-    const layerObj = layer.layerObj ? layer.layerObj : layer;    
+    const layerObj = layer.layerObj ? layer.layerObj : layer;
 
     let dataBreaks;
     if (breaks) {
@@ -52,8 +44,6 @@ class SumPieChart extends React.Component {
     }
 
     // Aggregate data
-    let j = 0
-    const brewerColors = this.getColorBrewerColor(chartSpec.title === 'Yes' ? "RdYlBu" : "Set3", 11)
     if (chartSpec.type === 'status') {
       // loop through dataset
       for (i; i < layerData.length; i += 1) {
@@ -63,10 +53,9 @@ class SumPieChart extends React.Component {
           // create it if it doesn't exist
           dataMap[datum[column]] = {
             count: 0, // start with a count of 0
-            color: brewerColors[j],// define the color to use
-            label: [datum[column]],
+            color: layerObj.categories.color[datum[column] - 1], // define the color to use
+            label: layerObj.categories.label[datum[column] - 1],
           };
-          j++
         }
         // increment the count of the datum category
         dataMap[datum[column]].count += 1;
@@ -155,7 +144,7 @@ class SumPieChart extends React.Component {
 
     return (
       <div className={chartClass}>
-        {chartSpec.title ? (<h4 className="pie-title">{chartSpec.title}</h4>) : '' }
+        {chartSpec.title ? (<h6>{chartSpec.title}</h6>) : ''}
         <PieChart
           seriesName={seriesName}
           seriesData={seriesData}

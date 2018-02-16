@@ -30,7 +30,7 @@ class SumChartMinimize extends React.Component {
         tabIndex="-1"
         onClick={(e) => { this.handleClick(e); }}
         title={`${this.state.isMin ? 'Show' : 'Hide'} Summary Charts`}
-        style={{ bottom:127 }}
+        style={{ bottom: this.state.bottom }}
         data-icon-credit="Created by Barracuda from the Noun Project"
         data-icon-credit-url="https://thenounproject.com/barracuda/collection/chart/?i=1217547"
       >

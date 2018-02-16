@@ -11,8 +11,9 @@ require('./SummaryChart.scss');
 const mapStateToProps = (state, ownProps) => {
 
   const layers = state.MAP.layers;
-  let layerObj = {}
-  let currentRegion = {}
+  let layerObj
+  let layersObj = []
+  let currentRegion
   let sumChartObj;
   let isChartMin;
   let legendBottom;  
@@ -21,29 +22,38 @@ const mapStateToProps = (state, ownProps) => {
     const layer = layers[key];
     if (layer.charts && layer.visible) {
       layerObj = layer;
-    }
+      layersObj.push(layerObj);
+    } 
   });
 
-  // Set layer to undefined of layer is fro diffrent region
+  // Set layer to undefined of layer is from diffrent region
   currentRegion = state.REGIONS.filter(region => region.current)[0];
-  layerObj = (layerObj && currentRegion && layerObj.region === currentRegion.name) ? layerObj : undefined;
-  
-  if (layerObj && !!layerObj.charts) {
+  if (currentRegion) {
+    layerObj = (layerObj && layerObj.region === currentRegion.name) ? layerObj : undefined;
+  } 
+
+  if (layerObj && layerObj.charts) {
+   
     // TODO: add timeseries suppport
-    sumChartObj =  layerObj;
-    isChartMin = layerObj.isChartMin;
-    legendBottom = layerObj.legendBottom;
+    if (typeof layerObj.isChartMin === 'undefined') {
+      console.log('lug down men')
+      layerObj.isChartMin = true;
+      layerObj.legendBottom = 40;
+    }
   }
-  if (layerObj && layerObj.charts)
+
+  if (layerObj && layerObj.charts) {
     return {
       layerId: layerObj.id,
-      layer: sumChartObj,
-      mapId: "map-1",
-      isChartMin: isChartMin,
-      legendBottom: legendBottom,
-      locations: {} 
-  }
-  return {}
+      layer: layerObj,
+      layersObj: layersObj,
+      mapId: "01",
+      isChartMin: layerObj.isChartMin,
+      legendBottom: layerObj.legendBottom,
+      locations: {},
+      showMinimize: true
+    }
+  } else return { showMinimize: false}
 }
 
 class SummaryChart extends React.Component {
@@ -138,7 +148,7 @@ class SummaryChart extends React.Component {
 
   constructor(props) {
     super(props);
-    if (Object.keys(this.props).length > 1) {
+    if (Object.keys(this.props).length > 2) {
       const { layerId, layer, mapId, isChartMin, legendBottom, locations } = this.props;
       const locationMap = {};
       const locationKeys = Object.keys(locations);
@@ -178,7 +188,7 @@ class SummaryChart extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (Object.keys(nextProps).length > 1) {
+    if (Object.keys(nextProps).length > 2) {
       const { layerId, layer, mapId, isChartMin, legendBottom } = nextProps;
       const legendPosition = SummaryChart.calcLegendPosition(mapId);
       const chartSpecs = SummaryChart.defineCharts(layer.charts);
@@ -189,6 +199,8 @@ class SummaryChart extends React.Component {
       $(`.legend.${this.props.mapId}`).css('bottom', legendBottom);
 
       this.setState({
+        layersObj: nextProps.layersObj,
+        layerObj: layer,
         layerId,
         layer,
         chartHeight: legendPosition.height,
@@ -228,7 +240,7 @@ class SummaryChart extends React.Component {
       chartWidth: primaryChartPosition.chartWidth,
       isFullBleed: primaryChartPosition.isFullBleed,
     }, () => {
-      this.props.saveChartState(this.props.layerId, this.state.isChartMin, legendBottom);
+      this.saveChartState(this.props.layerId, this.state.isChartMin, legendBottom);
     });
   }
 
@@ -247,7 +259,7 @@ class SummaryChart extends React.Component {
   }
 
   render() {
-    if (this.state && Object.keys(this.state).length > 1) {
+    if (this.state && Object.keys(this.state).length > 2 && this.props.showMinimize) {
     const { layerId, layerData, layer, charts, primaryChart, locations } = this.state;
     const { doShowModal, chartHeight, buttonBottom, isFullBleed, chartWidth } = this.state;
     let chartKey = '';
@@ -264,21 +276,8 @@ class SummaryChart extends React.Component {
               key={chartKey}
               layerId={layerId}
               layer={layer}
-              layerData={layerData ?
-                layerData.filter(datum => datum[layer.property] === 'Yes'
-                  || datum[layer.property] === 'TRUE') : layerData}
-              chartSpec={{ ...charts[c].spec, title: "Yes" }}
-              mapId={this.props.mapId}
-            />
-          ));
-          sumCharts.push((
-            <SumPieChart
-              key={chartKey}
-              layerId={layerId}
-              layer={layer}
-              layerData={layerData ? layerData.filter(datum => datum[layer.property] === 'No'
-                || datum[layer.property] === 'FALSE'  ) : layerData}
-              chartSpec={{ ...charts[c].spec, title: "No" }}
+              layerData={layerData}
+              chartSpec={charts[c].spec}
               mapId={this.props.mapId}
             />
           ));
@@ -316,7 +315,7 @@ class SummaryChart extends React.Component {
               moveMapLedgend={this.moveMapLedgend}
               onOpenModalClick={this.onOpenModalClick}
               doShowModal={doShowModal}
-              saveChartState={this.props.saveChartState}
+              saveChartState={this.saveChartState}
               isChartMin={this.state.isChartMin}
               chartHeight={primaryChartHeight}
               chartWidth={chartWidth}
