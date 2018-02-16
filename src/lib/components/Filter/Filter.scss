@@ -566,6 +566,10 @@
       margin-top: 5px;
     }
 
+    span.caret-right {
+      transform: rotate(-90deg);
+    }
+
     span.glyphicon {
       &.glyphicon-option-vertical {
         float: right;

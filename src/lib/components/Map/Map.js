@@ -107,13 +107,18 @@ class Map extends Component {
         Object.keys(layers).forEach((key) => {
           const layer = layers[key];
           if (layer.loaded) {
-            addLayer(this.map, layer, mapConfig, this.props.layersObj);
+            addLayer(this.map, layer, mapConfig);
           }
         });
       }
     }
     // Assign global variable for debugging purposes.
     window.GisidaMap = this.map;
+
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    
   }
 
   render() {

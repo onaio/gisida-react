@@ -57,7 +57,7 @@ class FilterSelector extends Component {
             key={optionKeys[i]}
             data-count={option.count}
             className={`optionLabel${option.enabled ? ' enabled' : ''}`}
-            onClick={(e) => { catchZeroCountClicks(e); }}
+            onClick={(e) => { this.catchZeroCountClicks(e); }}
             role="presentation"
             tabIndex="-1"
           >
