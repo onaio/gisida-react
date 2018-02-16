@@ -6,11 +6,20 @@ import Filter from '../Filter/Filter';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
+  let layersObj = [];
+  Object.keys(state.MAP.layers).forEach((key) => {
+    const layer = state.MAP.layers[key];
+    if (layer.visible) {
+      layersObj.push(layer);
+    }
+  });
+
   return {
     APP: state.APP,
     STYLES: state.STYLES,
     REGIONS: state.REGIONS,
-    MAP: state.MAP
+    MAP: state.MAP,
+    layersObj: layersObj
   }
 }
 
@@ -98,7 +107,7 @@ class Map extends Component {
         Object.keys(layers).forEach((key) => {
           const layer = layers[key];
           if (layer.loaded) {
-            addLayer(this.map, layer, mapConfig);
+            addLayer(this.map, layer, mapConfig, this.props.layersObj);
           }
         });
       }
@@ -114,7 +123,7 @@ class Map extends Component {
         (<div className="alert alert-info">
           Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
         </div>) :
-          (<div id='map' />)}
+          (<div id='map' style={{ width: this.props.MAP.showFilterPanel ? 'calc(100% - 250px)' : '100%'}}/>)}
         </div>
     );
   }
