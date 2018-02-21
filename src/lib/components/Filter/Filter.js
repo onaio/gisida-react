@@ -301,7 +301,6 @@ class Filter extends Component {
         filterOptions,
         layerId: id,
         doShowProfile: false,
-        layersObj: nextProps.layersObj
       });
     }
   }
@@ -775,7 +774,7 @@ class Filter extends Component {
     if (isFiltered) {
       nextFilters = this.buildFilteredFilters(filterKey, nextFilters);
     } else if (isResetable) {
-      const layerFilters = this.getLayerFilter(this.state.layerId);
+      const layerFilters = this.getLayerFilter(this.props.layerObj.id);
       nextFilters = this.buildFiltersMap(filterOptions, layerFilters, nextFilters);
     }
 
@@ -891,16 +890,16 @@ class Filter extends Component {
           this.props.showFilterPanel  ?
             <div>
               <div className={`profile-view-container filter-container${isMac ? ' mac' : ''}`}>
-                <button
+                {/*<button
                   className="filter-search"
                 
                   onClick={(e) => { this.showGlobalSearchField(e); }}
                 >
                   <span className="glyphicon glyphicon-search" />
-                </button>
+                </button>*/}
                 <button
                   className="close-btn filter-close"
-                  title="Close profile view"
+                  title="Close Filters"
                   onClick={() => { this.handleFilterClick(); }}
                 >
                   <span className="glyphicon glyphicon-remove" />
