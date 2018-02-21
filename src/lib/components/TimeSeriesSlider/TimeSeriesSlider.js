@@ -1,7 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux'
 
 require('./TimeSeriesSlider.scss');
+
+const mapStateToProps = (state, ownProps) => {
+  return {  
+  }
+}
 
 class TimeSeriesSlider extends React.Component {
   constructor(props) {
@@ -66,5 +72,4 @@ TimeSeriesSlider.propTypes = {
   timeSeriesObj: PropTypes.objectOf(PropTypes.any).isRequired,
   updateTimeseriesState: PropTypes.func.isRequired,
 };
-
-export default TimeSeriesSlider;
+export default connect(mapStateToProps)(TimeSeriesSlider);

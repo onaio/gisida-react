@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, addLayers, addPopUp } from 'gisida';
+import { Actions, addPopUp, sortLayers } from 'gisida';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -99,7 +99,19 @@ class Map extends Component {
 
       // Add current layers to map
       if (this.props.MAP.reloadLayers !== reloadLayers) {
-        addLayers(this.map, layers, mapConfig)
+        Object.keys(layers).forEach((key) => {
+          const layer = layers[key];
+          // Add layer to map if visible
+          if (!this.map.getLayer(layer.id) && layer.visible && layer.styleSpec) {
+            this.map.addLayer(layer.styleSpec);
+          }
+          // Change visibility if layer is already on map
+          if (this.map.getLayer(layer.id)) {
+            this.map.setLayoutProperty(layer.id, 'visibility', layer.visible ? 'visible' : 'none');
+          }
+        });
+
+        sortLayers(this.map, layers);
       }
     }
     // Assign global variable for debugging purposes.
