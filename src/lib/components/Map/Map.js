@@ -56,7 +56,7 @@ class Map extends Component {
     // this.addMouseMoveEvents()
     // etc
   }
-  
+
   componentWillReceiveProps(nextProps){
     const accessToken = nextProps.APP.accessToken;
     const mapConfig = nextProps.APP.mapConfig;
@@ -71,6 +71,7 @@ class Map extends Component {
     const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES;
     const regions = nextProps.REGIONS;
+  
 
     // Check if map is initialized.
     if (!isRendered) {
@@ -101,14 +102,17 @@ class Map extends Component {
       if (this.props.MAP.reloadLayers !== reloadLayers) {
         Object.keys(layers).forEach((key) => {
           const layer = layers[key];
+          const timeSeriesLayer = nextProps.MAP.timeseries[layer.id];
           // Add layer to map if visible
           if (!this.map.getLayer(layer.id) && layer.visible && layer.styleSpec) {
             this.map.addLayer(layer.styleSpec);
-          }
+          } 
           // Change visibility if layer is already on map
           if (this.map.getLayer(layer.id)) {
             this.map.setLayoutProperty(layer.id, 'visibility', layer.visible ? 'visible' : 'none');
           }
+          
+
         });
 
         sortLayers(this.map, layers);

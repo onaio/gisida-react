@@ -34,22 +34,21 @@ const mapStateToProps = (state, ownProps) => {
 
   if (layerObj && layerObj.charts) {
    
-    // TODO: add timeseries suppport
+    sumChartObj = state.MAP.timeseries[layerObj.id] ? state.MAP.timeseries[layerObj.id] : layerObj;
     if (typeof layerObj.isChartMin === 'undefined') {
-      console.log('lug down men')
-      layerObj.isChartMin = true;
-      layerObj.legendBottom = 40;
+      isChartMin = true;
+      legendBottom = 40;
     }
   }
 
   if (layerObj && layerObj.charts) {
     return {
       layerId: layerObj.id,
-      layer: layerObj,
+      layer: sumChartObj,
       layersObj: layersObj,
       mapId: "01",
-      isChartMin: layerObj.isChartMin,
-      legendBottom: layerObj.legendBottom,
+      isChartMin: isChartMin,
+      legendBottom: legendBottom,
       locations: {},
       showMinimize: true
     }
@@ -374,13 +373,13 @@ class SummaryChart extends React.Component {
 }
 
 SummaryChart.propTypes = {
-  layer: PropTypes.objectOf(PropTypes.any).isRequired,
-  locations: PropTypes.objectOf(PropTypes.any).isRequired,
-  layerId: PropTypes.string.isRequired,
-  mapId: PropTypes.string.isRequired,
-  saveChartState: PropTypes.func.isRequired,
-  isChartMin: PropTypes.bool.isRequired,
-  legendBottom: PropTypes.number.isRequired,
+  layer: PropTypes.objectOf(PropTypes.any),
+  locations: PropTypes.objectOf(PropTypes.any),
+  layerId: PropTypes.string,
+  mapId: PropTypes.string,
+  saveChartState: PropTypes.func,
+  isChartMin: PropTypes.bool,
+  legendBottom: PropTypes.number,
 };
 
 export default connect(mapStateToProps)(SummaryChart);
