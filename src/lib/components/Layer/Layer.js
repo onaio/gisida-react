@@ -10,28 +10,27 @@ const mapStateToProps = (state, ownProps) => {
 
 class Layer extends Component {
 
-  onLayerToggle = (layer) => {
+  onLayerToggle = (e, layer) => {
     const dispatch = this.props.dispatch;
     
     // dispatch toggle layer 
-    dispatch(Actions.toggleLayer(layer.id));
+    dispatch(Actions.toggleLayer(layer.id, e.target.checked));
 
-    // dispach prepare layer if layer data  has not been loaded into props
+    // dispach prepare layer if layer data has not been loaded into props
     if (!layer.loaded && !layer.isLoading) {
       prepareLayer(layer, dispatch);
     }
   }
 
   render() {
-    const mapTargetId= this.props.mapTargetId;
     const layer = this.props.layer;
 
     return (
-      <li className={`layer ${mapTargetId}`}>
+      <li className="layer">
         <input
           type="checkbox"
           data-layer={layer.id}
-          onChange={e => this.onLayerToggle(layer, mapTargetId)}
+          onChange={e => this.onLayerToggle(e, layer)}
           checked={!!layer.visible}
         />
         <label htmlFor={layer.id} >{layer.label}</label>
@@ -41,7 +40,6 @@ class Layer extends Component {
 }
 
 Layer.propTypes = {
-  mapTargetId: PropTypes.string.isRequired,
   layer: PropTypes.objectOf(PropTypes.any).isRequired,
 };
 

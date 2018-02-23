@@ -1,22 +1,31 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, addLayer, addPopUp } from 'gisida';
+import { Actions, addLayer, addPopUp, prepareLayer } from 'gisida';
 import { detectIE } from '../../utils';
+import Filter from '../Filter/Filter';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
+  let layersObj = [];
+  Object.keys(state.MAP.layers).forEach((key) => {
+    const layer = state.MAP.layers[key];
+    if (layer.visible) {
+      layersObj.push(layer);
+    }
+  });
+
   return {
     APP: state.APP,
     STYLES: state.STYLES,
     REGIONS: state.REGIONS,
-    MAP: state.MAP
+    MAP: state.MAP,
+    layersObj: layersObj
   }
 }
 
 const isIE = detectIE();
 
 class Map extends Component {
-
   initMap(accessToken, mapConfig) {
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;
@@ -54,7 +63,6 @@ class Map extends Component {
     // this.addMouseMoveEvents()
     // etc
   }
-  
   componentWillReceiveProps(nextProps){
     const accessToken = nextProps.APP.accessToken;
     const mapConfig = nextProps.APP.mapConfig;
@@ -106,15 +114,21 @@ class Map extends Component {
     }
     // Assign global variable for debugging purposes.
     window.GisidaMap = this.map;
+
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    
   }
 
   render() {
     return (
         <div>
         {isIE || !mapboxgl.supported() ?
-        (<div className="alert alert-info">Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
-        </div>):
-            ( <div id='map' />)}
+        (<div className="alert alert-info">
+          Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
+        </div>) :
+          (<div id='map' style={{ width: this.props.MAP.showFilterPanel ? 'calc(100% - 250px)' : '100%'}}/>)}
         </div>
     );
   }

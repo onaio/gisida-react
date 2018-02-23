@@ -57,3 +57,35 @@ export function detectIE() {
   // other browser
   return false;
 }
+
+export function catchZeroCountClicks(e) {
+  if (e.currentTarget && e.currentTarget.dataset && !Number(e.currentTarget.dataset.count)) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+}
+
+export function isFiltered(options, isOriginal) {
+    const optionKeys = Object.keys(options);
+    let hasEnabled = false;
+    let hasDisabled = false;
+    let i;
+
+    // if original check for BOTH enabled and disabled options
+    if (isOriginal || typeof isOriginal === 'undefined') {
+      for (i = 0; i < optionKeys.length; i += 1) {
+        if (options[optionKeys[i]].count && options[optionKeys[i]].enabled) {
+          hasEnabled = true;
+        } else if (options[optionKeys[i]].count) {
+          hasDisabled = true;
+        }
+      }
+      return hasEnabled && hasDisabled;
+    }
+
+    // if filtered check for a single enabled option
+    for (i = 0; i < optionKeys.length; i += 1) {
+      if (options[optionKeys[i]].enabled) return true;
+    }
+    return false;
+  }
