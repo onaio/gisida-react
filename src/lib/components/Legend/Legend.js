@@ -1,6 +1,7 @@
 /* eslint-disable no-loop-func */
 import React from 'react';
 import { connect } from 'react-redux';
+import { Actions } from 'gisida'
 import './Legend.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -11,10 +12,12 @@ const mapStateToProps = (state, ownProps) => {
       layersObj.push(layer);
     }
   });
+
   return {
     layerObj: state.MAP.layers[state.MAP.activeLayerId],
     layersData: layersObj,
     MAP: state.MAP,
+    primaryLayer: state.MAP.primaryLayer,
   }
 }
 
@@ -26,63 +29,16 @@ class Legend extends React.Component {
     };
   }
 
-  componentWillReceiveProps(nextProps) {
-
+  onUpdatePrimaryLayer(e) {
+    e.preventDefault();
+    const dispatch = this.props.dispatch;
+    const targetLayer = e.currentTarget.getAttribute('data-layer');
+    // dispatch primary layer id
+    dispatch(Actions.updatePrimaryLayer(targetLayer));
   }
 
-  setPrimaryLayer(e) {
-    e.preventDefault();
-    const $target = $(e.target).hasClass('legend-row')
-      ? $(e.target)
-      : $(e.target).parents('.legend-row');
-    if ($target.hasClass('primary')) return false;
+  componentWillReceiveProps(nextProps) {
 
-    // $('.set-primary-layer.primary').removeClass('primary');
-    $('.legend-row.primary').removeClass('primary');
-    $target.addClass('primary');
-
-    const nextLayerId = $target.data('layer');
-    let nextLayerObj = this.props.layersData.find(lo => lo.id === nextLayerId);
-    if (!nextLayerObj && this.props.MAP.layers[nextLayerId].layers) {
-      let nextLayer;
-      for (let l = 0; l < this.props.MAP.layers[nextLayerId].layers.length; l += 1) {
-        nextLayer = this.props.MAP.layers[nextLayerId].layers[l];
-        nextLayerObj = this.props.layersData.find(lo => lo.id === nextLayer);
-        if (nextLayerObj) break;
-      }
-    }
-    if (!nextLayerObj) {
-      return false;
-    }
-
-    // Move the selected primary layer to the top of the map layers
-    if (window.GisidaMap.getLayer(nextLayerId)) {
-      window.GisidaMap.moveLayer(nextLayerId);
-    }
-    let layerObj;
-    // Loop throught all active map layers
-    for (let i = this.props.layersData.length - 1; i >= 0; i -= 1) {
-      layerObj = this.props.layersData[i];
-      // If 'layerObj' is not a fill OR the selected primary layer
-      if (layerObj.type !== 'fill' && layerObj.id !== nextLayerId) {
-        // If 'layerObj' is not the same type as the selected
-        if (layerObj.type !== nextLayerObj.type) {
-          // Move 'layerObj' to the top of the map layers
-          if (window.GisidaMap.getLayer(layerObj.id)) {
-            window.GisidaMap.moveLayer(layerObj.id);
-          }
-        }
-      }
-    }
-
-    // Re-order this.state.layersObj array
-    const nextlayersObj = this.props.layersData.filter(lo => lo.id !== nextLayerId);
-    nextlayersObj.push(nextLayerObj);
-
-    this.setState({
-      setPrimary: true,
-    });
-    return true;
   }
 
   render() {
@@ -93,43 +49,58 @@ class Legend extends React.Component {
     }
     let shapesArr = [];
     const legendItems = [];
-    const circleLayer = (layerObj && layerObj.credit && layerObj.type === 'circle' && !layerObj.categories.shape && layerObj.visible);
-    const classKeys = ["sm", "md", "lg"];
-
-    for (let c = 0; c < classKeys.length; c += 1) {
-      shapesArr.push((
-        <span
-          className={`circle-${classKeys[c]}`}
-          style={{ background: circleLayer ? layerObj.categories.color : ' none' }}
-          key={classKeys[c]}
-        >
-        </span>
-      ));
-    }
 
     let primaryLegend;
     let layer;
 
     for (let l = 0; l < this.props.layersData.length; l += 1) {
       layer = this.props.layersData[l];
-
+      const classKeys = ["sm", "md", "lg"];
       const circleLayerType = (layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible);
       const symbolLayer = (layer && layer.credit && layer.categories.shape && layer.type !== 'circle');
       const fillLayerNoBreaks = (layer && layer.credit && layer.categories.breaks === 'no');
       const fillLayerWithBreaks = (layer && layer.credit && layer.type !== 'chart');
-      const activeLayerSelected = layerObj.id === layer.id ? 'primary' : '';
+      const activeLayerSelected =  this.props.primaryLayer === layer.id ? 'primary' : '';
+
+      for (let c = 0; c < classKeys.length; c += 1) {
+        shapesArr.push((
+          <span
+            className={`circle-${classKeys[c]}`}
+            style={{ background: circleLayerType ? layer.categories.color : ' none' }}
+            key={classKeys[c]}
+          >
+          </span>
+        ));
+      }
+
       if (layerObj.id === layer.id) {
         primaryLegend = (
         <div
           id={`legend-${layer.id}-${mapId}`}
           className={`legend-shapes legend-row ${activeLayerSelected}`}
           data-layer={`${layer.id}`}
+          onClick={(e) => this.onUpdatePrimaryLayer(e)}
+          key={l}
         >
           <b>
             {layer.label}
           </b>
           <div className="legend-symbols">
-            {shapesArr}
+          <span
+            className="circle-sm"
+            style={{ background: layer.categories.color }}
+          >
+          </span>
+          <span
+            className="circle-md"
+            style={{ background: layer.categories.color }}
+          >
+          </span>
+          <span
+            className="circle-lg"
+            style={{ background: layer.categories.color }}
+          >
+          </span>
           </div>
           <span>{layer.credit}</span>
         </div>);
@@ -141,13 +112,28 @@ class Legend extends React.Component {
             id={`legend-${layer.id}-${mapId}`}
             className={`legend-shapes legend-row ${activeLayerSelected}`}
             data-layer={`${layer.id}`}
-            onClick={(e) => this.setPrimaryLayer(e)}
+            key={l}
+            onClick={(e) => this.onUpdatePrimaryLayer(e)}
           >
             <b>
               {layer.label}
             </b>
             <div className="legend-symbols">
-              {shapesArr}
+              <span
+                className="circle-sm"
+                style={{ background: layer.categories.color }}
+              >
+              </span>
+              <span
+                className="circle-md"
+                style={{ background: layer.categories.color }}
+              >
+              </span>
+              <span
+                className="circle-lg"
+                style={{ background: layer.categories.color }}
+              >
+              </span>
             </div>
             <span>{layer.credit}</span>
           </div>

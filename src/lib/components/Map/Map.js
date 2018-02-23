@@ -12,13 +12,14 @@ const mapStateToProps = (state, ownProps) => {
       layersObj.push(layer);
     }
   });
-
   return {
     APP: state.APP,
     STYLES: state.STYLES,
     REGIONS: state.REGIONS,
     MAP: state.MAP,
-    layersObj: layersObj
+    layersData: layersObj,
+    layerObj: state.MAP.layers[state.MAP.activeLayerId],
+    primaryLayer: state.MAP.primaryLayer,
   }
 }
 
@@ -71,6 +72,48 @@ class Map extends Component {
     // etc
   }
 
+  setPrimaryLayer(primaryLayer, activeLayerId, layers, activeLayersData, activelayerObj) {
+    const nextLayerId =  primaryLayer || activeLayerId;
+    let nextLayerObj = activeLayersData.find(lo => lo.id === nextLayerId);
+    if (!nextLayerObj && layers[nextLayerId].layers) {
+      let nextLayer;
+      for (let l = 0; l < layers[nextLayerId].layers.length; l += 1) {
+        nextLayer = layers[nextLayerId].layers[l];
+        nextLayerObj = activeLayersData.find(lo => lo.id === nextLayer);
+        if (nextLayerObj) break;
+      }
+    }
+    if (!nextLayerObj) {
+      return false;
+    }
+
+    // Move the selected primary layer to the top of the map layers
+    if (window.GisidaMap.getLayer(nextLayerId)) {
+      window.GisidaMap.moveLayer(nextLayerId);
+    }
+    let layerObj;
+    // Loop throught all active map layers
+    for (let i = activeLayersData.length - 1; i >= 0; i -= 1) {
+      layerObj = activeLayersData[i];
+      // If 'layerObj' is not a fill OR the selected primary layer
+      if (layerObj.type !== 'fill' && layerObj.id !== nextLayerId) {
+        // If 'layerObj' is not the same type as the selected
+        if (layerObj.type !== nextLayerObj.type) {
+          // Move 'layerObj' to the top of the map layers
+          if (window.GisidaMap.getLayer(layerObj.id)) {
+            window.GisidaMap.moveLayer(layerObj.id);
+          }
+        }
+      }
+    }
+
+    // Re-order this.state.layersObj array
+    const nextlayersObj = activeLayersData.filter(lo => lo.id !== nextLayerId);
+    nextlayersObj.push(nextLayerObj);
+
+    return true;
+  }
+  
   componentWillReceiveProps(nextProps){
     const accessToken = nextProps.APP.accessToken;
     const mapConfig = nextProps.APP.mapConfig;
@@ -80,7 +123,10 @@ class Map extends Component {
     const currentStyle = nextProps.MAP.currentStyle;
     const currentRegion = nextProps.MAP.currentRegion;
     const reloadLayers = nextProps.MAP.reloadLayers;
-
+    const activelayersData = nextProps.layersData;
+    const activelayerObj = nextProps.layerObj;
+    const primaryLayer = nextProps.MAP.primaryLayer;
+    const activeLayerId = nextProps.MAP.activeLayerId;
 
     const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES;
@@ -148,6 +194,10 @@ class Map extends Component {
         });
 
         sortLayers(this.map, layers);
+      }
+
+      if (this.props.MAP.primaryLayer !== primaryLayer) {
+        this.setPrimaryLayer(primaryLayer, activeLayerId, layers, activelayersData, activelayerObj);
       }
     }
     // Assign global variable for debugging purposes.
