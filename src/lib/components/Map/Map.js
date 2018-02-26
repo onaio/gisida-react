@@ -17,7 +17,7 @@ const mapStateToProps = (state, ownProps) => {
     STYLES: state.STYLES,
     REGIONS: state.REGIONS,
     MAP: state.MAP,
-    layersData: layersObj,
+    layersObj: layersObj,
     layerObj: state.MAP.layers[state.MAP.activeLayerId],
     primaryLayer: state.MAP.primaryLayer,
   }
@@ -117,13 +117,12 @@ class Map extends Component {
   componentWillReceiveProps(nextProps){
     const accessToken = nextProps.APP.accessToken;
     const mapConfig = nextProps.APP.mapConfig;
-
     const isRendered = nextProps.MAP.isRendered;
     const isLoaded = nextProps.MAP.isLoaded;
     const currentStyle = nextProps.MAP.currentStyle;
     const currentRegion = nextProps.MAP.currentRegion;
     const reloadLayers = nextProps.MAP.reloadLayers;
-    const activelayersData = nextProps.layersData;
+    const activelayersData = nextProps.layersObj;
     const activelayerObj = nextProps.layerObj;
     const primaryLayer = nextProps.MAP.primaryLayer;
     const activeLayerId = nextProps.MAP.activeLayerId;
