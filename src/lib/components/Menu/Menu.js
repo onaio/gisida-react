@@ -38,10 +38,11 @@ const mapStateToProps = (state, ownProps) => {
   return {
     categories: categories,
     // todo: provide missing props
-    menuId: 'sector-menu-1',
+    menuId: '01',
     mapTargetId: '',
     regions: state.REGIONS,
     currentRegion: currentRegion,
+    loaded: state.APP.loaded
   }
 }
 
@@ -83,65 +84,65 @@ class Menu extends Component {
     const regions = this.props.regions;
     const currentRegion = this.props.currentRegion;
     return (
-      <div id={`${menuId}-wrapper`} className="sectors-menu-wrapper">
-        {!this.state.openMenu ?
+      <div>
+      {this.props.loaded ?
+        <div id={`${menuId}-wrapper`} className="sectors-menu-wrapper">
           <a onClick={e => this.onToggleMenu(e)} className="open-btn">
             <span className="glyphicon glyphicon-menu-hamburger"></span>
-          </a> : ''}
-        {this.state.openMenu ?
-        <div id={menuId} className="sectors-menu">
-          <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
-            <span className="glyphicon glyphicon-remove"></span>  
           </a>
-          <ul className="sectors">
-            {regions && regions.length ?
-              <li className="sector">
-                <a onClick={e => this.onCategoryClick(e, 'Regions')}>Regions
-                <span className="caret" />
-                </a>
-                <ul className="layers">
-                  {regions && regions.length ?
-                    regions.map((region, i) =>
-                      (<li className={`region ${mapTargetId}`} key={region.name}>
-                        <input
-                          id={region.name}
-                          key={region.name}
-                          name="region"
-                          type="radio"
-                          value={region.name}
-                          checked={!!region.current}
-                          onChange={e => this.onRegionClick(e)}
-                        />
-                        <label htmlFor={region.name}>{region.name}</label>
-                      </li>)) :
-                    <li></li>
-                  }
-                </ul>
-              </li>: <li/> }
-            {(categories && categories.length) > 0 ?
-              categories.map((category, i) =>
-                (<li className="sector" key={i}>
-                  <a onClick={e => this.onCategoryClick(e, category.category)}>{category.category}
-                    <span
-                      className={"category glyphicon " +
-                        (this.state.openCategories.includes(category.category) ?
-                        "glyphicon-chevron-down" : "glyphicon-chevron-right")}
-                    />
+          <div id={menuId} className="sectors-menu">
+            <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
+              <span className="glyphicon glyphicon-remove"></span>
+            </a>
+            <ul className="sectors">
+              {regions && regions.length ?
+                <li className="sector">
+                  <a onClick={e => this.onCategoryClick(e, 'Regions')}>Regions
+                  <span className="caret" />
                   </a>
-                  {
-                    this.state.openCategories.includes(category.category) ?
-                    <Layers
-                      mapTargetId={mapTargetId}
-                      layers={category.layers}
-                      currentRegion={currentRegion}
-                    />
-                    : <ul />}
-                </li>)) :
-              <li></li>
-            }
-          </ul>
-        </div>: <div/>
-        }
+                  <ul className="layers">
+                    {regions && regions.length ?
+                      regions.map((region, i) =>
+                        (<li className={`region ${mapTargetId}`} key={region.name}>
+                          <input
+                            id={region.name}
+                            key={region.name}
+                            name="region"
+                            type="radio"
+                            value={region.name}
+                            checked={!!region.current}
+                            onChange={e => this.onRegionClick(e)}
+                          />
+                          <label htmlFor={region.name}>{region.name}</label>
+                        </li>)) :
+                      <li></li>
+                    }
+                  </ul>
+                </li>: <li/> }
+              {(categories && categories.length) > 0 ?
+                categories.map((category, i) =>
+                  (<li className="sector" key={i}>
+                        <a onClick={e => this.onCategoryClick(e, category.category)}>{category.category}
+                          <span
+                            className={"category glyphicon " +
+                              (this.state.openCategories.includes(category.category) ?
+                                "glyphicon-chevron-down" : "glyphicon-chevron-right")}
+                          />
+                    </a>
+                        {
+                          this.state.openCategories.includes(category.category) ?
+                            <Layers
+                              mapTargetId={mapTargetId}
+                              layers={category.layers}
+                              currentRegion={currentRegion}
+                            />
+                            : <ul />}
+                  </li>)) :
+                <li></li>
+              }
+            </ul>
+          </div>
+        </div> : ''}
       </div>
     );
   }

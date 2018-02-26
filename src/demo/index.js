@@ -8,6 +8,7 @@ import Map from '../lib/components/Map/Map';
 import StyleSelector from '../lib/components/StyleSelector/StyleSelector';
 import Legend from '../lib/components/Legend/Legend';
 import FilterSelector from '../lib/components/FilterSelector/FilterSelector';
+import Filter from '../lib/components/Filter/Filter'
 import registerServiceWorker from './registerServiceWorker';
 import { initStore } from 'gisida';
 
@@ -22,6 +23,7 @@ ReactDOM.render(
         <Menu />
         <StyleSelector />
         <Legend />
+        <Filter />
       </App>
     </Provider>
   ),

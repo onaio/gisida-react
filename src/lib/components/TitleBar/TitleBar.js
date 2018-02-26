@@ -18,28 +18,38 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-const TitleBar = ({ appConfig = f => f }) =>
-  (<div className="menu" id="menu" style={{ background: appConfig.appColor }}>
-    <div className="brand">
-      <img src={appConfig.appIcon} alt="UKAID" className="brand-icon" />
-      <div className="brand-title">
-        <span className="white">{appConfig.appName}</span>&nbsp;&nbsp; {appConfig.appNameDesc}</div>
+class TitleBar extends React.Component{
+
+render() {
+  const { appConfig } = this.props;
+  return (
+    <div>
+    {appConfig.loaded ?
+      (<div className="menu" id="menu" style={{ background: appConfig.appColor }}>
+        <div className="brand">
+          <img src={appConfig.appIcon} alt="UKAID" className="brand-icon" />
+          <div className="brand-title">
+            <span className="white">{appConfig.appName}</span>&nbsp;&nbsp; {appConfig.appNameDesc}</div>
+        </div>
+        {appConfig.password ?
+          <a className="sign-out" onClick={logOut} role="button" tabIndex={0}>
+            <i className="fa fa-sign-out" aria-hidden="true" />
+          </a>
+          : ''}
+        <a
+          className="ona-logo"
+          href="http://www.ona.io/"
+          alt="Powered by ONA"
+          title="Powered by ONA"
+          target="_blank"
+          rel="noopener noreferrer"
+        >Powered by
+        </a>
+      </div>): ''}
     </div>
-    {appConfig.password ?
-      <a className="sign-out" onClick={logOut} role="button" tabIndex={0}>
-        <i className="fa fa-sign-out" aria-hidden="true" />
-      </a>
-      : ''}
-    <a
-      className="ona-logo"
-      href="http://www.ona.io/"
-      alt="Powered by ONA"
-      title="Powered by ONA"
-      target="_blank"
-      rel="noopener noreferrer"
-    >Powered by
-    </a>
-  </div>);
+    );
+  }
+}
 
 TitleBar.propTypes = {
   appConfig: PropTypes.objectOf(PropTypes.any).isRequired,
