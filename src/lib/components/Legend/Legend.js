@@ -2,20 +2,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Actions, generateStops, formatNum, hexToRgbA } from 'gisida';
+import { buildLayersObj } from '../../utils';
 import './Legend.scss';
 
 const mapStateToProps = (state, ownProps) => {
-  let layersObj = [];
-  Object.keys(state.MAP.layers).forEach((key) => {
-    const layer = state.MAP.layers[key];
-    if (layer.visible) {
-      layersObj.push(layer);
-    }
-  });
-
   return {
     layerObj: state.MAP.layers[state.MAP.activeLayerId],
-    layersData: layersObj,
+    layersData: buildLayersObj(state.MAP.layers),
     MAP: state.MAP,
     primaryLayer: state.MAP.primaryLayer,
   }

@@ -1,23 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, addPopUp, sortLayers } from 'gisida';
-import { detectIE } from '../../utils';
+import { Actions, addLayer, addPopUp, prepareLayer, sortLayers } from 'gisida';
+import { detectIE, buildLayersObj } from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
-  let layersObj = [];
-  Object.keys(state.MAP.layers).forEach((key) => {
-    const layer = state.MAP.layers[key];
-    if (layer.visible) {
-      layersObj.push(layer);
-    }
-  });
   return {
     APP: state.APP,
     STYLES: state.STYLES,
     REGIONS: state.REGIONS,
     MAP: state.MAP,
-    layersObj: layersObj,
+    layersObj: buildLayersObj(state.MAP.layers),
     layerObj: state.MAP.layers[state.MAP.activeLayerId],
     primaryLayer: state.MAP.primaryLayer,
   }

@@ -1,22 +1,17 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, generateFilterOptions } from 'gisida';
+import PropTypes from 'prop-types';
+import { buildLayersObj } from '../../utils';
 import FilterSelector from './FilterSelector';
 import './Filter.scss';
 
 const mapStateToProps = (state, ownProps) => {
-  let layersObj = [];
-  Object.keys(state.MAP.layers).forEach((key) => {
-    const layer = state.MAP.layers[key];
-    if (layer.visible) {
-      layersObj.push(layer);
-    }
-  });
   return {
     layerObj: state.MAP.layers[state.MAP.filter.layerId],
     doShowProfile: state.MAP.showProfile,
     showFilterPanel: state.MAP.showFilterPanel,
-    layersObj: layersObj,
+    layersObj: buildLayersObj(state.MAP.layers),
     showFilterBtn: state.MAP.filter.layerId,
     layerData: state.MAP.layers,
   }
