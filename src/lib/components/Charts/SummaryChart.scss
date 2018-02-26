@@ -1,0 +1,182 @@
+.sumChartModal {
+  position: fixed;
+  top: 10vh;
+  left: 33%;
+  min-width: 500px;
+  max-height: 550px;
+  overflow-y: auto;
+  display: flex;
+  flex-flow: column nowrap;
+  background-color: #fff;
+  border-radius: 5px;
+  z-index: 1005;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+
+  .sumChartModalHeader {
+    position: relative;
+
+    h4 {
+      display: inline-block;
+      margin-left: 12px;
+      padding-right: 24px;
+      max-width: 500px;
+    }
+
+    h5 {
+      margin: 10px 12px 0;
+      font-weight: normal;
+      font-size: 16px;
+    }
+
+    .closeBtn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      cursor: pointer;
+    }
+  }
+
+  .sumChartModalBody {
+    flex-grow: 1;
+  }
+}
+
+.sumChartsOverlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  z-index: 1003;
+}
+
+.sumChart {
+  position: absolute;
+  min-height: 22px;
+  z-index: 1004;
+  text-align: right;
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 1px 7px rgba(0, 0, 0, 0.2);
+  transition: height 0.4s, width 0.4s, bottom 0.4s, right 0.4s;
+
+  .toggleBtn {
+    position: absolute;
+    right: 52px;
+    top: 10px;
+    height: 23px;
+    width: 23px;
+    border: 1px solid transparent;
+    background-color: transparent;
+    transition: 0.4s border-color;
+    border-radius: 0;
+    z-index: 1002;
+
+    &::before {
+      position: relative;
+      right: 3px;
+      top: 1px;
+    }
+
+    &.isOpen {
+      background-color: #e3e3e3;
+
+      &::before {
+        top: 0.25px;
+        right: 2.25px;
+      }
+    }
+
+    &:active,
+    &:focus {
+      outline: none;
+    }
+
+    &:hover {
+      border-color: #999;
+    }
+  }
+
+  &.pie {
+    right: 20px;
+    min-width: 300px;
+  }
+
+  &.column {
+    right: 0;
+    bottom: 0;
+    width: 300px;
+
+    &.min {
+      box-shadow: none;
+      background-color: transparent;
+    }
+  }
+}
+
+.toggleChart {
+  position: fixed;
+  right: 32px;
+  height: 24px;
+  width: 24px;
+  color: #555;
+  cursor: pointer;
+  z-index: 1002;
+
+  &:hover,
+  &:active,
+  &:focus {
+    color: #333;
+    text-decoration: none;
+    outline: none;
+  }
+
+  .minimizedLabel {
+    display: none;
+    padding-right: 6px;
+    font-weight: bold;
+  }
+
+  span {
+    display: block;
+    height: 24px;
+    width: 24px;
+    border: 1px solid transparent;
+    transition: 0.4s border-color;
+    background: url('/assets/img/chart-icon-01.svg') center center no-repeat;
+    background-color: #e3e3e3;
+
+    &:hover {
+      border-color: #999;
+    }
+  }
+
+  .min & {
+    box-shadow: none;
+    background-color: transparent;
+
+    span {
+      background-color: transparent;
+    }
+
+    .minimizedLabel {
+      display: inline;
+    }
+  }
+
+  .pie & {
+    top: auto;
+    bottom: 10px;
+  }
+
+  .pie.min & {
+    bottom: 1px;
+  }
+}
+
+ .pie-title {
+    margin-left: 92px;
+    font-weight: bold;
+  }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, addLayer, addPopUp, prepareLayer } from 'gisida';
+import { Actions, addLayer, addPopUp, prepareLayer, sortLayers } from 'gisida';
 import { detectIE } from '../../utils';
 import Filter from '../Filter/Filter';
 import './Map.scss';
@@ -31,8 +31,7 @@ class Map extends Component {
       mapboxgl.accessToken = accessToken;
       this.map = new mapboxgl.Map(mapConfig);
       this.map.addControl(new mapboxgl.NavigationControl());
-      // Map Rendered
-      this.props.dispatch(Actions.mapRendered());
+  
       // Handle Map Load Event
       this.map.on('load', () => {
         const mapLoaded = true;
@@ -44,16 +43,22 @@ class Map extends Component {
       // Handle Style Change Event
       this.map.on('style.load', (e) => {
         let mapLoad = false;
-        // Render Event listner function for style load
+        // Define on map on render listener for current stlye loads
         const onStyleLoad = (e) => {
+          // check if map is loaded before reloading layers
           if (e.target.loaded() && mapLoad !== e.target.loaded() && this.props.MAP.isLoaded) {
             mapLoad = true;
             this.props.dispatch(Actions.reloadLayers(Math.random()));
           }
         };
+        // remove render listener for previous style.load event
         e.target.off('render', onStyleLoad);
+        // add render listener for current style.load event
         e.target.on('render', onStyleLoad);
       });
+
+      // Dispach map rendered to indicate map was rendered
+      this.props.dispatch(Actions.mapRendered());
     }
   }
 
@@ -63,6 +68,7 @@ class Map extends Component {
     // this.addMouseMoveEvents()
     // etc
   }
+
   componentWillReceiveProps(nextProps){
     const accessToken = nextProps.APP.accessToken;
     const mapConfig = nextProps.APP.mapConfig;
@@ -70,12 +76,14 @@ class Map extends Component {
     const isRendered = nextProps.MAP.isRendered;
     const isLoaded = nextProps.MAP.isLoaded;
     const currentStyle = nextProps.MAP.currentStyle;
+    const currentRegion = nextProps.MAP.currentRegion;
     const reloadLayers = nextProps.MAP.reloadLayers;
 
 
     const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES;
     const regions = nextProps.REGIONS;
+  
 
     // Check if map is initialized.
     if (!isRendered && (!isIE || mapboxgl.supported())) {
@@ -93,7 +101,7 @@ class Map extends Component {
 
       // Zoom to current region (center and zoom)
       regions.forEach((region) => {
-        if (region.current) {
+        if (region.current && this.props.MAP.currentRegion !== currentRegion) {
           this.map.easeTo({
             center: region.center,
             zoom: region.zoom,
@@ -106,10 +114,20 @@ class Map extends Component {
       if (this.props.MAP.reloadLayers !== reloadLayers) {
         Object.keys(layers).forEach((key) => {
           const layer = layers[key];
-          if (layer.loaded) {
-            addLayer(this.map, layer, mapConfig);
+          const timeSeriesLayer = nextProps.MAP.timeseries[layer.id];
+          // Add layer to map if visible
+          if (!this.map.getLayer(layer.id) && layer.visible && layer.styleSpec) {
+            this.map.addLayer(layer.styleSpec);
+          } 
+          // Change visibility if layer is already on map
+          if (this.map.getLayer(layer.id)) {
+            this.map.setLayoutProperty(layer.id, 'visibility', layer.visible ? 'visible' : 'none');
           }
+          
+
         });
+
+        sortLayers(this.map, layers);
       }
     }
     // Assign global variable for debugging purposes.

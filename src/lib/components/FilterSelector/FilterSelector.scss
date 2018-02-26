@@ -1,0 +1,97 @@
+.filter-group {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  font-weight: normal !important;
+  position: absolute;
+  right: 10px;
+  z-index: 1;
+  border-radius: 3px;
+  width: 120px;
+  color: #fff;
+  top: 200px;
+}
+
+.filter-group span input[type=checkbox]:first-child + label {
+  border-radius: 3px 3px 0 0;
+}
+
+.filter-group span label:last-child {
+  border-radius: 0 0 3px 3px;
+  border: none;
+}
+
+.filter-group span input[type=checkbox] {
+  display: none;
+}
+
+.filter-group span input[type=checkbox] + label {
+  background-color: rgba(0, 0, 0, 0.2);
+  display: block;
+  cursor: pointer;
+  padding: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+  margin-bottom: 0;
+}
+
+.filter-group span input[type=checkbox] + label {
+  background-color: rgba(0, 0, 0, 0.6);
+  text-transform: capitalize;
+}
+
+.filter-group span input[type=checkbox] + label:hover,
+.filter-group span input[type=checkbox]:checked + label {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.filter-group span input[type=checkbox]:checked + label::before {
+  content: '✔';
+  margin-right: 5px;
+}
+
+.multiselect {
+  width: 200px;
+ 
+  position: absolute;
+  right: 10px;
+  z-index: 1;
+  border-radius: 3px;
+ 
+ 
+  top: 180px;
+}
+
+.selectBox {
+  position: relative;
+}
+
+.selectBox select {
+  width: 100%;
+  font-weight: bold;
+}
+
+.overSelect {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+#checkboxes {
+  display: none;
+  border: 1px #dadada solid;
+  background-color: rgb(247, 246, 239);
+  padding: 15px;
+  box-shadow: 0 1px 7px rgba(0, 0, 0, 0.2), inset 0 0 0 1.5px rgba(0, 0, 0, 0.4);
+}
+
+#checkboxes label {
+  display: block;
+}
+
+#checkboxes input {
+  margin-right : 5px;
+}
+#checkboxes label:hover {
+   box-shadow: 0 1px 7px rgba(0, 0, 0, 0.2), inset 0 0 0 1.5px rgba(0, 0, 0, 0.2);
+}

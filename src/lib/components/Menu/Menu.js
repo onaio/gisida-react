@@ -30,33 +30,46 @@ const mapStateToProps = (state, ownProps) => {
       });
     }
   });
+
+  // Get current region
+  const currentRegion = state.REGIONS && state.REGIONS.length?
+    state.REGIONS.filter(region => region.current)[0].name: '';
+
   return {
     categories: categories,
     // todo: provide missing props
-    menuId: 'sector-menu-1',
+    menuId: '01',
     mapTargetId: '',
     regions: state.REGIONS,
+    currentRegion: currentRegion,
     loaded: state.APP.loaded
   }
 }
 
 class Menu extends Component {
-
-  onToggleMenu = (e) => {
-    // todo: Show/Hide Menu
-    const mapId  = 'map-1'
-    e.preventDefault();
-    const $wrapper = $(e.target).parents('.sectors-menu-wrapper');
-    $wrapper.find('.sectors-menu').toggle();
-    $wrapper.find('.open-btn').toggle();
-    // todo - move this into the state....
-    $(window).trigger('toggleSector', { mapId, sectorsId: $wrapper.attr('id') });
+  constructor(props) {
+    super(props)
+    this.state = {
+      openCategories: [],
+      openMenu: true
+    }
   }
 
-  onCategoryClick = (e) => {
-    //todo: Expand/Collapes layer categories sub-menu
+  onToggleMenu = (e) => {
     e.preventDefault();
-    $(e.target).parent('li').find('.layers').toggle();
+    this.setState({ openMenu: !this.state.openMenu });
+  }
+
+  onCategoryClick = (e, category) => {
+    e.preventDefault();
+
+    const openCategories = this.state.openCategories;
+    const index = openCategories.indexOf(category);
+  
+    if (index > -1) {
+      openCategories.splice(openCategories.indexOf(category), 1);
+    } else openCategories.push(category);
+    this.setState({ openCategories });
   }
 
   onRegionClick = (e) => {
@@ -69,6 +82,7 @@ class Menu extends Component {
     const mapTargetId = this.props.mapTargetId;
     const categories = this.props.categories;
     const regions = this.props.regions;
+    const currentRegion = this.props.currentRegion;
     return (
       <div>
       {this.props.loaded ?
@@ -83,7 +97,7 @@ class Menu extends Component {
             <ul className="sectors">
               {regions && regions.length ?
                 <li className="sector">
-                  <a onClick={e => this.onCategoryClick(e)}>Regions
+                  <a onClick={e => this.onCategoryClick(e, 'Regions')}>Regions
                   <span className="caret" />
                   </a>
                   <ul className="layers">
@@ -108,13 +122,21 @@ class Menu extends Component {
               {(categories && categories.length) > 0 ?
                 categories.map((category, i) =>
                   (<li className="sector" key={i}>
-                    <a onClick={e => this.onCategoryClick(e)}>{category.category}
-                      <span className="caret" />
+                        <a onClick={e => this.onCategoryClick(e, category.category)}>{category.category}
+                          <span
+                            className={"category glyphicon " +
+                              (this.state.openCategories.includes(category.category) ?
+                                "glyphicon-chevron-down" : "glyphicon-chevron-right")}
+                          />
                     </a>
-                    <Layers
-                      mapTargetId={mapTargetId}
-                      layers={category.layers}
-                    />
+                        {
+                          this.state.openCategories.includes(category.category) ?
+                            <Layers
+                              mapTargetId={mapTargetId}
+                              layers={category.layers}
+                              currentRegion={currentRegion}
+                            />
+                            : <ul />}
                   </li>)) :
                 <li></li>
               }

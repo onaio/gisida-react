@@ -12,9 +12,10 @@ class Layer extends Component {
 
   onLayerToggle = (e, layer) => {
     const dispatch = this.props.dispatch;
-    
+
     // dispatch toggle layer 
     dispatch(Actions.toggleLayer(layer.id, e.target.checked));
+
 
     // dispach prepare layer if layer data has not been loaded into props
     if (!layer.loaded && !layer.isLoading) {
