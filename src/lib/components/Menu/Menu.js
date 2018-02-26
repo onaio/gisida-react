@@ -38,7 +38,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     categories: categories,
     // todo: provide missing props
-    menuId: '01',
+    menuId: 'sector-menu-1',
     mapTargetId: '',
     regions: state.REGIONS,
     currentRegion: currentRegion,
