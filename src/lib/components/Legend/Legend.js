@@ -3,6 +3,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Actions, generateStops, formatNum, hexToRgbA } from 'gisida';
 import { buildLayersObj } from '../../utils';
+import Parser from 'html-react-parser';
 import './Legend.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -98,6 +99,7 @@ class Legend extends React.Component {
             const fillWidth = (100 / layer.categories.color.length).toString();
             background.push((
               <li
+                key={index}
                 style={{ background: color, width: fillWidth + '%' }}>
                 {layer.categories.label[index]}
               </li>
@@ -123,7 +125,7 @@ class Legend extends React.Component {
                 </ul>
               </div>
               <span>
-                {layer.credit}
+                {Parser(layer.credit)}
               </span>
             </div>
           );
@@ -169,7 +171,10 @@ class Legend extends React.Component {
           'border-bottom-color:' : 'background:';
           const styleString = `${style}: ${color}`;
           background += (
-            <li className="layer-symbols">
+            <li
+              className="layer-symbols"
+              key={index}
+            >
               <span
                 className={`${layer.categories.shape[index]}`}
                 style={{styleString}}
@@ -184,6 +189,7 @@ class Legend extends React.Component {
             id={`legend-${layer.id}-${mapId}`}
             className="legend-row"
             data-layer={`${layer.id}`}
+            key={l}
           >
             <b>
               {layer.label}
@@ -204,6 +210,7 @@ class Legend extends React.Component {
           const fillWidth = (100 / layer.categories.color.length).toString();
           background.push((
             <li
+              key={index}
               style={{ background: color, width: fillWidth + '%' }}>
               {layer.categories.label[index]}
             </li>
@@ -229,7 +236,7 @@ class Legend extends React.Component {
               </ul>
             </div>
             <span>
-              {layer.credit}
+            {Parser(layer.credit)}
             </span>
           </div>
         ));
@@ -262,6 +269,7 @@ class Legend extends React.Component {
             const lastVal = color === colorLegend[colorLegend.length - 1] || breaks[index] === undefined ? Math.max(...dataValues) : breaks[index];
             background.push((
               <li
+                key={index}
                 className={`background-block-${layer.id}-${mapId}`}
                 data-tooltip={`${formatNum(firstVal, 1)}-${formatNum(lastVal, 1)}${legendSuffix}`}
                 style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colorLegend.length) + '%'}}
@@ -275,6 +283,7 @@ class Legend extends React.Component {
               id={`legend-${layer.id}-${mapId}`}
               className={`legend-row ${activeLayerSelected}`}
               data-layer={`${layer.id}`}
+              key={l}
               onClick={(e) => this.onUpdatePrimaryLayer(e)}
             >
               <b>
@@ -310,7 +319,7 @@ class Legend extends React.Component {
                   {background}
                 </ul>
               </div>
-              <span>{layer.credit}</span>
+              <span>{Parser(layer.credit)}</span>
             </div>
           ));
         }
