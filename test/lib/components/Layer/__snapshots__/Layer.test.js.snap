@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Layer Layer comonent renderes correctly 1`] = `
+<li
+  className="layer"
+>
+  <input
+    checked={true}
+    data-layer="sample-layer"
+    id="sample-layer"
+    onChange={[Function]}
+    type="checkbox"
+  />
+  <label
+    htmlFor="sample-layer"
+  >
+    Boundaries
+  </label>
+</li>
+`;
