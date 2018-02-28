@@ -1,5 +1,4 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
 import Layer  from '../../../../src/lib/components/Layer/Layer'
 import layerObj from '../../../fixtures/sample-layer.json';
 import { shallow } from 'enzyme';
