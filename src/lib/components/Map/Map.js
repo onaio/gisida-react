@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, addLayer, addPopUp, prepareLayer, sortLayers } from 'gisida';
+import { Actions, addPopUp, sortLayers } from 'gisida';
 import { detectIE } from '../../utils';
-import Filter from '../Filter/Filter';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -114,7 +113,6 @@ class Map extends Component {
       if (this.props.MAP.reloadLayers !== reloadLayers) {
         Object.keys(layers).forEach((key) => {
           const layer = layers[key];
-          const timeSeriesLayer = nextProps.MAP.timeseries[layer.id];
           // Add layer to map if visible
           if (!this.map.getLayer(layer.id) && layer.visible && layer.styleSpec) {
             this.map.addLayer(layer.styleSpec);
@@ -123,8 +121,6 @@ class Map extends Component {
           if (this.map.getLayer(layer.id)) {
             this.map.setLayoutProperty(layer.id, 'visibility', layer.visible ? 'visible' : 'none');
           }
-          
-
         });
 
         sortLayers(this.map, layers);

@@ -9,11 +9,11 @@ const mapStateToProps = (state, ownProps) => {
   
   return {
     styles: state.STYLES,
-    MAP: state.MAP
+    showFilterPanel: state.MAP.showFilterPanel
   }
 }
 
-class StyleSelector extends Component {
+export class StyleSelector extends Component {
 
   changeStyle = (e) => {
     const style = e.target.value;
@@ -23,7 +23,7 @@ class StyleSelector extends Component {
   render() {
     const styles = this.props.styles;
     return (
-      <div className="leaflet-left leaflet-top leaflet-right layer-selector" style={{ right: this.props.MAP.showFilterPanel ? '250px' : '0'}}>
+      <div className="leaflet-left leaflet-top leaflet-right layer-selector" style={{ right: this.props.showFilterPanel ? '250px' : '0'}}>
         <div aria-haspopup="true" className="leaflet-control leaflet-control-layers">
           <a title="styles" className="leaflet-control-layers-toggle"> </a>
           <form className="leaflet-control-layers-list">
@@ -54,6 +54,7 @@ class StyleSelector extends Component {
 
 StyleSelector.propTypes = {
   styles: PropTypes.arrayOf(PropTypes.any).isRequired,
+  showFilterPanel: PropTypes.bool
 };
 
 export default connect(mapStateToProps)(StyleSelector);

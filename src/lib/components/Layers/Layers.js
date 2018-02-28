@@ -12,7 +12,7 @@ const Layers = ({ mapTargetId, layers, currentRegion}) =>
           layer={layer}
         />)
       }
-      return ""
+      return null
     })
   }
   </ul>);
@@ -20,7 +20,7 @@ const Layers = ({ mapTargetId, layers, currentRegion}) =>
 Layers.propTypes = {
   mapTargetId: PropTypes.string.isRequired,
   layers: PropTypes.arrayOf(PropTypes.any).isRequired,
-  currentRegion: PropTypes.string.isRequired,
+  currentRegion: PropTypes.string,
 };
 
 export default Layers;
