@@ -65,6 +65,10 @@ class Map extends Component {
     // etc
   }
 
+  findNextLayer(activelayersData, nextLayer) {
+    return activelayersData.find(lo => lo.id === nextLayer);
+  }
+
   setPrimaryLayer(primaryLayer, activeLayerId, layers, activeLayersData, activelayerObj) {
     const nextLayerId =  primaryLayer || activeLayerId;
     let nextLayerObj = activeLayersData.find(lo => lo.id === nextLayerId);
@@ -72,7 +76,7 @@ class Map extends Component {
       let nextLayer;
       for (let l = 0; l < layers[nextLayerId].layers.length; l += 1) {
         nextLayer = layers[nextLayerId].layers[l];
-        nextLayerObj = activeLayersData.find(lo => lo.id === nextLayer);
+        nextLayerObj = this.findNextLayer(activeLayersData, nextLayer);
         if (nextLayerObj) break;
       }
     }

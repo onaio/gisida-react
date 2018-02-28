@@ -1,5 +1,6 @@
 /* eslint-disable no-loop-func */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Actions, generateStops, formatNum, hexToRgbA } from 'gisida';
 import { buildLayersObj } from '../../utils';
@@ -15,7 +16,7 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-class Legend extends React.Component {
+export class Legend extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -41,7 +42,6 @@ class Legend extends React.Component {
     if (!layerObj) {
       return false;
     }
-    let shapesArr = [];
     const legendItems = [];
 
     let primaryLegend;
@@ -49,7 +49,6 @@ class Legend extends React.Component {
 
     for (let l = 0; l < this.props.layersData.length; l += 1) {
       layer = this.props.layersData[l];
-      const classKeys = ["sm", "md", "lg"];
       const circleLayerType = (layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible);
       const symbolLayer = (layer && layer.credit && layer.categories &&  layer.categories.shape && layer.type !== 'circle'); 
       const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
@@ -62,7 +61,6 @@ class Legend extends React.Component {
       const isBoundaries = boundaries.indexOf(layer.id) !== -1;
 
       let stops;
-      let newStops;
       let background = [];
 
       if (layerObj.id === layer.id) {
@@ -268,7 +266,6 @@ class Legend extends React.Component {
         }
 
         if (stops) {
-          newStops = { stops, id: layer.id };
           const colorStops = timefield ? stops[0][stops[0].length - 1] : stops[0][0];
           const radiusStops = stops[1][0];
           const stopsData = layer.type === 'circle' ? radiusStops : colorStops;
@@ -378,5 +375,12 @@ class Legend extends React.Component {
     );
   }
 }
+
+Legend.propTypes = {
+  layerObj: PropTypes.objectOf(PropTypes.any).isRequired,
+  layersData: PropTypes.arrayOf(PropTypes.any).isRequired,
+  MAP: PropTypes.objectOf(PropTypes.any).isRequired,
+  primaryLayer: PropTypes.string.isRequired,
+};
 
 export default connect(mapStateToProps)(Legend);

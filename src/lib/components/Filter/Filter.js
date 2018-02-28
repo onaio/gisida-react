@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, generateFilterOptions } from 'gisida';
-import PropTypes from 'prop-types';
 import { buildLayersObj } from '../../utils';
 import FilterSelector from './FilterSelector';
 import './Filter.scss';
@@ -973,8 +972,5 @@ class Filter extends Component {
     );
   }
 }
-
-Filter.propTypes = {
-};
 
 export default connect(mapStateToProps)(Filter);
