@@ -1,10 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Layers Layers component renders correctly 1`] = `
+exports[`Layers component renders correctly 1`] = `
 <ul
   className="layers"
 >
-  <Layer
+  <Connect(Layer)
     key="sample-layer"
     layer={
       Object {

@@ -9,7 +9,7 @@ const componentWrapper = shallow(
 );
 
 describe('Legend', () => {
-  it('Legend comonent renderes correctly', () => {
+  it('component renderes correctly', () => {
     const json = toJson(componentWrapper)
     expect(json).toMatchSnapshot();
   });

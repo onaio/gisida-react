@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import App from '../../../../src/lib/components/App/App';
 
 describe('App', () => {
-  it('renders without crashing', () => {
+  it('component renders correctly', () => {
     const div = document.createElement('div');
     ReactDOM.render(<App />, div);
     

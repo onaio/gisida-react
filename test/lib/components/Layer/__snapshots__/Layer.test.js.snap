@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Layer Layer comonent renderes correctly 1`] = `
+exports[`Layer component renderes correctly 1`] = `
 <li
   className="layer"
 >

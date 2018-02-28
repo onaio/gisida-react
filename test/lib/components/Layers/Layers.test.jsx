@@ -13,11 +13,10 @@ describe('Layers', () => {
       mapTargetId={'map-1'}
       layers={layers}
       currentRegion={undefined}
-
     />
   );
 
-  it('Layers component renders correctly', () => {
+  it('component renders correctly', () => {
     const json = toJson(componentWrapper)
     expect(json).toMatchSnapshot();
   });

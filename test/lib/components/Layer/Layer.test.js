@@ -1,5 +1,5 @@
 import React from 'react';
-import Layer  from '../../../../src/lib/components/Layer/Layer'
+import { Layer }  from '../../../../src/lib/components/Layer/Layer'
 import layerObj from '../../../fixtures/sample-layer.json';
 import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
@@ -11,7 +11,7 @@ const componentWrapper = shallow(
 );
 
 describe('Layer', () => {
-  it('Layer comonent renderes correctly', () => {
+  it('component renderes correctly', () => {
     const json = toJson(componentWrapper)
     expect(json).toMatchSnapshot();
   });

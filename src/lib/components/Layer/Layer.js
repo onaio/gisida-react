@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux'
 import { Actions, prepareLayer } from 'gisida'
 
-export default class Layer extends Component {
+export class Layer extends Component {
 
   onLayerToggle = (e, layer) => {
     // dispatch toggle layer action
@@ -34,3 +35,13 @@ export default class Layer extends Component {
 Layer.propTypes = {
   layer: PropTypes.objectOf(PropTypes.any).isRequired,
 };
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    mapId: '01',
+    timeSeriesObj: state.MAP.timeseries[state.MAP.visibleLayerId],
+    timeseries: state.MAP.timeseries,
+    layers: state.MAP.layers
+  }
+}
+export default connect(mapStateToProps)(Layer);

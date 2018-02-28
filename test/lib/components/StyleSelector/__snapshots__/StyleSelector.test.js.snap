@@ -1,0 +1,71 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`StyleSelector StyleSelector component renderes correctly 1`] = `
+<div
+  className="leaflet-left leaflet-top leaflet-right layer-selector"
+  style={
+    Object {
+      "right": "0",
+    }
+  }
+>
+  <div
+    aria-haspopup="true"
+    className="leaflet-control leaflet-control-layers"
+  >
+    <a
+      className="leaflet-control-layers-toggle"
+      title="styles"
+    >
+       
+    </a>
+    <form
+      className="leaflet-control-layers-list"
+    >
+      <div
+        className="leaflet-control-layers-base"
+      >
+        <label
+          htmlFor="styles"
+          key="label_Satelitte"
+        >
+          <input
+            checked={false}
+            className="leaflet-control-layers-selector"
+            key="input_Satelitte"
+            name="leaflet-base-layers"
+            onClick={[Function]}
+            readOnly={true}
+            type="radio"
+            value="mapbox://styles/mapbox/satellite-v9"
+          />
+          <span>
+            Satelitte
+          </span>
+        </label>
+        <label
+          htmlFor="styles"
+          key="label_Satelitte Streets"
+        >
+          <input
+            checked={false}
+            className="leaflet-control-layers-selector"
+            key="input_Satelitte Streets"
+            name="leaflet-base-layers"
+            onClick={[Function]}
+            readOnly={true}
+            type="radio"
+            value="mapbox://styles/mapbox/satellite-streets-v9"
+          />
+          <span>
+            Satelitte Streets
+          </span>
+        </label>
+      </div>
+      <div
+        className="leaflet-control-layers-overlays"
+      />
+    </form>
+  </div>
+</div>
+`;
