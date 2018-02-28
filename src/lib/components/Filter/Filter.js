@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, generateFilterOptions } from 'gisida';
-import PropTypes from 'prop-types';
 import FilterSelector from './FilterSelector';
 import './Filter.scss';
 
@@ -26,9 +25,6 @@ const mapStateToProps = (state, ownProps) => {
 class Filter extends Component {
   constructor(props) {
     super(props);
-    const { layerObj } = this.props.layerObj || {
-      filterOptions: {}
-    }
     const filters = null;
     const filterOptions = {}
     const id = null
@@ -311,7 +307,7 @@ class Filter extends Component {
   componentDidUpdate(prevProps, prevState) {
     window.GisidaMap.resize();
     const { layersObj, layerObj, layerData } = this.props;
-    if ((layerObj && layerObj.aggregate && prevProps.layerObj && prevProps.layerObj.aggregate) || layersObj && layersObj[layersObj.length - 1]) {
+    if ((layerObj && layerObj.aggregate && prevProps.layerObj && prevProps.layerObj.aggregate) || (layersObj && layersObj[layersObj.length - 1])) {
       let lData;
       // todo - update this conditional to look for feature-view property
       for (let l = 0; l < layersObj.length; l += 1) {
@@ -876,7 +872,7 @@ class Filter extends Component {
     }
 
     const doClear = isFilterable || this.state.isFiltered || this.isMapFiltered();
-    const filterBtnPos = this.state.doShowProfile && this.props.isOpen || this.state.isOpen ? '360px' : '10px';
+    const filterBtnPos = (this.state.doShowProfile && this.props.isOpen) || this.state.isOpen ? '360px' : '10px';
 
     return (
     <div>

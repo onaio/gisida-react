@@ -1,0 +1,18 @@
+ version: 2
+ jobs:
+   build:
+     working_directory: ~/gisida-react
+     docker:
+       - image: circleci/node:6.10.3
+     steps:
+       - checkout
+       - run: 
+           name: Install dependencies
+           command: yarn install
+       - run: 
+           name: Run tests
+           command: npm run test
+       - run: 
+           name: Compile production build
+           command: npm run build
+  

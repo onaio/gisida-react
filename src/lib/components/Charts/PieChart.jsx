@@ -36,7 +36,7 @@ class PieChart extends React.Component {
         width: chartWidth,
         height: chartHeight,
         backgroundColor: 'rgba(255,255,255,0)',
-        spacing: chartSpacing && chartSpacing.spacing || [10, 10, 15, 10],
+        spacing: (chartSpacing && chartSpacing.spacing) || [10, 10, 15, 10],
       },
       title: titleOptions || {
         text: seriesTitle || null,

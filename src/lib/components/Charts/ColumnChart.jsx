@@ -39,7 +39,7 @@ class ColumnChart extends React.Component {
       yAxis: [
         {
           title: {
-            text: yAxisLabel && yAxisLabel || 'Target Percentage (%)',
+            text: (yAxisLabel && yAxisLabel) || 'Target Percentage (%)',
             y: 10,
           },
           endOnTick: false,
@@ -48,7 +48,7 @@ class ColumnChart extends React.Component {
           linkedTo: 0,
           opposite: true,
           title: {
-            text: yAxisLabel && yAxisLabel || 'Target Percentage (%)',
+            text: (yAxisLabel && yAxisLabel) || 'Target Percentage (%)',
             y: 10,
             x: -10,
           },
