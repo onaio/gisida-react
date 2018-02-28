@@ -278,6 +278,9 @@ class Filter extends Component {
     } else if (combinedFilters.length === 2) {
       // if there is only one filter, apply the only one
       this.applyFilters(layerId, combinedFilters[1]);
+    } else if (combinedFilters.length === 1 && combinedFilters[0] === 'all') {
+      // if nothing was added to the combined filter array, removal all filters
+      this.applyFilters(layerId, null);
     }
   }
 
@@ -321,11 +324,11 @@ class Filter extends Component {
           // loop through layerObjs to find highlighted layerObj
           for (let i = 0; i < layersObj.length; i += 1) {
             nextLayerObj = layersObj[i];
-            if (nextLayerObj.id === layersObj[l].id) {
+            if (nextLayerObj.id === layersObj[l].id && nextLayerObj.filters.highlight && nextLayerObj.filters.rHighlight) {
               nextLayerObj.filters.highlight[2] = '';
               nextLayerObj.filters.rHighlight[2] = '';
-              featureLayerObj = Object.assign({}, nextLayerObj);
             }
+            featureLayerObj = Object.assign({}, nextLayerObj);
             nextLayersObj.push(nextLayerObj);
           }
           // update highlighted layerObj to original state

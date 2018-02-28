@@ -118,13 +118,32 @@ class Map extends Component {
           // Add layer to map if visible
           if (!this.map.getLayer(layer.id) && layer.visible && layer.styleSpec) {
             this.map.addLayer(layer.styleSpec);
+
+            // if layer has a highlight layer
+            if (layer.filters && layer.filters.highlight) {
+              // create a copy of the layer
+              const highlightLayer = Object.assign({}, layer.styleSpec);
+              // apply layout and paint properties to the highlight layer
+              if (layer['highlight-layout']) {
+                highlightLayer.layout = Object.assign({}, highlightLayer.layout, layer['highlight-layout']);
+              }
+              if (layer['highlight-paint']) {
+                highlightLayer.paint = Object.assign({}, highlightLayer.paint, layer['highlight-paint']);
+              }
+              // append suffix to highlight layer id
+              highlightLayer.id += '-highlight';
+              // add the highlight layer to the map
+              this.map.addLayer(highlightLayer);
+            }
           } 
           // Change visibility if layer is already on map
           if (this.map.getLayer(layer.id)) {
             this.map.setLayoutProperty(layer.id, 'visibility', layer.visible ? 'visible' : 'none');
+            // if layer has a highlight layer, update its visibility too
+            if (this.map.getLayer(`${layer.id}-highlight`)) {
+              this.map.setLayoutProperty(`${layer.id}-highlight`, 'visibility', layer.visibile ? 'visibile': 'none');
+            }
           }
-          
-
         });
 
         sortLayers(this.map, layers);
