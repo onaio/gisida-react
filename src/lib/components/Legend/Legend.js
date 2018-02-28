@@ -55,7 +55,11 @@ class Legend extends React.Component {
       const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
       const fillLayerWithBreaks = (layer && layer.credit && layer.type !== 'chart');
       const activeLayerSelected =  this.props.primaryLayer === layer.id ? 'primary' : '';
+      const lastSelected = this.props.layersData[this.props.layersData.length - 1].id === layer.id  ? 'primary' : '';
       const timefield = (layer && layer.aggregate && layer.aggregate.timeseries) ? layer.aggregate.timeseries.field : '';
+
+      const boundaries = ["region-boundaries", "district-boundaries"];
+      const isBoundaries = boundaries.indexOf(layer.id) !== -1;
 
       let stops;
       let newStops;
@@ -130,13 +134,30 @@ class Legend extends React.Component {
             </div>
           );
         }
+        // else {
+        //   primaryLegend = (
+        //     <div
+        //       id={`legend-${layer.id}-${mapId}`}
+        //       className={`legend-row primary`}
+        //       data-layer={`${layer.id}`}
+        //       key={l}
+        //     >
+        //       <b>
+        //         {layer.label}
+        //       </b>
+        //       <span>
+        //         {Parser(layer.credit)}
+        //       </span>
+        //     </div>
+        //   )
+        // }
         continue;
       }
       if (circleLayerType) {
         legendItems.unshift((
           <div
             id={`legend-${layer.id}-${mapId}`}
-            className={`legend-shapes legend-row ${activeLayerSelected}`}
+            className={`legend-shapes legend-row ${activeLayerSelected || lastSelected}`}
             data-layer={`${layer.id}`}
             key={l}
             onClick={(e) => this.onUpdatePrimaryLayer(e)}
@@ -187,8 +208,9 @@ class Legend extends React.Component {
         legendItems.unshift((
           <div
             id={`legend-${layer.id}-${mapId}`}
-            className="legend-row"
+            className={`legend-row ${activeLayerSelected || lastSelected}`}
             data-layer={`${layer.id}`}
+            onClick={(e) => this.onUpdatePrimaryLayer(e)}
             key={l}
           >
             <b>
@@ -200,7 +222,7 @@ class Legend extends React.Component {
               </ul>
             </div>
             <span>
-              {layer.credit}
+              {Parser(layer.credit)}
             </span>
           </div>
         ));
@@ -222,7 +244,7 @@ class Legend extends React.Component {
         legendItems.unshift((
           <div
             id={`legend-${layer.id}-${mapId}`}
-            className={`legend-row ${activeLayerSelected}`}
+            className={`legend-row ${activeLayerSelected || lastSelected}`}
             data-layer={`${layer.id}`}
             onClick={(e) => this.onUpdatePrimaryLayer(e)}
             key={l}
@@ -281,7 +303,7 @@ class Legend extends React.Component {
           legendItems.unshift((
             <div
               id={`legend-${layer.id}-${mapId}`}
-              className={`legend-row ${activeLayerSelected}`}
+              className={`legend-row ${activeLayerSelected || lastSelected}`}
               data-layer={`${layer.id}`}
               key={l}
               onClick={(e) => this.onUpdatePrimaryLayer(e)}
@@ -296,7 +318,7 @@ class Legend extends React.Component {
                 <li
                   id={`first-limit-${layer.id}`}
                   className={`${mapId}`}
-                  style={{ position: 'absolute', 'list-style': 'none', display: 'inline', left: '3%'}}
+                  style={{ position: 'absolute', listStyle: 'none', display: 'inline', left: '3%'}}
                 >
                   {0}
                   {legendSuffix}
@@ -304,7 +326,7 @@ class Legend extends React.Component {
                 <li
                   id={`last-limit-${layer.id}`}
                   className={`${mapId}`}
-                  style={{ position: 'absolute', 'list-style': 'none', display: 'inline', right: '3%'}}
+                  style={{ position: 'absolute', listStyle: 'none', display: 'inline', right: '3%'}}
                 >
                   {formatNum(Math.max(...dataValues), 1)}
                   {legendSuffix}
@@ -324,7 +346,24 @@ class Legend extends React.Component {
           ));
         }
       }
-        else {
+      else {
+        if (!isBoundaries) {
+          legendItems.unshift((
+            <div
+              id={`legend-${layer.id}-${mapId}`}
+              className={`legend-row`}
+              data-layer={`${layer.id}`}
+              key={l}
+            >
+              <b>
+                {layer.label}
+              </b>
+              <span>
+                {typeof layer.credit === "string" ? Parser(layer.credit) : null}
+              </span>
+            </div>
+          ));
+        }
       }
     }
 
