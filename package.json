@@ -70,7 +70,7 @@
   "dependencies": {
     "colorbrewer": "^1.1.0",
     "enzyme-adapter-react-16": "^1.1.1",
-    "gisida": "0.0.1",
+    "gisida": "0.0.2",
     "highcharts": "^6.0.6",
     "react-redux": "^5.0.6"
   },
