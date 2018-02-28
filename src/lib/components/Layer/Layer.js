@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Actions, prepareLayer } from 'gisida'
 
-export class Layer extends Component {
+export default class Layer extends Component {
 
   onLayerToggle = (e, layer) => {
     // dispatch toggle layer action
