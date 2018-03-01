@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, addLayer, addPopUp, prepareLayer, sortLayers } from 'gisida';
+import { Actions, addPopUp, sortLayers } from 'gisida';
 import { detectIE, buildLayersObj } from '../../utils';
 import './Map.scss';
 
