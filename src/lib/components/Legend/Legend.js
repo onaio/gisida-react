@@ -52,7 +52,7 @@ export class Legend extends React.Component {
       const circleLayerType = (layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible);
       const symbolLayer = (layer && layer.credit && layer.categories &&  layer.categories.shape && layer.type !== 'circle'); 
       const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
-      const fillLayerWithBreaks = (layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle');
+      const fillLayerWithBreaks = (!fillLayerNoBreaks && layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle');
       const activeLayerSelected =  this.props.primaryLayer === layer.id ? 'primary' : '';
       const lastSelected = this.props.layersData[this.props.layersData.length - 1].id === layer.id  ? 'primary' : '';
 
@@ -129,9 +129,8 @@ export class Legend extends React.Component {
               </span>
             </div>
           );
-        }
-        if (fillLayerWithBreaks && layerObj.stops && layer.stops) {
-          const { stopsData, breaks, colors, Data } = layerObj;
+        } if (fillLayerWithBreaks && layerObj.stops && layer.stops) {
+          const { stopsData, breaks, colors, Data } = layer;
 
           const dataValues = Data.map(values => values[layer.property]);
           const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];

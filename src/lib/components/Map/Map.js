@@ -111,6 +111,16 @@ class Map extends Component {
     return true;
   }
   
+  changeVisibility(layerId, visibility) {
+    if (this.map.getLayer(layerId)) {
+      this.map.setLayoutProperty(layerId, 'visibility', visibility ? 'visible' : 'none');
+      // if layer has a highlight layer, update its visibility too
+      if (this.map.getLayer(`${layerId}-highlight`)) {
+        this.map.setLayoutProperty(`${layerId}-highlight`, 'visibility', visibility ? 'visibile' : 'none');
+      }
+    }
+  }
+
   componentWillReceiveProps(nextProps){
     const accessToken = nextProps.APP.accessToken;
     const mapConfig = nextProps.APP.mapConfig;
@@ -180,12 +190,11 @@ class Map extends Component {
             }
           } 
           // Change visibility if layer is already on map
-          if (this.map.getLayer(layer.id)) {
-            this.map.setLayoutProperty(layer.id, 'visibility', layer.visible ? 'visible' : 'none');
-            // if layer has a highlight layer, update its visibility too
-            if (this.map.getLayer(`${layer.id}-highlight`)) {
-              this.map.setLayoutProperty(`${layer.id}-highlight`, 'visibility', layer.visibile ? 'visibile': 'none');
-            }
+          this.changeVisibility(layer.id, layer.visible);
+          if (layer.layers) {
+            layer.layers.forEach((subLayer) => {
+              this.changeVisibility(subLayer, layer.visible);
+            });
           }
         });
 
