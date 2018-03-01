@@ -153,8 +153,39 @@ class Map extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    
+    // remove/add labels
+    this.removeLabels();
+    this.props.layersObj.forEach(layerObj => {
+      if (layerObj.labels && layerObj.labels.labels) {
+        this.addLabels(layerObj);
+      }
+    })
+    // unsubscribe/subscribe zoom handler
   }
+
+  addLabels(layerObj) {
+    let el;
+    const { id } = layerObj;
+    const { offset, labels } = layerObj.labels;
+    for (let l = 0; l < labels.length; l += 1) {
+      el = document.createElement('div');
+      el.className = `map-label label-${id}`;
+      el.innerHTML = labels[l].label;
+      new mapboxgl.Marker(el, { offset })
+        .setLngLat(labels[l].coordinates)
+        .addTo(this.map);
+    }
+  }
+
+  removeLabels() {
+    const classItems = document.getElementsByClassName(`map-label`);
+    while (classItems[0]) {
+      classItems[0].parentNode.removeChild(classItems[0]);
+    }
+  }
+
+  // func to un/subscribe to map.zoom event
+  handleLabelsOnMapZoom() {}
 
   render() {
     return (
