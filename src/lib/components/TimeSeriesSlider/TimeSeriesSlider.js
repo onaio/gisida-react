@@ -97,31 +97,28 @@ class TimeSeriesSlider extends React.Component {
   }
 
   render() {
-    return (
-      <div>
-        {(this.props.timeSeriesObj) ?
-          <div className="series">
-            <label
-              id={`${this.props.mapId}-label`}
-              className="label"
-              htmlFor="slider"
-            >{this.state.period}</label>
-            <input
-              id={`${this.props.mapId}-slider`}
-              className="slider"
-              type="range"
-              list={`${this.props.mapId}-datalist`}
-              max={this.state.periods.length - 1}
-              value={this.state.index}
-              onInput={(e) => { this.handleMouseUp(e); }}
-              data-html2canvas-ignore
-            />
-            <datalist id={`${this.props.mapId}-datalist`}>
-              {this.state.periods.map((p, i) => <option key={i}>{i}</option>)}
-            </datalist>
-          </div> : ''}
+    return this.props.timeSeriesObj ? (
+      <div className="series">
+        <label
+          id={`${this.props.mapId}-label`}
+          className="label"
+          htmlFor="slider"
+        >{this.state.period}</label>
+        <input
+          id={`${this.props.mapId}-slider`}
+          className="slider"
+          type="range"
+          list={`${this.props.mapId}-datalist`}
+          max={this.state.periods.length - 1}
+          value={this.state.index}
+          onChange={(e) => { this.handleMouseUp(e); }}
+          data-html2canvas-ignore
+        />
+        <datalist id={`${this.props.mapId}-datalist`}>
+          {this.state.periods.map((p, i) => <option key={i}>{i}</option>)}
+        </datalist>
       </div>
-    );
+    ) : null;
   }
 }
 

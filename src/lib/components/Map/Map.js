@@ -18,7 +18,8 @@ const mapStateToProps = (state, ownProps) => {
     STYLES: state.STYLES,
     REGIONS: state.REGIONS,
     MAP: state.MAP,
-    layersObj: layersObj
+    layersObj: layersObj,
+    timeseries: state.MAP.timeseries
   }
 }
 
@@ -152,16 +153,56 @@ class Map extends Component {
     }
     // Assign global variable for debugging purposes.
     window.GisidaMap = this.map;
-
   }
 
   componentDidUpdate(prevProps, prevState) {
+    // Update Timeseries
+    const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
+
+    // Update Labels
     this.removeLabels();
     this.props.layersObj.forEach(layerObj => {
       if (layerObj.labels && layerObj.labels.labels) {
         this.addLabels(layerObj);
       }
     });
+  }
+
+  doUpdateTSlayers(prevProps) {
+    const { timeseries, layersObj } = this.props;
+    // if timeseries objects' keys don't match, update the timeseries
+    if (prevProps.timeseries &&
+      Object.keys(prevProps.timeseries).length !== Object.keys(timeseries).length) {
+      return true;
+    }
+
+    let layerObj;
+    for (let lo = 0; lo < layersObj.length; lo += 1) {
+      layerObj = layersObj[lo];
+      // If layerObj mapbox layer is transparent, update the timeseries
+      if (layerObj && this.map.getLayer(layerObj.id)
+        && this.map.getPaintProperty(layerObj.id, `${layerObj.type}-opacity`) === 0) {
+        return true;
+      }
+    }
+
+    // if still unsure if timeseries objects match
+    const tsKeys = Object.keys(timeseries);
+    let layer;
+    // loop through timeseries object checking for missmatching temporalIndecies
+    for (let i = 0; i < tsKeys.length; i += 1) {
+      layer = tsKeys[i];
+      // if temporalIndecies don't match, then definitely update the timeseries
+      if (timeseries[layer].temporalIndex !== prevProps.timeseries[layer].temporalIndex) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  updateLayers() {
+    
   }
 
   addLabels(layerObj) {
