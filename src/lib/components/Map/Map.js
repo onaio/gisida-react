@@ -56,6 +56,9 @@ class Map extends Component {
         e.target.on('render', onStyleLoad);
       });
 
+      // Handle adding/removing labels when zooming
+      this.map.on('zoom', this.handleLabelsOnMapZoom.bind(this))
+
       // Dispach map rendered to indicate map was rendered
       this.props.dispatch(Actions.mapRendered());
     }
@@ -153,7 +156,53 @@ class Map extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    
+    this.removeLabels();
+    this.props.layersObj.forEach(layerObj => {
+      if (layerObj.labels && layerObj.labels.labels) {
+        this.addLabels(layerObj);
+      }
+    });
+  }
+
+  addLabels(layerObj) {
+    let el;
+    const { id } = layerObj;
+    const { offset, labels } = layerObj.labels;
+    for (let l = 0; l < labels.length; l += 1) {
+      el = document.createElement('div');
+      el.className = `map-label label-${id}`;
+      el.innerHTML = labels[l].label;
+      new mapboxgl.Marker(el, { offset })
+        .setLngLat(labels[l].coordinates)
+        .addTo(this.map);
+    }
+  }
+
+  removeLabels(labelClass) {
+    const classItems = document.getElementsByClassName((labelClass || 'map-label'));
+    while (classItems[0]) {
+      classItems[0].parentNode.removeChild(classItems[0]);
+    }
+  }
+
+  handleLabelsOnMapZoom() {
+    let minZoom;
+    let maxZoom;
+    let zoom = this.map.getZoom();
+    let isRendered;
+    this.props.layersObj.forEach(layerObj => {
+      if (layerObj.labels) {
+        minZoom = layerObj.labels.minZoom || layerObj.labels.minzoom || 0;
+        maxZoom = layerObj.labels.maxZoom || layerObj.labels.maxzoom || 22;
+        isRendered = (document.getElementsByClassName(`label-${layerObj.id}`)).length;
+
+        if (zoom < minZoom || zoom > maxZoom) {
+          this.removeLabels(`label-${layerObj.id}`);
+        } else if (!isRendered) {
+          this.addLabels(layerObj);
+        }
+      }
+    });
   }
 
   render() {
