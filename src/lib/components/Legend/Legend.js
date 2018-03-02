@@ -54,7 +54,7 @@ export class Legend extends React.Component {
       const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
       const fillLayerWithBreaks = (!fillLayerNoBreaks && layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle');
       const activeLayerSelected =  this.props.primaryLayer === layer.id ? 'primary' : '';
-      const lastSelected = this.props.layersData[this.props.layersData.length - 1].id === layer.id  ? 'primary' : '';
+      const lastSelected = this.props.layersData[this.props.layersData.length - 1].id === layer.id ? 'primary' : '';
 
       const boundaries = ["region-boundaries", "district-boundaries"];
       const isBoundaries = boundaries.indexOf(layer.id) !== -1;
@@ -158,7 +158,7 @@ export class Legend extends React.Component {
           primaryLegend = (
             <div
             id={`legend-${layer.id}-${mapId}`}
-            className={`legend-row ${activeLayerSelected || lastSelected}`}
+            className={`legend-row ${activeLayerSelected}`}
             data-layer={`${layer.id}`}
             key={l}
             onClick={(e) => this.onUpdatePrimaryLayer(e)}
@@ -201,7 +201,7 @@ export class Legend extends React.Component {
           );
 
         }
-        if (!isBoundaries && !symbolLayer && !circleLayerType && !fillLayerNoBreaks && !fillLayerWithBreaks) {
+        if (!isBoundaries && !symbolLayer && !circleLayerType && !fillLayerNoBreaks && !fillLayerWithBreaks && !layerObj.layers) {
           primaryLegend = (
             <div
               id={`legend-${layer.id}-${mapId}`}
@@ -401,7 +401,7 @@ export class Legend extends React.Component {
         ));
       }
       else {
-        if (!isBoundaries && !symbolLayer && !circleLayerType && !fillLayerNoBreaks && !fillLayerWithBreaks) {
+        if (!isBoundaries && !symbolLayer && !circleLayerType && !fillLayerNoBreaks && !fillLayerWithBreaks && !layerObj.layers) {
           legendItems.unshift((
             <div
               id={`legend-${layer.id}-${mapId}`}
