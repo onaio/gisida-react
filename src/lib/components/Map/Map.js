@@ -19,6 +19,7 @@ const mapStateToProps = (state, ownProps) => {
     REGIONS: state.REGIONS,
     MAP: state.MAP,
     layersObj: layersObj,
+    timeSeriesObj: state.MAP.timeseries[state.MAP.visibleLayerId],
     timeseries: state.MAP.timeseries
   }
 }
@@ -158,6 +159,9 @@ class Map extends Component {
   componentDidUpdate(prevProps, prevState) {
     // Update Timeseries
     const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
+    if (doUpdateTSlayers) {
+      this.updateTimeseriesLayers();
+    }
 
     // Update Labels
     this.removeLabels();
@@ -201,8 +205,138 @@ class Map extends Component {
     return false;
   }
 
-  updateLayers() {
-    
+  updateTimeseriesLayers() {
+    const { timeSeriesObj, timeseries, layersObj } = this.props; 
+    const timeSeriesLayers = Object.keys(timeseries);
+
+    // determine what the currently timeperiod to see if layers should be hidden
+    const currPeriod = timeSeriesObj.period[timeSeriesObj.temporalIndex];
+
+    let layer;
+    let tsObj;
+    let tsFilter;
+    let layerObj;
+    let id;
+    let doUpdateStateForFilters = false;
+    let nextLayerObj;
+    let featureLayerObj;
+
+    let pIndex;
+    let hasData;
+    let type;
+
+    let index;
+    let defaultValue;
+    let paintProperty;
+    let newStops;
+    let newColorStops;
+    let newStrokeStops;
+
+    for (let i = 0; i < layersObj.length; i += 1) {
+      layerObj = layersObj[i];
+      id = layerObj.id;
+
+      if (timeSeriesLayers.includes(id)) {
+        tsObj = timeseries[id];
+
+        const {
+          temporalIndex, data, stops, colorStops, strokeWidthStops, breaks, colors,
+        } = tsObj;
+
+        index = parseInt(temporalIndex, 10);
+
+        // if (layerObj.type === 'chart') {
+          // $(`.marker-chart-${id}-${this.props.mapId}`).remove();
+          // this.addChart(layerObj, data);
+
+        // if not a chart, layer is on the map, and layer is visible
+        // } else if (this.map.getLayer(id) && layer && layer.visible) {
+
+          // look through the layer periods for a match
+          pIndex = timeseries[id].period.indexOf(currPeriod);
+          hasData = pIndex !== -1 ? timeseries[id].periodData[currPeriod].hasData : false;
+          type = layerObj.type !== 'symbol' ? layerObj.type : 'icon';
+
+          // if the layer is in the map and has no period match, hide it
+          if (!hasData || pIndex === -1) {
+
+            this.map.setLayoutProperty(layer.id, 'visibility', 'none');
+            // if layer has a highlight layer, update its visibility too
+            if (this.map.getLayer(`${layer.id}-highlight`)) {
+              this.map.setLayoutProperty(`${layer.id}-highlight`, 'visibility', 'none');
+            }
+
+          // if the layer is not in the map and does have a match, handle it
+          } else if (this.map.getLayer(id) && hasData && pIndex !== -1) {
+            // if layer is hidden, reveal it
+            if (this.map.getLayoutProperty(id, 'visibility') === 'none') {
+              this.map.setLayoutProperty(layer.id, 'visibility', 'visible');
+              // if layer has a highlight layer, update its visibility too
+              if (this.map.getLayer(`${layer.id}-highlight`)) {
+                this.map.setLayoutProperty(`${layer.id}-highlight`, 'visibility', 'visibile');
+              }
+            }
+
+            // if layer has stops, update them
+            if (stops && stops[index] !== undefined && stops[index][0][0] !== undefined) {
+              defaultValue = layerObj.type === 'circle' ? 0 : 'rgba(0,0,0,0)';
+              paintProperty = layerObj.type === 'circle' ? 'circle-radius' : 'fill-color';
+              newStops = {
+                property: layerObj.source.join[0],
+                stops: stops[index],
+                type: 'categorical',
+                default: defaultValue,
+              };
+
+              if (layerObj.type === 'circle' && layerObj.categories.color instanceof Array) {
+                newColorStops = {
+                  property: layerObj.source.join[0],
+                  stops: colorStops[index],
+                  type: 'categorical',
+                };
+                newStrokeStops = {
+                  property: layerObj.source.join[0],
+                  stops: strokeWidthStops[index],
+                  type: 'categorical',
+                };
+                this.map.setPaintProperty(id, 'circle-color', newColorStops);
+                this.map.setPaintProperty(id, 'circle-stroke-width', newStrokeStops);
+              }
+
+              this.map.setPaintProperty(id, paintProperty, newStops);
+
+              // TODO : update legend?
+              // this.removeLegend(layerObj);
+              // this.addLegend(layerObj, stops[index], data, breaks, colors);
+
+            // TODO : handle timeseries without stops via filters
+            // } else {
+            //   for (let i = 0; i < nextLayersObj.length; i += 1) {
+            //     nextLayerObj = Object.assign({}, nextLayersObj[i]);
+            //     if (nextLayerObj.id === id) {
+            //       nextLayerObj.filters.tsFilter = ['==', layerObj.aggregate.timeseries.field, currPeriod]
+            //       nextLayersObj[i] = Object.assign({}, nextLayerObj);
+            //     }
+            //   }
+            //   doUpdateStateForFilters = true;
+            }
+          }
+        // }
+      }
+    }
+
+    if (doUpdateStateForFilters) {
+      // this.setState({
+      //   layerObj: nextLayersObj[nextLayersObj.length - 1],
+      //   layersObj: nextLayersObj,
+      // }, () => {
+      //   for (let lo = 0; lo < nextLayersObj.length; lo += 1) {
+      //     if (nextLayersObj[lo].filters && typeof nextLayersObj[lo].filters.tsFilter !== 'undefined') {
+      //       this.buildFilters(nextLayersObj[lo]);
+      //     }
+      //   }
+      // });
+    }
   }
 
   addLabels(layerObj) {
