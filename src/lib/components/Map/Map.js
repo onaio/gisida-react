@@ -176,11 +176,11 @@ class Map extends Component {
 
     // Update Labels
     this.removeLabels();
-    this.props.layersObj.forEach(layerObj => {
-      if (layerObj.labels && layerObj.labels.labels) {
-        this.addLabels(layerObj);
+    for (let l = 0; l < this.props.layersObj.length; l += 1) {
+      if (this.props.layersObj[l].labels && this.props.layersObj[l].labels.labels) {
+        this.addLabels(this.props.layersObj[l], this.props.timeseries);
       }
-    });
+    }
   }
 
   doUpdateTSlayers(prevProps) {
@@ -350,10 +350,14 @@ class Map extends Component {
     }
   }
 
-  addLabels(layerObj) {
+  addLabels(layerObj, timeseries) {
     let el;
     const { id } = layerObj;
-    const { offset, labels } = layerObj.labels;
+    const { offset } = layerObj.labels;
+    const labels = typeof timeseries[layerObj.id] !== 'undefined'
+      ? layerObj.labels.labels[timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]]
+      : layerObj.labels.labels;
+
     for (let l = 0; l < labels.length; l += 1) {
       el = document.createElement('div');
       el.className = `map-label label-${id}`;
