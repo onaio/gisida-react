@@ -32,21 +32,16 @@ export class Legend extends React.Component {
     dispatch(Actions.updatePrimaryLayer(targetLayer));
   }
 
-  componentWillReceiveProps(nextProps) {
-
-  }
-
   render() {
     const mapId = '01';
     const { layerObj } = this.props;
     if (!layerObj) {
       return false;
     }
-    const legendItems = [];
+    let legendItems = [];
 
     let primaryLegend;
     let layer;
-
     for (let l = 0; l < this.props.layersData.length; l += 1) {
       layer = this.props.layersData[l];
       const circleLayerType = (layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible);
@@ -111,7 +106,7 @@ export class Legend extends React.Component {
           primaryLegend = (
             <div
               id={`legend-${layer.id}-${mapId}`}
-              className={`legend-row ${activeLayerSelected}`}
+              className={`legend-row ${activeLayerSelected || lastSelected}`}
               data-layer={`${layer.id}`}
               onClick={(e) => this.onUpdatePrimaryLayer(e)}
               key={l}
@@ -205,7 +200,7 @@ export class Legend extends React.Component {
           primaryLegend = (
             <div
               id={`legend-${layer.id}-${mapId}`}
-              className={`legend-row primary`}
+              className={`legend-row`}
               data-layer={`${layer.id}`}
               key={l}
             >
@@ -311,7 +306,7 @@ export class Legend extends React.Component {
         legendItems.unshift((
           <div
             id={`legend-${layer.id}-${mapId}`}
-            className={`legend-row ${activeLayerSelected || lastSelected}`}
+            className={`legend-row ${activeLayerSelected}`}
             data-layer={`${layer.id}`}
             onClick={(e) => this.onUpdatePrimaryLayer(e)}
             key={l}

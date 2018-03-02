@@ -85,8 +85,8 @@ class Map extends Component {
     }
 
     // Move the selected primary layer to the top of the map layers
-    if (window.GisidaMap.getLayer(nextLayerId)) {
-      window.GisidaMap.moveLayer(nextLayerId);
+    if (this.map.getLayer(nextLayerId)) {
+      this.map.moveLayer(nextLayerId);
     }
     let layerObj;
     // Loop throught all active map layers
@@ -97,8 +97,8 @@ class Map extends Component {
         // If 'layerObj' is not the same type as the selected
         if (layerObj.type !== nextLayerObj.type) {
           // Move 'layerObj' to the top of the map layers
-          if (window.GisidaMap.getLayer(layerObj.id)) {
-            window.GisidaMap.moveLayer(layerObj.id);
+          if (this.map.getLayer(layerObj.id)) {
+            this.map.moveLayer(layerObj.id);
           }
         }
       }
