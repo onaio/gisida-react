@@ -1,7 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Legend component renderes correctly 1`] = `
-<div
-  className="legend 01"
-/>
+<div>
+  <div
+    className="legend 01"
+  >
+    <div
+      className="legend-row"
+      data-layer="undefined"
+      id="legend-undefined-01"
+      key="0"
+    >
+      <b />
+      <span />
+    </div>
+  </div>
+</div>
 `;
