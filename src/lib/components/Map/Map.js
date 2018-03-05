@@ -65,6 +65,19 @@ class Map extends Component {
     // this.addMapClickEvents()
     // this.addMouseMoveEvents()
     // etc
+    this.map.on('click', this.onFeatureClick.bind(this));
+  }
+
+  onFeatureClick(e) {
+    const activeLayers = this.props.layersObj.map(l => l.id)
+    const features = this.map.queryRenderedFeatures(e.point, { layers: activeLayers });
+    const feature = features.find(f => f.layer.id === this.props.layerObj.id);
+    if (!feature) return false;
+
+    if (this.props.layerObj['detail-view']) {
+      // dispatch event with feature.properties
+      debugger;
+    }
   }
 
   findNextLayer(activelayersData, nextLayer) {
@@ -118,7 +131,7 @@ class Map extends Component {
       this.map.setLayoutProperty(layerId, 'visibility', visibility ? 'visible' : 'none');
       // if layer has a highlight layer, update its visibility too
       if (this.map.getLayer(`${layerId}-highlight`)) {
-        this.map.setLayoutProperty(`${layerId}-highlight`, 'visibility', visibility ? 'visibile' : 'none');
+        this.map.setLayoutProperty(`${layerId}-highlight`, 'visibility', visibility ? 'visible' : 'none');
       }
     }
   }
@@ -229,7 +242,13 @@ class Map extends Component {
   }
 
   doUpdateTSlayers(prevProps) {
-    const { timeseries, layersObj } = this.props;
+    const { timeSeriesObj, timeseries, layersObj } = this.props;
+
+    // if no timeseries object, don't update the timeseries
+    if (!timeSeriesObj) {
+      return false;
+    }
+
     // if timeseries objects' keys don't match, update the timeseries
     if (prevProps.timeseries &&
       Object.keys(prevProps.timeseries).length !== Object.keys(timeseries).length) {
@@ -241,7 +260,7 @@ class Map extends Component {
       layerObj = layersObj[lo];
       // If layerObj mapbox layer is transparent, update the timeseries
       if (layerObj && this.map.getLayer(layerObj.id)
-        && this.map.getPaintProperty(layerObj.id, `${layerObj.type}-opacity`) === 0) {
+        && this.map.getLayoutProperty(layerObj.id, 'visibility') === 'none') {
         return true;
       }
     }
