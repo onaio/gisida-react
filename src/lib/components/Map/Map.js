@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, addPopUp, sortLayers } from 'gisida';
+import { Actions, addPopUp, sortLayers, addChart } from 'gisida';
 import { detectIE, buildLayersObj } from '../../utils';
 import './Map.scss';
 
@@ -197,6 +197,17 @@ class Map extends Component {
             layer.layers.forEach((subLayer) => {
               this.changeVisibility(subLayer, layer.visible);
             });
+          }
+
+          if (layer.visible && layer.type === 'chart' && (typeof layer.source.data !== 'string')) {
+            const timefield = (layer.aggregate && layer.aggregate.timeseries) ? layer.aggregate.timeseries.field : '';
+            let { data } = layer.source;
+            if (timefield) {
+              const period = [...new Set(layer.source.data.map(p => p[timefield]))];
+              // newStops = { id: layer.id, period, timefield };
+              data = layer.source.data.filter(d => d[timefield] === period[period.length - 1]);
+            }
+            addChart(layer, data, this.map);
           }
         });
 
