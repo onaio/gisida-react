@@ -10,6 +10,8 @@ const mapStateToProps = (state, ownProps) => {
     STYLES: state.STYLES,
     REGIONS: state.REGIONS,
     MAP: state.MAP,
+    timeSeriesObj: state.MAP.timeseries[state.MAP.visibleLayerId],
+    timeseries: state.MAP.timeseries,
     layersObj: buildLayersObj(state.MAP.layers),
     layerObj: state.MAP.layers[state.MAP.activeLayerId],
     primaryLayer: state.MAP.primaryLayer,
@@ -207,22 +209,198 @@ class Map extends Component {
     }
     // Assign global variable for debugging purposes.
     window.GisidaMap = this.map;
-
   }
 
   componentDidUpdate(prevProps, prevState) {
+    const { layersObj, primaryLayer } = this.props;
+    // Update Timeseries
+    const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
+    if (doUpdateTSlayers) {
+      this.updateTimeseriesLayers();
+    }
+
+    // Update Labels
     this.removeLabels();
-    this.props.layersObj.forEach(layerObj => {
-      if (layerObj.labels && layerObj.labels.labels) {
-        this.addLabels(layerObj);
+    for (let l = 0; l < layersObj.length; l += 1) {
+      if (layersObj[l].id === primaryLayer && layersObj[l].labels && layersObj[l].labels.labels) {
+        this.addLabels(this.props.layersObj[l], this.props.timeseries);
       }
-    });
+    }
   }
 
-  addLabels(layerObj) {
+  doUpdateTSlayers(prevProps) {
+    const { timeseries, layersObj } = this.props;
+    // if timeseries objects' keys don't match, update the timeseries
+    if (prevProps.timeseries &&
+      Object.keys(prevProps.timeseries).length !== Object.keys(timeseries).length) {
+      return true;
+    }
+
+    let layerObj;
+    for (let lo = 0; lo < layersObj.length; lo += 1) {
+      layerObj = layersObj[lo];
+      // If layerObj mapbox layer is transparent, update the timeseries
+      if (layerObj && this.map.getLayer(layerObj.id)
+        && this.map.getPaintProperty(layerObj.id, `${layerObj.type}-opacity`) === 0) {
+        return true;
+      }
+    }
+
+    // if still unsure if timeseries objects match
+    const tsKeys = Object.keys(timeseries);
+    let layer;
+    // loop through timeseries object checking for missmatching temporalIndecies
+    for (let i = 0; i < tsKeys.length; i += 1) {
+      layer = tsKeys[i];
+      // if temporalIndecies don't match, then definitely update the timeseries
+      if (timeseries[layer].temporalIndex !== prevProps.timeseries[layer].temporalIndex) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  updateTimeseriesLayers() {
+    const { timeSeriesObj, timeseries, layersObj } = this.props; 
+    const timeSeriesLayers = Object.keys(timeseries);
+
+    // determine what the currently timeperiod to see if layers should be hidden
+    const currPeriod = timeSeriesObj.period[timeSeriesObj.temporalIndex];
+
+    let layer;
+    let tsObj;
+    let layerObj;
+    let id;
+    let doUpdateStateForFilters = false;
+    // let tsFilter;
+    // let nextLayerObj;
+    // let featureLayerObj;
+
+    let pIndex;
+    let hasData;
+
+    let index;
+    let defaultValue;
+    let paintProperty;
+    let newStops;
+    let newColorStops;
+    let newStrokeStops;
+
+    for (let i = 0; i < layersObj.length; i += 1) {
+      layerObj = layersObj[i];
+      id = layerObj.id;
+
+      if (timeSeriesLayers.includes(id)) {
+        tsObj = timeseries[id];
+
+        const {
+          temporalIndex, stops, colorStops, strokeWidthStops,
+        } = tsObj;
+
+        index = parseInt(temporalIndex, 10);
+
+        // if (layerObj.type === 'chart') {
+          // $(`.marker-chart-${id}-${this.props.mapId}`).remove();
+          // this.addChart(layerObj, data);
+
+        // if not a chart, layer is on the map, and layer is visible
+        // } else if (this.map.getLayer(id) && layer && layer.visible) {
+
+          // look through the layer periods for a match
+          pIndex = timeseries[id].period.indexOf(currPeriod);
+          hasData = pIndex !== -1 ? timeseries[id].periodData[currPeriod].hasData : false;
+
+          // if the layer is in the map and has no period match, hide it
+          if (!hasData || pIndex === -1) {
+
+            this.map.setLayoutProperty(layer.id, 'visibility', 'none');
+            // if layer has a highlight layer, update its visibility too
+            if (this.map.getLayer(`${layer.id}-highlight`)) {
+              this.map.setLayoutProperty(`${layer.id}-highlight`, 'visibility', 'none');
+            }
+
+          // if the layer is not in the map and does have a match, handle it
+          } else if (this.map.getLayer(id) && hasData && pIndex !== -1) {
+            // if layer is hidden, reveal it
+            if (this.map.getLayoutProperty(id, 'visibility') === 'none') {
+              this.map.setLayoutProperty(layer.id, 'visibility', 'visible');
+              // if layer has a highlight layer, update its visibility too
+              if (this.map.getLayer(`${layer.id}-highlight`)) {
+                this.map.setLayoutProperty(`${layer.id}-highlight`, 'visibility', 'visibile');
+              }
+            }
+
+            // if layer has stops, update them
+            if (stops && stops[index] !== undefined && stops[index][0][0] !== undefined) {
+              defaultValue = layerObj.type === 'circle' ? 0 : 'rgba(0,0,0,0)';
+              paintProperty = layerObj.type === 'circle' ? 'circle-radius' : 'fill-color';
+              newStops = {
+                property: layerObj.source.join[0],
+                stops: stops[index],
+                type: 'categorical',
+                default: defaultValue,
+              };
+
+              if (layerObj.type === 'circle' && layerObj.categories.color instanceof Array) {
+                newColorStops = {
+                  property: layerObj.source.join[0],
+                  stops: colorStops[index],
+                  type: 'categorical',
+                };
+                newStrokeStops = {
+                  property: layerObj.source.join[0],
+                  stops: strokeWidthStops[index],
+                  type: 'categorical',
+                };
+                this.map.setPaintProperty(id, 'circle-color', newColorStops);
+                this.map.setPaintProperty(id, 'circle-stroke-width', newStrokeStops);
+              }
+
+              this.map.setPaintProperty(id, paintProperty, newStops);
+
+              // TODO : update legend?
+              // this.removeLegend(layerObj);
+              // this.addLegend(layerObj, stops[index], data, breaks, colors);
+
+            // TODO : handle timeseries without stops via filters
+            // } else {
+            //   for (let i = 0; i < nextLayersObj.length; i += 1) {
+            //     nextLayerObj = Object.assign({}, nextLayersObj[i]);
+            //     if (nextLayerObj.id === id) {
+            //       nextLayerObj.filters.tsFilter = ['==', layerObj.aggregate.timeseries.field, currPeriod]
+            //       nextLayersObj[i] = Object.assign({}, nextLayerObj);
+            //     }
+            //   }
+            //   doUpdateStateForFilters = true;
+            }
+          }
+        // }
+      }
+    }
+
+    if (doUpdateStateForFilters) {
+      // this.setState({
+      //   layerObj: nextLayersObj[nextLayersObj.length - 1],
+      //   layersObj: nextLayersObj,
+      // }, () => {
+      //   for (let lo = 0; lo < nextLayersObj.length; lo += 1) {
+      //     if (nextLayersObj[lo].filters && typeof nextLayersObj[lo].filters.tsFilter !== 'undefined') {
+      //       this.buildFilters(nextLayersObj[lo]);
+      //     }
+      //   }
+      // });
+    }
+  }
+
+  addLabels(layerObj, timeseries) {
     let el;
     const { id } = layerObj;
-    const { offset, labels } = layerObj.labels;
+    const { offset } = layerObj.labels;
+    const labels = typeof timeseries[layerObj.id] !== 'undefined'
+      ? layerObj.labels.labels[timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]]
+      : layerObj.labels.labels;
+
     for (let l = 0; l < labels.length; l += 1) {
       el = document.createElement('div');
       el.className = `map-label label-${id}`;
