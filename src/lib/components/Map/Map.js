@@ -212,6 +212,7 @@ class Map extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    const { layersObj, primaryLayer } = this.props;
     // Update Timeseries
     const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
     if (doUpdateTSlayers) {
@@ -220,8 +221,8 @@ class Map extends Component {
 
     // Update Labels
     this.removeLabels();
-    for (let l = 0; l < this.props.layersObj.length; l += 1) {
-      if (this.props.layersObj[l].labels && this.props.layersObj[l].labels.labels) {
+    for (let l = 0; l < layersObj.length; l += 1) {
+      if (layersObj[l].id === primaryLayer && layersObj[l].labels && layersObj[l].labels.labels) {
         this.addLabels(this.props.layersObj[l], this.props.timeseries);
       }
     }
