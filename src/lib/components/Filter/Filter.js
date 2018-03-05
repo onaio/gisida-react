@@ -7,6 +7,7 @@ import './Filter.scss';
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    MAP: state.MAP,
     layerObj: state.MAP.layers[state.MAP.filter.layerId],
     doShowProfile: state.MAP.showProfile,
     showFilterPanel: state.MAP.showFilterPanel,
@@ -866,7 +867,11 @@ class Filter extends Component {
     }
 
     const doClear = isFilterable || this.state.isFiltered || this.isMapFiltered();
-    const filterBtnPos = (this.state.doShowProfile && this.props.isOpen) || this.state.isOpen ? '360px' : '10px';
+    const sidebarOffset = this.props.MAP.showFilterPanel
+      ? '260px'
+      : !!this.props.MAP.detailView
+      ? '355px'
+      : '10px';
 
     return (
     <div>
@@ -875,7 +880,7 @@ class Filter extends Component {
             <button
             className={`filterButton glyphicon glyphicon-filter${this.props.showFilterPanel ? ' open' : ''}`}
             onClick={() => { this.handleFilterClick(); }}
-              style={{ right: this.props.showFilterPanel ? '260px' : filterBtnPos }}
+              style={{ right: sidebarOffset }}
           /> : ''
         }
 

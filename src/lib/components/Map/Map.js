@@ -5,16 +5,18 @@ import { detectIE, buildLayersObj } from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
+  const { APP, MAP, STYLES, REGIONS } = state;
   return {
-    APP: state.APP,
-    STYLES: state.STYLES,
-    REGIONS: state.REGIONS,
-    MAP: state.MAP,
-    timeSeriesObj: state.MAP.timeseries[state.MAP.visibleLayerId],
-    timeseries: state.MAP.timeseries,
-    layersObj: buildLayersObj(state.MAP.layers),
-    layerObj: state.MAP.layers[state.MAP.activeLayerId],
-    primaryLayer: state.MAP.primaryLayer,
+    APP,
+    STYLES,
+    REGIONS,
+    MAP,
+    timeSeriesObj: MAP.timeseries[MAP.visibleLayerId],
+    timeseries: MAP.timeseries,
+    layersObj: buildLayersObj(MAP.layers),
+    layerObj: MAP.layers[MAP.activeLayerId],
+    primaryLayer: MAP.primaryLayer,
+    showDetailView: !!MAP.detailView,
   }
 }
 
@@ -75,8 +77,7 @@ class Map extends Component {
     if (!feature) return false;
 
     if (this.props.layerObj['detail-view']) {
-      // dispatch event with feature.properties
-      debugger;
+      this.props.dispatch(Actions.detailView(feature.properties, feature.layer.id));
     }
   }
 
@@ -458,13 +459,19 @@ class Map extends Component {
   }
 
   render() {
+    // todo - move this in to this.props.MAP.sidebarOffset for extensibility
+    const mapWidth = this.props.MAP.showFilterPanel
+      ? 'calc(100% - 250px)'
+      : this.props.showDetailView
+      ? 'calc(100% - 345px)'
+      : '100%';
     return (
         <div>
         {isIE || !mapboxgl.supported() ?
         (<div className="alert alert-info">
           Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
         </div>) :
-          (<div id='map' style={{ width: this.props.MAP.showFilterPanel ? 'calc(100% - 250px)' : '100%'}}/>)}
+          (<div id='map' style={{ width: mapWidth }}/>)}
         </div>
     );
   }
