@@ -118,7 +118,7 @@ class Map extends Component {
       this.map.setLayoutProperty(layerId, 'visibility', visibility ? 'visible' : 'none');
       // if layer has a highlight layer, update its visibility too
       if (this.map.getLayer(`${layerId}-highlight`)) {
-        this.map.setLayoutProperty(`${layerId}-highlight`, 'visibility', visibility ? 'visibile' : 'none');
+        this.map.setLayoutProperty(`${layerId}-highlight`, 'visibility', visibility ? 'visible' : 'none');
       }
     }
   }
@@ -139,6 +139,7 @@ class Map extends Component {
     const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES;
     const regions = nextProps.REGIONS;
+    const mapId = 'map-1';
   
 
     // Check if map is initialized.
@@ -208,6 +209,8 @@ class Map extends Component {
               data = layer.source.data.filter(d => d[timefield] === period[period.length - 1]);
             }
             addChart(layer, data, this.map);
+          } else {
+             $(`.marker-chart-${layer.id}-${mapId}`).remove();
           }
         });
 
@@ -338,7 +341,7 @@ class Map extends Component {
               this.map.setLayoutProperty(layer.id, 'visibility', 'visible');
               // if layer has a highlight layer, update its visibility too
               if (this.map.getLayer(`${layer.id}-highlight`)) {
-                this.map.setLayoutProperty(`${layer.id}-highlight`, 'visibility', 'visibile');
+                this.map.setLayoutProperty(`${layer.id}-highlight`, 'visibility', 'visible');
               }
             }
 
