@@ -270,16 +270,15 @@ class Map extends Component {
 
     let layer;
     let tsObj;
-    let tsFilter;
     let layerObj;
     let id;
     let doUpdateStateForFilters = false;
-    let nextLayerObj;
-    let featureLayerObj;
+    // let tsFilter;
+    // let nextLayerObj;
+    // let featureLayerObj;
 
     let pIndex;
     let hasData;
-    let type;
 
     let index;
     let defaultValue;
@@ -296,7 +295,7 @@ class Map extends Component {
         tsObj = timeseries[id];
 
         const {
-          temporalIndex, data, stops, colorStops, strokeWidthStops, breaks, colors,
+          temporalIndex, stops, colorStops, strokeWidthStops,
         } = tsObj;
 
         index = parseInt(temporalIndex, 10);
@@ -311,7 +310,6 @@ class Map extends Component {
           // look through the layer periods for a match
           pIndex = timeseries[id].period.indexOf(currPeriod);
           hasData = pIndex !== -1 ? timeseries[id].periodData[currPeriod].hasData : false;
-          type = layerObj.type !== 'symbol' ? layerObj.type : 'icon';
 
           // if the layer is in the map and has no period match, hide it
           if (!hasData || pIndex === -1) {
