@@ -6,7 +6,7 @@ exports[`Legend component renderes correctly 1`] = `
     className="legend 01"
   >
     <div
-      className="legend-row primary"
+      className="legend-row"
       data-layer="undefined"
       id="legend-undefined-01"
       key="0"
