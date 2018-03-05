@@ -1,26 +1,20 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, addPopUp, sortLayers } from 'gisida';
-import { detectIE } from '../../utils';
+import { detectIE, buildLayersObj } from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
-  let layersObj = [];
-  Object.keys(state.MAP.layers).forEach((key) => {
-    const layer = state.MAP.layers[key];
-    if (layer.visible) {
-      layersObj.push(layer);
-    }
-  });
-
   return {
     APP: state.APP,
     STYLES: state.STYLES,
     REGIONS: state.REGIONS,
     MAP: state.MAP,
-    layersObj: layersObj,
     timeSeriesObj: state.MAP.timeseries[state.MAP.visibleLayerId],
-    timeseries: state.MAP.timeseries
+    timeseries: state.MAP.timeseries,
+    layersObj: buildLayersObj(state.MAP.layers),
+    layerObj: state.MAP.layers[state.MAP.activeLayerId],
+    primaryLayer: state.MAP.primaryLayer,
   }
 }
 
@@ -73,9 +67,54 @@ class Map extends Component {
     // etc
   }
 
+  findNextLayer(activelayersData, nextLayer) {
+    return activelayersData.find(lo => lo.id === nextLayer);
+  }
+
+  setPrimaryLayer(primaryLayer, activeLayerId, layers, activeLayersData, activelayerObj) {
+    const nextLayerId =  primaryLayer || activeLayerId;
+    let nextLayerObj = activeLayersData.find(lo => lo.id === nextLayerId);
+    if (!nextLayerObj && layers[nextLayerId].layers) {
+      let nextLayer;
+      for (let l = 0; l < layers[nextLayerId].layers.length; l += 1) {
+        nextLayer = layers[nextLayerId].layers[l];
+        nextLayerObj = this.findNextLayer(activeLayersData, nextLayer);
+        if (nextLayerObj) break;
+      }
+    }
+    if (!nextLayerObj) {
+      return false;
+    }
+
+    // Move the selected primary layer to the top of the map layers
+    if (this.map.getLayer(nextLayerId)) {
+      this.map.moveLayer(nextLayerId);
+    }
+    let layerObj;
+    // Loop throught all active map layers
+    for (let i = activeLayersData.length - 1; i >= 0; i -= 1) {
+      layerObj = activeLayersData[i];
+      // If 'layerObj' is not a fill OR the selected primary layer
+      if (layerObj.type !== 'fill' && layerObj.id !== nextLayerId) {
+        // If 'layerObj' is not the same type as the selected
+        if (layerObj.type !== nextLayerObj.type) {
+          // Move 'layerObj' to the top of the map layers
+          if (this.map.getLayer(layerObj.id)) {
+            this.map.moveLayer(layerObj.id);
+          }
+        }
+      }
+    }
+
+    // Re-order this.state.layersObj array
+    const nextlayersObj = activeLayersData.filter(lo => lo.id !== nextLayerId);
+    nextlayersObj.push(nextLayerObj);
+
+    return true;
+  }
+  
   changeVisibility(layerId, visibility) {
     if (this.map.getLayer(layerId)) {
-      console.log(layerId, visibility)
       this.map.setLayoutProperty(layerId, 'visibility', visibility ? 'visible' : 'none');
       // if layer has a highlight layer, update its visibility too
       if (this.map.getLayer(`${layerId}-highlight`)) {
@@ -87,13 +126,15 @@ class Map extends Component {
   componentWillReceiveProps(nextProps){
     const accessToken = nextProps.APP.accessToken;
     const mapConfig = nextProps.APP.mapConfig;
-
     const isRendered = nextProps.MAP.isRendered;
     const isLoaded = nextProps.MAP.isLoaded;
     const currentStyle = nextProps.MAP.currentStyle;
     const currentRegion = nextProps.MAP.currentRegion;
     const reloadLayers = nextProps.MAP.reloadLayers;
-
+    const activelayersData = nextProps.layersObj;
+    const activelayerObj = nextProps.layerObj;
+    const primaryLayer = nextProps.MAP.primaryLayer;
+    const activeLayerId = nextProps.MAP.activeLayerId;
 
     const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES;
@@ -154,13 +195,16 @@ class Map extends Component {
           this.changeVisibility(layer.id, layer.visible);
           if (layer.layers) {
             layer.layers.forEach((subLayer) => {
-              console.log(subLayer, layer.id, layer.visible)
               this.changeVisibility(subLayer, layer.visible);
             });
           }
         });
 
         sortLayers(this.map, layers);
+      }
+
+      if (this.props.MAP.primaryLayer !== primaryLayer) {
+        this.setPrimaryLayer(primaryLayer, activeLayerId, layers, activelayersData, activelayerObj);
       }
     }
     // Assign global variable for debugging purposes.
