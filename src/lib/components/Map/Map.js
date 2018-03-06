@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, addPopUp, sortLayers } from 'gisida';
+import { Actions, addPopUp, sortLayers, addChart } from 'gisida';
 import { detectIE, buildLayersObj } from '../../utils';
 import './Map.scss';
 
@@ -118,7 +118,7 @@ class Map extends Component {
       this.map.setLayoutProperty(layerId, 'visibility', visibility ? 'visible' : 'none');
       // if layer has a highlight layer, update its visibility too
       if (this.map.getLayer(`${layerId}-highlight`)) {
-        this.map.setLayoutProperty(`${layerId}-highlight`, 'visibility', visibility ? 'visibile' : 'none');
+        this.map.setLayoutProperty(`${layerId}-highlight`, 'visibility', visibility ? 'visible' : 'none');
       }
     }
   }
@@ -139,6 +139,7 @@ class Map extends Component {
     const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES;
     const regions = nextProps.REGIONS;
+    const mapId = 'map-1';
   
 
     // Check if map is initialized.
@@ -198,6 +199,19 @@ class Map extends Component {
               this.changeVisibility(subLayer, layer.visible);
             });
           }
+
+          if (layer.visible && layer.type === 'chart' && (typeof layer.source.data !== 'string')) {
+            const timefield = (layer.aggregate && layer.aggregate.timeseries) ? layer.aggregate.timeseries.field : '';
+            let { data } = layer.source;
+            if (timefield) {
+              const period = [...new Set(layer.source.data.map(p => p[timefield]))];
+              // newStops = { id: layer.id, period, timefield };
+              data = layer.source.data.filter(d => d[timefield] === period[period.length - 1]);
+            }
+            addChart(layer, data, this.map);
+          } else {
+             $(`.marker-chart-${layer.id}-${mapId}`).remove();
+          }
         });
 
         sortLayers(this.map, layers);
@@ -241,7 +255,7 @@ class Map extends Component {
       layerObj = layersObj[lo];
       // If layerObj mapbox layer is transparent, update the timeseries
       if (layerObj && this.map.getLayer(layerObj.id)
-        && this.map.getPaintProperty(layerObj.id, `${layerObj.type}-opacity`) === 0) {
+        && this.map.getLayoutProperty(layerObj.id, 'visibility' ) === 'none') {
         return true;
       }
     }
@@ -327,7 +341,7 @@ class Map extends Component {
               this.map.setLayoutProperty(layer.id, 'visibility', 'visible');
               // if layer has a highlight layer, update its visibility too
               if (this.map.getLayer(`${layer.id}-highlight`)) {
-                this.map.setLayoutProperty(`${layer.id}-highlight`, 'visibility', 'visibile');
+                this.map.setLayoutProperty(`${layer.id}-highlight`, 'visibility', 'visible');
               }
             }
 
