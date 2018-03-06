@@ -255,7 +255,7 @@ class Map extends Component {
       layerObj = layersObj[lo];
       // If layerObj mapbox layer is transparent, update the timeseries
       if (layerObj && this.map.getLayer(layerObj.id)
-        && this.map.getPaintProperty(layerObj.id, `${layerObj.type}-opacity`) === 0) {
+        && this.map.getLayoutProperty(layerObj.id, 'visibility' ) === 'none') {
         return true;
       }
     }
