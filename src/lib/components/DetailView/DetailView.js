@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Actions, parseMustache } from 'gisida';
+import { Actions } from 'gisida';
 import { connect } from 'react-redux';
 import Parser from 'html-react-parser';
 import './DetailView.scss';
@@ -13,7 +13,8 @@ const mapStateToProps = (state, ownProps) => {
     layerObj,
     detailView: detailView && detailView.model,
     properties: detailView && detailView.properties,
-    spec: detailView && detailView.spec, 
+    spec: detailView && detailView.spec,
+    children: ownProps.children,
   };
 }
 
@@ -93,6 +94,11 @@ class DetailView extends Component {
           <div className="detail-list">
             <ul>{detailList}</ul>
           </div>
+          {this.props.children ? (
+            <div className="detail-extension-wrapper">
+              {this.props.children}
+            </div>
+          ) : ''}
         </div>
       </div>
     );
