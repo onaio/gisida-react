@@ -1,0 +1,20 @@
+{
+  "label": "Percentage of beneficiaries per county",
+  "source": {
+    "type": "geojson",
+    "data": "data/ken_district_population_2009.geojson",
+    "join": [
+      "DISTRICT",
+      "DISTRICT"
+    ]
+  },
+  "type": "fill",
+  "property": "perce_Benf",
+  "categories": {
+    "breaks": "yes",
+    "color": "Oranges",
+    "clusters": 7
+  },
+  "credit": "Percentage of beneficiaries per county (Kenya National Bureau of Statistics - 2009)",
+  "category": "Population"
+}
