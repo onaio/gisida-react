@@ -33,7 +33,7 @@ class Filter extends Component {
       isMac: (window.navigator.platform.indexOf('Mac') !== -1),
       isLinux: (window.navigator.platform.indexOf('Linux') !== -1),
       globalSearchField: false,
-      layersObj: []
+      layersObj: this.props.layersObj,
     };
   }
 
@@ -80,20 +80,28 @@ class Filter extends Component {
           ? prevFilters[filterKey].isFiltered
           : false, // whether any options have been modified
         isOriginal: true, // whether the filter has been filtered
+        dataType: prevFilters ? prevFilters[filterKey].dataType
+          : !filters[filterKey].quantitativeValues ? 'ordinal' : 'quantitative',
         options: {}, // actual filter options map
         isOpen: prevFilters ? prevFilters[filterKey].isOpen : false,
+        doAdvFiltering: prevFilters ? prevFilters[filterKey].doAdvFiltering : false,
+        queries: prevFilters ? prevFilters[filterKey].queries : [],
       };
 
-      options = filters[filterKey].filterValues;
-      optionKeys = Object.keys(options);
-      // loop over all options
-      for (o = 0; o < optionKeys.length; o += 1) {
-        optionKey = optionKeys[o];
-        // set filter option to true
-        filter.options[optionKey] = {
-          enabled: false,
-          count: options[optionKey],
-        };
+      if (filter.dataType === 'quantitative') {
+        filter.options = [...filters[filterKey].quantitativeValues];
+      } else {
+        options = filters[filterKey].filterValues;
+        optionKeys = Object.keys(options);
+        // loop over all options
+        for (o = 0; o < optionKeys.length; o += 1) {
+          optionKey = optionKeys[o];
+          // set filter option to true
+          filter.options[optionKey] = {
+            enabled: false,
+            count: options[optionKey],
+          };
+        }
       }
 
       // add filter to the filterMap
@@ -105,11 +113,15 @@ class Filter extends Component {
         if (layerFilters[f] instanceof Array) {
           for (o = 0; o < layerFilters[f].length; o += 1) {
             if (layerFilters[f][o] instanceof Array) {
-              filterKey = layerFilters[f][o][1];
-              optionKey = layerFilters[f][o][2];
-              filterMap[filterKey].options[optionKey].enabled = true;
-              filterMap[filterKey].options[optionKey].hidden = false;
-              if (!filterMap[filterKey]) filterMap[filterKey].isFiltered = true;
+              if (layerFilters[f][o][0] === '==') {
+                filterKey = layerFilters[f][o][1];
+                optionKey = layerFilters[f][o][2];
+                filterMap[filterKey].options[optionKey].enabled = true;
+                filterMap[filterKey].options[optionKey].hidden = false;
+                if (!filterMap[filterKey]) filterMap[filterKey].isFiltered = true;
+              } else {
+                // To DO: handle quant filter expressions
+              }
             }
           }
         }
@@ -177,24 +189,29 @@ class Filter extends Component {
             isFiltered: originalFilters[filterKey].isFiltered,
             toggleAllOn: originalFilters[filterKey].toggleAllOn,
             isOpen: filterIsOpen,
+            doAdvFiltering: originalFilters[filterKey].doAdvFiltering,
+            queries: originalFilters[filterKey].queries,
+            queriedOptionKeys: originalFilters[filterKey].queriedOptionKeys,
           },
         );
-        fOptions = filteredFilters[filterKey].options;
-        oOptions = originalFilters[filterKey].options;
-        ooKeys = Object.keys(oOptions);
+        if (nextFilter.type === 'ordinal') {
+          fOptions = filteredFilters[filterKey].options;
+          oOptions = originalFilters[filterKey].options;
+          ooKeys = Object.keys(oOptions);
 
-        // Loop through all of the original filter options
-        for (let o = 0; o < ooKeys.length; o += 1) {
-          ooKey = ooKeys[o];
-          // If the filtered filter doesn't have the option, add it
-          if (!fOptions[ooKey]) {
-            nextFilter.options[ooKey] = {
-              count: 0,
-              enabled: false,
-              hidden: false,
-            };
-          } else {
-            nextFilter.options[ooKey].enabled = oOptions[ooKey].enabled;
+          // Loop through all of the original filter options
+          for (let o = 0; o < ooKeys.length; o += 1) {
+            ooKey = ooKeys[o];
+            // If the filtered filter doesn't have the option, add it
+            if (!fOptions[ooKey]) {
+              nextFilter.options[ooKey] = {
+                count: 0,
+                enabled: false,
+                hidden: false,
+              };
+            } else {
+              nextFilter.options[ooKey].enabled = oOptions[ooKey].enabled;
+            }
           }
         }
         nextFilters[filterKey] = nextFilter;
@@ -341,13 +358,17 @@ class Filter extends Component {
   
   onFilterItemClick = (e, filterKey) => {
     e.preventDefault();
-    const { filters } = this.state;
-    const nextFilters = filters;
-    nextFilters[filterKey].isOpen = !filters[filterKey].isOpen;
-    // nextFilters[filterKey].doAdvFiltering = false;
-    this.setState({
-      filters: nextFilters,
-    });
+    if (e.target.getAttribute('data-type') === 'basic-filter') {
+      const { filters } = this.state;
+      const nextFilters = filters;
+      nextFilters[filterKey].isOpen = !filters[filterKey].isOpen;
+      // nextFilters[filterKey].doAdvFiltering = false;
+      this.setState({
+        filters: nextFilters,
+      });
+    } else {
+      e.stopPropagation();
+    }
   }
 
   onFilterOptionClick = (e, filterKey) => {
@@ -429,6 +450,7 @@ class Filter extends Component {
       // chec if the filter is actually filtered
       if (filters[filterKeys[f]].isFiltered) {
         newFilters = ['any'];
+        if (filters[filterKeys[f]].dataType === 'ordinal') {
           // define the options and option keys for this filter
           options = filters[filterKeys[f]].options;
           optionKeys = Object.keys(options);
@@ -438,6 +460,9 @@ class Filter extends Component {
               newFilters.push(['==', filterKeys[f], optionKeys[o]]);
             }
           }
+        } else {
+          // generate filter expressions from adv filter queries
+        }
         // push this filter to the combind filter
         if (newFilters.length > 1) {
           nextFilters.push(newFilters);
@@ -511,42 +536,15 @@ class Filter extends Component {
   }
 
   clearAllFiltersSearch = (e) => {
-    const { filters } = this.state;
     this.searchEl.value = '';
     this.allFiltersSearch(e);
     // this.onClearClick(e, isFilterable);
-    const filterKeys = Object.keys(filters);
-    let filter;
-    let filterKey;
-    let options;
-
-    for (let f = 0; f < filterKeys.length; f += 1) {
-      filterKey = filterKeys[f];
-      filter = filters[filterKeys[f]];
-      filter.isOpen = false;
-      options = filter.options;
-    }
-
-    const nextFilters = Object.assign(
-      {},
-      filters,
-      {
-        [filterKey]: {
-          isFiltered: this.isFiltered(options),
-          options,
-          isOpen: false,
-        },
-      });
-
-    this.setState({
-      filters: nextFilters,
-    });
   }
 
   allFiltersSearch = (e) => {
     const { filters } = this.state;
-    const val = (e.target.value || '').toLowerCase();
-    const filterKeys = filters ? Object.keys(filters) : {};
+    let val = (e.target.value || '').toLowerCase();
+    const filterKeys = Object.keys(filters);
     let filter;
     let filterKey;
     let options;
@@ -554,14 +552,16 @@ class Filter extends Component {
     let isMatched;
     let isClear = false;
     let toggleAllOn = false;
+    const nextFilters = {};
 
     if (val === '') isClear = true;
 
     for (let f = 0; f < filterKeys.length; f += 1) {
       filterKey = filterKeys[f];
       filter = filters[filterKeys[f]];
+      if (filter.dataType === 'ordinal') {
         filter.isOpen = true;
-        options = filter.options;
+        options = Object.assign({}, filter.options);
         optionKeys = Object.keys(options);
 
         for (let o = 0; o < optionKeys.length; o += 1) {
@@ -574,20 +574,17 @@ class Filter extends Component {
             }
           }
         }
+        nextFilters[filterKey] = Object.assign(
+          {},
+          filters[filterKey],
+          {
+            isFiltered: this.isFiltered(options),
+            options,
+            isOpen: true,
+          }
+        );
+      }
     }
-
-    const nextFilters = Object.assign(
-      {},
-      filters,
-      {
-        [filterKey]: {
-          isFiltered: this.isFiltered(options),
-          options,
-          toggleAllOn,
-          isOpen: true,
-        },
-      },
-    );
 
     this.setState({
       filters: nextFilters,
@@ -636,7 +633,7 @@ class Filter extends Component {
         // filter.queriedOptionKeys.length ?
         // filter.queriedOptionKeys : 'quant';
       // } else
-      if (filter.isFiltered) {
+      if (filter.isFiltered && filter.dataType === 'ordinal') {
         options = filter.options;
         optionKeys = Object.keys(options);
         for (let o = 0; o < optionKeys.length; o += 1) {
@@ -652,9 +649,9 @@ class Filter extends Component {
         }
       // } else if (dataType === 'quantitative') {
       //   aggregate['accepted-filter-values'][f] = filter.isFiltered ?
-      } else  {
+      } else if (!filter.isFiltered)  {
         // if (filters[filterKey].isOriginal) {
-        aggregate['accepted-filter-values'][f] = 'all';
+        aggregate['accepted-filter-values'][f] = filter.dataType === 'ordinal' ? 'all' : 'quant';
       }
 
       // if (typeof aggregate['accepted-sub-filter-values'][f] === 'string') {
@@ -691,7 +688,7 @@ class Filter extends Component {
     if (!layerFilters) {
       return false;
     }
-    /*const { outsideFilters } = this.state;
+    const { outsideFilters } = this.state;
 
     function isArrayEqual(a, b) {
       if (!a || !b) {
@@ -713,9 +710,9 @@ class Filter extends Component {
         }
       }
       return true;
-    }*/
+    }
 
-    return true;
+    return !isArrayEqual(outsideFilters, layerFilters);
   }
 
   buildNextFilters = (nextOptions, filters, filterKey, isResetable) => {
@@ -748,7 +745,7 @@ class Filter extends Component {
       nextFilter = nextFilters[filterKeys[i]];
       nextFilter.isFiltered = this.isFiltered(nextFilter.options, nextFilter.isOriginal);
 
-      /*// todo - put all this logic in FilterModal.isFiltered()
+      // todo - put all this logic in FilterModal.isFiltered()
       const queriedKeys = nextFilter.queriedOptionKeys;
       if (nextFilter.isFiltered
         || (nextFilter.queries && nextFilter.queries.length
@@ -758,10 +755,10 @@ class Filter extends Component {
           [...new Set(nextFilter.options)].length !== queriedKeys.length))) {
         isFiltered = true;
         nextFilter.isFiltered = true;
-      }*/
-      if (nextFilter.isFiltered) {
-        isFiltered = true;
       }
+      // if (nextFilter.isFiltered) {
+      //   isFiltered = true;
+      // }
     }
 
     if (isFiltered) {
@@ -809,6 +806,8 @@ class Filter extends Component {
     const filterItems = [];
     let filter;
     let isFilterable = false;
+
+
     for (let f = 0; f < filterKeys.length; f += 1) {
       filter = filters[filterKeys[f]];
       const { isFiltered, toggleAllOn, queries, queriedOptionKeys } = filter;
@@ -829,7 +828,7 @@ class Filter extends Component {
             tabIndex="-1"
           >
             {[filterKeys[f]]}
-            {/*filter.isOpen ?
+            {filter.isOpen ?
               <span
                 role="button"
                 tabIndex="0"
@@ -838,7 +837,7 @@ class Filter extends Component {
                 onClick={(e) => { this.toggleAdvFilter(e, filterKeys[f]); }}
                 data-key={filterKeys[f]}
               />
-            : ''*/}
+            : ''}
             <span
               className={`caret caret-${filter.isOpen ? 'down' : 'right'}`}
               data-type="basic-filter"
@@ -883,13 +882,13 @@ class Filter extends Component {
           this.props.showFilterPanel  ?
             <div>
               <div className={`profile-view-container filter-container${isMac ? ' mac' : ''}`}>
-                {/*<button
+                {<button
                   className="filter-search"
                 
                   onClick={(e) => { this.showGlobalSearchField(e); }}
                 >
                   <span className="glyphicon glyphicon-search" />
-                </button>*/}
+                </button>}
                 <button
                   className="close-btn filter-close"
                   title="Close Filters"
