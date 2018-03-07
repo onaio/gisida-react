@@ -7,127 +7,127 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-class AdvancedFilter extends React.Component {
-getQueriedOptionKeys(queries, prevOptions, isQuant) {
-// const { queries, prevOptions } = this.state;
-const nextOptions = [];
-let options = {}; // map iterated per query, reset to prevOptions for ORs
-let nextOptionKeys = [];
-let query;
-let optionKey = '';
-let isEmpty = true;
-let isOR = false;
-let qValue = '';
-let qContr;
-let i;
-let q;
-let isMatched;
-let nOptions;
-let mOptions;
+export class AdvancedFilter extends React.Component {
+  getQueriedOptionKeys(queries, prevOptions, isQuant) {
+    // const { queries, prevOptions } = this.state;
+    const nextOptions = [];
+    let options = {}; // map iterated per query, reset to prevOptions for ORs
+    let nextOptionKeys = [];
+    let query;
+    let optionKey = '';
+    let isEmpty = true;
+    let isOR = false;
+    let qValue = '';
+    let qContr;
+    let i;
+    let q;
+    let isMatched;
+    let nOptions;
+    let mOptions;
 
-for (q = 0; q < queries.length; q += 1) {
-    query = queries[q];
-    qContr = query.control;
-    qValue = query.val;
-    isEmpty = query.val === '';
-    isOR = q ? query.isOR : false;
-    if (!q && isEmpty) break;
+    for (q = 0; q < queries.length; q += 1) {
+      query = queries[q];
+      qContr = query.control;
+      qValue = query.val;
+      isEmpty = query.val === '';
+      isOR = q ? query.isOR : false;
+      if (!q && isEmpty) break;
 
-    /* Handle Individual Queries */
-    options = q && !isOR
-    ? nextOptions[nextOptions.length - 1]
-    : isQuant ? prevOptions : Object.assign({}, prevOptions);
+      /* Handle Individual Queries */
+      options = q && !isOR
+        ? nextOptions[nextOptions.length - 1]
+        : isQuant ? prevOptions : Object.assign({}, prevOptions);
 
-    nextOptions.push((isQuant ? [] : {}));
-    // loop through all options
-    if (isQuant) {
-    for (i = 0; i < options.length; i += 1) {
-        switch (qContr) {
-        case 'between':
-        case 'not between':
-            isMatched = options[i] >= qValue.min && options[i] <= qValue.max;
-            if (qContr !== 'between') isMatched = !isMatched;
-            break;
-        default:
-            isMatched = false;
-            break;
+      nextOptions.push((isQuant ? [] : {}));
+      // loop through all options
+      if (isQuant) {
+        for (i = 0; i < options.length; i += 1) {
+          switch (qContr) {
+            case 'between':
+            case 'not between':
+              isMatched = options[i] >= qValue.min && options[i] <= qValue.max;
+              if (qContr !== 'between') isMatched = !isMatched;
+              break;
+            default:
+              isMatched = false;
+              break;
+          }
+
+          if (isMatched) {
+            nextOptions[nextOptions.length - 1].push(options[i]);
+          }
         }
+      } else {
+        nextOptionKeys = Object.keys(options);
+        for (i = 0; i < nextOptionKeys.length; i += 1) {
+          optionKey = nextOptionKeys[i];
+          if (options[optionKey].count) {
+            // determine option-query match based on control
+            switch (qContr) {
+              case 'contains':
+              case 'does not contain': {
+                isMatched = (optionKey.toLowerCase()).indexOf(qValue.toLowerCase()) !== -1;
+                if (qContr !== 'contains') isMatched = !isMatched;
+                break;
+              }
 
-        if (isMatched) {
-        nextOptions[nextOptions.length - 1].push(options[i]);
-        }
-    }
-    } else {
-    nextOptionKeys = Object.keys(options);
-    for (i = 0; i < nextOptionKeys.length; i += 1) {
-        optionKey = nextOptionKeys[i];
-        if (options[optionKey].count) {
-        // determine option-query match based on control
-        switch (qContr) {
-            case 'contains':
-            case 'does not contain': {
-            isMatched = (optionKey.toLowerCase()).indexOf(qValue.toLowerCase()) !== -1;
-            if (qContr !== 'contains') isMatched = !isMatched;
-            break;
+              case 'starts with':
+              case 'does not start with': {
+                isMatched = (optionKey.toLowerCase()).indexOf(qValue.toLowerCase()) === 0;
+                if (qContr !== 'starts with') isMatched = !isMatched;
+                break;
+              }
+
+              case 'is':
+              case 'is not': {
+                isMatched = optionKey.toLowerCase() === qValue.toLowerCase();
+                if (qContr !== 'is') isMatched = !isMatched;
+                break;
+              }
+
+              default: {
+                isMatched = false; // this pretty much shouldn't happen
+                break;
+              }
             }
 
-            case 'starts with':
-            case 'does not start with': {
-            isMatched = (optionKey.toLowerCase()).indexOf(qValue.toLowerCase()) === 0;
-            if (qContr !== 'starts with') isMatched = !isMatched;
-            break;
+            // add matched options to nextOptions
+            if (isMatched) {
+              nextOptions[nextOptions.length - 1][optionKey] =
+                Object.assign({}, options[optionKey]);
             }
-
-            case 'is':
-            case 'is not': {
-            isMatched = optionKey.toLowerCase() === qValue.toLowerCase();
-            if (qContr !== 'is') isMatched = !isMatched;
-            break;
-            }
-
-            default: {
-            isMatched = false; // this pretty much shouldn't happen
-            break;
-            }
+          }
         }
+      }
 
-        // add matched options to nextOptions
-        if (isMatched) {
-            nextOptions[nextOptions.length - 1][optionKey] =
-            Object.assign({}, options[optionKey]);
-        }
-        }
-    }
+      // handle combing of queries based on logical operator
+      // And operations are condensed into a single set of passing options
+      // Or operations create a new set of passing options
+      // eg - [(conditionA1, conditionB1, ..., conditionN1), (conditionA2, ...), ...]
+      if (q && !isOR) {
+        // remove last query options results
+        nOptions = nextOptions.pop();
+        // define query results to merge into
+        mOptions = nextOptions[nextOptions.length - 1];
+        // evaluate query results from both to find overlap
+        nextOptions[nextOptions.length - 1] = isQuant
+          ? [...new Set([...nOptions, ...mOptions])]
+          : this.getObectIntersect(nOptions, mOptions);
+      }
     }
 
-    // handle combing of queries based on logical operator
-    // And operations are condensed into a single set of passing options
-    // Or operations create a new set of passing options
-    // eg - [(conditionA1, conditionB1, ..., conditionN1), (conditionA2, ...), ...]
-    if (q && !isOR) {
-    // remove last query options results
-    nOptions = nextOptions.pop();
-    // define query results to merge into
-    mOptions = nextOptions[nextOptions.length - 1];
-    // evaluate query results from both to find overlap
-    nextOptions[nextOptions.length - 1] = isQuant
-        ? [...new Set([...nOptions, ...mOptions])]
-        : this.getObectIntersect(nOptions, mOptions);
+    let queriedOptionKeys = [];
+    for (q = 0; q < nextOptions.length; q += 1) {
+      queriedOptionKeys = isQuant
+        ? [...new Set([...queriedOptionKeys, ...nextOptions[q]])]
+        : queriedOptionKeys.concat(Object.keys(nextOptions[q]));
     }
-}
-
-let queriedOptionKeys = [];
-for (q = 0; q < nextOptions.length; q += 1) {
-    queriedOptionKeys = isQuant
-    ? [...new Set([...queriedOptionKeys, ...nextOptions[q]])]
-    : queriedOptionKeys.concat(Object.keys(nextOptions[q]));
-}
-return queriedOptionKeys.length
-    ? [...new Set(queriedOptionKeys)]
-    : queries.length === 1 && queries[0].val === ''
-    ? null
-    : [];
-}
+    return queriedOptionKeys.length
+      ? [...new Set(queriedOptionKeys)]
+      : queries.length === 1 && queries[0].val === ''
+        ? null
+        : [];
+  }
 
   // helper funciton for finding AND intersection
   // todo - move to includes file?

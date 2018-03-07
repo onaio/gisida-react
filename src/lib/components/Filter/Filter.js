@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Actions, generateFilterOptions } from 'gisida';
 import { buildLayersObj } from '../../utils';
@@ -16,7 +17,7 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-class Filter extends Component {
+export class Filter extends Component {
   constructor(props) {
     super(props);
     const filters = null;
@@ -965,6 +966,14 @@ class Filter extends Component {
       </div>  
     );
   }
+}
+
+Filter.propTypes = {
+  layerObj: PropTypes.objectOf(PropTypes.any).isRequired,
+  doShowProfile: PropTypes.bool.isRequired,
+  showFilterPanel: PropTypes.bool.isRequired,
+  layersObj: PropTypes.arrayOf(PropTypes.any).isRequired,
+  layerData: PropTypes.objectOf(PropTypes.any).isRequired,
 }
 
 export default connect(mapStateToProps)(Filter);

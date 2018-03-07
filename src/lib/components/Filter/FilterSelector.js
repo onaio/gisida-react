@@ -10,7 +10,7 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 
-class FilterSelector extends Component {
+export class FilterSelector extends Component {
   parseQueries(options, queriedOptionKeys) {
     const nextOptions = Object.assign({}, options);
     const optionKeys = Object.keys(nextOptions);
@@ -146,30 +146,30 @@ class FilterSelector extends Component {
         </div>}
 
         {dataType === 'ordinal' ?
-        (<ul id="filter-group" className="filterGroup" key={filterKey}>
-          <li>
-            {totalOptions ? (
-              <div>
-                <input
-                  type="checkbox"
-                  id={`all-${filterKey}`}
-                  checked={!toggleAllOn}
-                  onChange={(e) => { this.props.onToggleAllOptions(e, toggleAllOn, filterKey); }}
-                />
-                <label
-                  className="optionLabel"
-                  htmlFor={`all-${filterKey}`}
-                >
-                  <span className={`filter-option-label${isLinux ? ' linux' : ''}`}>(All)</span>
-                  <span>({totalOptions})</span>
-                </label>
-              </div>
-            ) : (
-              <span className="noOptions">(No options available)</span>
-            )}
-          </li>
-          {selectedOptions.concat(filterOptions, inactiveOptions)}
-        </ul>) : ''}
+          (<ul id="filter-group" className="filterGroup" key={filterKey}>
+            <li>
+              {totalOptions ? (
+                <div>
+                  <input
+                    type="checkbox"
+                    id={`all-${filterKey}`}
+                    checked={!toggleAllOn}
+                    onChange={(e) => { this.props.onToggleAllOptions(e, toggleAllOn, filterKey); }}
+                  />
+                  <label
+                    className="optionLabel"
+                    htmlFor={`all-${filterKey}`}
+                  >
+                    <span className={`filter-option-label${isLinux ? ' linux' : ''}`}>(All)</span>
+                    <span>({totalOptions})</span>
+                  </label>
+                </div>
+              ) : (
+                  <span className="noOptions">(No options available)</span>
+                )}
+            </li>
+            {selectedOptions.concat(filterOptions, inactiveOptions)}
+          </ul>) : ''}
       </div>
     );
   }

@@ -1,0 +1,117 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FilterSelector FilterSelector component renderes correctly 1`] = `
+<div>
+  <div
+    className="search-column hidden"
+  >
+    <span
+      className="searchBtn"
+      role="button"
+    >
+      <span
+        className="glyphicon glyphicon-search"
+      />
+    </span>
+    <input
+      className="filterSearch"
+      onChange={[Function]}
+      placeholder="Search Options"
+      type="text"
+    />
+  </div>
+  <ul
+    className="filterGroup"
+    id="filter-group"
+    key="label"
+  >
+    <li>
+      <div>
+        <input
+          checked={false}
+          id="all-label"
+          onChange={[Function]}
+          type="checkbox"
+        />
+        <label
+          className="optionLabel"
+          htmlFor="all-label"
+        >
+          <span
+            className="filter-option-label"
+          >
+            (All)
+          </span>
+          <span>
+            (
+            28
+            )
+          </span>
+        </label>
+      </div>
+    </li>
+    <li
+      className="optionItem"
+      key="0"
+    >
+      <input
+        checked={true}
+        id="option1"
+        onChange={[Function]}
+        type="checkbox"
+        value="option1"
+      />
+      <label
+        className="optionLabel enabled"
+        data-count={20}
+        htmlFor="option1"
+        key="option1"
+        onClick={[Function]}
+        role="presentation"
+        tabIndex="-1"
+      >
+        <span
+          className="filter-option-label"
+          title="option1"
+        >
+          option1
+        </span>
+        <span>
+          20
+        </span>
+      </label>
+    </li>
+    <li
+      className="optionItem"
+      key="1"
+    >
+      <input
+        checked={false}
+        id="option2"
+        onChange={[Function]}
+        type="checkbox"
+        value="option2"
+      />
+      <label
+        className="optionLabel"
+        data-count={8}
+        htmlFor="option2"
+        key="option2"
+        onClick={[Function]}
+        role="presentation"
+        tabIndex="-1"
+      >
+        <span
+          className="filter-option-label"
+          title="option2"
+        >
+          option2
+        </span>
+        <span>
+          8
+        </span>
+      </label>
+    </li>
+  </ul>
+</div>
+`;
