@@ -20,7 +20,7 @@ class FilterSelector extends Component {
     for (o = 0; o < optionKeys.length; o += 1) {
       isPassed = queriedOptionKeys.indexOf(optionKeys[o]) !== -1;
       nextOptions[optionKeys[o]].hidden = !isPassed;
-      nextOptions[optionKeys[o]].enabled = isPassed && options[optionKeys[o]].enabled || false;
+      nextOptions[optionKeys[o]].enabled = (isPassed && options[optionKeys[o]].enabled) || false;
     }
     return nextOptions;
   }
@@ -31,7 +31,7 @@ class FilterSelector extends Component {
     this.state = Object.assign({}, this.props.filter, {
       isLinux: (window.navigator.platform.indexOf('Linux') !== -1),
       options: dataType === 'quantitative' ? options
-          : (doAdvFiltering && queriedOptionKeys || queriedOptionKeys)
+          : ((doAdvFiltering && queriedOptionKeys) || queriedOptionKeys)
           ? this.parseQueries(options, queriedOptionKeys) : options,
     });
   }
@@ -43,7 +43,7 @@ class FilterSelector extends Component {
       nextProps.filter,
       {
         options: dataType === 'quantitative' ? options
-          : (doAdvFiltering && queriedOptionKeys || queriedOptionKeys)
+          : ((doAdvFiltering && queriedOptionKeys) || queriedOptionKeys)
           ? this.parseQueries(options, queriedOptionKeys) : options,
       },
     ));

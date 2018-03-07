@@ -551,7 +551,6 @@ class Filter extends Component {
     let optionKeys;
     let isMatched;
     let isClear = false;
-    let toggleAllOn = false;
     const nextFilters = {};
 
     if (val === '') isClear = true;
@@ -568,10 +567,6 @@ class Filter extends Component {
           if (options[optionKeys[o]].count) {
             isMatched = isClear || (optionKeys[o].toLowerCase()).indexOf(val) !== -1;
             options[optionKeys[o]].hidden = !isMatched;
-
-            if (!options[optionKeys[o]].hidden && !options[optionKeys[o]].enabled) {
-              toggleAllOn = true;
-            }
           }
         }
         nextFilters[filterKey] = Object.assign(
