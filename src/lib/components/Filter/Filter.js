@@ -440,6 +440,15 @@ export class Filter extends Component {
       return false;
     }
     const { filters, layerId } = this.state;
+
+    const { layerObj } = this.props;
+
+    if (!layerObj) {
+      return false;
+    }
+
+    let joinKey;
+
     const filterKeys = Object.keys(filters);
     const nextFilters = ['all'];
 
@@ -458,7 +467,14 @@ export class Filter extends Component {
           // loop through all options and add to this filter
           for (let o = 0; o < optionKeys.length; o += 1) {
             if (options[optionKeys[o]].enabled) {
-              newFilters.push(['==', filterKeys[f], optionKeys[o]]);
+
+              if (layerObj && layerObj['join-key']) {
+                joinKey = layerObj.source.join[0];
+              } else {
+                joinKey = filterKeys[f];
+              }
+
+              newFilters.push(['==', joinKey, optionKeys[o]]);
             }
           }
         } else {
@@ -500,6 +516,7 @@ export class Filter extends Component {
     const val = (e.target.value || '').toLowerCase();
     const options = Object.assign({}, this.state.filters[filterKey].options);
     const optionKeys = Object.keys(options);
+    const nextFilters = {};
     let optionKey;
     let isClear = false;
     let toggleAllOn = false;
@@ -516,18 +533,16 @@ export class Filter extends Component {
         }
       }
     }
-    const nextFilters = Object.assign(
+    nextFilters[filterKey] = Object.assign(
       {},
-      this.state.filters,
+      this.state.filters[filterKey],
       {
-        [filterKey]: {
-          isFiltered: this.isFiltered(options),
-          toggleAllOn,
-          options,
-          isOpen: true,
-          doAdvFiltering: e.target.getAttribute('data-type') === 'advanced-filter',
-          // queries: null,
-        },
+        isFiltered: this.isFiltered(options),
+        toggleAllOn,
+        options,
+        isOpen: true,
+        doAdvFiltering: e.target.getAttribute('data-type') === 'advanced-filter',
+        // queries: null,
       },
     );
 
