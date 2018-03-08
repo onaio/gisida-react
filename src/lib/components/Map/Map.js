@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, addPopUp, sortLayers, addChart } from 'gisida';
+import { Actions, addPopUp, sortLayers, addChart, buildDetailView } from 'gisida';
 import { detectIE, buildLayersObj } from '../../utils';
 import './Map.scss';
 
@@ -72,12 +72,12 @@ class Map extends Component {
 
   onFeatureClick(e) {
     const activeLayers = this.props.layersObj.map(l => l.id)
+    const { layerObj } = this.props;
     const features = this.map.queryRenderedFeatures(e.point, { layers: activeLayers });
-    const feature = features.find(f => f.layer.id === this.props.layerObj.id);
-    if (!feature) return false;
+    const feature = features.find(f => f.layer.id === layerObj.id);
 
-    if (this.props.layerObj['detail-view']) {
-      this.props.dispatch(Actions.detailView(feature.properties, feature.layer.id));
+    if (feature && layerObj['detail-view']) {
+      buildDetailView(layerObj, feature.properties, this.props.dispatch);
     }
   }
 

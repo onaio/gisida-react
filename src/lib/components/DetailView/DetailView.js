@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Actions } from 'gisida';
+import { buildDetailView } from 'gisida';
 import { connect } from 'react-redux';
 import Parser from 'html-react-parser';
 import './DetailView.scss';
@@ -45,7 +45,7 @@ class DetailView extends Component {
 
   onCloseClick(e) {
     e.preventDefault();
-    this.props.dispatch(Actions.detailView(null));
+    buildDetailView(null, null, this.props.dispatch);
   }
 
   render() {
