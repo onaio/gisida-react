@@ -474,7 +474,9 @@ class Map extends Component {
 
   render() {
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
-    const mapWidth = this.props.MAP.showFilterPanel
+    const mapWidth = !this.props.MAP
+      ? '100%'
+      : this.props.MAP.showFilterPanel
       ? 'calc(100% - 250px)'
       : this.props.showDetailView
       ? 'calc(100% - 345px)'

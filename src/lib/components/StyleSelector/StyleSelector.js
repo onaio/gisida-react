@@ -23,7 +23,9 @@ export class StyleSelector extends Component {
 
   render() {
     const styles = this.props.styles;
-    const sidebarOffset = this.props.MAP.showFilterPanel
+    const sidebarOffset = !this.props.MAP
+      ? '0'
+      : this.props.MAP.showFilterPanel
       ? '250px'
       : !!this.props.MAP.detailView
       ? '345px'
