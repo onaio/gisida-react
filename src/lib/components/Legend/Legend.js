@@ -13,6 +13,7 @@ const mapStateToProps = (state, ownProps) => {
     layersData: buildLayersObj(state.MAP.layers),
     MAP: state.MAP,
     primaryLayer: state.MAP.primaryLayer,
+    showFilterPanel: state.MAP.showFilterPanel,
   }
 }
 
@@ -420,7 +421,9 @@ export class Legend extends React.Component {
 
     return (
       <div>
-        <div className={`legend ${mapId}`}>
+        <div
+          className={`legend ${mapId}`}
+          style={{ right: this.props.showFilterPanel ? '270px' : '20px' }}>
           {legendItems}
         </div>
       </div>

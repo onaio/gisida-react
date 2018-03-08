@@ -316,38 +316,38 @@ export class Filter extends Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    window.GisidaMap.resize();
-    const { layersObj, layerObj, layerData } = this.props;
-    if ((layerObj && layerObj.aggregate && prevProps.layerObj && prevProps.layerObj.aggregate) || (layersObj && layersObj[layersObj.length - 1])) {
-      let lData;
-      // todo - update this conditional to look for feature-view property
-      for (let l = 0; l < layersObj.length; l += 1) {
-        lData = layerData[layersObj[l].id];
-        // todo - update this conditional to look for feature-view property
-        if (lData && lData['highlight-filter-property'] && window.GisidaMap.getLayer(layersObj[l].id)) {
-          let nextLayerObj;
-          let featureLayerObj;
-          const nextLayersObj = [];
-          // loop through layerObjs to find highlighted layerObj
-          for (let i = 0; i < layersObj.length; i += 1) {
-            nextLayerObj = layersObj[i];
-            if (nextLayerObj.id === layersObj[l].id && nextLayerObj.filters.highlight && nextLayerObj.filters.rHighlight) {
-              nextLayerObj.filters.highlight[2] = '';
-              nextLayerObj.filters.rHighlight[2] = '';
-            }
-            featureLayerObj = Object.assign({}, nextLayerObj);
-            nextLayersObj.push(nextLayerObj);
-          }
-          // update highlighted layerObj to original state
-          this.setState(() => {
-            // apply the new default filters
-            this.buildFilters(featureLayerObj);
-          });
-        }
-      }
-    }
-  }
+  // componentDidUpdate(prevProps, prevState) {
+  //   window.GisidaMap.resize();
+  //   const { layersObj, layerObj, layerData } = this.props;
+  //   if ((layerObj && layerObj.aggregate && prevProps.layerObj && prevProps.layerObj.aggregate) || (layersObj && layersObj[layersObj.length - 1])) {
+  //     let lData;
+  //     // todo - update this conditional to look for feature-view property
+  //     for (let l = 0; l < layersObj.length; l += 1) {
+  //       lData = layerData[layersObj[l].id];
+  //       // todo - update this conditional to look for feature-view property
+  //       if (lData && lData['highlight-filter-property'] && window.GisidaMap.getLayer(layersObj[l].id)) {
+  //         let nextLayerObj;
+  //         let featureLayerObj;
+  //         const nextLayersObj = [];
+  //         // loop through layerObjs to find highlighted layerObj
+  //         for (let i = 0; i < layersObj.length; i += 1) {
+  //           nextLayerObj = layersObj[i];
+  //           if (nextLayerObj.id === layersObj[l].id && nextLayerObj.filters.highlight && nextLayerObj.filters.rHighlight) {
+  //             nextLayerObj.filters.highlight[2] = '';
+  //             nextLayerObj.filters.rHighlight[2] = '';
+  //           }
+  //           featureLayerObj = Object.assign({}, nextLayerObj);
+  //           nextLayersObj.push(nextLayerObj);
+  //         }
+  //         // update highlighted layerObj to original state
+  //         this.setState(() => {
+  //           // apply the new default filters
+  //           this.buildFilters(featureLayerObj);
+  //         });
+  //       }
+  //     }
+  //   }
+  // }
 
   onCloseClick = (e) => {
     e.preventDefault();

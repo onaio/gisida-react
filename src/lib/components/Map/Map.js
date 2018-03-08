@@ -226,6 +226,7 @@ class Map extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    this.map.resize();
     const { layersObj, primaryLayer } = this.props;
     // Update Timeseries
     const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
