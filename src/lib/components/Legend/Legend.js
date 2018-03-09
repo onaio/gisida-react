@@ -90,7 +90,7 @@ export class Legend extends React.Component {
           <span>{layer.credit}</span>
         </div>);
         }
-        if (fillLayerNoBreaks) {
+        if (fillLayerNoBreaks && !layer.parent) {
           layer.categories.color.forEach((color, index) => {
             const fillWidth = (100 / layer.categories.color.length).toString();
             background.push((
@@ -125,7 +125,7 @@ export class Legend extends React.Component {
               </span>
             </div>
           );
-        } if (fillLayerWithBreaks && layerObj.stops && layer.stops) {
+        } if (fillLayerWithBreaks && layerObj.stops && layer.stops && !layer.parent) {
           const { stopsData, breaks, colors, Data } = layer;
 
           const dataValues = Data.map(values => values[layer.property]);
@@ -197,7 +197,7 @@ export class Legend extends React.Component {
           );
 
         }
-        if (!isBoundaries && !symbolLayer && !circleLayerType && !fillLayerNoBreaks && !fillLayerWithBreaks && !layerObj.layers) {
+        if (!isBoundaries && !symbolLayer && !circleLayerType && !fillLayerNoBreaks && !fillLayerWithBreaks && !layer.parent) {
           primaryLegend = (
             <div
               id={`legend-${layer.id}-${mapId}`}
@@ -290,7 +290,7 @@ export class Legend extends React.Component {
           </div>
         ));
 
-      } else if (fillLayerNoBreaks) {
+      } else if (fillLayerNoBreaks && !layer.parent) {
         layer.categories.color.forEach((color, index) => {
           const fillWidth = (100 / layer.categories.color.length).toString();
           background.push((
@@ -325,7 +325,7 @@ export class Legend extends React.Component {
             </span>
           </div>
         ));
-      } else if (fillLayerWithBreaks && layer.stops) {
+      } else if (fillLayerWithBreaks && layer.stops && !layer.parent) {
         const { stopsData, breaks, colors, Data } = layer;
 
         const dataValues = Data.map(values => values[layer.property]);
@@ -397,7 +397,7 @@ export class Legend extends React.Component {
         ));
       }
       else {
-        if (!isBoundaries && !symbolLayer && !circleLayerType && !fillLayerNoBreaks && !fillLayerWithBreaks && !layerObj.layers) {
+        if (!isBoundaries && !symbolLayer && !circleLayerType && !fillLayerNoBreaks && !fillLayerWithBreaks && !layer.parent) {
           legendItems.unshift((
             <div
               id={`legend-${layer.id}-${mapId}`}
