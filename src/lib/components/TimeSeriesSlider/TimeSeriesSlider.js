@@ -8,7 +8,7 @@ require('./TimeSeriesSlider.scss');
 
 const mapStateToProps = (state, ownProps) => {
   let timeLayer;
-  buildLayersObj(state.MAP.layers).map((layer) => {
+  buildLayersObj(state.MAP.layers).forEach((layer) => {
     if (layer && layer.visible && layer.aggregate && layer.aggregate.timeseries) {
       timeLayer = layer.id;
     }
