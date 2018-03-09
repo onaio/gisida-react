@@ -90,45 +90,46 @@ class Menu extends Component {
           <a onClick={e => this.onToggleMenu(e)} className="open-btn">
             <span className="glyphicon glyphicon-menu-hamburger"></span>
           </a>
-          <div id={menuId} className="sectors-menu">
-            <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
-              <span className="glyphicon glyphicon-remove"></span>
-            </a>
-            <ul className="sectors">
-              {regions && regions.length ?
-                <li className="sector">
-                  <a onClick={e => this.onCategoryClick(e, 'Regions')}>Regions
+          {this.state.openMenu ?
+              <div id={menuId} className="sectors-menu">
+                <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
+                  <span className="glyphicon glyphicon-remove"></span>
+                </a>
+                <ul className="sectors">
+                  {regions && regions.length ?
+                    <li className="sector">
+                      <a onClick={e => this.onCategoryClick(e, 'Regions')}>Regions
                   <span className="caret" />
-                  </a>
-                  <ul className="layers">
-                    {regions && regions.length ?
-                      regions.map((region, i) =>
-                        (<li className={`region ${mapTargetId}`} key={region.name}>
-                          <input
-                            id={region.name}
-                            key={region.name}
-                            name="region"
-                            type="radio"
-                            value={region.name}
-                            checked={!!region.current}
-                            onChange={e => this.onRegionClick(e)}
-                          />
-                          <label htmlFor={region.name}>{region.name}</label>
-                        </li>)) :
-                      <li></li>
-                    }
-                  </ul>
-                </li>: <li/> }
-              {(categories && categories.length) > 0 ?
-                categories.map((category, i) =>
-                  (<li className="sector" key={i}>
+                      </a>
+                      <ul className="layers">
+                        {regions && regions.length ?
+                          regions.map((region, i) =>
+                            (<li className={`region ${mapTargetId}`} key={region.name}>
+                              <input
+                                id={region.name}
+                                key={region.name}
+                                name="region"
+                                type="radio"
+                                value={region.name}
+                                checked={!!region.current}
+                                onChange={e => this.onRegionClick(e)}
+                              />
+                              <label htmlFor={region.name}>{region.name}</label>
+                            </li>)) :
+                          <li></li>
+                        }
+                      </ul>
+                    </li> : <li />}
+                  {(categories && categories.length) > 0 ?
+                    categories.map((category, i) =>
+                      (<li className="sector" key={i}>
                         <a onClick={e => this.onCategoryClick(e, category.category)}>{category.category}
                           <span
                             className={"category glyphicon " +
                               (this.state.openCategories.includes(category.category) ?
                                 "glyphicon-chevron-down" : "glyphicon-chevron-right")}
                           />
-                    </a>
+                        </a>
                         {
                           this.state.openCategories.includes(category.category) ?
                             <Layers
@@ -137,11 +138,11 @@ class Menu extends Component {
                               currentRegion={currentRegion}
                             />
                             : <ul />}
-                  </li>)) :
-                <li></li>
-              }
-            </ul>
-          </div>
+                      </li>)) :
+                    <li></li>
+                  }
+                </ul>
+              </div> : ''}
         </div> : ''}
       </div>
     );

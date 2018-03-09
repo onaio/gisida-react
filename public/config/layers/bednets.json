@@ -12,6 +12,13 @@
   },
   "type": "fill",
   "property": "bednet",
+  "aggregate": {
+      "filter": ["County"],
+      "sub-filter": [""],
+      "accepted-filter-values": ["all"],
+      "accepted-sub-filter-values": [""],
+      "filter-label": ["County"]
+  },
   "categories": {
     "breaks": "yes",
     "color": "Blues",
@@ -39,6 +46,9 @@
   "popup": {
     "header": "region",
     "body": " Health Spending per person: {{Heath_Spending_Per_Person_}}%"
+  },
+  "join-key": {
+    "County": "Adm1Name"
   },
   "visible": false,
   "credit": "Health Spending Per Capita",

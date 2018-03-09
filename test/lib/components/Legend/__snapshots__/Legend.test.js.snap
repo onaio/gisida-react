@@ -4,6 +4,11 @@ exports[`Legend component renderes correctly 1`] = `
 <div>
   <div
     className="legend 01"
+    style={
+      Object {
+        "right": "20px",
+      }
+    }
   >
     <div
       className="legend-row"

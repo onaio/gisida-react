@@ -12,6 +12,13 @@
   },
   "type": "fill",
   "property": "Heath_Spending_Per_Person_",
+  "aggregate": {
+      "filter": ["County"],
+      "sub-filter": [""],
+      "accepted-filter-values": ["all"],
+      "accepted-sub-filter-values": [""],
+      "filter-label": ["County"]
+  },
   "categories": {
     "breaks": "yes",
     "color": "Greens",
@@ -41,6 +48,9 @@
     "body": " Health Spending per person: {{Heath_Spending_Per_Person_}}%"
   },
   "visible": false,
+  "join-key": {
+    "County": "Adm1Name"
+  },
   "credit": "Health Spending Per Capita",
   "category": "Indicators"
 }

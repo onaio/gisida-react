@@ -1,16 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
-import { Actions, getSliderLayers} from 'gisida';
+import { Actions, getSliderLayers } from 'gisida';
+import { buildLayersObj } from '../../utils';
 
 require('./TimeSeriesSlider.scss');
 
-const mapStateToProps = (state, ownProps) => {  
-  return {  
+const mapStateToProps = (state, ownProps) => {
+  let timeLayer;
+  buildLayersObj(state.MAP.layers).forEach((layer) => {
+    if (layer && layer.visible && layer.aggregate && layer.aggregate.timeseries) {
+      timeLayer = layer.id;
+    }
+  });
+
+  return {
     mapId: '01',
-    timeSeriesObj: state.MAP.timeseries[state.MAP.visibleLayerId],
+    timeSeriesObj: state.MAP.timeseries[timeLayer],
     timeseries: state.MAP.timeseries,
-    layers: state.MAP.layers
+    layers: state.MAP.layers,
+    showFilterPanel: state.MAP.showFilterPanel,
   }
 }
 
@@ -98,13 +107,15 @@ class TimeSeriesSlider extends React.Component {
 
   render() {
     return this.props.timeSeriesObj ? (
-      <div className="series">
+      <div
+        className="series"
+        style={{ right: this.props.showFilterPanel ? '310px' : '50px'}}>
         <label
           id={`${this.props.mapId}-label`}
           className="label"
           htmlFor="slider"
         >{this.state.period}</label>
-        <input
+      <input
           id={`${this.props.mapId}-slider`}
           className="slider"
           type="range"
