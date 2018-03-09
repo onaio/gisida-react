@@ -234,11 +234,6 @@ export class AdvancedFilter extends React.Component {
     // const isLast = q === nextQueries.length - 1;
 
     if (doAdd) {
-      // nextQueries.push({
-      //   isOR: false,
-      //   val: '',
-      //   control: 'contains',
-      // });
       nextQueries.splice(q + 1, 0, {
         isOR: false,
         val: '',
