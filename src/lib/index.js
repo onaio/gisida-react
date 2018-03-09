@@ -8,7 +8,18 @@ import Legend from './components/Legend/Legend';
 import Filter from './components/Filter/Filter';
 import SummaryChart from './components/Charts/SummaryChart';
 import TimeSeriesSlider from './components/TimeSeriesSlider/TimeSeriesSlider';
+import DetailView from './components/DetailView/DetailView';
 
 export {
-  App, TitleBar, Menu, Map, StyleSelector, Legend, Filter, FilterSelector, SummaryChart, TimeSeriesSlider
+  App,
+  TitleBar,
+  Menu,
+  Map,
+  StyleSelector,
+  Legend,
+  Filter,
+  FilterSelector,
+  SummaryChart,
+  TimeSeriesSlider,
+  DetailView,
 }

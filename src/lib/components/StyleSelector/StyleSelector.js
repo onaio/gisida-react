@@ -8,6 +8,7 @@ import './StyleSelector.scss';
 const mapStateToProps = (state, ownProps) => {
   
   return {
+    MAP: state.MAP,
     styles: state.STYLES,
     showFilterPanel: state.MAP.showFilterPanel
   }
@@ -22,8 +23,15 @@ export class StyleSelector extends Component {
 
   render() {
     const styles = this.props.styles;
+    const sidebarOffset = !this.props.MAP
+      ? '0'
+      : this.props.MAP.showFilterPanel
+      ? '250px'
+      : !!this.props.MAP.detailView
+      ? '345px'
+      : '0';
     return (
-      <div className="leaflet-left leaflet-top leaflet-right layer-selector" style={{ right: this.props.showFilterPanel ? '250px' : '0'}}>
+      <div className="leaflet-left leaflet-top leaflet-right layer-selector" style={{ right: sidebarOffset }}>
         <div aria-haspopup="true" className="leaflet-control leaflet-control-layers">
           <a title="styles" className="leaflet-control-layers-toggle"> </a>
           <form className="leaflet-control-layers-list">

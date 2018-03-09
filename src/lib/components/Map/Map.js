@@ -1,20 +1,22 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, addPopUp, sortLayers, addChart } from 'gisida';
+import { Actions, addPopUp, sortLayers, addChart, buildDetailView } from 'gisida';
 import { detectIE, buildLayersObj } from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
+  const { APP, MAP, STYLES, REGIONS } = state;
   return {
-    APP: state.APP,
-    STYLES: state.STYLES,
-    REGIONS: state.REGIONS,
-    MAP: state.MAP,
-    timeSeriesObj: state.MAP.timeseries[state.MAP.visibleLayerId],
-    timeseries: state.MAP.timeseries,
-    layersObj: buildLayersObj(state.MAP.layers),
-    layerObj: state.MAP.layers[state.MAP.activeLayerId],
-    primaryLayer: state.MAP.primaryLayer,
+    APP,
+    STYLES,
+    REGIONS,
+    MAP,
+    timeSeriesObj: MAP.timeseries[MAP.visibleLayerId],
+    timeseries: MAP.timeseries,
+    layersObj: buildLayersObj(MAP.layers),
+    layerObj: MAP.layers[MAP.activeLayerId],
+    primaryLayer: MAP.primaryLayer,
+    showDetailView: !!MAP.detailView,
   }
 }
 
@@ -65,6 +67,18 @@ class Map extends Component {
     // this.addMapClickEvents()
     // this.addMouseMoveEvents()
     // etc
+    this.map.on('click', this.onFeatureClick.bind(this));
+  }
+
+  onFeatureClick(e) {
+    const activeLayers = this.props.layersObj.map(l => l.id)
+    const { layerObj } = this.props;
+    const features = this.map.queryRenderedFeatures(e.point, { layers: activeLayers });
+    const feature = features.find(f => f.layer.id === layerObj.id);
+
+    if (feature && layerObj['detail-view']) {
+      buildDetailView(layerObj, feature.properties, this.props.dispatch);
+    }
   }
 
   findNextLayer(activelayersData, nextLayer) {
@@ -243,7 +257,13 @@ class Map extends Component {
   }
 
   doUpdateTSlayers(prevProps) {
-    const { timeseries, layersObj } = this.props;
+    const { timeSeriesObj, timeseries, layersObj } = this.props;
+
+    // if no timeseries object, don't update the timeseries
+    if (!timeSeriesObj) {
+      return false;
+    }
+
     // if timeseries objects' keys don't match, update the timeseries
     if (prevProps.timeseries &&
       Object.keys(prevProps.timeseries).length !== Object.keys(timeseries).length) {
@@ -255,7 +275,7 @@ class Map extends Component {
       layerObj = layersObj[lo];
       // If layerObj mapbox layer is transparent, update the timeseries
       if (layerObj && this.map.getLayer(layerObj.id)
-        && this.map.getLayoutProperty(layerObj.id, 'visibility' ) === 'none') {
+        && this.map.getLayoutProperty(layerObj.id, 'visibility') === 'none') {
         return true;
       }
     }
@@ -453,13 +473,21 @@ class Map extends Component {
   }
 
   render() {
+    // todo - move this in to this.props.MAP.sidebarOffset for extensibility
+    const mapWidth = !this.props.MAP
+      ? '100%'
+      : this.props.MAP.showFilterPanel
+      ? 'calc(100% - 250px)'
+      : this.props.showDetailView
+      ? 'calc(100% - 345px)'
+      : '100%';
     return (
         <div>
         {isIE || !mapboxgl.supported() ?
         (<div className="alert alert-info">
           Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
         </div>) :
-          (<div id='map' style={{ width: this.props.MAP.showFilterPanel ? 'calc(100% - 250px)' : '100%'}}/>)}
+          (<div id='map' style={{ width: mapWidth }}/>)}
         </div>
     );
   }
