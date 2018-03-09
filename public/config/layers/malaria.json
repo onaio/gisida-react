@@ -11,6 +11,13 @@
     ]
   },
   "property": "malaria",
+  "aggregate": {
+      "filter": ["County"],
+      "sub-filter": [""],
+      "accepted-filter-values": ["all"],
+      "accepted-sub-filter-values": [""],
+      "filter-label": ["County"]
+  },
   "type": "circle",
   "minZoom": 0,
   "radius-range": ["6", "9", "12", "15", "18", "21", "24", "27", "30"],
@@ -36,6 +43,9 @@
   "popup": {
     "header": "region",
     "body": "Malaria Incidence: {{malaria}}"
+  },
+  "join-key": {
+    "County": "Adm1Name"
   },
   "credit": "MoH Kenya 2017",
   "visible": false,

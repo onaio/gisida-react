@@ -11,7 +11,7 @@
     ]
   },
   "property": "Heath_Spending_Per_Person_",
-  "properties": ["County"],
+  "properties": ["County", "OBJECTID"],
   "aggregate": {
       "filter": ["County"],
       "sub-filter": [""],
@@ -40,6 +40,9 @@
       "15% - 25%",
       "below 15%"
     ]
+  },
+  "join-key": {
+    "County": "Adm1Name"
   },
   "credit": "% Health spending per person",
   "visible": false,
