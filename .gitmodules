@@ -1,0 +1,3 @@
+[submodule "src/lib/submodules/gisida-react-private"]
+	path = src/lib/submodules/gisida-react-private
+	url = git@github.com:onaio/gisida-react-private.git
