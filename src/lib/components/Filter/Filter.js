@@ -340,7 +340,7 @@ export class Filter extends Component {
       prevFilters: null,
     }, () => {
       this.props.dispatch(Actions.setLayerFilter(layerId, null));
-      clearFilterState(this.props.layerObj.aggregate, layerId, this.props.dispatch);
+      clearFilterState(filterOptions, this.props.layerObj.aggregate, layerId, this.props.dispatch);
     });
     return true;
   }
@@ -403,7 +403,7 @@ export class Filter extends Component {
       prevFilters: filters,
     }, () => {
       this.props.dispatch(Actions.setLayerFilter(layerId, nextFilters));
-      buildFilterState(filters, layerId, this.props.dispatch);
+      buildFilterState(filters, this.state.filterOptions, layerId, this.props.dispatch);
     });
     return true;
   }
