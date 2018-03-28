@@ -7,6 +7,8 @@ import StyleSelector from './components/StyleSelector/StyleSelector';
 import Legend from './components/Legend/Legend';
 import SummaryChart from './components/Charts/SummaryChart';
 import DetailView from './components/DetailView/DetailView';
+import Filter from './components/Filter/Filter';
+import TimeSeriesSlider from './components/TimeSeriesSlider/TimeSeriesSlider';
 
 export {
   App,
@@ -17,4 +19,6 @@ export {
   Legend,
   SummaryChart,
   DetailView,
+  Filter,
+  TimeSeriesSlider,
 }
