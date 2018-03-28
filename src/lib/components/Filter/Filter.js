@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Actions, generateFilterOptions } from 'gisida';
+import { Actions, generateFilterOptions, buildFilterState, clearFilterState } from 'gisida';
 import { buildLayersObj } from '../../utils';
 import FilterSelector from './FilterSelector';
 import './Filter.scss';
@@ -9,6 +9,7 @@ import './Filter.scss';
 const mapStateToProps = (state, ownProps) => {
   return {
     MAP: state.MAP,
+    FILTER: state.FILTER,
     layerObj: state.MAP.layers[state.MAP.filter.layerId],
     doShowProfile: state.MAP.showProfile,
     showFilterPanel: state.MAP.showFilterPanel,
@@ -339,6 +340,7 @@ export class Filter extends Component {
       prevFilters: null,
     }, () => {
       this.props.dispatch(Actions.setLayerFilter(layerId, null));
+      clearFilterState(this.props.layerObj.aggregate, layerId, this.props.dispatch);
     });
     return true;
   }
@@ -401,6 +403,7 @@ export class Filter extends Component {
       prevFilters: filters,
     }, () => {
       this.props.dispatch(Actions.setLayerFilter(layerId, nextFilters));
+      buildFilterState(filters, layerId, this.props.dispatch);
     });
     return true;
   }
