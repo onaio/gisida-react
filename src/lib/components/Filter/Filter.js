@@ -111,7 +111,6 @@ export class Filter extends Component {
       filterMap[filterKey] = filter;
     }
 
-
     // this might be deprecated?? :-/
     if (layerFilters) {
       for (f = 0; f < layerFilters.length; f += 1) {
