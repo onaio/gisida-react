@@ -112,6 +112,7 @@ export class Filter extends Component {
     }
 
 
+    // this might be deprecated?? :-/
     if (layerFilters) {
       for (f = 0; f < layerFilters.length; f += 1) {
         if (layerFilters[f] instanceof Array) {
@@ -242,20 +243,35 @@ export class Filter extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const layerObj = nextProps.layerObj || {
-      filterOptions: {}
-    };
-    const { filterOptions, id } = layerObj;
-    if (filterOptions && Object.keys(filterOptions).length > 0) {
-      const layerFilters = this.getLayerFilter(id);
-      const filters = this.state.isFiltered && this.state.prevFilters ? this.state.prevFilters
-        : this.buildFiltersMap(filterOptions, layerFilters, this.state.filters);
-      
+    if (!nextProps.layerObj) return false;
+
+    const layerId = nextProps.layerObj.id;
+
+    // Build new component state or retrieve it from FILTER store
+    const filterState = this.props.FILTER[layerId];
+    const layerFilters = this.getLayerFilter(layerId); // this may be deprecated
+    const filterOptions = filterState
+      ? filterState.filterOptions
+      : nextProps.layerObj.filterOptions || {};
+    const filters = filterState
+      ? filterState.filters
+      : this.state.isFiltered && this.state.prevFilters
+      ? this.state.prevFilters
+      : this.buildFiltersMap(filterOptions, layerFilters, this.state.filters);
+
+    // determine whether to update the compnent state
+    const doUpdate = filterState
+      ? filterState.doUpdate
+      : filterOptions && Object.keys(filterOptions).length > 0;
+
+    if (doUpdate) {
       this.setState({
         filters,
         filterOptions,
-        layerId: id,
+        layerId,
         doShowProfile: false,
+      }, () => {
+        this.props.dispatch(Actions.filtersUpdated(layerId));
       });
     }
   }
@@ -335,21 +351,17 @@ export class Filter extends Component {
       return false;
     }
     const { layerId, filterOptions } = this.state;
+    // Clear layerFilter from mapbox layer
+    this.props.dispatch(Actions.setLayerFilter(layerId, null));
 
-    this.setState({
-      isFiltered: false,
+    // Update FILTER state
+    const filterState = {
+      filterOptions,
       filters: this.buildFiltersMap(filterOptions),
-      prevFilters: null,
-    }, () => {
-      this.props.dispatch(Actions.setLayerFilter(layerId, null));
-      const filterState = {
-        filterOptions,
-        filters: this.buildFiltersMap(filterOptions),
-        aggregate: this.props.layerObj.aggregate,
-        isFiltered: false,
-      };
-      clearFilterState(filterState, layerId, this.props.dispatch);
-    });
+      aggregate: this.props.layerObj.aggregate,
+      isFiltered: false,
+    };
+    clearFilterState(filterState, layerId, this.props.dispatch);
     return true;
   }
 
@@ -406,13 +418,11 @@ export class Filter extends Component {
       }
     }
 
-    this.setState({
-      isFiltered: true,
-      prevFilters: filters,
-    }, () => {
-      this.props.dispatch(Actions.setLayerFilter(layerId, nextFilters));
-      buildFilterState(this.state.filterOptions, filters, layerId, this.props.dispatch);
-    });
+    // Apply layerFilter to mapbox layer
+    this.props.dispatch(Actions.setLayerFilter(layerId, nextFilters));
+    // Update FILTER store state
+    buildFilterState(this.state.filterOptions, filters, layerId, this.props.dispatch);
+
     return true;
   }
 
