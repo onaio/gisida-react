@@ -71,7 +71,7 @@ export class Filter extends Component {
     //   return 0;
     // };
 
-    // loop over all filters
+    // loop over all filters and build filter state from prevFilters or clean
     for (f = 0; f < filterKeys.length; f += 1) {
       filterKey = filterKeys[f];
       filter = {
@@ -110,6 +110,7 @@ export class Filter extends Component {
       // add filter to the filterMap
       filterMap[filterKey] = filter;
     }
+
 
     if (layerFilters) {
       for (f = 0; f < layerFilters.length; f += 1) {
@@ -334,13 +335,20 @@ export class Filter extends Component {
       return false;
     }
     const { layerId, filterOptions } = this.state;
+
     this.setState({
       isFiltered: false,
       filters: this.buildFiltersMap(filterOptions),
       prevFilters: null,
     }, () => {
       this.props.dispatch(Actions.setLayerFilter(layerId, null));
-      clearFilterState(filterOptions, this.props.layerObj.aggregate, layerId, this.props.dispatch);
+      const filterState = {
+        filterOptions,
+        filters: this.buildFiltersMap(filterOptions),
+        aggregate: this.props.layerObj.aggregate,
+        isFiltered: false,
+      };
+      clearFilterState(filterState, layerId, this.props.dispatch);
     });
     return true;
   }
@@ -403,7 +411,7 @@ export class Filter extends Component {
       prevFilters: filters,
     }, () => {
       this.props.dispatch(Actions.setLayerFilter(layerId, nextFilters));
-      buildFilterState(filters, this.state.filterOptions, layerId, this.props.dispatch);
+      buildFilterState(this.state.filterOptions, filters, layerId, this.props.dispatch);
     });
     return true;
   }
