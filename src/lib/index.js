@@ -1,4 +1,3 @@
-import fs from 'fs';
 import App from './components/App/App';
 import TitleBar from './components/TitleBar/TitleBar';
 import Menu from './components/Menu/Menu';

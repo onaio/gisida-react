@@ -42,7 +42,8 @@ const mapStateToProps = (state, ownProps) => {
     mapTargetId: '',
     regions: state.REGIONS,
     currentRegion: currentRegion,
-    loaded: state.APP.loaded
+    loaded: state.APP.loaded,
+    preparedLayers: state.MAP.layers,
   }
 }
 
@@ -83,6 +84,7 @@ class Menu extends Component {
     const categories = this.props.categories;
     const regions = this.props.regions;
     const currentRegion = this.props.currentRegion;
+    const preparedLayers = this.props.preparedLayers;
     return (
       <div>
       {this.props.loaded ?
@@ -136,6 +138,7 @@ class Menu extends Component {
                               mapTargetId={mapTargetId}
                               layers={category.layers}
                               currentRegion={currentRegion}
+                              preparedLayers={preparedLayers}
                             />
                             : <ul />}
                       </li>)) :

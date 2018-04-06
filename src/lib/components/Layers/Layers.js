@@ -1,25 +1,21 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
-import { connect } from 'react-redux'
-
-const mapStateToProps = (state, ownProps) => {
-  return {
-    preparedLayers: state.MAP.layers
-  }
-}
 
 export class Layers extends Component {
   render() {
-    const { mapTargetId, layers, currentRegion } = this.props;
+    const { mapTargetId, layers, currentRegion, preparedLayers } = this.props;
 
     let layerKeys;
     let layerObj;
-    let layer;
     const layerItem = [];
     const subLayerIds = [];
 
-    layerKeys = Object.keys(this.props.preparedLayers);
+    if (!preparedLayers) {
+      return false;
+    }
+
+    layerKeys = Object.keys(preparedLayers);
 
     for (let lo = 0; lo < layerKeys.length; lo += 1) {
       layerObj = this.props.preparedLayers[layerKeys[lo]];
@@ -57,4 +53,4 @@ Layers.propTypes = {
   currentRegion: PropTypes.string,
 };
 
-export default connect(mapStateToProps)(Layers);
+export default Layers;
