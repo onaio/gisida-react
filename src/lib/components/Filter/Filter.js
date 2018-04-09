@@ -409,6 +409,10 @@ export class Filter extends Component {
           }
         } else {
           // generate filter expressions from adv filter queries
+          options = filters[filterKeys[f]].queriedOptionKeys;
+          for (let o = 0; o < options.length; o += 1) {
+            newFilters.push(['==', filterKeys[f], options[o]]);
+          }
         }
         // push this filter to the combind filter
         if (newFilters.length > 1) {
@@ -434,7 +438,7 @@ export class Filter extends Component {
       nextFilters,
     } = (this.buildNextFilters(prevFilters[filterKey].options, prevFilters, filterKey, true));
 
-    this.setState({ filters: nextFilters });
+    buildFilterState(this.state.filterOptions, nextFilters, this.state.layerId, this.props.dispatch);
   }
 
   searchFilterOptions = (e, filterKey) => {
@@ -686,7 +690,7 @@ export class Filter extends Component {
       if (nextFilter.isFiltered
         || (nextFilter.queries && nextFilter.queries.length
         && (nextFilter.queries.length > 1 || nextFilter.queries[0].val !== ''))
-        || (Array.isArray(nextFilter.options)
+        || (Array.isArray(nextFilter.options) && queriedKeys
         && (
           [...new Set(nextFilter.options)].length !== queriedKeys.length))) {
         isFiltered = true;
@@ -764,7 +768,7 @@ export class Filter extends Component {
             tabIndex="-1"
           >
             {[filterKeys[f]]}
-            {filter.isOpen ?
+            {filter.isOpen && filter.dataType !== 'quantitative' ?
               <span
                 role="button"
                 tabIndex="0"

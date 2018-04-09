@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from 'highcharts';
-import { isNewSeriesData } from '../../utils';
+import { isNewSeriesData } from './../../utils';
 
 class ColumnChart extends React.Component {
   static pointFormatterFunc() {
@@ -16,7 +16,10 @@ class ColumnChart extends React.Component {
       chartHeight,
       chartWidth,
       categories,
+      xAxis,
+      yAxis,
       yAxisLabel,
+      pointFormatterFunc,
     } = this.props;
 
     this.state = {
@@ -28,7 +31,7 @@ class ColumnChart extends React.Component {
         spacingTop: 15,
         spacintRight: 10,
       },
-      xAxis: {
+      xAxis: typeof xAxis !== 'undefined' ? (xAxis || null) : {
         categories,
         labels: {
           style: {
@@ -36,7 +39,7 @@ class ColumnChart extends React.Component {
           },
         },
       },
-      yAxis: [
+      yAxis: typeof yAxis !== 'undefined' ? (yAxis || null) : [
         {
           title: {
             text: (yAxisLabel && yAxisLabel) || 'Target Percentage (%)',
@@ -73,10 +76,11 @@ class ColumnChart extends React.Component {
         column: {
           showInLegend: false,
           pointPadding: 0,
+          borderWidth: 0,
           tooltip: {
             distance: 0,
             padding: 0,
-            pointFormatter: ColumnChart.pointFormatterFunc,
+            pointFormatter: pointFormatterFunc || ColumnChart.pointFormatterFunc,
           },
         },
       },
@@ -101,6 +105,7 @@ class ColumnChart extends React.Component {
       chartHeight,
       chartWidth,
       categories,
+      xAxis,
     } = nextProps;
 
     if (isNewSeriesData(this.state.series[0].data, seriesData)) {
@@ -114,7 +119,7 @@ class ColumnChart extends React.Component {
         title: {
           text: seriesTitle || null,
         },
-        xAxis: {
+        xAxis: typeof xAxis !== 'undefined' ? (xAxis || null) : {
           categories,
           labels: {
             style: {
@@ -125,6 +130,9 @@ class ColumnChart extends React.Component {
         series: [{
           name: seriesTitle,
           data: seriesData,
+          animation: {
+            duration: 0,
+          },
         }],
       }, () => {
         this.chart = Highcharts.chart(this.chartEl, this.state);

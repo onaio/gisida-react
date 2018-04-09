@@ -56,7 +56,7 @@ export class FilterSelector extends Component {
   }
 
   render() {
-    const { options, isLinux, dataType } = this.state;
+    const { options, isLinux, dataType, queriedOptionKeys } = this.state;
     const { filterKey, doAdvFiltering,  toggleAllOn, queries } = this.props;
     if (!options || !(Object.keys(options)).length) {
       return null;
@@ -120,6 +120,7 @@ export class FilterSelector extends Component {
             queries={queries}
             setFilterQueries={this.props.setFilterQueries}
             dataType={dataType}
+            queriedOptionKeys={queriedOptionKeys}
           />
           :
           <div className={`search-column${this.props.globalSearchField ? ' hidden' : ''}`}>
