@@ -9,7 +9,7 @@ import './Filter.scss';
 const mapStateToProps = (state, ownProps) => {
   return {
     MAP: state.MAP,
-    FILTER: state.FILTER,
+    FILTER: { ...state.FILTER },
     layerObj: state.MAP.layers[state.MAP.filter.layerId],
     doShowProfile: state.MAP.showProfile,
     showFilterPanel: state.MAP.showFilterPanel,
@@ -247,7 +247,7 @@ export class Filter extends Component {
     const layerId = nextProps.layerObj.id;
 
     // Build new component state or retrieve it from FILTER store
-    const filterState = this.props.FILTER[layerId];
+    const filterState = nextProps.FILTER[layerId];
     const layerFilters = this.getLayerFilter(layerId); // this may be deprecated
     const filterOptions = filterState
       ? filterState.filterOptions
@@ -270,7 +270,7 @@ export class Filter extends Component {
         layerId,
         doShowProfile: false,
       }, () => {
-        this.props.dispatch(Actions.filtersUpdated(layerId));
+        nextProps.dispatch(Actions.filtersUpdated(layerId));
       });
     }
   }
@@ -767,7 +767,7 @@ export class Filter extends Component {
             role="button"
             tabIndex="-1"
           >
-            {[filterKeys[f]]}
+            {filter.label}
             {filter.isOpen && filter.dataType !== 'quantitative' ?
               <span
                 role="button"
