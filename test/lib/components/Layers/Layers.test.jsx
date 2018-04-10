@@ -7,12 +7,14 @@ import layerObj from '../../../fixtures/sample-layer.json';
 describe('Layers', () => {
   layerObj.id = 'sample-layer';
   const layers = [layerObj];
+  const preparedLayers = {'sample-layer-id': layerObj}
   
   const componentWrapper = shallow(
     <Layers
       mapTargetId={'map-1'}
       layers={layers}
       currentRegion={undefined}
+      preparedLayers={preparedLayers}
     />
   );
 
