@@ -166,7 +166,7 @@ export class AdvancedFilter extends React.Component {
     const nextQueries = [];
     const { queries, filterKey, isQuant } = this.state;
     let query;
-    // const isMin = e.target.placeholder === 'min';
+    const isMin = e
 
     for (let i = 0; i < queries.length; i += 1) {
       query = queries[i];
@@ -323,40 +323,49 @@ export class AdvancedFilter extends React.Component {
 
       case 'less than':
         inputEl = (
-          <div className="inputLessThan">
-            <label>Less Than: {val.max}</label>
-            <input
-              className="inputMax"
-              type="range"
-              placeholder="max"
-              value={val.max}
-              min={val.min}
+          <div className="inputLessThan"> 
+            <Slider
+              min={min}
               max={max}
-              // step={1}
-              list={`${this.state.filterKey}-datalist`}
-              onChange={(e) => { this.onInputChange(e, q); }}
+              defaultValue={val.max}
+              onChange={(e) => {
+                this.onInputChange([val.min, e], q);
+              }}
             />
-            {datalistEl}
+            <div className="texttip min" style={{right: '100%'}}>
+              <span>{min}</span>
+            </div>
+            <div className="texttip high" style={{right: `${(1 - (val.max / max)) * 100}%`}}>
+              <span>{val.max}</span>
+            </div>
+            <div className="texttip max" style={{right: '0%'}}>
+              <span>{max}</span>
+            </div>
           </div>
         );
         break;
 
       case 'greater than':
         inputEl = (
-          <div className="inputBetween">
-            <label>Greater Than: {val.min}</label>
-            <input
-              className="inputMin"
-              type="range"
-              placeholder="min"
-              value={val.min}
+          <div className="inputGreaterThan">
+            <Slider
               min={min}
-              max={val.max}
-              // step={1}
-              list={`${this.state.filterKey}-datalist`}
-              onChange={(e) => { this.onInputChange(e, q); }}
+              max={max}
+              defaultValue={val.min}
+              onChange={(e) => {
+                this.onInputChange([e, val.max], q);
+              }}
             />
-            {datalistEl}
+
+            <div className="texttip min" style={{right: '100%'}}>
+              <span>{min}</span>
+            </div>
+            <div className="texttip low" style={{right: `${(1 - (val.min / max)) * 100}%`}}>
+              <span>{val.min}</span>
+            </div>
+            <div className="texttip max" style={{right: '0%'}}>
+              <span>{max}</span>
+            </div>
           </div>
         );
         break;

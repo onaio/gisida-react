@@ -656,7 +656,9 @@
   color: #444;
 }
 
-.inputBetween {
+.inputBetween,
+.inputLessThan,
+.inputGreaterThan {
   width: calc(100% - 16px);
   position: relative;
   padding: 12px 0 16px;
