@@ -12,17 +12,7 @@ export class AdvancedFilter extends React.Component {
   // helper funciton for finding AND intersection
   // todo - move to includes file?
   getObectIntersect(n, m) {
-    // create set of unique keys from both option objects
-    const keys = [...new Set([...Object.keys(n), ...Object.keys(m)])];
-    const nextOptionsMap = {};
-    let key;
-
-    for (let i = 0; i < keys.length; i += 1) {
-      key = keys[i];
-      if (n[key] && m[key]) nextOptionsMap[key] = n[key];
-    }
-
-    return nextOptionsMap;
+    return [...new Set(n.filter((x) => m.indexOf(x) !== -1))];
   }
 
   constructor(props) {
@@ -143,7 +133,7 @@ export class AdvancedFilter extends React.Component {
         if (!q || query.isOR) {
           nextMatches.push(query.matches);
         } else if (query.matches) {
-          nextMatches[nextMatches.length - 1] = AdvancedFilter.getObectIntersect(
+          nextMatches[nextMatches.length - 1] = this.getObectIntersect(
             nextMatches[nextMatches.length - 1],
             query.matches
           );
@@ -426,25 +416,27 @@ export class AdvancedFilter extends React.Component {
           { /* Logical Operator toggle */ }
           {q ? (
             <table>
-              <tr>
-                <td>And</td>
-                <td>
-                  <label
-                    className="switch"
-                    htmlFor="operator-toggle"
-                  >
-                    <input
-                      type="checkbox"
-                      id="operator-toggle"
-                      className="operator-toggle"
-                      checked={query.isOR}
-                      onChange={(e) => { this.toggleLogicalOperators(e, q); }}
-                    />
-                    <span className="slider" />
-                  </label>
-                </td>
-                <td>Or</td>
-              </tr>
+              <tbody>
+                <tr>
+                  <td>And</td>
+                  <td>
+                    <label
+                      className="switch"
+                      htmlFor="operator-toggle"
+                    >
+                      <input
+                        type="checkbox"
+                        id="operator-toggle"
+                        className="operator-toggle"
+                        checked={query.isOR}
+                        onChange={(e) => { this.toggleLogicalOperators(e, q); }}
+                      />
+                      <span className="slider" />
+                    </label>
+                  </td>
+                  <td>Or</td>
+                </tr>
+              </tbody>
             </table>
             ) : ''}
           {controlSelectorEl}
