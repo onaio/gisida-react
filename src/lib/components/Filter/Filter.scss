@@ -655,3 +655,34 @@
 .inputMax {
   color: #444;
 }
+
+.inputBetween {
+  width: calc(100% - 16px);
+  position: relative;
+  padding: 12px 0 16px;
+
+  .texttip {
+    position: absolute;
+    color: #aaa;
+    width: 24px;
+    text-align: center;
+    margin-right: -12px;
+    top: 30px;
+
+    &.low,
+    &.high {
+      top: -6px;
+      color: #fff;
+    }
+  }
+
+  .rc-slider-track {
+    background-color: #7cb5ec;
+  }
+  .rc-slider-handle {
+    border-color: #7cb5ec;
+    background-color: #eee;
+  }
+}
+
+

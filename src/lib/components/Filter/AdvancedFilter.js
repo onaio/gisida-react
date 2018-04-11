@@ -3,6 +3,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import QuantColumnChart from './../Charts/QuantColumnChart';
 
+import 'rc-slider/assets/index.css';
+import Slider from 'rc-slider';
+const createSliderWithTooltip = Slider.createSliderWithTooltip;
+const Range = createSliderWithTooltip(Slider.Range);
+
 const mapStateToProps = (state, ownProps) => {
   return {
   }
@@ -161,7 +166,7 @@ export class AdvancedFilter extends React.Component {
     const nextQueries = [];
     const { queries, filterKey, isQuant } = this.state;
     let query;
-    const isMin = e.target.placeholder === 'min';
+    // const isMin = e.target.placeholder === 'min';
 
     for (let i = 0; i < queries.length; i += 1) {
       query = queries[i];
@@ -171,8 +176,8 @@ export class AdvancedFilter extends React.Component {
           query,
           {
             val: !isQuant ? e.target.value : {
-              min: isMin ? Number(e.target.value) : queries[i].val.min,
-              max: isMin ? queries[i].val.max : Number(e.target.value),
+              min: e[0], // isMin ? Number(e.target.value) : queries[i].val.min,
+              max: e[1] // isMin ? queries[i].val.max : Number(e.target.value),
             },
           },
         ));
@@ -290,32 +295,28 @@ export class AdvancedFilter extends React.Component {
       case 'not between':
         inputEl = (
           <div className="inputBetween">
-            <label>Min: {val.min}</label>
-            <input
-              className="inputMin"
-              type="range"
-              placeholder="min"
-              value={val.min}
+            <Range
               min={min}
-              max={val.max}
-              // step={1}
-              list={`${this.state.filterKey}-datalist`}
-              onChange={(e) => { this.onInputChange(e, q); }}
-            />
-            <br />
-            <label>Max: {val.max}</label>
-            <input
-              className="inputMax"
-              type="range"
-              placeholder="max"
-              value={val.max}
-              min={val.min}
               max={max}
-              // step={1}
-              list={`${this.state.filterKey}-datalist`}
-              onChange={(e) => { this.onInputChange(e, q); }}
+              defaultValue={[val.min, val.max]}
+              onChange={(e) => {
+                this.onInputChange(e, q);
+              }}
+              tipFormatter={value => `${value}`}
             />
-            {datalistEl}
+
+            <div className="texttip min" style={{right: '100%'}}>
+              <span>{min}</span>
+            </div>
+            <div className="texttip low" style={{right: `${(1 - (val.min / max)) * 100}%`}}>
+              <span>{val.min}</span>
+            </div>
+            <div className="texttip high" style={{right: `${(1 - (val.max / max)) * 100}%`}}>
+              <span>{val.max}</span>
+            </div>
+            <div className="texttip max" style={{right: '0%'}}>
+              <span>{max}</span>
+            </div>
           </div>
         );
         break;
