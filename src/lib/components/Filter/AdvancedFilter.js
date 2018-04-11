@@ -166,7 +166,6 @@ export class AdvancedFilter extends React.Component {
     const nextQueries = [];
     const { queries, filterKey, isQuant } = this.state;
     let query;
-    const isMin = e
 
     for (let i = 0; i < queries.length; i += 1) {
       query = queries[i];
@@ -290,89 +289,57 @@ export class AdvancedFilter extends React.Component {
       </datalist>
     );
 
-    switch (control) {
-      case 'between':
-      case 'not between':
-        inputEl = (
-          <div className="inputBetween">
-            <Range
-              min={min}
-              max={max}
-              defaultValue={[val.min, val.max]}
-              onChange={(e) => {
-                this.onInputChange(e, q);
-              }}
-              tipFormatter={value => `${value}`}
-            />
+    const containerClass = control === 'less than'
+      ? 'inputLessThan'
+      : control === 'greater than'
+      ? 'inputGreaterThan'
+      : 'inputBetween';
 
-            <div className="texttip min" style={{right: '100%'}}>
-              <span>{min}</span>
-            </div>
-            <div className="texttip low" style={{right: `${(1 - (val.min / max)) * 100}%`}}>
-              <span>{val.min}</span>
-            </div>
-            <div className="texttip high" style={{right: `${(1 - (val.max / max)) * 100}%`}}>
-              <span>{val.max}</span>
-            </div>
-            <div className="texttip max" style={{right: '0%'}}>
-              <span>{max}</span>
-            </div>
+    return (
+      <div className={containerClass}>
+
+        {control === 'between' || control === 'not between' ? (
+          <Range
+            min={min}
+            max={max}
+            defaultValue={[val.min, val.max]}
+            onChange={(e) => {
+              this.onInputChange(e, q);
+            }}
+            tipFormatter={value => `${value}`}
+          />
+        ) : (
+          <Slider
+            min={min}
+            max={max}
+            defaultValue={control === 'less than' ? val.max : val.min}
+            onChange={(e) => {
+              this.onInputChange(control === 'less than' ? [val.min, e] : [e, val.max], q);
+            }}
+          />
+        )}
+
+        <div className="texttip min" style={{right: '100%'}}>
+          <span>{min}</span>
+        </div>
+
+        {control !== 'less than' ? (
+          <div className="texttip low" style={{right: `${(1 - (val.min / max)) * 100}%`}}>
+            <span>{val.min}</span>
           </div>
-        );
-        break;
+        ) : ''}
 
-      case 'less than':
-        inputEl = (
-          <div className="inputLessThan"> 
-            <Slider
-              min={min}
-              max={max}
-              defaultValue={val.max}
-              onChange={(e) => {
-                this.onInputChange([val.min, e], q);
-              }}
-            />
-            <div className="texttip min" style={{right: '100%'}}>
-              <span>{min}</span>
-            </div>
-            <div className="texttip high" style={{right: `${(1 - (val.max / max)) * 100}%`}}>
-              <span>{val.max}</span>
-            </div>
-            <div className="texttip max" style={{right: '0%'}}>
-              <span>{max}</span>
-            </div>
+        {control !== 'greater than' ? (
+          <div className="texttip high" style={{right: `${(1 - (val.max / max)) * 100}%`}}>
+            <span>{val.max}</span>
           </div>
-        );
-        break;
+        ) : ''}
 
-      case 'greater than':
-        inputEl = (
-          <div className="inputGreaterThan">
-            <Slider
-              min={min}
-              max={max}
-              defaultValue={val.min}
-              onChange={(e) => {
-                this.onInputChange([e, val.max], q);
-              }}
-            />
-
-            <div className="texttip min" style={{right: '100%'}}>
-              <span>{min}</span>
-            </div>
-            <div className="texttip low" style={{right: `${(1 - (val.min / max)) * 100}%`}}>
-              <span>{val.min}</span>
-            </div>
-            <div className="texttip max" style={{right: '0%'}}>
-              <span>{max}</span>
-            </div>
-          </div>
-        );
-        break;
-      default:
-        break;
-    }
-    return inputEl;
+        <div className="texttip max" style={{right: '0%'}}>
+          <span>{max}</span>
+        </div>
+      </div>
+    );
   }
 
   render() {
