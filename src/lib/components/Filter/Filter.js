@@ -16,6 +16,7 @@ const mapStateToProps = (state, ownProps) => {
     layersObj: buildLayersObj(state.MAP.layers),
     showFilterBtn: state.MAP.filter.layerId,
     layerData: state.MAP.layers,
+    detailView: state.MAP.detailView,
   }
 }
 
@@ -397,14 +398,8 @@ export class Filter extends Component {
           // loop through all options and add to this filter
           for (let o = 0; o < optionKeys.length; o += 1) {
             if (options[optionKeys[o]].enabled) {
-
-              if (layerObj && layerObj['join-key']) {
-                joinKey = layerObj.source.join[0];
-              } else {
-                joinKey = filterKeys[f];
-              }
-
-              newFilters.push(['==', joinKey, optionKeys[o]]);
+              // push filter expression into array of expressions
+              newFilters.push(['==', filterKeys[f], optionKeys[o]]);
             }
           }
         } else {
@@ -801,9 +796,9 @@ export class Filter extends Component {
     }
 
     const doClear = isFilterable || this.state.isFiltered || this.isMapFiltered();
-    const sidebarOffset = this.props.MAP.showFilterPanel
+    const sidebarOffset = this.props.showFilterPanel
       ? '260px'
-      : !!this.props.MAP.detailView
+      : !!this.props.detailView
       ? '355px'
       : '10px';
 
