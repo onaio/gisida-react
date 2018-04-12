@@ -6,11 +6,11 @@ import './StyleSelector.scss';
 
 
 const mapStateToProps = (state, ownProps) => {
-  
+  const MAP = state[ownProps.mapId]
   return {
-    MAP: state.MAP,
+    MAP,
     styles: state.STYLES,
-    showFilterPanel: state.MAP.showFilterPanel
+    showFilterPanel: MAP.showFilterPanel
   }
 }
 

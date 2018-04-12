@@ -5,11 +5,12 @@ import Parser from 'html-react-parser';
 import './DetailView.scss';
 
 const mapStateToProps = (state, ownProps) => {
-  const { detailView } = state.MAP;
+  const MAP = state[ownProps.mapId];
+  const { detailView } = MAP;
   const layerObj = (detailView && detailView.layerId)
-    ? state.MAP.layers[detailView.layerId] : null;
+    ? MAP.layers[detailView.layerId] : null;
   return {
-    MAP: state.MAP,
+    MAP: MAP,
     layerObj,
     detailView: detailView && detailView.model,
     properties: detailView && detailView.properties,

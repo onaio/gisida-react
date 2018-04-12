@@ -9,8 +9,8 @@ require('./SummaryChart.scss');
 
 
 const mapStateToProps = (state, ownProps) => {
-
-  const layers = state.MAP.layers;
+  const MAP = state[ownProps.mapId];
+  const layers = MAP.layers;
   let layerObj
   let layersObj = []
   let currentRegion
@@ -34,7 +34,7 @@ const mapStateToProps = (state, ownProps) => {
 
   if (layerObj && layerObj.charts) {
    
-    sumChartObj = state.MAP.timeseries[layerObj.id] ? state.MAP.timeseries[layerObj.id] : layerObj;
+    sumChartObj = MAP.timeseries[layerObj.id] ? MAP.timeseries[layerObj.id] : layerObj;
     if (typeof layerObj.isChartMin === 'undefined') {
       isChartMin = true;
       legendBottom = 40;
@@ -150,29 +150,20 @@ class SummaryChart extends React.Component {
     if (Object.keys(this.props).length > 2) {
       const { layerId, layer, mapId, isChartMin, legendBottom, locations } = this.props;
       const locationMap = {};
-      const locationKeys = Object.keys(locations);
+      const locationKeys = Object.keys(locations || {});
       for (let l = 0; l < locationKeys.length; l += 1) {
         locationMap[locations[locationKeys[l]]] = locationKeys[l];
       }
 
-      const legendPosition = SummaryChart.calcLegendPosition(mapId);
-      const chartSpecs = SummaryChart.defineCharts(layer.charts);
-      const primaryChartPosition = chartSpecs && !chartSpecs.primaryChart
-        ? { chartWidth: 0, isFullBleed: false }
-        : SummaryChart.calcChartWidth(`sector-menu-${mapId.replace('map-', '')}-wrapper`);
+      const primaryChartPosition =  SummaryChart.calcChartWidth(`sector-menu-${mapId.replace('map-', '')}-wrapper`);
 
       $(`.legend.${this.props.mapId}`).css('bottom', legendBottom);
   
       this.state = {
         layerId,
         layer,
-        chartHeight: legendPosition.height,
-        buttonBottom: legendPosition.bottom,
         isChartMin,
         doShowModal: false,
-        layerData: layer.layerObj ? layer.data : layer.mergedData,
-        charts: chartSpecs.charts,
-        primaryChart: chartSpecs.primaryChart,
         chartWidth: primaryChartPosition.chartWidth,
         isFullBleed: primaryChartPosition.isFullBleed,
         locations: locationMap,

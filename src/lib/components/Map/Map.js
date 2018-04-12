@@ -5,25 +5,30 @@ import { detectIE, buildLayersObj } from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
-  const { APP, MAP, STYLES, REGIONS } = state;
+  const { APP, STYLES, REGIONS, VIEW } = state;
+  const { mapId } = ownProps;
+  const MAP = state[mapId] || {blockLoad: true};
   return {
     APP,
     STYLES,
     REGIONS,
     MAP,
-    timeSeriesObj: MAP.timeseries[MAP.visibleLayerId],
-    timeseries: MAP.timeseries,
-    layersObj: buildLayersObj(MAP.layers),
-    layerObj: MAP.layers[MAP.activeLayerId],
+    VIEW,
+    timeSeriesObj: MAP.timeseries ? MAP.timeseries[MAP.visibleLayerId]: null,
+    timeseries:  MAP.timeseries,
+    layersObj: MAP.layers ? buildLayersObj(MAP.layers) : {},
+    layerObj: MAP.layers ? MAP.layers[MAP.activeLayerId]: null,
     primaryLayer: MAP.primaryLayer,
     showDetailView: !!MAP.detailView,
+    showFilterPanel: !!MAP.showFilterPanel
   }
 }
 
 const isIE = detectIE();
 
 class Map extends Component {
-  initMap(accessToken, mapConfig) {
+  initMap(accessToken, mapConfig, mapId) {
+    console.log('initMap', mapId);
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;
       this.map = new mapboxgl.Map(mapConfig);
@@ -32,9 +37,9 @@ class Map extends Component {
       // Handle Map Load Event
       this.map.on('load', () => {
         const mapLoaded = true;
-        this.addMouseEvents();
+        this.addMouseEvents(mapId);
         this.setState({ mapLoaded });
-        this.props.dispatch(Actions.mapLoaded(true));
+        this.props.dispatch(Actions.mapLoaded(mapId, true));
       });
 
       // Handle Style Change Event
@@ -45,7 +50,7 @@ class Map extends Component {
           // check if map is loaded before reloading layers
           if (e.target.loaded() && mapLoad !== e.target.loaded() && this.props.MAP.isLoaded) {
             mapLoad = true;
-            this.props.dispatch(Actions.reloadLayers(Math.random()));
+            this.props.dispatch(Actions.reloadLayers(mapId, Math.random()));
           }
         };
         // remove render listener for previous style.load event
@@ -58,12 +63,12 @@ class Map extends Component {
       this.map.on('zoom', this.handleLabelsOnMapZoom.bind(this))
 
       // Dispach map rendered to indicate map was rendered
-      this.props.dispatch(Actions.mapRendered());
+      this.props.dispatch(Actions.mapRendered(mapId));
     }
   }
 
-  addMouseEvents() {
-    addPopUp(this.map, this.props.dispatch);
+  addMouseEvents(mapId) {
+    addPopUp(mapId, this.map, this.props.dispatch);
     // this.addMapClickEvents()
     // this.addMouseMoveEvents()
     // etc
@@ -139,7 +144,7 @@ class Map extends Component {
 
   componentWillReceiveProps(nextProps){
     const accessToken = nextProps.APP.accessToken;
-    const mapConfig = nextProps.APP.mapConfig;
+    let mapConfig = nextProps.APP.mapConfig;
     const isRendered = nextProps.MAP.isRendered;
     const isLoaded = nextProps.MAP.isLoaded;
     const currentStyle = nextProps.MAP.currentStyle;
@@ -153,16 +158,17 @@ class Map extends Component {
     const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES;
     const regions = nextProps.REGIONS;
-    const mapId = 'map-1';
+    const mapId = nextProps.mapId;
+    mapConfig.container = mapId
   
 
     // Check if map is initialized.
-    if (!isRendered && (!isIE || mapboxgl.supported())) {
-      this.initMap(accessToken, mapConfig);
+    if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
+      console.log('next--', nextProps.MAP);
+      this.initMap(accessToken, mapConfig, mapId);
     }
     // Check if rendererd map has finished loading
     if (isLoaded) {
-
       // Set current style (basemap)
       styles.forEach((style) => {
         if (style.current && this.props.MAP.currentStyle !== currentStyle) {
@@ -240,19 +246,21 @@ class Map extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    this.map.resize();
-    const { layersObj, primaryLayer } = this.props;
-    // Update Timeseries
-    const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
-    if (doUpdateTSlayers) {
-      this.updateTimeseriesLayers();
-    }
+    if (this.map) {
+      this.map.resize();
+      const { layersObj, primaryLayer } = this.props;
+      // Update Timeseries
+      const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
+      if (doUpdateTSlayers) {
+        this.updateTimeseriesLayers();
+      }
 
-    // Update Labels
-    this.removeLabels();
-    for (let l = 0; l < layersObj.length; l += 1) {
-      if (layersObj[l].id === primaryLayer && layersObj[l].labels && layersObj[l].labels.labels) {
-        this.addLabels(this.props.layersObj[l], this.props.timeseries);
+      // Update Labels
+      this.removeLabels();
+      for (let l = 0; l < layersObj.length; l += 1) {
+        if (layersObj[l].id === primaryLayer && layersObj[l].labels && layersObj[l].labels.labels) {
+          this.addLabels(this.props.layersObj[l], this.props.timeseries);
+        }
       }
     }
   }
@@ -475,20 +483,34 @@ class Map extends Component {
 
   render() {
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
-    const mapWidth = !this.props.MAP
-      ? '100%'
-      : this.props.MAP.showFilterPanel
-      ? 'calc(100% - 250px)'
-      : this.props.showDetailView
-      ? 'calc(100% - 345px)'
-      : '100%';
+    let mapWidth = '100%';
+    if (this.props.VIEW.splitScreen) {
+      mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
+    }
+    if (this.props.showFilterPanel) {
+      mapWidth = 'calc(100% - 250px)';
+    }
+    if (this.props.showDetailView) {
+      mapWidth = 'calc(100% - 345px)'
+    }
+   
     return (
         <div>
         {isIE || !mapboxgl.supported() ?
         (<div className="alert alert-info">
           Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
         </div>) :
-          (<div id='map' style={{ width: mapWidth }}/>)}
+          (<div id={this.props.mapId} style={{ width: mapWidth }} />)}
+        <div className="widgets">
+          {/* Render Children elemets with mapId prop added to each child  */}
+          {
+            React.Children.map(this.props.children, child => {
+            return React.cloneElement(child, {
+              mapId: this.props.mapId
+            });
+            })
+          }
+        </div>
         </div>
     );
   }
