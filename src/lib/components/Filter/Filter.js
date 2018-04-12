@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Actions, generateFilterOptions } from 'gisida';
+import { Actions, generateFilterOptions, buildFilterState, clearFilterState } from 'gisida';
 import { buildLayersObj } from '../../utils';
 import FilterSelector from './FilterSelector';
 import './Filter.scss';
@@ -9,12 +9,14 @@ import './Filter.scss';
 const mapStateToProps = (state, ownProps) => {
   return {
     MAP: state.MAP,
+    FILTER: state.FILTER,
     layerObj: state.MAP.layers[state.MAP.filter.layerId],
     doShowProfile: state.MAP.showProfile,
     showFilterPanel: state.MAP.showFilterPanel,
     layersObj: buildLayersObj(state.MAP.layers),
     showFilterBtn: state.MAP.filter.layerId,
     layerData: state.MAP.layers,
+    detailView: state.MAP.detailView,
   }
 }
 
@@ -70,7 +72,7 @@ export class Filter extends Component {
     //   return 0;
     // };
 
-    // loop over all filters
+    // loop over all filters and build filter state from prevFilters or clean
     for (f = 0; f < filterKeys.length; f += 1) {
       filterKey = filterKeys[f];
       filter = {
@@ -110,6 +112,7 @@ export class Filter extends Component {
       filterMap[filterKey] = filter;
     }
 
+    // this might be deprecated?? :-/
     if (layerFilters) {
       for (f = 0; f < layerFilters.length; f += 1) {
         if (layerFilters[f] instanceof Array) {
@@ -240,20 +243,35 @@ export class Filter extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const layerObj = nextProps.layerObj || {
-      filterOptions: {}
-    };
-    const { filterOptions, id } = layerObj;
-    if (filterOptions && Object.keys(filterOptions).length > 0) {
-      const layerFilters = this.getLayerFilter(id);
-      const filters = this.state.isFiltered && this.state.prevFilters ? this.state.prevFilters
-        : this.buildFiltersMap(filterOptions, layerFilters, this.state.filters);
-      
+    if (!nextProps.layerObj) return false;
+
+    const layerId = nextProps.layerObj.id;
+
+    // Build new component state or retrieve it from FILTER store
+    const filterState = this.props.FILTER[layerId];
+    const layerFilters = this.getLayerFilter(layerId); // this may be deprecated
+    const filterOptions = filterState
+      ? filterState.filterOptions
+      : nextProps.layerObj.filterOptions || {};
+    const filters = filterState
+      ? filterState.filters
+      : this.state.isFiltered && this.state.prevFilters
+      ? this.state.prevFilters
+      : this.buildFiltersMap(filterOptions, layerFilters, this.state.filters);
+
+    // determine whether to update the compnent state
+    const doUpdate = filterState
+      ? filterState.doUpdate
+      : filterOptions && Object.keys(filterOptions).length > 0;
+
+    if (doUpdate) {
       this.setState({
         filters,
         filterOptions,
-        layerId: id,
+        layerId,
         doShowProfile: false,
+      }, () => {
+        this.props.dispatch(Actions.filtersUpdated(layerId));
       });
     }
   }
@@ -333,13 +351,17 @@ export class Filter extends Component {
       return false;
     }
     const { layerId, filterOptions } = this.state;
-    this.setState({
-      isFiltered: false,
+    // Clear layerFilter from mapbox layer
+    this.props.dispatch(Actions.setLayerFilter(layerId, null));
+
+    // Update FILTER state
+    const filterState = {
+      filterOptions,
       filters: this.buildFiltersMap(filterOptions),
-      prevFilters: null,
-    }, () => {
-      this.props.dispatch(Actions.setLayerFilter(layerId, null));
-    });
+      aggregate: this.props.layerObj.aggregate,
+      isFiltered: false,
+    };
+    clearFilterState(filterState, layerId, this.props.dispatch);
     return true;
   }
 
@@ -355,8 +377,6 @@ export class Filter extends Component {
     if (!layerObj) {
       return false;
     }
-
-    let joinKey;
 
     const filterKeys = Object.keys(filters);
     const nextFilters = ['all'];
@@ -376,14 +396,8 @@ export class Filter extends Component {
           // loop through all options and add to this filter
           for (let o = 0; o < optionKeys.length; o += 1) {
             if (options[optionKeys[o]].enabled) {
-
-              if (layerObj && layerObj['join-key']) {
-                joinKey = layerObj.source.join[0];
-              } else {
-                joinKey = filterKeys[f];
-              }
-
-              newFilters.push(['==', joinKey, optionKeys[o]]);
+              // push filter expression into array of expressions
+              newFilters.push(['==', filterKeys[f], optionKeys[o]]);
             }
           }
         } else {
@@ -396,12 +410,11 @@ export class Filter extends Component {
       }
     }
 
-    this.setState({
-      isFiltered: true,
-      prevFilters: filters,
-    }, () => {
-      this.props.dispatch(Actions.setLayerFilter(layerId, nextFilters));
-    });
+    // Apply layerFilter to mapbox layer
+    this.props.dispatch(Actions.setLayerFilter(layerId, nextFilters));
+    // Update FILTER store state
+    buildFilterState(this.state.filterOptions, filters, layerId, this.props.dispatch);
+
     return true;
   }
 
@@ -781,9 +794,9 @@ export class Filter extends Component {
     }
 
     const doClear = isFilterable || this.state.isFiltered || this.isMapFiltered();
-    const sidebarOffset = this.props.MAP.showFilterPanel
+    const sidebarOffset = this.props.showFilterPanel
       ? '260px'
-      : !!this.props.MAP.detailView
+      : !!this.props.detailView
       ? '355px'
       : '10px';
 
