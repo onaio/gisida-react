@@ -378,8 +378,6 @@ export class Filter extends Component {
       return false;
     }
 
-    let joinKey;
-
     const filterKeys = Object.keys(filters);
     const nextFilters = ['all'];
 
