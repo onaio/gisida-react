@@ -257,7 +257,7 @@ export class Filter extends Component {
       ? filterState.filters
       : this.state.isFiltered && this.state.prevFilters
       ? this.state.prevFilters
-      : this.buildFiltersMap(filterOptions, layerFilters, this.state.filters);
+      : this.buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters);
 
     // determine whether to update the compnent state
     const doUpdate = filterState
