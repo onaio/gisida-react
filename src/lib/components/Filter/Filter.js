@@ -756,7 +756,7 @@ export class Filter extends Component {
             role="button"
             tabIndex="-1"
           >
-            {[filterKeys[f]]}
+            {filter.label}
             {filter.isOpen ?
               <span
                 role="button"
