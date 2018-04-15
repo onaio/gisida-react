@@ -5,9 +5,9 @@ import { Actions, prepareLayer } from 'gisida'
 
 export class Layer extends Component {
 
-  onLayerToggle = (e, layer) => {
+  onLayerToggle = layer => {
     // dispatch toggle layer action
-    this.props.dispatch(Actions.toggleLayer(layer.id, e.target.checked));
+    this.props.dispatch(Actions.toggleLayer(layer.id));
 
     // Prepare layer if layer had not been loaded
     if (!layer.loaded && !layer.isLoading) {
@@ -23,7 +23,7 @@ export class Layer extends Component {
           id={layer.id}  
           type="checkbox"
           data-layer={layer.id}
-          onChange={e => this.onLayerToggle(e, layer)}
+          onChange={e => this.onLayerToggle(layer)}
           checked={!!layer.visible}
         />
         <label htmlFor={layer.id} >{layer.label}</label>
