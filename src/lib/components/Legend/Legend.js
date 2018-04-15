@@ -52,9 +52,6 @@ export class Legend extends React.Component {
       const activeLayerSelected =  this.props.primaryLayer === layer.id ? 'primary' : '';
       const lastSelected = this.props.layersData[this.props.layersData.length - 1].id === layer.id ? 'primary' : '';
 
-      const boundaries = ["region-boundaries", "district-boundaries"];
-      const isBoundaries = boundaries.indexOf(layer.id) !== -1;
-
       let background = [];
 
       if (layerObj.id === layer.id) {
@@ -196,23 +193,6 @@ export class Legend extends React.Component {
           </div>
           );
 
-        }
-        if (!isBoundaries && !symbolLayer && !circleLayerType && !fillLayerNoBreaks && !fillLayerWithBreaks && !layer.parent) {
-          primaryLegend = (
-            <div
-              id={`legend-${layer.id}-${mapId}`}
-              className={`legend-row`}
-              data-layer={`${layer.id}`}
-              key={l}
-            >
-              <b>
-                {layer.label}
-              </b>
-              <span>
-                {layer.credit ? Parser(layer.credit) : ''}
-              </span>
-            </div>
-          );
         }
         continue;
       }
@@ -397,23 +377,7 @@ export class Legend extends React.Component {
         ));
       }
       else {
-        if (!isBoundaries && !symbolLayer && !circleLayerType && !fillLayerNoBreaks && !fillLayerWithBreaks && !layer.parent) {
-          legendItems.unshift((
-            <div
-              id={`legend-${layer.id}-${mapId}`}
-              className={`legend-row`}
-              data-layer={`${layer.id}`}
-              key={l}
-            >
-              <b>
-                {layer.label}
-              </b>
-              <span>
-                {typeof layer.credit === "string" ? Parser(layer.credit) : null}
-              </span>
-            </div>
-          ));
-        }
+
       }
     }
 

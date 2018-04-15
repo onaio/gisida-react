@@ -9,16 +9,6 @@ exports[`Legend component renderes correctly 1`] = `
         "right": "20px",
       }
     }
-  >
-    <div
-      className="legend-row"
-      data-layer="undefined"
-      id="legend-undefined-01"
-      key="0"
-    >
-      <b />
-      <span />
-    </div>
-  </div>
+  />
 </div>
 `;
