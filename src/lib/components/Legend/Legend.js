@@ -52,9 +52,6 @@ export class Legend extends React.Component {
       const activeLayerSelected =  this.props.primaryLayer === layer.id ? 'primary' : '';
       const lastSelected = this.props.layersData[this.props.layersData.length - 1].id === layer.id ? 'primary' : '';
 
-      const boundaries = ["region-boundaries", "district-boundaries"];
-      const isBoundaries = boundaries.indexOf(layer.id) !== -1;
-
       let background = [];
 
       if (layerObj.id === layer.id) {
