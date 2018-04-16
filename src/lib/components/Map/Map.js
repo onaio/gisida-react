@@ -7,7 +7,8 @@ import './Map.scss';
 const mapStateToProps = (state, ownProps) => {
   const { APP, STYLES, REGIONS, VIEW } = state;
   const { mapId } = ownProps;
-  const MAP = state[mapId] || {blockLoad: true};
+  const MAP = state[mapId] || { blockLoad: true };
+  MAP.blockLoad = (!VIEW.splitScreen && mapId !== 'map-1');
   return {
     APP,
     STYLES,
@@ -28,7 +29,6 @@ const isIE = detectIE();
 
 class Map extends Component {
   initMap(accessToken, mapConfig, mapId) {
-    console.log('initMap', mapId);
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;
       this.map = new mapboxgl.Map(mapConfig);
@@ -164,7 +164,6 @@ class Map extends Component {
 
     // Check if map is initialized.
     if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
-      console.log('next--', nextProps.MAP);
       this.initMap(accessToken, mapConfig, mapId);
     }
     // Check if rendererd map has finished loading
@@ -493,25 +492,33 @@ class Map extends Component {
     if (this.props.showDetailView) {
       mapWidth = 'calc(100% - 345px)'
     }
-   
     return (
-        <div>
-        {isIE || !mapboxgl.supported() ?
-        (<div className="alert alert-info">
-          Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
-        </div>) :
-          (<div id={this.props.mapId} style={{ width: mapWidth }} />)}
-        <div className="widgets">
-          {/* Render Children elemets with mapId prop added to each child  */}
-          {
-            React.Children.map(this.props.children, child => {
-            return React.cloneElement(child, {
-              mapId: this.props.mapId
-            });
-            })
-          }
-        </div>
-        </div>
+      <div>
+        {isIE || !mapboxgl.supported() 
+          ?
+          (
+            <div className="alert alert-info">
+              Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
+            </div>
+          ) :
+          (
+            <div id={this.props.mapId} style={{
+              width: mapWidth,
+              display: this.props.MAP.blockLoad ? 'none' : 'inline'
+            }} >
+              <div className="widgets">
+                {/* Render Children elemets with mapId prop added to each child  */}
+                {
+                  React.Children.map(this.props.children, child => {
+                    return React.cloneElement(child, {
+                      mapId: this.props.mapId
+                    });
+                  })
+                }
+              </div>
+            </div>
+          )}
+      </div>
     );
   }
 }
