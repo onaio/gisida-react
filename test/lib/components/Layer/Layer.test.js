@@ -24,7 +24,7 @@ describe('Layer', () => {
     componentWrapper.instance().onLayerToggle = jest.fn();
     componentWrapper.update();
     componentWrapper.find(`#${layerObj.id}`).simulate('change', event);
-    expect(componentWrapper.instance().onLayerToggle).toBeCalledWith(event, layerObj);
+    expect(componentWrapper.instance().onLayerToggle).toBeCalledWith(layerObj);
 
   })
 });
