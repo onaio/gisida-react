@@ -282,12 +282,6 @@ export class AdvancedFilter extends React.Component {
     const { options } = this.props;
     const min = Math.min(...options);
     const max = Math.max(...options);
-    let inputEl;
-    const datalistEl = (
-      <datalist id={`${this.state.filterKey}-datalist`}>
-        {[...new Set(options)].map((d, i)=> <option key={i}>{d}</option>)}
-      </datalist>
-    );
 
     const containerClass = control === 'less than'
       ? 'inputLessThan'
