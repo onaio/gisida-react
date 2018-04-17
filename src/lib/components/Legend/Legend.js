@@ -8,12 +8,13 @@ import Parser from 'html-react-parser';
 import './Legend.scss';
 
 const mapStateToProps = (state, ownProps) => {
+  const MAP = state[ownProps.mapId] || { layers: {}}
   return {
-    layerObj: state.MAP.layers[state.MAP.activeLayerId],
-    layersData: buildLayersObj(state.MAP.layers),
-    MAP: state.MAP,
-    primaryLayer: state.MAP.primaryLayer,
-    showFilterPanel: state.MAP.showFilterPanel,
+    layerObj: MAP.layers[MAP.activeLayerId],
+    layersData: buildLayersObj(MAP.layers),
+    MAP,
+    primaryLayer: MAP.primaryLayer,
+    showFilterPanel: MAP.showFilterPanel,
   }
 }
 
@@ -396,7 +397,7 @@ export class Legend extends React.Component {
 }
 
 Legend.propTypes = {
-  layerObj: PropTypes.objectOf(PropTypes.any).isRequired,
+  layerObj: PropTypes.objectOf(PropTypes.any),
   layersData: PropTypes.arrayOf(PropTypes.any).isRequired,
   MAP: PropTypes.objectOf(PropTypes.any).isRequired,
   primaryLayer: PropTypes.string.isRequired,
