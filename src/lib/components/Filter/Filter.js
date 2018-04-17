@@ -228,8 +228,9 @@ export class Filter extends Component {
 
   getLayerFilter(layerId) {
     let layerObj;
-    for (let i = 0; i < this.state.layersObj.length; i += 1) {
-      layerObj = this.state.layersObj[i];
+    const { layersObj } = this.props;
+    for (let i = 0; i < layersObj.length; i += 1) {
+      layerObj = layersObj[i];
       if (layerObj.id === layerId) {
         return layerObj.filters && layerObj.filters.layerFilters;
       }
@@ -434,7 +435,6 @@ export class Filter extends Component {
     const val = (e.target.value || '').toLowerCase();
     const options = Object.assign({}, this.state.filters[filterKey].options);
     const optionKeys = Object.keys(options);
-    const nextFilters = {};
     let optionKey;
     let isClear = false;
     let toggleAllOn = false;
@@ -451,15 +451,20 @@ export class Filter extends Component {
         }
       }
     }
-    nextFilters[filterKey] = Object.assign(
+    const nextFilters = Object.assign(
       {},
-      this.state.filters[filterKey],
+      this.state.filters,
       {
-        isFiltered: this.isFiltered(options),
-        toggleAllOn,
-        options,
-        isOpen: true,
-        doAdvFiltering: e.target.getAttribute('data-type') === 'advanced-filter',
+        [filterKey]: Object.assign({},
+          this.state.filters[filterKey],
+          {
+            isFiltered: this.isFiltered(options),
+            toggleAllOn,
+            options,
+            isOpen: true,
+            doAdvFiltering: e.target.getAttribute('data-type') === 'advanced-filter',
+          }
+        ),
         // queries: null,
       },
     );
