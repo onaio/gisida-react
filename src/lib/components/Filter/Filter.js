@@ -242,7 +242,7 @@ export class Filter extends Component {
 
   handleFilterClick() {
     const dispatch = this.props.dispatch;
-    dispatch(Actions.toggleFilter());
+    dispatch(Actions.toggleFilter(this.props.mapId));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -274,7 +274,7 @@ export class Filter extends Component {
         layerId,
         doShowProfile: false,
       }, () => {
-        this.props.dispatch(Actions.filtersUpdated(layerId));
+        this.props.dispatch(Actions.filtersUpdated(this.props.mapId, layerId));
       });
     }
   }
@@ -355,7 +355,7 @@ export class Filter extends Component {
     }
     const { layerId, filterOptions } = this.state;
     // Clear layerFilter from mapbox layer
-    this.props.dispatch(Actions.setLayerFilter(layerId, null));
+    this.props.dispatch(Actions.setLayerFilter(this.props.mapId, layerId, null));
 
     // Update FILTER state
     const filterState = {
@@ -414,7 +414,7 @@ export class Filter extends Component {
     }
 
     // Apply layerFilter to mapbox layer
-    this.props.dispatch(Actions.setLayerFilter(layerId, nextFilters));
+    this.props.dispatch(Actions.setLayerFilter(this.props.mapId, layerId, nextFilters));
     // Update FILTER store state
     buildFilterState(this.state.filterOptions, filters, layerId, this.props.dispatch);
 
@@ -825,14 +825,14 @@ export class Filter extends Component {
                 {<button
                   className="filter-search"
                 
-                  onClick={(e) => { this.showGlobalSearchField(e); }}
+                  onClick={() => { this.showGlobalSearchField(); }}
                 >
                   <span className="glyphicon glyphicon-search" />
                 </button>}
                 <button
                   className="close-btn filter-close"
                   title="Close Filters"
-                  onClick={() => { this.handleFilterClick(); }}
+                  onClick={(e) => { this.handleFilterClick(e); }}
                 >
                   <span className="glyphicon glyphicon-remove" />
                 </button>
