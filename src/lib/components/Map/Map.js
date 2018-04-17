@@ -170,7 +170,7 @@ class Map extends Component {
     if (isLoaded) {
       // Set current style (basemap)
       styles.forEach((style) => {
-        if (style.current && this.props.MAP.currentStyle !== currentStyle) {
+        if (style[mapId] && style[mapId].current && this.props.MAP.currentStyle !== currentStyle) {
           this.map.setStyle(style.url);
         }
       });

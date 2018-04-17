@@ -18,7 +18,7 @@ export class StyleSelector extends Component {
 
   changeStyle = (e) => {
     const style = e.target.value;
-    this.props.dispatch(Actions.changeStyle(style));
+    this.props.dispatch(Actions.changeStyle(this.props.mapId, style));
   }
 
   render() {
@@ -29,7 +29,8 @@ export class StyleSelector extends Component {
       ? '250px'
       : !!this.props.MAP.detailView
       ? '345px'
-      : '0';
+          : '0';
+    const mapId = this.props.mapId;
     return (
       <div className="leaflet-left leaflet-top leaflet-right layer-selector" style={{ right: sidebarOffset }}>
         <div aria-haspopup="true" className="leaflet-control leaflet-control-layers">
@@ -47,7 +48,7 @@ export class StyleSelector extends Component {
                       className="leaflet-control-layers-selector"
                       value={s.url}
                       onClick={e => this.changeStyle(e)}
-                      checked={!!s.current}
+                      checked={(!!s[mapId] && !!s[mapId].current) || !!s.current }
                     />
                     <span>{s.label}</span>
                   </label>)) : <span>No available styles</span>
