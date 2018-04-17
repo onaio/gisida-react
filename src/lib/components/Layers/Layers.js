@@ -4,7 +4,7 @@ import Layer from '../Layer/Layer';
 
 export class Layers extends Component {
   render() {
-    const { mapTargetId, layers, currentRegion, preparedLayers } = this.props;
+    const { mapId, layers, currentRegion, preparedLayers } = this.props;
 
     let layerKeys;
     let layerObj;
@@ -31,7 +31,7 @@ export class Layers extends Component {
         layerItem.push(
           (<Layer
             key={layer.id}
-            mapTargetId={mapTargetId}
+            mapId={mapId}
             layer={layer}
           />)
         );
@@ -48,7 +48,7 @@ export class Layers extends Component {
 }
 
 Layers.propTypes = {
-  mapTargetId: PropTypes.string.isRequired,
+  mapId: PropTypes.string.isRequired,
   layers: PropTypes.arrayOf(PropTypes.any).isRequired,
   currentRegion: PropTypes.string,
 };

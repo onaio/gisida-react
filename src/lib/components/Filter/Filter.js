@@ -906,7 +906,7 @@ export class Filter extends Component {
 }
 
 Filter.propTypes = {
-  layerObj: PropTypes.objectOf(PropTypes.any).isRequired,
+  layerObj: PropTypes.objectOf(PropTypes.any),
   doShowProfile: PropTypes.bool.isRequired,
   showFilterPanel: PropTypes.bool.isRequired,
   layersObj: PropTypes.arrayOf(PropTypes.any).isRequired,

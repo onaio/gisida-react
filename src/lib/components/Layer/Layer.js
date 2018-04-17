@@ -3,15 +3,29 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
 import { Actions, prepareLayer } from 'gisida'
 
+
+const mapStateToProps = (state, ownProps) => {
+  const MAP = state[ownProps.mapId]
+  if (!!!MAP) {
+    debugger
+  }
+  return {
+    timeSeriesObj: MAP.timeseries[MAP.visibleLayerId],
+    timeseries: MAP.timeseries,
+    layers: MAP.layers
+  }
+}
+
 export class Layer extends Component {
 
   onLayerToggle = layer => {
     // dispatch toggle layer action
-    this.props.dispatch(Actions.toggleLayer(layer.id));
+    const mapId = this.props.mapId;
+    this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
 
     // Prepare layer if layer had not been loaded
     if (!layer.loaded && !layer.isLoading) {
-      prepareLayer(layer, this.props.dispatch);
+      prepareLayer(mapId, layer, this.props.dispatch);
     }
   }
 
@@ -36,12 +50,4 @@ Layer.propTypes = {
   layer: PropTypes.objectOf(PropTypes.any).isRequired,
 };
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    mapId: '01',
-    timeSeriesObj: state.MAP.timeseries[state.MAP.visibleLayerId],
-    timeseries: state.MAP.timeseries,
-    layers: state.MAP.layers
-  }
-}
 export default connect(mapStateToProps)(Layer);
