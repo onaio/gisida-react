@@ -11,7 +11,7 @@ describe('Layers', () => {
   
   const componentWrapper = shallow(
     <Layers
-      mapTargetId={'map-1'}
+      mapId={'map-1'}
       layers={layers}
       currentRegion={undefined}
       preparedLayers={preparedLayers}

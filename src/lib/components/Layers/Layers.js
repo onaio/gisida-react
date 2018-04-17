@@ -48,7 +48,7 @@ export class Layers extends Component {
 }
 
 Layers.propTypes = {
-  mapTargetId: PropTypes.string.isRequired,
+  mapId: PropTypes.string.isRequired,
   layers: PropTypes.arrayOf(PropTypes.any).isRequired,
   currentRegion: PropTypes.string,
 };
