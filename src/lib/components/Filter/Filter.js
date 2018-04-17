@@ -7,16 +7,18 @@ import FilterSelector from './FilterSelector';
 import './Filter.scss';
 
 const mapStateToProps = (state, ownProps) => {
+  const { mapId } = ownProps;
+  const MAP = state[mapId] || { layers: {}, filter: {}};
   return {
-    MAP: state.MAP,
+    MAP,
     FILTER: state.FILTER,
-    layerObj: state.MAP.layers[state.MAP.filter.layerId],
-    doShowProfile: state.MAP.showProfile,
-    showFilterPanel: state.MAP.showFilterPanel,
-    layersObj: buildLayersObj(state.MAP.layers),
-    showFilterBtn: state.MAP.filter.layerId,
-    layerData: state.MAP.layers,
-    detailView: state.MAP.detailView,
+    layerObj: MAP.layers[MAP.filter.layerId],
+    doShowProfile: MAP.showProfile,
+    showFilterPanel: MAP.showFilterPanel,
+    layersObj: buildLayersObj(MAP.layers),
+    showFilterBtn: MAP.filter.layerId,
+    layerData: MAP.layers,
+    detailView: MAP.detailView,
   }
 }
 
