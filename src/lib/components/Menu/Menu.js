@@ -9,7 +9,7 @@ import './Menu.scss';
 const mapStateToProps = (state, ownProps) => {
   const categories = [];
   const layers = [];
-  const MAP = state[ownProps.mapId];
+  const MAP = state[ownProps.mapId] || { layers: {}};
   // populate layers array with layer objects in state.MAP.layers;
   for (var key in MAP.layers) {
     layers.push(MAP.layers[key]);
@@ -80,8 +80,7 @@ class Menu extends Component {
   }
 
   render() {
-    const menuId = this.props.menuId;
-    const mapTargetId = this.props.mapId;
+    const mapId = this.props.mapId;
     const categories = this.props.categories;
     const regions = this.props.regions;
     const currentRegion = this.props.currentRegion;
@@ -90,15 +89,14 @@ class Menu extends Component {
       <div>
         {this.props.children ? this.props.children :
           <div>
-
             {
               this.props.loaded ?
-                <div id={`${menuId}-wrapper`} className="sectors-menu-wrapper">
+                <div id={`${mapId}-menu-wrapper`} className="menu-wrapper">
                   <a onClick={e => this.onToggleMenu(e)} className="open-btn">
                     <span className="glyphicon glyphicon-menu-hamburger"></span>
                   </a>
                   {this.state.openMenu ?
-                    <div id={menuId} className="sectors-menu">
+                    <div id={`${mapId}-menu`} className="sectors-menu">
                       <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
                         <span className="glyphicon glyphicon-remove"></span>
                       </a>
@@ -111,7 +109,7 @@ class Menu extends Component {
                             <ul className="layers">
                               {regions && regions.length ?
                                 regions.map((region, i) =>
-                                  (<li className={`region ${mapTargetId}`} key={region.name}>
+                                  (<li className={`region ${mapId}`} key={region.name}>
                                     <input
                                       id={region.name}
                                       key={region.name}
@@ -140,7 +138,7 @@ class Menu extends Component {
                               {
                                 this.state.openCategories.includes(category.category) ?
                                   <Layers
-                                    mapId={mapTargetId}
+                                    mapId={mapId}
                                     layers={category.layers}
                                     currentRegion={currentRegion}
                                     preparedLayers={preparedLayers}

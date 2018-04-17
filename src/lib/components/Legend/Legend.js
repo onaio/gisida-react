@@ -8,7 +8,7 @@ import Parser from 'html-react-parser';
 import './Legend.scss';
 
 const mapStateToProps = (state, ownProps) => {
-  const MAP = state[ownProps.mapId]
+  const MAP = state[ownProps.mapId] || { layers: {}}
   return {
     layerObj: MAP.layers[MAP.activeLayerId],
     layersData: buildLayersObj(MAP.layers),

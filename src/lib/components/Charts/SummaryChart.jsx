@@ -9,7 +9,7 @@ require('./SummaryChart.scss');
 
 
 const mapStateToProps = (state, ownProps) => {
-  const MAP = state[ownProps.mapId];
+  const MAP = state[ownProps.mapId] || { layers: {}};
   const layers = MAP.layers;
   let layerObj
   let layersObj = []

@@ -6,7 +6,7 @@ import './StyleSelector.scss';
 
 
 const mapStateToProps = (state, ownProps) => {
-  const MAP = state[ownProps.mapId]
+  const MAP = state[ownProps.mapId] || {}
   return {
     MAP,
     styles: state.STYLES,

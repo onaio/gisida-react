@@ -5,7 +5,7 @@ import Parser from 'html-react-parser';
 import './DetailView.scss';
 
 const mapStateToProps = (state, ownProps) => {
-  const MAP = state[ownProps.mapId];
+  const MAP = state[ownProps.mapId] || {};
   const { detailView } = MAP;
   const layerObj = (detailView && detailView.layerId)
     ? MAP.layers[detailView.layerId] : null;
