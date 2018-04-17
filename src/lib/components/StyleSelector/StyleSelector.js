@@ -39,9 +39,10 @@ export class StyleSelector extends Component {
             <div className="leaflet-control-layers-base">
               {(styles && styles.length > 0) ?
                 styles.map(s =>
-                  (<label key={`label_${s.label}`} htmlFor="styles">
+                  (<label key={`label_${s.label}`} htmlFor={`${s.label}`}>
                     <input  
                       readOnly
+                      id={`${s.label}`}
                       key={`input_${s.label}`}
                       type="radio"
                       name="leaflet-base-layers"

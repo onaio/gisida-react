@@ -262,6 +262,51 @@ class Map extends Component {
         }
       }
     }
+
+    // Update Layer Filters
+    if (this.props.MAP.doApplyFilters) {
+      this.buildFilters();
+    }
+  }
+
+  buildFilters() {
+    this.props.dispatch(Actions.filtersUpdated());
+    const { layerObj } = this.props;
+    const layerId = layerObj.id;
+
+    const filterKeys = Object.keys(layerObj.filters);
+    let filter;
+    const combinedFilters = ['all'];
+
+    // loop through filters object
+    for (let f = 0; f < filterKeys.length; f += 1) {
+      filter = layerObj.filters[filterKeys[f]];
+
+      if (filterKeys[f] === 'highlight') {
+        // handle highlight filter seperately
+        this.applyFilters(`${layerId}-highlight`, filter);
+      } else if (filter) {
+        // build out combined filters
+        combinedFilters.push(filter);
+      }
+    }
+
+    if (combinedFilters.length > 2) {
+      // if there are multiple filters apply as is
+      this.applyFilters(layerId, combinedFilters);
+    } else if (combinedFilters.length === 2) {
+      // if there is only one filter, apply the only one
+      this.applyFilters(layerId, combinedFilters[1]);
+    } else if (combinedFilters.length === 1 && combinedFilters[0] === 'all') {
+      // if nothing was added to the combined filter array, removal all filters
+      this.applyFilters(layerId, null);
+    }
+  }
+
+  applyFilters(layerId, filters) {
+    if (this.map.getLayer(layerId)) {
+      this.map.setFilter(layerId, filters);
+    }
   }
 
   doUpdateTSlayers(prevProps) {
