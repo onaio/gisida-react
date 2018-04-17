@@ -469,7 +469,10 @@ export class Filter extends Component {
     );
 
     this.setState({
-      filters: nextFilters,
+      filters: {
+        ...this.state.filters,
+        ...nextFilters
+      },
     });
   }
 
