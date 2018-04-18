@@ -34,13 +34,13 @@ export class Layer extends Component {
     return (
       <li className="layer">
         <input
-          id={layer.id}  
+          id={`${layer.id}-${this.props.mapId}`}
           type="checkbox"
           data-layer={layer.id}
           onChange={e => this.onLayerToggle(layer)}
           checked={!!layer.visible}
         />
-        <label htmlFor={layer.id} >{layer.label}</label>
+        <label htmlFor={`${layer.id}-${this.props.mapId}`} >{layer.label}</label>
       </li>
     );
   }

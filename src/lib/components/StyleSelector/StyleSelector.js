@@ -26,7 +26,7 @@ export class StyleSelector extends Component {
     const sidebarOffset = !this.props.MAP
       ? '0'
       : this.props.MAP.showFilterPanel
-      ? '250px'
+      ? '0'
       : !!this.props.MAP.detailView
       ? '345px'
           : '0';
@@ -39,11 +39,11 @@ export class StyleSelector extends Component {
             <div className="leaflet-control-layers-base">
               {(styles && styles.length > 0) ?
                 styles.map(s =>
-                  (<label key={`label_${s.label}`} htmlFor={`${s.label}`}>
+                  (<label key={`label_${s.label}-${this.props.mapId}`} htmlFor={`${s.label}-${this.props.mapId}`}>
                     <input  
                       readOnly
-                      id={`${s.label}`}
-                      key={`input_${s.label}`}
+                      id={`${s.label}-${this.props.mapId}`}
+                      key={`input_${s.label}-${this.props.mapId}`}
                       type="radio"
                       name="leaflet-base-layers"
                       className="leaflet-control-layers-selector"
