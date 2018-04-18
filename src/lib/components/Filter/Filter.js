@@ -274,7 +274,7 @@ export class Filter extends Component {
         layerId,
         doShowProfile: false,
       }, () => {
-        nextProps.dispatch(Actions.filtersUpdated(layerId));
+        nextProps.dispatch(Actions.filtersUpdated(nextProps.mapId, layerId));
       });
     }
   }
@@ -354,8 +354,9 @@ export class Filter extends Component {
       return false;
     }
     const { layerId, filterOptions } = this.state;
+    const { mapId, dispatch } = this.props;
     // Clear layerFilter from mapbox layer
-    this.props.dispatch(Actions.setLayerFilter(layerId, null));
+    dispatch(Actions.setLayerFilter(mapId, layerId, null));
 
     // Update FILTER state
     const filterState = {
@@ -364,7 +365,7 @@ export class Filter extends Component {
       aggregate: this.props.layerObj.aggregate,
       isFiltered: false,
     };
-    clearFilterState(filterState, layerId, this.props.dispatch);
+    clearFilterState(mapId, filterState, layerId, dispatch);
     return true;
   }
 
@@ -373,9 +374,9 @@ export class Filter extends Component {
     if (!isFilterable) {
       return false;
     }
-    const { filters, layerId } = this.state;
+    const { filters, layerId, filterOptions } = this.state;
 
-    const { layerObj } = this.props;
+    const { layerObj, mapId, dispatch } = this.props;
 
     if (!layerObj) {
       return false;
@@ -418,9 +419,9 @@ export class Filter extends Component {
     }
 
     // Apply layerFilter to mapbox layer
-    this.props.dispatch(Actions.setLayerFilter(layerId, nextFilters));
+    this.props.dispatch(Actions.setLayerFilter(mapId, layerId, nextFilters));
     // Update FILTER store state
-    buildFilterState(this.state.filterOptions, filters, layerId, this.props.dispatch);
+    buildFilterState(mapId, filterOptions, filters, layerId, dispatch);
 
     return true;
   }
@@ -434,7 +435,9 @@ export class Filter extends Component {
       nextFilters,
     } = (this.buildNextFilters(prevFilters[filterKey].options, prevFilters, filterKey, true));
 
-    buildFilterState(this.state.filterOptions, nextFilters, this.state.layerId, this.props.dispatch);
+    const { mapId, dispatch } = this.props;
+    const { filterOptions, layerId } = this.state;
+    buildFilterState(mapId, filterOptions, nextFilters, layerId, dispatch);
   }
 
   searchFilterOptions = (e, filterKey) => {
