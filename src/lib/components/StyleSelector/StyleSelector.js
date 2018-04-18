@@ -22,9 +22,9 @@ export class StyleSelector extends Component {
   }
 
   render() {
-    const styles = this.props.styles;
-    const sidebarOffset = !this.props.MAP ? '0' : !!this.props.MAP.detailView ? '345px' : '0';
-    const mapId = this.props.mapId;
+    const { styles, mapId, MAP } = this.props;
+    const sidebarOffset = MAP && !!MAP.detailView ? '345px' : '0';
+    
     return (
       <div className="leaflet-left leaflet-top leaflet-right layer-selector" style={{ right: sidebarOffset }}>
         <div aria-haspopup="true" className="leaflet-control leaflet-control-layers">
@@ -33,11 +33,11 @@ export class StyleSelector extends Component {
             <div className="leaflet-control-layers-base">
               {(styles && styles.length > 0) ?
                 styles.map(s =>
-                  (<label key={`label_${s.label}`} htmlFor={`${s.label}`}>
+                  (<label key={`label_${s.label}-${this.props.mapId}`} htmlFor={`${s.label}-${this.props.mapId}`}>
                     <input  
                       readOnly
-                      id={`${s.label}`}
-                      key={`input_${s.label}`}
+                      id={`${s.label}-${this.props.mapId}`}
+                      key={`input_${s.label}-${this.props.mapId}`}
                       type="radio"
                       name="leaflet-base-layers"
                       className="leaflet-control-layers-selector"

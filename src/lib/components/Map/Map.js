@@ -144,6 +144,9 @@ class Map extends Component {
   }
 
   componentWillReceiveProps(nextProps){
+    if (this.map) {
+      this.map.resize();
+    }
     const accessToken = nextProps.APP.accessToken;
     let mapConfig = nextProps.APP.mapConfig;
     const isRendered = nextProps.MAP.isRendered;
