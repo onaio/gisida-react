@@ -23,13 +23,7 @@ export class StyleSelector extends Component {
 
   render() {
     const styles = this.props.styles;
-    const sidebarOffset = !this.props.MAP
-      ? '0'
-      : this.props.MAP.showFilterPanel
-      ? '250px'
-      : !!this.props.MAP.detailView
-      ? '345px'
-          : '0';
+    const sidebarOffset = !this.props.MAP ? '0' : !!this.props.MAP.detailView ? '345px' : '0';
     const mapId = this.props.mapId;
     return (
       <div className="leaflet-left leaflet-top leaflet-right layer-selector" style={{ right: sidebarOffset }}>
