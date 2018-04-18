@@ -28,11 +28,11 @@ export class Filter extends Component {
     super(props);
     const filters = null;
     const filterOptions = {}
-    const id = null
+
     this.state = {
       isFiltered: false,
       prevFilters: null,
-      layerId: id,
+      layerId: (this.props.layerObj && this.props.layerObj.id) || null,
       filters,
       filterOptions,
       doShowProfile: this.props.doShowProfile,
@@ -241,8 +241,8 @@ export class Filter extends Component {
   }
 
   handleFilterClick() {
-    const dispatch = this.props.dispatch;
-    dispatch(Actions.toggleFilter(this.props.mapId));
+    const { dispatch, mapId, layerId } = this.props;
+    dispatch(Actions.toggleFilter(mapId, layerId));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -253,19 +253,20 @@ export class Filter extends Component {
     // Build new component state or retrieve it from FILTER store
     const filterState = nextProps.FILTER[layerId];
     const layerFilters = this.getLayerFilter(layerId); // this may be deprecated
-    const filterOptions = filterState
+    const filterOptions = filterState && filterState.filterOptions
       ? filterState.filterOptions
       : nextProps.layerObj.filterOptions || {};
-    const filters = filterState
-      ? filterState.filters
-      : this.state.isFiltered && this.state.prevFilters
-      ? this.state.prevFilters
-      : this.buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters);
+
+    const filters = (filterState && filterState.filters)
+      || (this.state.isFiltered && this.state.prevFilters)
+      || this.buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters);
+
 
     // determine whether to update the compnent state
-    const doUpdate = filterState
-      ? filterState.doUpdate
-      : filterOptions && Object.keys(filterOptions).length > 0;
+    const doUpdate = (layerId !== this.state.layerId
+      && (filterOptions && Object.keys(filterOptions).length > 0))
+      || (filterState && filterState.doUpdate);
+
 
     if (doUpdate) {
       this.setState({
