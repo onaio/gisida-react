@@ -7,19 +7,19 @@ import { buildLayersObj } from '../../utils';
 require('./TimeSeriesSlider.scss');
 
 const mapStateToProps = (state, ownProps) => {
+  const MAP = state[ownProps.mapId] || { layers: {} };
   let timeLayer;
-  buildLayersObj(state.MAP.layers).forEach((layer) => {
+  buildLayersObj(MAP.layers).forEach((layer) => {
     if (layer && layer.visible && layer.aggregate && layer.aggregate.timeseries) {
       timeLayer = layer.id;
     }
   });
 
   return {
-    mapId: '01',
-    timeSeriesObj: state.MAP.timeseries[timeLayer],
-    timeseries: state.MAP.timeseries,
-    layers: state.MAP.layers,
-    showFilterPanel: state.MAP.showFilterPanel,
+    timeSeriesObj: MAP.timeseries[timeLayer],
+    timeseries: MAP.timeseries,
+    layers: MAP.layers,
+    showFilterPanel: MAP.showFilterPanel,
   }
 }
 

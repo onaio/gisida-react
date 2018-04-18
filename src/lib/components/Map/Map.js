@@ -6,10 +6,11 @@ import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
   const { APP, STYLES, REGIONS, VIEW } = state;
-  const { mapId } = ownProps;
+  const mapId = ownProps.mapId || 'map-1';
   const MAP = state[mapId] || { blockLoad: true };
-  MAP.blockLoad = (!VIEW.splitScreen && mapId !== 'map-1');
+  MAP.blockLoad = VIEW ? (!VIEW.splitScreen && mapId !== 'map-1'): false;
   return {
+    mapId,
     APP,
     STYLES,
     REGIONS,
@@ -531,7 +532,7 @@ class Map extends Component {
   render() {
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
     let mapWidth = '100%';
-    if (this.props.VIEW.splitScreen) {
+    if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
     }
     if (this.props.showFilterPanel) {
