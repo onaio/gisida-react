@@ -230,8 +230,9 @@ export class Filter extends Component {
 
   getLayerFilter(layerId) {
     let layerObj;
-    for (let i = 0; i < this.state.layersObj.length; i += 1) {
-      layerObj = this.state.layersObj[i];
+    const { layersObj } = this.props;
+    for (let i = 0; i < layersObj.length; i += 1) {
+      layerObj = layersObj[i];
       if (layerObj.id === layerId) {
         return layerObj.filters && layerObj.filters.layerFilters;
       }
@@ -241,7 +242,7 @@ export class Filter extends Component {
 
   handleFilterClick() {
     const dispatch = this.props.dispatch;
-    dispatch(Actions.toggleFilter());
+    dispatch(Actions.toggleFilter(this.props.mapId));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -273,7 +274,7 @@ export class Filter extends Component {
         layerId,
         doShowProfile: false,
       }, () => {
-        this.props.dispatch(Actions.filtersUpdated(layerId));
+        this.props.dispatch(Actions.filtersUpdated(this.props.mapId, layerId));
       });
     }
   }
@@ -354,7 +355,7 @@ export class Filter extends Component {
     }
     const { layerId, filterOptions } = this.state;
     // Clear layerFilter from mapbox layer
-    this.props.dispatch(Actions.setLayerFilter(layerId, null));
+    this.props.dispatch(Actions.setLayerFilter(this.props.mapId, layerId, null));
 
     // Update FILTER state
     const filterState = {
@@ -413,7 +414,7 @@ export class Filter extends Component {
     }
 
     // Apply layerFilter to mapbox layer
-    this.props.dispatch(Actions.setLayerFilter(layerId, nextFilters));
+    this.props.dispatch(Actions.setLayerFilter(this.props.mapId, layerId, nextFilters));
     // Update FILTER store state
     buildFilterState(this.state.filterOptions, filters, layerId, this.props.dispatch);
 
@@ -436,7 +437,6 @@ export class Filter extends Component {
     const val = (e.target.value || '').toLowerCase();
     const options = Object.assign({}, this.state.filters[filterKey].options);
     const optionKeys = Object.keys(options);
-    const nextFilters = {};
     let optionKey;
     let isClear = false;
     let toggleAllOn = false;
@@ -453,15 +453,20 @@ export class Filter extends Component {
         }
       }
     }
-    nextFilters[filterKey] = Object.assign(
+    const nextFilters = Object.assign(
       {},
-      this.state.filters[filterKey],
+      this.state.filters,
       {
-        isFiltered: this.isFiltered(options),
-        toggleAllOn,
-        options,
-        isOpen: true,
-        doAdvFiltering: e.target.getAttribute('data-type') === 'advanced-filter',
+        [filterKey]: Object.assign({},
+          this.state.filters[filterKey],
+          {
+            isFiltered: this.isFiltered(options),
+            toggleAllOn,
+            options,
+            isOpen: true,
+            doAdvFiltering: e.target.getAttribute('data-type') === 'advanced-filter',
+          }
+        ),
         // queries: null,
       },
     );
@@ -820,14 +825,14 @@ export class Filter extends Component {
                 {<button
                   className="filter-search"
                 
-                  onClick={(e) => { this.showGlobalSearchField(e); }}
+                  onClick={() => { this.showGlobalSearchField(); }}
                 >
                   <span className="glyphicon glyphicon-search" />
                 </button>}
                 <button
                   className="close-btn filter-close"
                   title="Close Filters"
-                  onClick={() => { this.handleFilterClick(); }}
+                  onClick={(e) => { this.handleFilterClick(e); }}
                 >
                   <span className="glyphicon glyphicon-remove" />
                 </button>
