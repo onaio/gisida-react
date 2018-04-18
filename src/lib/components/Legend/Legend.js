@@ -13,6 +13,7 @@ const mapStateToProps = (state, ownProps) => {
     layerObj: MAP.layers[MAP.activeLayerId],
     layersData: buildLayersObj(MAP.layers),
     MAP,
+    mapId: ownProps.mapId,
     primaryLayer: MAP.primaryLayer,
     showFilterPanel: MAP.showFilterPanel,
   }
@@ -31,7 +32,7 @@ export class Legend extends React.Component {
     const dispatch = this.props.dispatch;
     const targetLayer = e.currentTarget.getAttribute('data-layer');
     // dispatch primary layer id
-    dispatch(Actions.updatePrimaryLayer(targetLayer));
+    dispatch(Actions.updatePrimaryLayer(this.props.mapId, targetLayer));
   }
 
   render() {
@@ -388,7 +389,7 @@ export class Legend extends React.Component {
       <div>
         <div
           className={`legend ${mapId}`}
-          style={{ right: this.props.showFilterPanel ? '270px' : '20px' }}>
+          style={{ right: '20px' }}>
           {legendItems}
         </div>
       </div>
