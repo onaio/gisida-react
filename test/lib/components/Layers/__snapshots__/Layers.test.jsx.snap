@@ -25,7 +25,7 @@ exports[`Layers component renders correctly 1`] = `
         "visible": true,
       }
     }
-    mapTargetId="map-1"
+    mapId="map-1"
   />
 </ul>
 `;

@@ -7,16 +7,19 @@ import FilterSelector from './FilterSelector';
 import './Filter.scss';
 
 const mapStateToProps = (state, ownProps) => {
+  const { mapId } = ownProps;
+  const MAP = state[mapId] || { layers: {}, filter: {}};
   return {
-    MAP: state.MAP,
-    FILTER: { ...state.FILTER },
-    layerObj: state.MAP.layers[state.MAP.filter.layerId],
-    doShowProfile: state.MAP.showProfile,
-    showFilterPanel: state.MAP.showFilterPanel,
-    layersObj: buildLayersObj(state.MAP.layers),
-    showFilterBtn: state.MAP.filter.layerId,
-    layerData: state.MAP.layers,
-    detailView: state.MAP.detailView,
+    MAP,
+    mapId,
+    FILTER: state.FILTER,
+    layerObj: MAP.layers[MAP.filter.layerId],
+    doShowProfile: MAP.showProfile,
+    showFilterPanel: MAP.showFilterPanel,
+    layersObj: buildLayersObj(MAP.layers),
+    showFilterBtn: MAP.filter.layerId,
+    layerData: MAP.layers,
+    detailView: MAP.detailView,
   }
 }
 
@@ -239,7 +242,7 @@ export class Filter extends Component {
 
   handleFilterClick() {
     const dispatch = this.props.dispatch;
-    dispatch(Actions.toggleFilter());
+    dispatch(Actions.toggleFilter(this.props.mapId));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -913,7 +916,7 @@ export class Filter extends Component {
 }
 
 Filter.propTypes = {
-  layerObj: PropTypes.objectOf(PropTypes.any).isRequired,
+  layerObj: PropTypes.objectOf(PropTypes.any),
   doShowProfile: PropTypes.bool.isRequired,
   showFilterPanel: PropTypes.bool.isRequired,
   layersObj: PropTypes.arrayOf(PropTypes.any).isRequired,

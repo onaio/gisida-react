@@ -11,6 +11,9 @@ describe('Legend', () => {
     <Legend
       layerObj={layerObj}
       layersData={layersData}
+      mapId='map-1'
+      primaryLayer=''
+      MAP={{}}
     />
   );
 
