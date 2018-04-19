@@ -8,7 +8,7 @@ const mapStateToProps = (state, ownProps) => {
   const { APP, STYLES, REGIONS, VIEW } = state;
   const mapId = ownProps.mapId || 'map-1';
   const MAP = state[mapId] || { blockLoad: true };
-  MAP.blockLoad = VIEW ? (!VIEW.splitScreen && mapId !== 'map-1'): false;
+  MAP.blockLoad = VIEW ? (!VIEW.splitScreen && mapId !== 'map-1') : false;
   return {
     mapId,
     APP,
