@@ -1,6 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import QuantColumnChart from './../Charts/QuantColumnChart';
+
+import 'rc-slider/assets/index.css';
+import Slider from 'rc-slider';
+const createSliderWithTooltip = Slider.createSliderWithTooltip;
+const Range = createSliderWithTooltip(Slider.Range);
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -8,141 +14,10 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 export class AdvancedFilter extends React.Component {
-  getQueriedOptionKeys(queries, prevOptions, isQuant) {
-    // const { queries, prevOptions } = this.state;
-    const nextOptions = [];
-    let options = {}; // map iterated per query, reset to prevOptions for ORs
-    let nextOptionKeys = [];
-    let query;
-    let optionKey = '';
-    let isEmpty = true;
-    let isOR = false;
-    let qValue = '';
-    let qContr;
-    let i;
-    let q;
-    let isMatched;
-    let nOptions;
-    let mOptions;
-
-    for (q = 0; q < queries.length; q += 1) {
-      query = queries[q];
-      qContr = query.control;
-      qValue = query.val;
-      isEmpty = query.val === '';
-      isOR = q ? query.isOR : false;
-      if (!q && isEmpty) break;
-
-      /* Handle Individual Queries */
-      options = q && !isOR
-        ? nextOptions[nextOptions.length - 1]
-        : isQuant ? prevOptions : Object.assign({}, prevOptions);
-
-      nextOptions.push((isQuant ? [] : {}));
-      // loop through all options
-      if (isQuant) {
-        for (i = 0; i < options.length; i += 1) {
-          switch (qContr) {
-            case 'between':
-            case 'not between':
-              isMatched = options[i] >= qValue.min && options[i] <= qValue.max;
-              if (qContr !== 'between') isMatched = !isMatched;
-              break;
-            default:
-              isMatched = false;
-              break;
-          }
-
-          if (isMatched) {
-            nextOptions[nextOptions.length - 1].push(options[i]);
-          }
-        }
-      } else {
-        nextOptionKeys = Object.keys(options);
-        for (i = 0; i < nextOptionKeys.length; i += 1) {
-          optionKey = nextOptionKeys[i];
-          if (options[optionKey].count) {
-            // determine option-query match based on control
-            switch (qContr) {
-              case 'contains':
-              case 'does not contain': {
-                isMatched = (optionKey.toLowerCase()).indexOf(qValue.toLowerCase()) !== -1;
-                if (qContr !== 'contains') isMatched = !isMatched;
-                break;
-              }
-
-              case 'starts with':
-              case 'does not start with': {
-                isMatched = (optionKey.toLowerCase()).indexOf(qValue.toLowerCase()) === 0;
-                if (qContr !== 'starts with') isMatched = !isMatched;
-                break;
-              }
-
-              case 'is':
-              case 'is not': {
-                isMatched = optionKey.toLowerCase() === qValue.toLowerCase();
-                if (qContr !== 'is') isMatched = !isMatched;
-                break;
-              }
-
-              default: {
-                isMatched = false; // this pretty much shouldn't happen
-                break;
-              }
-            }
-
-            // add matched options to nextOptions
-            if (isMatched) {
-              nextOptions[nextOptions.length - 1][optionKey] =
-                Object.assign({}, options[optionKey]);
-            }
-          }
-        }
-      }
-
-      // handle combing of queries based on logical operator
-      // And operations are condensed into a single set of passing options
-      // Or operations create a new set of passing options
-      // eg - [(conditionA1, conditionB1, ..., conditionN1), (conditionA2, ...), ...]
-      if (q && !isOR) {
-        // remove last query options results
-        nOptions = nextOptions.pop();
-        // define query results to merge into
-        mOptions = nextOptions[nextOptions.length - 1];
-        // evaluate query results from both to find overlap
-        nextOptions[nextOptions.length - 1] = isQuant
-          ? [...new Set([...nOptions, ...mOptions])]
-          : this.getObectIntersect(nOptions, mOptions);
-      }
-    }
-
-    let queriedOptionKeys = [];
-    for (q = 0; q < nextOptions.length; q += 1) {
-      queriedOptionKeys = isQuant
-        ? [...new Set([...queriedOptionKeys, ...nextOptions[q]])]
-        : queriedOptionKeys.concat(Object.keys(nextOptions[q]));
-    }
-    return queriedOptionKeys.length
-      ? [...new Set(queriedOptionKeys)]
-      : queries.length === 1 && queries[0].val === ''
-        ? null
-        : [];
-  }
-
   // helper funciton for finding AND intersection
   // todo - move to includes file?
-   getObectIntersect(n, m) {
-    // create set of unique keys from both option objects
-    const keys = [...new Set([...Object.keys(n), ...Object.keys(m)])];
-    const nextOptionsMap = {};
-    let key;
-
-    for (let i = 0; i < keys.length; i += 1) {
-      key = keys[i];
-      if (n[key] && m[key]) nextOptionsMap[key] = n[key];
-    }
-
-    return nextOptionsMap;
+  getObectIntersect(n, m) {
+    return [...new Set(n.filter((x) => m.indexOf(x) !== -1))];
   }
 
   constructor(props) {
@@ -172,11 +47,125 @@ export class AdvancedFilter extends React.Component {
     }
   }
 
+  getQueryMatches(queries, q) {
+    const { isQuant, prevOptions } = this.state;
+    const query = queries[q];
+    const qContr = query.control;
+    const qValue = query.val;
+    const isOR = q ? query.isOR : false;
+    const options = !q || isOR
+      ? isQuant
+        ? [...new Set(prevOptions)]
+        : Object.keys(prevOptions)
+      : queries[q - 1].matches;
+
+    const isEmpty = !isQuant
+      ? query.val === ''
+      : query.val.min === Math.min(...options) && query.val.max === Math.max(...options);
+    if (isEmpty) return options;
+
+    const matches = [];
+    let optionKey;
+    let hasCount;
+    let isMatched = false;
+    for (let i = 0; i < options.length; i += 1) {
+      optionKey = options[i];
+      hasCount = prevOptions[optionKey] && prevOptions[optionKey].count;
+      switch (qContr) {
+        case 'between':
+        case 'not between':
+          isMatched = options[i] >= qValue.min && options[i] <= qValue.max;
+          if (qContr !== 'between') isMatched = !isMatched;
+          break;
+        case 'less than':
+          isMatched = options[i] < qValue.max;
+          break;
+        case 'greater than': 
+          isMatched = options[i] > qValue.min;
+          break;
+
+        case 'contains':
+        case 'does not contain': {
+          isMatched = hasCount
+            ? (optionKey.toLowerCase()).indexOf(qValue.toLowerCase()) !== -1
+            : false;
+          if (hasCount && qContr !== 'contains') isMatched = !isMatched;
+          break;
+        }
+        case 'starts with':
+        case 'does not start with':
+          isMatched = hasCount
+            ? (optionKey.toLowerCase()).indexOf(qValue.toLowerCase()) === 0
+            : false;
+          if (hasCount && qContr !== 'starts with') isMatched = !isMatched;
+          break;
+        case 'is':
+        case 'is not': {
+          isMatched = hasCount
+            ? optionKey.toLowerCase() === qValue.toLowerCase()
+            : false;
+          if (hasCount && qContr !== 'is') isMatched = !isMatched;
+          break;
+        }
+
+        default:
+          isMatched = false; // this pretty much shouldn't happen
+          break;
+      }
+
+      if (isMatched) {
+        matches.push(options[i]);
+      }
+    }
+
+    return matches;
+  }
+
+  reduceQueryMatches(queries) {
+    const { isQuant, prevOptions } = this.state;
+    let q;
+    let query;
+    const nextMatches = [];
+
+    // loop through all queries
+    for (q = 0; q < queries.length; q += 1) {
+      query = queries[q];
+      if (query.matches) {
+        // handle combing of queries based on logical operator
+        // AND operations are condensed into a single set of passing options
+        // OR operations create a new set of passing options
+        // eg - [(conditionA1, conditionB1, ..., conditionN1), (conditionA2, ...), ...]
+        if (!q || query.isOR) {
+          nextMatches.push(query.matches);
+        } else if (query.matches) {
+          nextMatches[nextMatches.length - 1] = this.getObectIntersect(
+            nextMatches[nextMatches.length - 1],
+            query.matches
+          );
+        }
+      }
+    }
+
+    // reduce all matching sets into one set
+    let reducedMatches = [];
+    for (q = 0; q < nextMatches.length; q += 1) {
+      reducedMatches = [...new Set([...reducedMatches, ...nextMatches[q]])];
+    }
+
+    return reducedMatches.length // check for matches
+      ? reducedMatches // return matches
+      : queries.length === 1 && (!isQuant // check for first and empty
+        ? query.val === ''
+        : query.val.min === Math.min(...prevOptions) && query.val.max === Math.max(...prevOptions))
+      ? null // if first and empty, return null
+      : []
+    ;
+  }
+
   onInputChange(e, q) {
     const nextQueries = [];
-    const { queries, filterKey, prevOptions, isQuant } = this.state;
+    const { queries, filterKey, isQuant } = this.state;
     let query;
-    const isMin = e.target.placeholder === 'min';
 
     for (let i = 0; i < queries.length; i += 1) {
       query = queries[i];
@@ -186,25 +175,25 @@ export class AdvancedFilter extends React.Component {
           query,
           {
             val: !isQuant ? e.target.value : {
-              min: isMin ? Number(e.target.value) : queries[i].val.min,
-              max: isMin ? queries[i].val.max : Number(e.target.value),
+              min: e[0], // isMin ? Number(e.target.value) : queries[i].val.min,
+              max: e[1] // isMin ? queries[i].val.max : Number(e.target.value),
             },
           },
         ));
       } else {
         nextQueries.push(query);
       }
+      nextQueries[i].matches = this.getQueryMatches(nextQueries, i);
     }
 
-    const queriedOptionKeys = this.getQueriedOptionKeys(
-      nextQueries, prevOptions, isQuant);
+    const queriedOptionKeys = this.reduceQueryMatches(nextQueries);
     this.props.setFilterQueries(filterKey, nextQueries, queriedOptionKeys);
   }
 
   // todo - merge this with onInputChange
   onControlChange(e, q) {
     const nextQueries = [];
-    const { queries, prevOptions, filterKey, isQuant } = this.state;
+    const { queries, filterKey } = this.state;
     let query;
 
     for (let i = 0; i < queries.length; i += 1) {
@@ -220,24 +209,28 @@ export class AdvancedFilter extends React.Component {
       } else {
         nextQueries.push(query);
       }
+      nextQueries[i].matches = this.getQueryMatches(nextQueries, i);
     }
 
-    const queriedOptionKeys = this.getQueriedOptionKeys(
-      nextQueries, prevOptions, isQuant);
+    const queriedOptionKeys = this.reduceQueryMatches(nextQueries);
     this.props.setFilterQueries(filterKey, nextQueries, queriedOptionKeys);
   }
 
   onAddRemoveClick(e, q, doAdd) {
     e.preventDefault();
-    const { queries, prevOptions, filterKey } = this.state;
+    const { queries, filterKey, isQuant } = this.state;
+    const { options } = this.props;
     const nextQueries = [...queries];
     // const isLast = q === nextQueries.length - 1;
 
     if (doAdd) {
       nextQueries.splice(q + 1, 0, {
         isOR: false,
-        val: '',
-        control: 'contains',
+        val: isQuant ? {
+          min: Math.min(...options),
+          max: Math.max(...options),
+        } : '',
+        control: isQuant ? 'between' : 'contains',
       });
     } else {
       nextQueries.splice(q, 1);
@@ -246,99 +239,125 @@ export class AdvancedFilter extends React.Component {
     if (!nextQueries.length) {
       nextQueries.push({
         isOR: false,
-        val: '',
-        control: 'contains',
+        val: isQuant ? {
+          min: Math.min(...options),
+          max: Math.max(...options),
+        } : '',
+        control: isQuant ? 'between' : 'contains',
       });
     }
 
-    const queriedOptionKeys = this.getQueriedOptionKeys(nextQueries, prevOptions);
+    const queriedOptionKeys = this.reduceQueryMatches(nextQueries);
     this.props.setFilterQueries(filterKey, nextQueries, queriedOptionKeys);
   }
 
   toggleLogicalOperators(e, q) {
     // e.preventDefault();
     e.stopPropagation();
-    const { queries, prevOptions, filterKey, isQuant } = this.state;
-    const nextQueries = [...queries];
-    nextQueries[q].isOR = !nextQueries[q].isOR;
+    const { queries, filterKey } = this.state;
+    const nextQueries = [];
+    // nextQueries[q].isOR = !nextQueries[q].isOR;
 
-    const queriedOptionKeys = this.getQueriedOptionKeys(
-      nextQueries, prevOptions, isQuant);
+    for (let i = 0; i < queries.length; i += 1) {
+      if (q === i) {
+        nextQueries.push(Object.assign(
+          {},
+          queries[i],
+          {
+            isOR: !queries[i].isOR,
+          }
+        ));
+      } else {
+        nextQueries.push(queries[i]);
+      }
+      nextQueries[i].matches = this.getQueryMatches(nextQueries, i);
+    }
+
+    const queriedOptionKeys = this.reduceQueryMatches(nextQueries);
     this.props.setFilterQueries(filterKey, nextQueries, queriedOptionKeys);
   }
 
   buildQuantInputEl(query, q) {
     const { control, val } = query;
+    const { options } = this.props;
+    const min = Math.min(...options);
+    const max = Math.max(...options);
 
-    let inputEl;
-    switch (control) {
-      case 'between': {
-        const min = Math.min(...this.props.options);
-        const max = Math.max(...this.props.options);
-        inputEl = (
-          <div className="inputBetween">
-            <input
-              className="inputMin"
-              type="number"
-              placeholder="min"
-              value={val.min}
-              min={min}
-              max={val.max}
-              step={1}
-              onChange={(e) => { this.onInputChange(e, q); }}
-            />
-            <input
-              className="inputMax"
-              type="number"
-              placeholder="max"
-              value={val.max}
-              min={val.min}
-              max={max}
-              step={1}
-              onChange={(e) => { this.onInputChange(e, q); }}
-            />
+    const containerClass = control === 'less than'
+      ? 'inputLessThan'
+      : control === 'greater than'
+      ? 'inputGreaterThan'
+      : 'inputBetween';
+
+    return (
+      <div className={containerClass}>
+
+        {control === 'between' || control === 'not between' ? (
+          <Range
+            min={min}
+            max={max}
+            defaultValue={[val.min, val.max]}
+            onChange={(e) => {
+              this.onInputChange(e, q);
+            }}
+            tipFormatter={value => `${value}`}
+          />
+        ) : (
+          <Slider
+            min={min}
+            max={max}
+            defaultValue={control === 'less than' ? val.max : val.min}
+            onChange={(e) => {
+              this.onInputChange(control === 'less than' ? [val.min, e] : [e, val.max], q);
+            }}
+          />
+        )}
+
+        <div className="texttip min" style={{right: '100%'}}>
+          <span>{min}</span>
+        </div>
+
+        {control !== 'less than' ? (
+          <div className="texttip low" style={{right: `${(1 - (val.min / max)) * 100}%`}}>
+            <span>{val.min}</span>
           </div>
-        );
-        break;
-      }
+        ) : ''}
 
-      default:
-        break;
-    }
-    return inputEl;
+        {control !== 'greater than' ? (
+          <div className="texttip high" style={{right: `${(1 - (val.max / max)) * 100}%`}}>
+            <span>{val.max}</span>
+          </div>
+        ) : ''}
+
+        <div className="texttip max" style={{right: '0%'}}>
+          <span>{max}</span>
+        </div>
+      </div>
+    );
   }
 
   render() {
     const { queries, isQuant } = this.state;
+    const { options, queriedOptionKeys } = this.props;
+
     const queryEls = [];
     let query;
     let queryEl;
     let isClear = true;
-    // let isFirst = true;
-    // let isLast = true;
-    // let iconClass = '';
     let controlSelectorEl;
     let inputEl;
 
     for (let q = 0; q < queries.length; q += 1) {
       query = queries[q];
       isClear = query.val === '';
-      /* isFirst = q === 0;
-       isLast = q === queries.length - 1; */
-
-      // Determine whether the button should be plus or minus
-      // todo - Move this logic to isPlus or doAddQuery state variable
-      /* iconClass = isFirst
-        ? (isLast ? 'plus' : 'minus')
-        : isLast
-          ? (isClear ? 'minus' : 'plus')
-          : 'minus'
-      ; */
 
       // Control Selector
       controlSelectorEl = isQuant ? (
         <select onChange={(e) => { this.onControlChange(e, q); }} role="button">
           <option label="between" selected="selected">between</option>
+          <option label="not between" >not between</option>
+          <option label="less than">less than</option>
+          <option label="greater than">greater than</option>
         </select>
       ) : (
         <select onChange={(e) => { this.onControlChange(e, q); }} role="button">
@@ -369,25 +388,25 @@ export class AdvancedFilter extends React.Component {
           {q ? (
             <table>
               <tbody>
-              <tr>
-                <td>And</td>
-                <td>
-                  <label
-                    className="switch"
-                    htmlFor="operator-toggle"
-                  >
-                    <input
-                      type="checkbox"
-                      id="operator-toggle"
-                      className="operator-toggle"
-                      checked={query.isOR}
-                      onChange={(e) => { this.toggleLogicalOperators(e, q); }}
-                    />
-                    <span className="slider" />
-                  </label>
-                </td>
-                <td>Or</td>
-              </tr>
+                <tr>
+                  <td>And</td>
+                  <td>
+                    <label
+                      className="switch"
+                      htmlFor="operator-toggle"
+                    >
+                      <input
+                        type="checkbox"
+                        id="operator-toggle"
+                        className="operator-toggle"
+                        checked={query.isOR}
+                        onChange={(e) => { this.toggleLogicalOperators(e, q); }}
+                      />
+                      <span className="slider" />
+                    </label>
+                  </td>
+                  <td>Or</td>
+                </tr>
               </tbody>
             </table>
             ) : ''}
@@ -421,6 +440,7 @@ export class AdvancedFilter extends React.Component {
 
     return (
       <div className="advanced-controls-container">
+        {isQuant ? <QuantColumnChart data={options} passing={queriedOptionKeys} /> : ''}
         {queryEls}
       </div>
     );

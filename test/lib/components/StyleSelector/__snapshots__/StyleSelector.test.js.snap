@@ -26,14 +26,14 @@ exports[`StyleSelector StyleSelector component renderes correctly 1`] = `
         className="leaflet-control-layers-base"
       >
         <label
-          htmlFor="Satelitte"
-          key="label_Satelitte"
+          htmlFor="Satelitte-undefined"
+          key="label_Satelitte-undefined"
         >
           <input
             checked={false}
             className="leaflet-control-layers-selector"
-            id="Satelitte"
-            key="input_Satelitte"
+            id="Satelitte-undefined"
+            key="input_Satelitte-undefined"
             name="leaflet-base-layers"
             onClick={[Function]}
             readOnly={true}
@@ -45,14 +45,14 @@ exports[`StyleSelector StyleSelector component renderes correctly 1`] = `
           </span>
         </label>
         <label
-          htmlFor="Satelitte Streets"
-          key="label_Satelitte Streets"
+          htmlFor="Satelitte Streets-undefined"
+          key="label_Satelitte Streets-undefined"
         >
           <input
             checked={false}
             className="leaflet-control-layers-selector"
-            id="Satelitte Streets"
-            key="input_Satelitte Streets"
+            id="Satelitte Streets-undefined"
+            key="input_Satelitte Streets-undefined"
             name="leaflet-base-layers"
             onClick={[Function]}
             readOnly={true}

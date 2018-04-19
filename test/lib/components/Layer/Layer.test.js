@@ -6,8 +6,12 @@ import toJson from 'enzyme-to-json';
 
 
 layerObj.id = 'sample-layer';
+const mapId = 'map-1';
 const componentWrapper = shallow(
-  <Layer layer={layerObj} />
+  <Layer
+    layer={layerObj}
+    mapId={mapId}
+  />
 );
 
 describe('Layer', () => {
@@ -23,8 +27,7 @@ describe('Layer', () => {
     }
     componentWrapper.instance().onLayerToggle = jest.fn();
     componentWrapper.update();
-    componentWrapper.find(`#${layerObj.id}`).simulate('change', event);
+    componentWrapper.find(`#${layerObj.id}-${mapId}`).simulate('change', event);
     expect(componentWrapper.instance().onLayerToggle).toBeCalledWith(layerObj);
-
   })
 });

@@ -21,6 +21,9 @@ export class Layer extends Component {
   onLayerToggle = layer => {
     // dispatch toggle layer action
     const mapId = this.props.mapId;
+    if (!mapId) {
+      return null;
+    }
     this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
 
     // Prepare layer if layer had not been loaded
@@ -30,17 +33,21 @@ export class Layer extends Component {
   }
 
   render() {
-    const layer = this.props.layer; 
+    const layer = this.props.layer;
+    const mapId = this.props.mapId;
+    if (!mapId) {
+      return null;
+    }
     return (
       <li className="layer">
         <input
-          id={layer.id}  
+          id={`${layer.id}-${mapId}`}
           type="checkbox"
           data-layer={layer.id}
           onChange={e => this.onLayerToggle(layer)}
           checked={!!layer.visible}
         />
-        <label htmlFor={layer.id} >{layer.label}</label>
+        <label htmlFor={`${layer.id}-${mapId}`} >{layer.label}</label>
       </li>
     );
   }
@@ -48,6 +55,7 @@ export class Layer extends Component {
 
 Layer.propTypes = {
   layer: PropTypes.objectOf(PropTypes.any).isRequired,
+  mapId: PropTypes.string,
 };
 
 export default connect(mapStateToProps)(Layer);

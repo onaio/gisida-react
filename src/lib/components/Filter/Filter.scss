@@ -8,6 +8,7 @@
   background-color: white;
   border-radius: 5px;
   border: none;
+  z-index: 10;
 
   &.open {
     background-color: #aaa;
@@ -198,7 +199,7 @@
   font-family: proxima-nova, sans-serif;
   line-height: 20px;
   margin: 0.2em;
-  position: absolute;
+  position: fixed;
   z-index: 1;
   right: 0;
   top: 0;
@@ -655,3 +656,36 @@
 .inputMax {
   color: #444;
 }
+
+.inputBetween,
+.inputLessThan,
+.inputGreaterThan {
+  width: calc(100% - 16px);
+  position: relative;
+  padding: 12px 0 16px;
+
+  .texttip {
+    position: absolute;
+    color: #aaa;
+    width: 24px;
+    text-align: center;
+    margin-right: -12px;
+    top: 30px;
+
+    &.low,
+    &.high {
+      top: -6px;
+      color: #fff;
+    }
+  }
+
+  .rc-slider-track {
+    background-color: #7cb5ec;
+  }
+  .rc-slider-handle {
+    border-color: #7cb5ec;
+    background-color: #eee;
+  }
+}
+
+

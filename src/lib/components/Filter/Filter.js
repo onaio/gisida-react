@@ -11,6 +11,7 @@ const mapStateToProps = (state, ownProps) => {
   const MAP = state[mapId] || { layers: {}, filter: {}};
   return {
     MAP,
+    mapId,
     FILTER: state.FILTER,
     layerObj: MAP.layers[MAP.filter.layerId],
     doShowProfile: MAP.showProfile,
@@ -27,11 +28,11 @@ export class Filter extends Component {
     super(props);
     const filters = null;
     const filterOptions = {}
-    const id = null
+
     this.state = {
       isFiltered: false,
       prevFilters: null,
-      layerId: id,
+      layerId: (this.props.layerObj && this.props.layerObj.id) || null,
       filters,
       filterOptions,
       doShowProfile: this.props.doShowProfile,
@@ -230,8 +231,9 @@ export class Filter extends Component {
 
   getLayerFilter(layerId) {
     let layerObj;
-    for (let i = 0; i < this.state.layersObj.length; i += 1) {
-      layerObj = this.state.layersObj[i];
+    const { layersObj } = this.props;
+    for (let i = 0; i < layersObj.length; i += 1) {
+      layerObj = layersObj[i];
       if (layerObj.id === layerId) {
         return layerObj.filters && layerObj.filters.layerFilters;
       }
@@ -240,8 +242,8 @@ export class Filter extends Component {
   }
 
   handleFilterClick() {
-    const dispatch = this.props.dispatch;
-    dispatch(Actions.toggleFilter());
+    const { dispatch, mapId, layerId } = this.props;
+    dispatch(Actions.toggleFilter(mapId, layerId));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -250,21 +252,22 @@ export class Filter extends Component {
     const layerId = nextProps.layerObj.id;
 
     // Build new component state or retrieve it from FILTER store
-    const filterState = this.props.FILTER[layerId];
+    const filterState = nextProps.FILTER[layerId];
     const layerFilters = this.getLayerFilter(layerId); // this may be deprecated
-    const filterOptions = filterState
+    const filterOptions = filterState && filterState.filterOptions
       ? filterState.filterOptions
       : nextProps.layerObj.filterOptions || {};
-    const filters = filterState
-      ? filterState.filters
-      : this.state.isFiltered && this.state.prevFilters
-      ? this.state.prevFilters
-      : this.buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters);
+
+    const filters = (filterState && filterState.filters)
+      || (this.state.isFiltered && this.state.prevFilters)
+      || this.buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters);
+
 
     // determine whether to update the compnent state
-    const doUpdate = filterState
-      ? filterState.doUpdate
-      : filterOptions && Object.keys(filterOptions).length > 0;
+    const doUpdate = (layerId !== this.state.layerId
+      && (filterOptions && Object.keys(filterOptions).length > 0))
+      || (filterState && filterState.doUpdate);
+
 
     if (doUpdate) {
       this.setState({
@@ -273,7 +276,7 @@ export class Filter extends Component {
         layerId,
         doShowProfile: false,
       }, () => {
-        this.props.dispatch(Actions.filtersUpdated(layerId));
+        nextProps.dispatch(Actions.filtersUpdated(nextProps.mapId, layerId));
       });
     }
   }
@@ -353,8 +356,9 @@ export class Filter extends Component {
       return false;
     }
     const { layerId, filterOptions } = this.state;
+    const { mapId, dispatch } = this.props;
     // Clear layerFilter from mapbox layer
-    this.props.dispatch(Actions.setLayerFilter(layerId, null));
+    dispatch(Actions.setLayerFilter(mapId, layerId, null));
 
     // Update FILTER state
     const filterState = {
@@ -363,7 +367,7 @@ export class Filter extends Component {
       aggregate: this.props.layerObj.aggregate,
       isFiltered: false,
     };
-    clearFilterState(filterState, layerId, this.props.dispatch);
+    clearFilterState(mapId, filterState, layerId, dispatch);
     return true;
   }
 
@@ -372,9 +376,9 @@ export class Filter extends Component {
     if (!isFilterable) {
       return false;
     }
-    const { filters, layerId } = this.state;
+    const { filters, layerId, filterOptions } = this.state;
 
-    const { layerObj } = this.props;
+    const { layerObj, mapId, dispatch } = this.props;
 
     if (!layerObj) {
       return false;
@@ -404,6 +408,10 @@ export class Filter extends Component {
           }
         } else {
           // generate filter expressions from adv filter queries
+          options = filters[filterKeys[f]].queriedOptionKeys;
+          for (let o = 0; o < options.length; o += 1) {
+            newFilters.push(['==', filterKeys[f], options[o]]);
+          }
         }
         // push this filter to the combind filter
         if (newFilters.length > 1) {
@@ -413,9 +421,9 @@ export class Filter extends Component {
     }
 
     // Apply layerFilter to mapbox layer
-    this.props.dispatch(Actions.setLayerFilter(layerId, nextFilters));
+    this.props.dispatch(Actions.setLayerFilter(mapId, layerId, nextFilters));
     // Update FILTER store state
-    buildFilterState(this.state.filterOptions, filters, layerId, this.props.dispatch);
+    buildFilterState(mapId, filterOptions, filters, layerId, dispatch);
 
     return true;
   }
@@ -429,14 +437,15 @@ export class Filter extends Component {
       nextFilters,
     } = (this.buildNextFilters(prevFilters[filterKey].options, prevFilters, filterKey, true));
 
-    this.setState({ filters: nextFilters });
+    const { mapId, dispatch } = this.props;
+    const { filterOptions, layerId } = this.state;
+    buildFilterState(mapId, filterOptions, nextFilters, layerId, dispatch);
   }
 
   searchFilterOptions = (e, filterKey) => {
     const val = (e.target.value || '').toLowerCase();
     const options = Object.assign({}, this.state.filters[filterKey].options);
     const optionKeys = Object.keys(options);
-    const nextFilters = {};
     let optionKey;
     let isClear = false;
     let toggleAllOn = false;
@@ -453,21 +462,29 @@ export class Filter extends Component {
         }
       }
     }
-    nextFilters[filterKey] = Object.assign(
+    const nextFilters = Object.assign(
       {},
-      this.state.filters[filterKey],
+      this.state.filters,
       {
-        isFiltered: this.isFiltered(options),
-        toggleAllOn,
-        options,
-        isOpen: true,
-        doAdvFiltering: e.target.getAttribute('data-type') === 'advanced-filter',
+        [filterKey]: Object.assign({},
+          this.state.filters[filterKey],
+          {
+            isFiltered: this.isFiltered(options),
+            toggleAllOn,
+            options,
+            isOpen: true,
+            doAdvFiltering: e.target.getAttribute('data-type') === 'advanced-filter',
+          }
+        ),
         // queries: null,
       },
     );
 
     this.setState({
-      filters: nextFilters,
+      filters: {
+        ...this.state.filters,
+        ...nextFilters
+      },
     });
   }
 
@@ -681,7 +698,7 @@ export class Filter extends Component {
       if (nextFilter.isFiltered
         || (nextFilter.queries && nextFilter.queries.length
         && (nextFilter.queries.length > 1 || nextFilter.queries[0].val !== ''))
-        || (Array.isArray(nextFilter.options)
+        || (Array.isArray(nextFilter.options) && queriedKeys
         && (
           [...new Set(nextFilter.options)].length !== queriedKeys.length))) {
         isFiltered = true;
@@ -759,7 +776,7 @@ export class Filter extends Component {
             tabIndex="-1"
           >
             {filter.label}
-            {filter.isOpen ?
+            {filter.isOpen && filter.dataType !== 'quantitative' ?
               <span
                 role="button"
                 tabIndex="0"
@@ -820,14 +837,14 @@ export class Filter extends Component {
                 {<button
                   className="filter-search"
                 
-                  onClick={(e) => { this.showGlobalSearchField(e); }}
+                  onClick={() => { this.showGlobalSearchField(); }}
                 >
                   <span className="glyphicon glyphicon-search" />
                 </button>}
                 <button
                   className="close-btn filter-close"
                   title="Close Filters"
-                  onClick={() => { this.handleFilterClick(); }}
+                  onClick={(e) => { this.handleFilterClick(e); }}
                 >
                   <span className="glyphicon glyphicon-remove" />
                 </button>

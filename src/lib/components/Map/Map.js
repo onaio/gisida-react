@@ -144,6 +144,9 @@ class Map extends Component {
   }
 
   componentWillReceiveProps(nextProps){
+    if (this.map) {
+      this.map.resize();
+    }
     const accessToken = nextProps.APP.accessToken;
     let mapConfig = nextProps.APP.mapConfig;
     const isRendered = nextProps.MAP.isRendered;
@@ -271,8 +274,9 @@ class Map extends Component {
   }
 
   buildFilters() {
-    this.props.dispatch(Actions.filtersUpdated());
-    const { layerObj } = this.props;
+    const { layerObj, mapId } = this.props;
+    this.props.dispatch(Actions.filtersUpdated(mapId));
+
     const layerId = layerObj.id;
 
     const filterKeys = Object.keys(layerObj.filters);

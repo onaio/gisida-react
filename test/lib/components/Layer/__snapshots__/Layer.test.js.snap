@@ -7,12 +7,12 @@ exports[`Layer component renderes correctly 1`] = `
   <input
     checked={true}
     data-layer="sample-layer"
-    id="sample-layer"
+    id="sample-layer-map-1"
     onChange={[Function]}
     type="checkbox"
   />
   <label
-    htmlFor="sample-layer"
+    htmlFor="sample-layer-map-1"
   >
     Boundaries
   </label>
