@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 const mapStateToProps = (state, ownProps) => {
+  const MAP = state[ownProps.mapId];
   return {
-    showFilterPanel: state.MAP.showFilterPanel,
+    showFilterPanel: MAP.showFilterPanel,
   }
 }
 
