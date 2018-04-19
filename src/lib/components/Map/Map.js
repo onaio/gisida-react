@@ -94,7 +94,7 @@ class Map extends Component {
   setPrimaryLayer(primaryLayer, activeLayerId, layers, activeLayersData, activelayerObj) {
     const nextLayerId =  primaryLayer || activeLayerId;
     let nextLayerObj = activeLayersData.find(lo => lo.id === nextLayerId);
-    if (!nextLayerObj && layers[nextLayerId].layers) {
+    if (nextLayerId && !nextLayerObj && layers[nextLayerId].layers) {
       let nextLayer;
       for (let l = 0; l < layers[nextLayerId].layers.length; l += 1) {
         nextLayer = layers[nextLayerId].layers[l];
