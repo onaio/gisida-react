@@ -7,14 +7,13 @@ import { buildLayersObj } from '../../utils';
 require('./TimeSeriesSlider.scss');
 
 const mapStateToProps = (state, ownProps) => {
-  const MAP = state[ownProps.mapId] || { layers: {} };
+  const MAP = state[ownProps.mapId] || { layers: {}, timeseries: {} };
   let timeLayer;
   buildLayersObj(MAP.layers).forEach((layer) => {
     if (layer && layer.visible && layer.aggregate && layer.aggregate.timeseries) {
       timeLayer = layer.id;
     }
   });
-
   return {
     timeSeriesObj: MAP.timeseries[timeLayer],
     timeseries: MAP.timeseries,
@@ -80,7 +79,7 @@ class TimeSeriesSlider extends React.Component {
       }
     }
 
-    this.props.dispatch(Actions.updateTimeseries(nextTimeseries))
+    this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries))
   }
 
   componentWillReceiveProps(nextProps) {
@@ -97,7 +96,6 @@ class TimeSeriesSlider extends React.Component {
   handleMouseUp(e) {
     const nextIndex = parseInt(e.target.value, 10);
     const { index } = this.state;
-
     if (nextIndex !== index) {
       this.updateTimeseriesState(e.target.value, this.props.timeSeriesObj);
     }

@@ -46,7 +46,6 @@ const mapStateToProps = (state, ownProps) => {
       layerId: layerObj.id,
       layer: sumChartObj,
       layersObj: layersObj,
-      mapId: "01",
       isChartMin: isChartMin,
       legendBottom: legendBottom,
       locations: {},
@@ -178,7 +177,7 @@ class SummaryChart extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (Object.keys(nextProps).length > 2) {
+    if (Object.keys(nextProps).length > 2 && nextProps.layer) {
       const { layerId, layer, mapId, isChartMin, legendBottom } = nextProps;
       const legendPosition = SummaryChart.calcLegendPosition(mapId);
       const chartSpecs = SummaryChart.defineCharts(layer.charts);
@@ -331,7 +330,10 @@ class SummaryChart extends React.Component {
 
     return (
       <div>
-        <SumChartMinimize toggleChart={this.toggleChart} bottom={buttonBottom} />
+        <SumChartMinimize
+          toggleChart={this.toggleChart}
+          bottom={buttonBottom}
+          mapId={this.props.mapId}/>
         {!this.state.isChartMin && primarySumChart ? primarySumChart : ''}
         {doShowModal && sumCharts.length ? (
           <div className={`sumChartModal ${this.props.mapId}`}>
