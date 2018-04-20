@@ -8,15 +8,43 @@ import './Menu.scss';
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {} };
   const { LAYERS } = state;
+  let categories;
+  // let layers;
 
-  // build list of LAYERS.categories populated with layers from MAP.layers 
-  const categories = Object.keys(LAYERS.groups).map((group) => {
-    return {
-      category: group,
-      layers: LAYERS.groups[group].map((l) => MAP.layers[l])
-        .filter((l) => typeof l !== 'undefined'),
-    };
-  });
+  if (Object.keys(LAYERS.groups).length) {
+    // build list of LAYERS.categories populated with layers from MAP.layers 
+    categories = Object.keys(LAYERS.groups).map((group) => {
+      return {
+        category: group,
+        layers: LAYERS.groups[group].map((l) => MAP.layers[l])
+          .filter((l) => typeof l !== 'undefined'),
+      };
+    });
+  } else if (Object.keys(MAP.layers).length) {
+    categories = {};
+    let category;
+
+    Object.keys(MAP.layers).forEach((l) => {
+      if (MAP.layers[l].category) {
+        category = MAP.layers[l].category;
+        if (!categories[category]) {
+          categories[category] = {
+            category,
+            layers: [],
+          };
+        }
+        categories[category].layers.push(MAP.layers[l]);
+      }
+    });
+
+    categories = Object.keys(categories).map(c => categories[c]);
+  }
+
+  // todo - support layers without categories
+  // if (!Object.keys(categories).length) {
+  //   categories = null;
+  //   layers = Object.keys(MAP.layers).map(l => MAP.layers[l]);
+  // }
 
   // Get current region
   const currentRegion = state.REGIONS && state.REGIONS.length ?
@@ -24,6 +52,7 @@ const mapStateToProps = (state, ownProps) => {
 
   return {
     categories,
+    // layers, // todo - support layers without categories
     LAYERS,
     menuId: 'sector-menu-1',
     mapTargetId: '',
