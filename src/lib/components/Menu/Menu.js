@@ -13,7 +13,8 @@ const mapStateToProps = (state, ownProps) => {
   const categories = Object.keys(LAYERS.groups).map((group) => {
     return {
       category: group,
-      layers: LAYERS.groups[group].map((l) => MAP.layers[l]),
+      layers: LAYERS.groups[group].map((l) => MAP.layers[l])
+        .filter((l) => typeof l !== 'undefined'),
     };
   });
 
@@ -23,6 +24,7 @@ const mapStateToProps = (state, ownProps) => {
 
   return {
     categories,
+    LAYERS,
     menuId: 'sector-menu-1',
     mapTargetId: '',
     regions: state.REGIONS,
