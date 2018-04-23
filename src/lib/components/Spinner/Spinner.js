@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 require('./Spinner.scss');
 
@@ -24,9 +25,14 @@ export class Spinner extends React.Component {
       <div
         className="spinner"
         id={`spinner-${this.props.mapId}`}
-        style={{ display: this.props.MAP.isRendered && this.props.MAP.isLoaded ? 'none' : 'block'}} />
+        style={{ display: this.props.MAP.showSpinner ? 'block' : 'none'}} />
     );
   }
 }
 
 export default connect(mapStateToProps)(Spinner);
+
+Spinner.propTypes = {
+  MAP: PropTypes.objectOf(PropTypes.any).isRequired,
+  mapId: PropTypes.string.isRequired,
+}
