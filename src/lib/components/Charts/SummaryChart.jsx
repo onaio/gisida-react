@@ -233,10 +233,12 @@ class SummaryChart extends React.Component {
 
     $(`.legend.${mapId}`).css('bottom', legendBottom);
     const $primaryRow = $('.legend-row.primary', `.legend.${mapId}`);
+    const buttonBottom = $primaryRow.length
+      ? $(window).innerHeight() - ($primaryRow.offset().top + $primaryRow.innerHeight()) + 12
+      : legendBottom + 12;
+
     this.setState({
-      buttonBottom: $primaryRow.length
-        ? $(`.legend.${mapId}`).innerHeight() - $primaryRow.innerHeight() + legendBottom + 12 
-        : legendBottom + 12,
+      buttonBottom,
       chartWidth: primaryChartPosition.chartWidth,
       isFullBleed: primaryChartPosition.isFullBleed,
     }, () => {
