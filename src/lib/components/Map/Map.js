@@ -360,7 +360,6 @@ class Map extends Component {
     // determine what the currently timeperiod to see if layers should be hidden
     const currPeriod = timeSeriesObj.period[timeSeriesObj.temporalIndex];
 
-    let layer;
     let tsObj;
     let layerObj;
     let id;
@@ -406,20 +405,20 @@ class Map extends Component {
           // if the layer is in the map and has no period match, hide it
           if (!hasData || pIndex === -1) {
 
-            this.map.setLayoutProperty(layer.id, 'visibility', 'none');
+            this.map.setLayoutProperty(layerObj.id, 'visibility', 'none');
             // if layer has a highlight layer, update its visibility too
-            if (this.map.getLayer(`${layer.id}-highlight`)) {
-              this.map.setLayoutProperty(`${layer.id}-highlight`, 'visibility', 'none');
+            if (this.map.getLayer(`${layerObj.id}-highlight`)) {
+              this.map.setLayoutProperty(`${layerObj.id}-highlight`, 'visibility', 'none');
             }
 
           // if the layer is not in the map and does have a match, handle it
           } else if (this.map.getLayer(id) && hasData && pIndex !== -1) {
             // if layer is hidden, reveal it
             if (this.map.getLayoutProperty(id, 'visibility') === 'none') {
-              this.map.setLayoutProperty(layer.id, 'visibility', 'visible');
+              this.map.setLayoutProperty(layerObj.id, 'visibility', 'visible');
               // if layer has a highlight layer, update its visibility too
-              if (this.map.getLayer(`${layer.id}-highlight`)) {
-                this.map.setLayoutProperty(`${layer.id}-highlight`, 'visibility', 'visible');
+              if (this.map.getLayer(`${layerObj.id}-highlight`)) {
+                this.map.setLayoutProperty(`${layerObj.id}-highlight`, 'visibility', 'visible');
               }
             }
 
