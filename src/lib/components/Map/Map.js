@@ -60,6 +60,12 @@ class Map extends Component {
         e.target.on('render', onStyleLoad);
       });
 
+      this.map.on('data', (data) => {
+        if (data.isSourceLoaded) {
+          this.props.dispatch(Actions.triggerSpinner(this.props.mapId));
+        }
+      });
+
       // Handle adding/removing labels when zooming
       this.map.on('zoom', this.handleLabelsOnMapZoom.bind(this))
 
