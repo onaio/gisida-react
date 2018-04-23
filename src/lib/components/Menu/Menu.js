@@ -3,49 +3,64 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types';
 import { Actions } from 'gisida';
 import Layers from '../Layers/Layers';
-import { groupBy } from '../../utils'
 import './Menu.scss';
 
 const mapStateToProps = (state, ownProps) => {
-  const categories = [];
-  const layers = [];
   const MAP = state[ownProps.mapId] || { layers: {} };
-  // populate layers array with layer objects in state.MAP.layers;
-  for (var key in MAP.layers) {
-    layers.push(MAP.layers[key]);
-  }
-  // Group layers by category property
-  const grouped = groupBy(layers, 'category');
+  const { LAYERS } = state;
+  let categories;
+  // let layers;
 
-  // Add layers to categories
-  grouped.forEach(group => {
-    if (group[0].hasOwnProperty('category')) {
-      categories.push({
-        layers: group,
-        category: group[0].category
-      });
-    } else {
-      categories.push({
-        layers: group,
-        category: "Default"
-      });
-    }
-  });
+  if (Object.keys(LAYERS.groups).length) {
+    // build list of LAYERS.categories populated with layers from MAP.layers 
+    categories = Object.keys(LAYERS.groups).map((group) => {
+      return {
+        category: group,
+        layers: LAYERS.groups[group].map((l) => MAP.layers[l])
+          .filter((l) => typeof l !== 'undefined'),
+      };
+    });
+  } else if (Object.keys(MAP.layers).length) {
+    categories = {};
+    let category;
+
+    Object.keys(MAP.layers).forEach((l) => {
+      if (MAP.layers[l].category) {
+        category = MAP.layers[l].category;
+        if (!categories[category]) {
+          categories[category] = {
+            category,
+            layers: [],
+          };
+        }
+        categories[category].layers.push(MAP.layers[l]);
+      }
+    });
+
+    categories = Object.keys(categories).map(c => categories[c]);
+  }
+
+  // todo - support layers without categories
+  // if (!Object.keys(categories).length) {
+  //   categories = null;
+  //   layers = Object.keys(MAP.layers).map(l => MAP.layers[l]);
+  // }
 
   // Get current region
   const currentRegion = state.REGIONS && state.REGIONS.length ?
     state.REGIONS.filter(region => region.current)[0].name : '';
 
   return {
-    categories: categories,
-    // todo: provide missing props
+    categories,
+    // layers, // todo - support layers without categories
+    LAYERS,
     menuId: 'sector-menu-1',
     mapTargetId: '',
     regions: state.REGIONS,
     currentRegion: currentRegion,
     loaded: state.APP.loaded,
     preparedLayers: MAP.layers,
-  }
+  };
 }
 
 class Menu extends Component {
@@ -109,7 +124,7 @@ class Menu extends Component {
                     {regions && regions.length ?
                       <li className="sector">
                         <a onClick={e => this.onCategoryClick(e, 'Regions')}>Regions
-                  <span className="caret" />
+                          <span className="caret" />
                         </a>
                         <ul className="layers">
                           {regions && regions.length ?
