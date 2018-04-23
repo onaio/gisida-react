@@ -8,6 +8,7 @@ import SummaryChart from './components/Charts/SummaryChart';
 import DetailView from './components/DetailView/DetailView';
 import Filter from './components/Filter/Filter';
 import TimeSeriesSlider from './components/TimeSeriesSlider/TimeSeriesSlider';
+import Spinner from './components/Spinner/Spinner';
 
 export {
   App,
@@ -20,4 +21,5 @@ export {
   DetailView,
   Filter,
   TimeSeriesSlider,
+  Spinner,
 }
