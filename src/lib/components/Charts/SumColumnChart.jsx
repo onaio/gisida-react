@@ -132,11 +132,11 @@ class SumColumnChart extends React.Component {
   }
 
   setChartWidth(e, payload) {
-    const { mapId, sectorsId } = payload || e.data;
+    const { mapId } = payload || e.data;
     if (mapId === this.props.mapId) {
-      const chartPosition = this.props.calcChartWidth(sectorsId);
+      const chartPosition = this.props.calcChartWidth(mapId);
       if (chartPosition.isFullBleed !== this.state.isFullBleed) {
-        this.props.moveMapLedgend();
+        this.props.moveMapLedgend(this.state.chartHeight);
       } else {
         this.setState({
           chartWidth: chartPosition.chartWidth,
