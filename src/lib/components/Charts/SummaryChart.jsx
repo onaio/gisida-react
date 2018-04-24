@@ -31,17 +31,23 @@ const mapStateToProps = (state, ownProps) => {
   if (currentRegion) {
     layerObj = (layerObj && layerObj.region === currentRegion.name) ? layerObj : undefined;
   } 
-
-  if (layerObj && layerObj.charts) {
+  const isTimeseries = layerObj && layerObj.aggregate
+    && typeof layerObj.aggregate.timeseries !== 'undefined';
+  if (layerObj && layerObj.charts ) {
    
-    sumChartObj = MAP.timeseries[layerObj.id] ? MAP.timeseries[layerObj.id] : layerObj;
+    sumChartObj = !isTimeseries
+      ? layerObj
+      : MAP.timeseries[layerObj.id]
+      ? MAP.timeseries[layerObj.id]
+      : null;
+
     if (typeof layerObj.isChartMin === 'undefined') {
       isChartMin = true;
       legendBottom = 40;
     }
   }
 
-  if (layerObj && layerObj.charts) {
+  if (layerObj && layerObj.charts && sumChartObj) {
     return {
       layerId: layerObj.id,
       layer: sumChartObj,
@@ -83,9 +89,9 @@ class SummaryChart extends React.Component {
     return { charts, primaryChart };
   }
 
-  static calcChartWidth(sectorsId) {
+  static calcChartWidth(mapId) {
     const windowWidth = $(window).outerWidth();
-    const $sectors = $(`#${sectorsId} .sectors-menu`);
+    const $sectors = $(`#${mapId}-menu-wrapper .sectors-menu`);
     const sectorsMenuWidth = $sectors.css('display') === 'block' ? $sectors.outerWidth() : 0;
     const menuIsFixedLeft = $(window).outerHeight() === $('#menu').outerHeight() &&
       !$('#menu').offset().top && !$('#menu').offset().left;
@@ -103,10 +109,10 @@ class SummaryChart extends React.Component {
   static calcLegendPosition(mapId) {
     const $legend = $(`.legend.${mapId}`);
     const legendHeight = $('.legend-row.primary', $legend).innerHeight(); // bottom of 40
-    const legendBottom = $legend.innerHeight() - legendHeight + 40 + 12; // padding of 12
+    const legendBottom = $legend.innerHeight() - (legendHeight || 0) + 40 + 12; // padding of 12
 
     return {
-      height: legendHeight + 40,
+      height: (legendHeight || 0) + 20,
       bottom: legendBottom,
     };
   }
@@ -154,7 +160,7 @@ class SummaryChart extends React.Component {
         locationMap[locations[locationKeys[l]]] = locationKeys[l];
       }
 
-      const primaryChartPosition =  SummaryChart.calcChartWidth(`sector-menu-${mapId.replace('map-', '')}-wrapper`);
+      const primaryChartPosition =  SummaryChart.calcChartWidth(mapId);
 
       $(`.legend.${this.props.mapId}`).css('bottom', legendBottom);
   
@@ -183,10 +189,9 @@ class SummaryChart extends React.Component {
       const chartSpecs = SummaryChart.defineCharts(layer.charts);
       const primaryChartPosition = chartSpecs && !chartSpecs.primaryChart
         ? { chartWidth: 0, isFullBleed: false }
-        : SummaryChart.calcChartWidth(`sector-menu-${mapId.replace('map-', '')}-wrapper`);
+        : SummaryChart.calcChartWidth(mapId);
 
-      $(`.legend.${this.props.mapId}`).css('bottom', legendBottom);
-
+      $(`.legend.${mapId}`).css('bottom', legendBottom);
       this.setState({
         layersObj: nextProps.layersObj,
         layerObj: layer,
@@ -215,21 +220,29 @@ class SummaryChart extends React.Component {
     this.setState({ doShowModal: false });
   }
 
-  moveMapLedgend() {
-    const { isChartMin } = this.state;
-    const sectorsId = `sector-menu-${this.props.mapId.replace('map-', '')}-wrapper`;
-    const legendPosition = SummaryChart.calcLegendPosition(this.props.mapId);
-    const primaryChartPosition = SummaryChart.calcChartWidth(sectorsId);
-    const legendBottom = !isChartMin ? primaryChartPosition.isFullBleed
-      ? legendPosition.height + 20 : 40 : 40;
+  moveMapLedgend(chartHeight) {
+    const { isChartMin, layerId } = this.state;
+    const { mapId } = this.props;
+    const legendPosition = SummaryChart.calcLegendPosition(mapId);
+    const primaryChartPosition = SummaryChart.calcChartWidth(mapId);
+    const legendBottom = isChartMin
+      ? 40
+      : primaryChartPosition.isFullBleed
+      ? (chartHeight || legendPosition.height) + 20
+      : 40;
 
-    $(`.legend.${this.props.mapId}`).css('bottom', legendBottom);
+    $(`.legend.${mapId}`).css('bottom', legendBottom);
+    const $primaryRow = $('.legend-row.primary', `.legend.${mapId}`);
+    const buttonBottom = $primaryRow.length
+      ? $(window).innerHeight() - ($primaryRow.offset().top + $primaryRow.innerHeight()) + 12
+      : legendBottom + 12;
+
     this.setState({
-      buttonBottom: legendBottom + 12,
+      buttonBottom,
       chartWidth: primaryChartPosition.chartWidth,
       isFullBleed: primaryChartPosition.isFullBleed,
     }, () => {
-      this.saveChartState(this.props.layerId, this.state.isChartMin, legendBottom);
+      this.saveChartState(layerId, this.state.isChartMin, legendBottom);
     });
   }
 
