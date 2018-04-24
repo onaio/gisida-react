@@ -84,12 +84,12 @@ class Map extends Component {
 
   onFeatureClick(e) {
     const activeLayers = this.props.layersObj.map(l => l.id)
-    const { layerObj } = this.props;
+    const { layerObj, mapId } = this.props;
     const features = this.map.queryRenderedFeatures(e.point, { layers: activeLayers });
     const feature = features.find(f => f.layer.id === layerObj.id);
 
     if (feature && layerObj['detail-view']) {
-      buildDetailView(layerObj, feature.properties, this.props.dispatch);
+      buildDetailView(mapId, layerObj, feature.properties, this.props.dispatch);
     }
   }
 

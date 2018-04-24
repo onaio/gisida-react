@@ -46,7 +46,7 @@ class DetailView extends Component {
 
   onCloseClick(e) {
     e.preventDefault();
-    buildDetailView(null, null, this.props.dispatch);
+    buildDetailView(this.props.mapId, null, null, this.props.dispatch);
   }
 
   render() {
