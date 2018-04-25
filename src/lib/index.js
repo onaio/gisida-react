@@ -9,6 +9,8 @@ import DetailView from './components/DetailView/DetailView';
 import Filter from './components/Filter/Filter';
 import TimeSeriesSlider from './components/TimeSeriesSlider/TimeSeriesSlider';
 import Spinner from './components/Spinner/Spinner';
+import PieChart from './components/Charts/PieChart';
+import LineChart from './components/Charts/LineChart';
 
 export {
   App,
@@ -22,4 +24,6 @@ export {
   Filter,
   TimeSeriesSlider,
   Spinner,
+  PieChart,
+  LineChart,
 }
