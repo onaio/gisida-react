@@ -11,11 +11,8 @@ jobs:
           command: yarn install
       - run: 
           name: Run tests
-          command: npm run test
-      - run: 
-          name: Compile production build
-          command: npm run build
- publish:
+          command: yarn test
+  publish:
     docker:
       - image: circleci/node:6.10.3
     steps:
