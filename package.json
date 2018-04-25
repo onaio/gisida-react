@@ -72,7 +72,7 @@
     "camelcase": "^4.1.0",
     "colorbrewer": "^1.1.0",
     "enzyme-adapter-react-16": "^1.1.1",
-    "gisida": "0.0.2",
+    "gisida": "^0.0.8",
     "highcharts": "^6.0.6",
     "html-react-parser": "^0.4.2",
     "rc-slider": "^8.6.1",
