@@ -91,6 +91,13 @@ class Map extends Component {
     if (feature && layerObj['detail-view']) {
       buildDetailView(mapId, layerObj, feature.properties, this.props.dispatch);
     }
+    if (feature) {
+      const newZoom = this.map.getZoom() < 7.5 ? 7.5 : this.map.getZoom();
+      this.map.easeTo({
+        center: e.lngLat,
+        zoom: newZoom
+      });
+    }
   }
 
   findNextLayer(activelayersData, nextLayer) {
