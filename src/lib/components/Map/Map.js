@@ -28,11 +28,14 @@ const mapStateToProps = (state, ownProps) => {
 
 const isIE = detectIE();
 
+window.maps = [];
+
 class Map extends Component {
   initMap(accessToken, mapConfig, mapId) {
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;
       this.map = new mapboxgl.Map(mapConfig);
+      window.maps.push(this.map);
       this.map.addControl(new mapboxgl.NavigationControl());
   
       // Handle Map Load Event
