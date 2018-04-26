@@ -30,8 +30,6 @@
   }
 
   .detail-basic-details {
-    flex-grow: 1;
-
     .detail-header {
       min-height: 90px;
       margin: 0.4em 0;
@@ -87,6 +85,10 @@
         }
       }
     }
+  }
+
+  .detail-extension-wrapper {
+    overflow-y: auto;
   }
 }
 

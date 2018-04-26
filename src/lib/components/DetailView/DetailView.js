@@ -95,20 +95,20 @@ class DetailView extends Component {
           <div className="detail-list">
             <ul>{detailList}</ul>
           </div>
-          {this.props.children ? (
-            <div className="detail-extension-wrapper">
-              {
-                React.Children.map(this.props.children, child => 
-                  React.cloneElement(child, {
-                    parentstate: child.props.parentstate && this.state,
-                    parentprops: child.props.parentprops && this.props,
-                  })
-                )
-              }
-
-            </div>
-          ) : ''}
         </div>
+        {this.props.children ? (
+          <div className="detail-extension-wrapper">
+            {
+              React.Children.map(this.props.children, child => 
+                React.cloneElement(child, {
+                  parentstate: child.props.parentstate && this.state,
+                  parentprops: child.props.parentprops && this.props,
+                })
+              )
+            }
+
+          </div>
+        ) : ''}
       </div>
     );
   }
