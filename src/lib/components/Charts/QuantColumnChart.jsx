@@ -17,11 +17,15 @@ class QuantColumnChart extends React.Component {
       Number(a) - Number(b)
     );
     const seriesData = [];
+    let color;
     for (let o = 0; o < optionKeys.length; o += 1) {
+      color = passing.indexOf(Number(optionKeys[o])) === -1
+        && passing.indexOf(optionKeys[o]) === -1
+        ? '#999999' : '#7cb5ec'
       seriesData.push({
         name: optionKeys[o],
         y: optionCounts[optionKeys[o]],
-        color: passing.indexOf(Number(optionKeys[o])) === -1 ? '#999999' : '#7cb5ec',
+        color,
       });
     }
 
