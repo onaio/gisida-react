@@ -30,8 +30,6 @@
   }
 
   .detail-basic-details {
-    flex-grow: 1;
-
     .detail-header {
       min-height: 90px;
       margin: 0.4em 0;
@@ -92,6 +90,10 @@
       }
     }
   }
+
+  .detail-extension-wrapper {
+    overflow-y: auto;
+  }
 }
 
 [data-balloon]::after {
@@ -100,7 +102,15 @@
   width: 100px;
   text-align: center;
 }
+#facilityImg {
+  border-radius: 5px;
+  cursor: -moz-zoom-in;
+  cursor: -webkit-zoom-in;
+  cursor: zoom-in;
+  transition: 0.3s;
+}
 
+#facilityImg:hover { opacity: 0.7; }
 /* The Modal (background) */
 .modal {
   display: block !important;

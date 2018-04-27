@@ -10,6 +10,7 @@ const mapStateToProps = (state, ownProps) => {
   const layerObj = (detailView && detailView.layerId)
     ? MAP.layers[detailView.layerId] : null;
   return {
+    APP: state.APP,
     MAP: MAP,
     layerObj,
     detailView: detailView && detailView.model,
@@ -62,6 +63,13 @@ class DetailView extends Component {
 
   onCloseClick(e) {
     e.preventDefault();
+    window.maps[0].easeTo({
+      center: {
+        lng: this.props.APP.mapConfig.center[0],
+        lat: this.props.APP.mapConfig.center[1],
+      },
+      zoom: this.props.APP.mapConfig.zoom,
+    });
     buildDetailView(this.props.mapId, null, null, this.props.dispatch);
   }
 
@@ -116,12 +124,20 @@ class DetailView extends Component {
           <div className="detail-list">
             <ul>{detailList}</ul>
           </div>
-          {this.props.children ? (
-            <div className="detail-extension-wrapper">
-              {this.props.children}
-            </div>
-          ) : ''}
         </div>
+        {this.props.children ? (
+          <div className="detail-extension-wrapper">
+            {
+              React.Children.map(this.props.children, child => 
+                React.cloneElement(child, {
+                  parentstate: child.props.parentstate && this.state,
+                  parentprops: child.props.parentprops && this.props,
+                })
+              )
+            }
+
+          </div>
+        ) : ''}
         {this.state.showImageModal ?
         <div id="image-modal" className="modal">
           <span
