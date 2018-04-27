@@ -10,6 +10,7 @@ const mapStateToProps = (state, ownProps) => {
   const { mapId } = ownProps;
   const MAP = state[mapId] || { layers: {}, filter: {}};
   return {
+    APP: state.APP,
     MAP,
     mapId,
     FILTER: state.FILTER,
@@ -243,6 +244,13 @@ export class Filter extends Component {
 
   handleFilterClick() {
     const { dispatch, mapId, layerId } = this.props;
+    window.maps[0].easeTo({
+      center: {
+        lng: this.props.APP.mapConfig.center[0],
+        lat: this.props.APP.mapConfig.center[1],
+      },
+      zoom: this.props.APP.mapConfig.zoom,
+    });
     dispatch(Actions.toggleFilter(mapId, layerId));
   }
 
@@ -279,6 +287,7 @@ export class Filter extends Component {
         nextProps.dispatch(Actions.filtersUpdated(nextProps.mapId, layerId));
       });
     }
+    window.GisidaMap = this.map;
   }
 
   onCloseClick = (e) => {

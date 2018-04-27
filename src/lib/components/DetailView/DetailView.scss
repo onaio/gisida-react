@@ -55,6 +55,10 @@
         height: 45px;
         padding: 0 1px;
         margin-bottom: 10px;
+        vertical-align: middle;
+        border-radius: 5px;
+        cursor: zoom-in;
+        transition: .3s;
       }
     }
 
@@ -98,7 +102,6 @@
   width: 100px;
   text-align: center;
 }
-
 #facilityImg {
   border-radius: 5px;
   cursor: -moz-zoom-in;
@@ -108,10 +111,9 @@
 }
 
 #facilityImg:hover { opacity: 0.7; }
-
 /* The Modal (background) */
 .modal {
-  display: none; /* Hidden by default */
+  display: block !important;
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
   padding-top: 100px; /* Location of the box */

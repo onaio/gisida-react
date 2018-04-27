@@ -22,7 +22,23 @@ const mapStateToProps = (state, ownProps) => {
 class DetailView extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      showImageModal: false,
+    };
+  }
+
+  onFacilityImageClick(e) {
+    e.preventDefault();
+    this.setState({
+      showImageModal: true
+    });
+  }
+
+  closeImageModal(e) {
+    e.preventDefault();
+    this.setState({
+      showImageModal: false,
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -91,6 +107,11 @@ class DetailView extends Component {
           <div className="detail-header">
             <h4>{title}</h4>
             {!!subTitle ? (<h6>{subTitle}</h6>) : ''}
+            <img
+              id="facilityImg"
+              alt={`${title}`}
+              onClick={(e) => this.onFacilityImageClick(e)}
+              src="/assets/img/no-facility-img.jpg" />
           </div>
           <div className="detail-list">
             <ul>{detailList}</ul>
@@ -109,6 +130,21 @@ class DetailView extends Component {
 
           </div>
         ) : ''}
+        {this.state.showImageModal ?
+        <div id="image-modal" className="modal">
+          <span
+            className="close"
+            onClick={(e) => this.closeImageModal(e)}
+          >&times;</span>
+          <img
+            alt={`${title}`}
+            src="/assets/img/no-facility-img.jpg"
+            className="modal-content"
+            id="facility-image" />
+          <div id="caption">
+            {title}
+          </div>
+        </div> : ''}
       </div>
     );
   }
