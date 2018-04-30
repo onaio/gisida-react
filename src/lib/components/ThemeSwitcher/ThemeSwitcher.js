@@ -123,3 +123,7 @@ export class ThemeSwitcher extends React.Component {
 }
 
 export default connect(mapStateToProps)(ThemeSwitcher);
+
+ThemeSwitcher.propTypes = {
+  showFilterPanel: PropTypes.bool.isRequired,
+}
