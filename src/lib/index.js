@@ -8,10 +8,11 @@ import SummaryChart from './components/Charts/SummaryChart';
 import DetailView from './components/DetailView/DetailView';
 import Filter from './components/Filter/Filter';
 import TimeSeriesSlider from './components/TimeSeriesSlider/TimeSeriesSlider';
-import LineChart from './components/Charts/LineChart';
-import PieChart from './components/Charts/PieChart';
-import ColumnChart from './components/Charts/ColumnChart';
+
 import BarChartStacked from './components/Charts/BarChartStacked';
+import Spinner from './components/Spinner/Spinner';
+import PieChart from './components/Charts/PieChart';
+import LineChart from './components/Charts/LineChart';
 
 export {
   App,
@@ -28,4 +29,5 @@ export {
   PieChart,
   ColumnChart,
   BarChartStacked,
+  Spinner,
 }

@@ -14,6 +14,7 @@ const mapStateToProps = (state, ownProps) => {
       timeLayer = layer.id;
     }
   });
+  timeLayer = MAP.timeseries[MAP.primaryLayer] ? MAP.primaryLayer : timeLayer;
   return {
     timeSeriesObj: MAP.timeseries[timeLayer],
     timeseries: MAP.timeseries,

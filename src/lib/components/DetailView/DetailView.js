@@ -10,6 +10,7 @@ const mapStateToProps = (state, ownProps) => {
   const layerObj = (detailView && detailView.layerId)
     ? MAP.layers[detailView.layerId] : null;
   return {
+    APP: state.APP,
     MAP: MAP,
     layerObj,
     detailView: detailView && detailView.model,
@@ -22,7 +23,23 @@ const mapStateToProps = (state, ownProps) => {
 class DetailView extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      showImageModal: false,
+    };
+  }
+
+  onFacilityImageClick(e) {
+    e.preventDefault();
+    this.setState({
+      showImageModal: true
+    });
+  }
+
+  closeImageModal(e) {
+    e.preventDefault();
+    this.setState({
+      showImageModal: false,
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -46,7 +63,14 @@ class DetailView extends Component {
 
   onCloseClick(e) {
     e.preventDefault();
-    buildDetailView(null, null, this.props.dispatch);
+    window.maps[0].easeTo({
+      center: {
+        lng: this.props.APP.mapConfig.center[0],
+        lat: this.props.APP.mapConfig.center[1],
+      },
+      zoom: this.props.APP.mapConfig.zoom,
+    });
+    buildDetailView(this.props.mapId, null, null, this.props.dispatch);
   }
 
   render() {
@@ -91,16 +115,44 @@ class DetailView extends Component {
           <div className="detail-header">
             <h4>{title}</h4>
             {!!subTitle ? (<h6>{subTitle}</h6>) : ''}
+            <img
+              id="facilityImg"
+              alt={`${title}`}
+              onClick={(e) => this.onFacilityImageClick(e)}
+              src="/assets/img/no-facility-img.jpg" />
           </div>
           <div className="detail-list">
             <ul>{detailList}</ul>
           </div>
-          {this.props.children ? (
-            <div className="detail-extension-wrapper">
-              {this.props.children}
-            </div>
-          ) : ''}
         </div>
+        {this.props.children ? (
+          <div className="detail-extension-wrapper">
+            {
+              React.Children.map(this.props.children, child => 
+                React.cloneElement(child, {
+                  parentstate: child.props.parentstate && this.state,
+                  parentprops: child.props.parentprops && this.props,
+                })
+              )
+            }
+
+          </div>
+        ) : ''}
+        {this.state.showImageModal ?
+        <div id="image-modal" className="modal">
+          <span
+            className="close"
+            onClick={(e) => this.closeImageModal(e)}
+          >&times;</span>
+          <img
+            alt={`${title}`}
+            src="/assets/img/no-facility-img.jpg"
+            className="modal-content"
+            id="facility-image" />
+          <div id="caption">
+            {title}
+          </div>
+        </div> : ''}
       </div>
     );
   }

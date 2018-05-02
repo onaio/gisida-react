@@ -36,8 +36,7 @@ export class Legend extends React.Component {
   }
 
   render() {
-    const mapId = '01';
-    const { layerObj } = this.props;
+    const { layerObj, mapId } = this.props;
     if (!layerObj) {
       return false;
     }

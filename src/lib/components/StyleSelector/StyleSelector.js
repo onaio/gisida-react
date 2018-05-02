@@ -22,8 +22,8 @@ export class StyleSelector extends Component {
   }
 
   render() {
-    const { styles, mapId, MAP } = this.props;
-    const sidebarOffset = MAP && !!MAP.detailView ? '345px' : '0';
+    const { styles, mapId } = this.props;
+    const sidebarOffset = '0';
     
     return (
       <div className="leaflet-left leaflet-top leaflet-right layer-selector" style={{ right: sidebarOffset }}>

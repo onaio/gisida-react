@@ -3,7 +3,7 @@
 exports[`Legend component renderes correctly 1`] = `
 <div>
   <div
-    className="legend 01"
+    className="legend map-1"
     style={
       Object {
         "right": "20px",

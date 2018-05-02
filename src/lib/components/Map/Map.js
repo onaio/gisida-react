@@ -28,11 +28,14 @@ const mapStateToProps = (state, ownProps) => {
 
 const isIE = detectIE();
 
+window.maps = [];
+
 class Map extends Component {
   initMap(accessToken, mapConfig, mapId) {
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;
       this.map = new mapboxgl.Map(mapConfig);
+      window.maps.push(this.map);
       this.map.addControl(new mapboxgl.NavigationControl());
   
       // Handle Map Load Event
@@ -60,6 +63,12 @@ class Map extends Component {
         e.target.on('render', onStyleLoad);
       });
 
+      this.map.on('data', (data) => {
+        if (data.isSourceLoaded) {
+          this.props.dispatch(Actions.triggerSpinner(this.props.mapId));
+        }
+      });
+
       // Handle adding/removing labels when zooming
       this.map.on('zoom', this.handleLabelsOnMapZoom.bind(this))
 
@@ -78,12 +87,19 @@ class Map extends Component {
 
   onFeatureClick(e) {
     const activeLayers = this.props.layersObj.map(l => l.id)
-    const { layerObj } = this.props;
+    const { layerObj, mapId } = this.props;
     const features = this.map.queryRenderedFeatures(e.point, { layers: activeLayers });
     const feature = features.find(f => f.layer.id === layerObj.id);
 
     if (feature && layerObj['detail-view']) {
-      buildDetailView(layerObj, feature.properties, this.props.dispatch);
+      buildDetailView(mapId, layerObj, feature.properties, this.props.dispatch);
+    }
+    if (feature) {
+      const newZoom = this.map.getZoom() < 7.5 ? 7.5 : this.map.getZoom();
+      this.map.easeTo({
+        center: e.lngLat,
+        zoom: newZoom
+      });
     }
   }
 
@@ -94,7 +110,7 @@ class Map extends Component {
   setPrimaryLayer(primaryLayer, activeLayerId, layers, activeLayersData, activelayerObj) {
     const nextLayerId =  primaryLayer || activeLayerId;
     let nextLayerObj = activeLayersData.find(lo => lo.id === nextLayerId);
-    if (!nextLayerObj && layers[nextLayerId].layers) {
+    if (nextLayerId && !nextLayerObj && layers[nextLayerId].layers) {
       let nextLayer;
       for (let l = 0; l < layers[nextLayerId].layers.length; l += 1) {
         nextLayer = layers[nextLayerId].layers[l];
@@ -102,12 +118,26 @@ class Map extends Component {
         if (nextLayerObj) break;
       }
     }
+    if (nextLayerObj && nextLayerId) {
+      const parentLayer = layers[nextLayerId];
+      if (parentLayer.layers) {
+        const sublayers = parentLayer.layers;
+        if (sublayers) {
+          for (let l = 0; l < sublayers.length; l += 1) {
+            if (this.map.getLayer(sublayers[l])) {
+              this.map.moveLayer(sublayers[l]);
+            }
+          }
+        }
+      }
+    }
+
     if (!nextLayerObj) {
       return false;
     }
 
     // Move the selected primary layer to the top of the map layers
-    if (this.map.getLayer(nextLayerId)) {
+    if (!nextLayerObj.parent && this.map.getLayer(nextLayerId)) {
       this.map.moveLayer(nextLayerId);
     }
     let layerObj;
@@ -115,9 +145,9 @@ class Map extends Component {
     for (let i = activeLayersData.length - 1; i >= 0; i -= 1) {
       layerObj = activeLayersData[i];
       // If 'layerObj' is not a fill OR the selected primary layer
-      if (layerObj.type !== 'fill' && layerObj.id !== nextLayerId) {
+      if (layerObj.type !== 'fill' && layerObj.id === nextLayerId) {
         // If 'layerObj' is not the same type as the selected
-        if (layerObj.type !== nextLayerObj.type) {
+        if (layerObj.type === nextLayerObj.type) {
           // Move 'layerObj' to the top of the map layers
           if (this.map.getLayer(layerObj.id)) {
             this.map.moveLayer(layerObj.id);
@@ -360,7 +390,6 @@ class Map extends Component {
     // determine what the currently timeperiod to see if layers should be hidden
     const currPeriod = timeSeriesObj.period[timeSeriesObj.temporalIndex];
 
-    let layer;
     let tsObj;
     let layerObj;
     let id;
@@ -406,20 +435,20 @@ class Map extends Component {
           // if the layer is in the map and has no period match, hide it
           if (!hasData || pIndex === -1) {
 
-            this.map.setLayoutProperty(layer.id, 'visibility', 'none');
+            this.map.setLayoutProperty(layerObj.id, 'visibility', 'none');
             // if layer has a highlight layer, update its visibility too
-            if (this.map.getLayer(`${layer.id}-highlight`)) {
-              this.map.setLayoutProperty(`${layer.id}-highlight`, 'visibility', 'none');
+            if (this.map.getLayer(`${layerObj.id}-highlight`)) {
+              this.map.setLayoutProperty(`${layerObj.id}-highlight`, 'visibility', 'none');
             }
 
           // if the layer is not in the map and does have a match, handle it
           } else if (this.map.getLayer(id) && hasData && pIndex !== -1) {
             // if layer is hidden, reveal it
             if (this.map.getLayoutProperty(id, 'visibility') === 'none') {
-              this.map.setLayoutProperty(layer.id, 'visibility', 'visible');
+              this.map.setLayoutProperty(layerObj.id, 'visibility', 'visible');
               // if layer has a highlight layer, update its visibility too
-              if (this.map.getLayer(`${layer.id}-highlight`)) {
-                this.map.setLayoutProperty(`${layer.id}-highlight`, 'visibility', 'visible');
+              if (this.map.getLayer(`${layerObj.id}-highlight`)) {
+                this.map.setLayoutProperty(`${layerObj.id}-highlight`, 'visibility', 'visible');
               }
             }
 
