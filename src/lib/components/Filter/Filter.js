@@ -846,7 +846,7 @@ export class Filter extends Component {
                 {<button
                   className="filter-search"
                 
-                  onClick={() => { this.showGlobalSearchField(); }}
+                  onClick={(e) => { this.showGlobalSearchField(e); }}
                 >
                   <span className="glyphicon glyphicon-search" />
                 </button>}

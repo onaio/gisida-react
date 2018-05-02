@@ -11,6 +11,7 @@ import TimeSeriesSlider from './components/TimeSeriesSlider/TimeSeriesSlider';
 import Spinner from './components/Spinner/Spinner';
 import PieChart from './components/Charts/PieChart';
 import LineChart from './components/Charts/LineChart';
+import ThemeSwitcher from './components/ThemeSwitcher/ThemeSwitcher';
 
 export {
   App,
@@ -26,4 +27,5 @@ export {
   Spinner,
   PieChart,
   LineChart,
+  ThemeSwitcher,
 }
