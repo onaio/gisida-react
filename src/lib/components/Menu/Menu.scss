@@ -71,6 +71,10 @@
     width: 80%;
     display: block;
     margin: 0 0 10px 20px;
+
+    span.glyphicon-th-list {
+      left: 10px;
+    }
   }
 
   input[type='checkbox'] {
