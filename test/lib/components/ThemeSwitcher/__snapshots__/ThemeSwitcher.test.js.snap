@@ -1,0 +1,68 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ThemeSwitcher ThemeSwitcher component renderes correctly 1`] = `
+<div>
+  <div
+    className="wrap"
+  >
+    <div
+      className="btn-group btn-toggle theme-toggle"
+      onClick={[Function]}
+      role="button"
+      tabIndex="0"
+    >
+      <button
+        alt="Theme: light"
+        className="glyphicon glyphicon-list-alt theme-toggle-btn light"
+      />
+    </div>
+  </div>
+  <style
+    media="screen"
+  >
+    
+    .filter-container {
+      background: #eae3bc !important;
+    }
+    .filter-section-options {
+      background: #f7f6ef !important;
+    }
+    .filter-section-options .filter-item {
+      background: rgba(255, 255, 255, 0.4) !important;
+    }
+    .filter-section-options .filter-item a.filter-option {
+      color: #555 !important;
+      font-weight: 600 !important;
+      font-size: 14px;
+    }
+    .filter-section-options .filterGroup {
+      background: #f7f6ef !important;
+      color: #555;
+      font-size: 12px;
+
+    }
+    .filter-section-options .searchBtn,
+    .filter-section-options .clearSearch {
+      color: #000 !important;
+    }
+    .filter-container .filter-header-section {
+      background: rgba(255, 255, 255, 0.8) !important;
+      color: #000;
+    }
+    .filter-footer {
+      background: #f7f6ef !important;
+      color: #000;
+    }
+    .filter-footer  button:hover {
+      box-shadow: 0 0 0 1px #4a4747 !important;
+    }
+    .filter-close,
+    .filter-container .filter-search {
+      color: #000 !important;
+    }
+    .filterSearch {
+      color: #000 !important;
+    }
+  </style>
+</div>
+`;

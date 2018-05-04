@@ -92,14 +92,12 @@ class Map extends Component {
     const feature = features.find(f => f.layer.id === layerObj.id);
 
     if (feature && layerObj['detail-view']) {
-      buildDetailView(mapId, layerObj, feature.properties, this.props.dispatch);
-    }
-    if (feature) {
       const newZoom = this.map.getZoom() < 7.5 ? 7.5 : this.map.getZoom();
       this.map.easeTo({
         center: e.lngLat,
         zoom: newZoom
       });
+      buildDetailView(mapId, layerObj, feature.properties, this.props.dispatch);
     }
   }
 
@@ -242,7 +240,9 @@ class Map extends Component {
               // append suffix to highlight layer id
               highlightLayer.id += '-highlight';
               // add the highlight layer to the map
-              this.map.addLayer(highlightLayer);
+              if (!this.map.getLayer(highlightLayer.id)) {
+                this.map.addLayer(highlightLayer);
+              }
             }
           } 
           // Change visibility if layer is already on map
@@ -266,7 +266,6 @@ class Map extends Component {
              $(`.marker-chart-${layer.id}-${mapId}`).remove();
           }
         });
-
         sortLayers(this.map, layers);
       }
 

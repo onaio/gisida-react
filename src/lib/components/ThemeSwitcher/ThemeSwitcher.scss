@@ -1,0 +1,55 @@
+.wrap {
+    margin: 0 auto;
+    padding: 1.5rem;
+    max-width: 20rem;
+    z-index: 10000;
+  
+    // temp overwrite
+    position: absolute;
+    right: -180px;
+  
+    label.button {
+      background: #000;
+      padding: 0.7rem 3rem;
+      color: #fff;
+      border-radius: 0.45rem;
+      cursor: pointer;
+      font-family: sans-serif;
+  
+      input[type="checkbox"] {
+        position: absolute;
+        left: -9999px;
+      }
+    }
+  
+    .btn-group {
+      // left: 5px;
+  
+      p {
+        position: relative;
+        right: 2px;
+      }
+  
+      button {
+        height: 18px;
+        width: 18px;
+        background-color: transparent;
+        border: none;
+        padding: 0;
+  
+        &.light {
+          color: #1d1c1c;
+          // border-color: #212121;
+        }
+  
+        &.dark {
+          color: #eee;
+          // border-color: #444;
+        }
+      }
+      &.theme-toggle {
+          position: fixed;
+      }
+    }
+  }
+  

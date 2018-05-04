@@ -20,6 +20,7 @@ import PieChart from './components/Charts/PieChart';
 import LineChart from './components/Charts/LineChart';
 import ColumnChart from './components/Charts/BarChartStacked';
 import BarChartStacked from './components/Charts/BarChartStacked';
+import ThemeSwitcher from './components/ThemeSwitcher/ThemeSwitcher';
 
 export {
   App,
@@ -37,4 +38,5 @@ export {
   PieChart,
   ColumnChart,
   BarChartStacked,
+  ThemeSwitcher,
 }
