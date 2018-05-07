@@ -106,16 +106,17 @@ class TimeSeriesSlider extends React.Component {
           className="label"
           htmlFor="slider"
         >{this.state.period}</label>
-      <input
-          id={`${this.props.mapId}-slider`}
-          className="slider"
-          type="range"
-          list={`${this.props.mapId}-datalist`}
-          max={this.state.periods.length - 1}
-          value={this.state.index}
-          onChange={(e) => { this.handleMouseUp(e); }}
-          data-html2canvas-ignore
-        />
+        {this.state.periods.length > 1 ?
+          <input
+            id={`${this.props.mapId}-slider`}
+            className="slider"
+            type="range"
+            list={`${this.props.mapId}-datalist`}
+            max={this.state.periods.length - 1}
+            value={this.state.index}
+            onChange={(e) => { this.handleMouseUp(e); }}
+            data-html2canvas-ignore
+          /> : null}
         <datalist id={`${this.props.mapId}-datalist`}>
           {this.state.periods.map((p, i) => <option key={i}>{i}</option>)}
         </datalist>
