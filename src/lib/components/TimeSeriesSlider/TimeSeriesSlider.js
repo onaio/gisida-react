@@ -33,7 +33,6 @@ class TimeSeriesSlider extends React.Component {
     let nextTimeseriesLayer;
     let layerId;
     let temporalIndex;
-    let stops;
     let period;
     const nextTimeseries = Object.assign({}, this.props.timeseries);
 
@@ -49,14 +48,11 @@ class TimeSeriesSlider extends React.Component {
       }
     });
 
-    const stopsFilter = d => d[stops.timefield] === period[temporalIndex];
-
     for (let i = 0; i < timeSeriesLayers.length; i += 1) {
       layerId = timeSeriesLayers[i];
       if (activeLayers.includes(layerId) && nextTimeseries[layerId]) {
         nextTimeseriesLayer = nextTimeseries[layerId];
-        const { layerObj, periodData } = nextTimeseriesLayer;
-        stops = nextTimeseriesLayer.stops;
+        const { periodData } = nextTimeseriesLayer;
         period = nextTimeseriesLayer.period;
 
         if (layerId === sliderLayerObj.layerId) {
@@ -71,9 +67,7 @@ class TimeSeriesSlider extends React.Component {
             nextTimeseriesLayer,
             {
               temporalIndex,
-              data: (layerObj.type === 'chart')
-                ? stops.filter(stopsFilter)
-                : periodData[period[temporalIndex]].data,
+              data: periodData[period[temporalIndex]].data,
             },
           );
         }
