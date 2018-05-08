@@ -33,7 +33,6 @@ class TimeSeriesSlider extends React.Component {
     let nextTimeseriesLayer;
     let layerId;
     let temporalIndex;
-    let stops;
     let period;
     const nextTimeseries = Object.assign({}, this.props.timeseries);
 
@@ -49,14 +48,11 @@ class TimeSeriesSlider extends React.Component {
       }
     });
 
-    const stopsFilter = d => d[stops.timefield] === period[temporalIndex];
-
     for (let i = 0; i < timeSeriesLayers.length; i += 1) {
       layerId = timeSeriesLayers[i];
       if (activeLayers.includes(layerId) && nextTimeseries[layerId]) {
         nextTimeseriesLayer = nextTimeseries[layerId];
-        const { layerObj, periodData } = nextTimeseriesLayer;
-        stops = nextTimeseriesLayer.stops;
+        const { periodData } = nextTimeseriesLayer;
         period = nextTimeseriesLayer.period;
 
         if (layerId === sliderLayerObj.layerId) {
@@ -71,9 +67,7 @@ class TimeSeriesSlider extends React.Component {
             nextTimeseriesLayer,
             {
               temporalIndex,
-              data: (layerObj.type === 'chart')
-                ? stops.filter(stopsFilter)
-                : periodData[period[temporalIndex]].data,
+              data: periodData[period[temporalIndex]].data,
             },
           );
         }
@@ -112,16 +106,17 @@ class TimeSeriesSlider extends React.Component {
           className="label"
           htmlFor="slider"
         >{this.state.period}</label>
-      <input
-          id={`${this.props.mapId}-slider`}
-          className="slider"
-          type="range"
-          list={`${this.props.mapId}-datalist`}
-          max={this.state.periods.length - 1}
-          value={this.state.index}
-          onChange={(e) => { this.handleMouseUp(e); }}
-          data-html2canvas-ignore
-        />
+        {this.state.periods.length > 1 ?
+          <input
+            id={`${this.props.mapId}-slider`}
+            className="slider"
+            type="range"
+            list={`${this.props.mapId}-datalist`}
+            max={this.state.periods.length - 1}
+            value={this.state.index}
+            onChange={(e) => { this.handleMouseUp(e); }}
+            data-html2canvas-ignore
+          /> : null}
         <datalist id={`${this.props.mapId}-datalist`}>
           {this.state.periods.map((p, i) => <option key={i}>{i}</option>)}
         </datalist>
