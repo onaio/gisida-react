@@ -516,7 +516,6 @@ class Map extends Component {
   addLabels(layerObj, timeseries) {
     let el;
     const { id } = layerObj;
-    const { offset } = layerObj.labels;
     const labels = typeof timeseries[layerObj.id] !== 'undefined'
       ? layerObj.labels.labels[timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]]
       : layerObj.labels.labels;
@@ -525,7 +524,9 @@ class Map extends Component {
       el = document.createElement('div');
       el.className = `map-label label-${id}`;
       el.innerHTML = labels[l].label;
-      new mapboxgl.Marker(el, { offset })
+      new mapboxgl.Marker(el, {
+        offset: labels[l].offset,
+      })
         .setLngLat(labels[l].coordinates)
         .addTo(this.map);
     }
