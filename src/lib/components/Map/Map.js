@@ -261,7 +261,7 @@ class Map extends Component {
               // newStops = { id: layer.id, period, timefield };
               data = layer.source.data.filter(d => d[timefield] === period[period.length - 1]);
             }
-            addChart(layer, data, this.map);
+            addChart(layer, data, this.map, mapId);
           } else {
              $(`.marker-chart-${layer.id}-${mapId}`).remove();
           }
