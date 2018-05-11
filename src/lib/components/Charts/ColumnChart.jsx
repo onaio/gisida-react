@@ -109,7 +109,9 @@ class ColumnChart extends React.Component {
     } = nextProps;
 
     if (isNewSeriesData(this.state.series[0].data, seriesData)) {
-      this.chart.destroy();
+      if (this.chart) {
+        this.chart.destroy();
+      }
 
       this.setState({
         chart: Object.assign({}, this.state.chart, {
