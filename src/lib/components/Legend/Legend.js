@@ -54,38 +54,49 @@ export class Legend extends React.Component {
 
       let background = [];
 
+      let uniqueStops;
+
+      const quantiles = [];
+
+      if (circleLayerType && layer.styleSpec && layer.styleSpec.paint) {
+        const stopVals = [];
+        layer.styleSpec.paint['circle-radius'].stops.forEach((s) => {
+           stopVals.push(s[1]);
+        });
+
+        uniqueStops = [...new Set(stopVals)];
+
+        uniqueStops.forEach((s) => {
+          quantiles.push((
+            <div className="legend-symbols">
+              <span
+                style={
+                  {
+                    background: layer.categories.color,
+                    width: `${s * 2}px`,
+                    height: `${s * 2}px`,
+                    margin: `0px -${uniqueStops.indexOf(s) + 3}px`
+                  }
+                  }
+              ></span>
+              <p>{s}</p>
+            </div>
+          ));
+        });
+      }
+
+
+
       if (layerObj.id === layer.id) {
         if (circleLayerType) {
           primaryLegend = (
-        <div
-          id={`legend-${layer.id}-${mapId}`}
-          className={`legend-shapes legend-row ${activeLayerSelected}`}
-          data-layer={`${layer.id}`}
-          onClick={(e) => this.onUpdatePrimaryLayer(e)}
-          key={l}
-        >
-          <b>
-            {layer.label}
-          </b>
-          <div className="legend-symbols">
-          <span
-            className="circle-sm"
-            style={{ background: layer.categories.color }}
-          >
-          </span>
-          <span
-            className="circle-md"
-            style={{ background: layer.categories.color }}
-          >
-          </span>
-          <span
-            className="circle-lg"
-            style={{ background: layer.categories.color }}
-          >
-          </span>
-          </div>
-          <span>{layer.credit}</span>
-        </div>);
+            <div className="legend-shapes">
+            <h4>
+              {layer.label}
+            </h4>
+            {quantiles}
+            <span>{layer.credit}</span>
+          </div>);
         }
         if (fillLayerNoBreaks && !layer.parent) {
           layer.categories.color.forEach((color, index) => {
@@ -198,35 +209,13 @@ export class Legend extends React.Component {
       }
       if (circleLayerType) {
         legendItems.unshift((
-          <div
-            id={`legend-${layer.id}-${mapId}`}
-            className={`legend-shapes legend-row ${activeLayerSelected}`}
-            data-layer={`${layer.id}`}
-            key={l}
-            onClick={(e) => this.onUpdatePrimaryLayer(e)}
-          >
-            <b>
+          <div className="legend-shapes">
+            <h4>
               {layer.label}
-            </b>
-            <div className="legend-symbols">
-              <span
-                className="circle-sm"
-                style={{ background: layer.categories.color }}
-              >
-              </span>
-              <span
-                className="circle-md"
-                style={{ background: layer.categories.color }}
-              >
-              </span>
-              <span
-                className="circle-lg"
-                style={{ background: layer.categories.color }}
-              >
-              </span>
-            </div>
+            </h4>
+            {quantiles}
             <span>{layer.credit}</span>
-          </div>
+          </div>  
         ));
       } else if (symbolLayer) {
         layer.categories.color.forEach((color, index) => {
@@ -386,7 +375,7 @@ export class Legend extends React.Component {
     return (
       <div>
         <div
-          className={`legend ${mapId}`}
+          className={`${layer.type === 'circle' ? 'circle-legend' : 'legend'} ${mapId}`}
           style={{ right: this.props.showFilterPanel ? '30px' : '20px' }}>
           {legendItems}
         </div>
