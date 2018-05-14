@@ -90,7 +90,11 @@ export class Legend extends React.Component {
       if (layerObj.id === layer.id) {
         if (circleLayerType) {
           primaryLegend = (
-            <div className="legend-shapes">
+            <div
+              className={`circle-legend legend-shapes legend-row ${activeLayerSelected}`}
+              onClick={(e) => this.onUpdatePrimaryLayer(e)}
+              data-layer={`${layer.id}`}
+              key={l}>
             <h4>
               {layer.label}
             </h4>
@@ -209,7 +213,11 @@ export class Legend extends React.Component {
       }
       if (circleLayerType) {
         legendItems.unshift((
-          <div className="legend-shapes">
+          <div
+            className={`circle-legend legend-shapes legend-row ${activeLayerSelected}`}
+            onClick={(e) => this.onUpdatePrimaryLayer(e)}
+            data-layer={`${layer.id}`}
+            key={l}>
             <h4>
               {layer.label}
             </h4>
@@ -375,7 +383,7 @@ export class Legend extends React.Component {
     return (
       <div>
         <div
-          className={`${layer.type === 'circle' ? 'circle-legend' : 'legend'} ${mapId}`}
+          className={`legend ${mapId}`}
           style={{ right: this.props.showFilterPanel ? '30px' : '20px' }}>
           {legendItems}
         </div>
