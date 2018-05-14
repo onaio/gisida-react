@@ -121,9 +121,9 @@ class Map extends Component {
       if (parentLayer.layers) {
         const sublayers = parentLayer.layers;
         if (sublayers) {
-          for (let l = 0; l < sublayers.length; l += 1) {
-            if (this.map.getLayer(sublayers[l])) {
-              this.map.moveLayer(sublayers[l]);
+          for (let s = 0; s < sublayers.length; s += 1) {
+            if (this.map.getLayer(sublayers[s])) {
+              this.map.moveLayer(sublayers[s]);
             }
           }
         }
@@ -135,7 +135,7 @@ class Map extends Component {
     }
 
     // Move the selected primary layer to the top of the map layers
-    if (!nextLayerObj.parent && this.map.getLayer(nextLayerId)) {
+    if (!nextLayerObj.layers && this.map.getLayer(nextLayerId)) {
       this.map.moveLayer(nextLayerId);
     }
     let layerObj;
@@ -143,9 +143,9 @@ class Map extends Component {
     for (let i = activeLayersData.length - 1; i >= 0; i -= 1) {
       layerObj = activeLayersData[i];
       // If 'layerObj' is not a fill OR the selected primary layer
-      if (layerObj.type !== 'fill' && layerObj.id === nextLayerId) {
+      if (layerObj.type !== 'fill' && layerObj.id !== nextLayerId && !layerObj.parent) {
         // If 'layerObj' is not the same type as the selected
-        if (layerObj.type === nextLayerObj.type) {
+        if (layerObj.type !== nextLayerObj.type) {
           // Move 'layerObj' to the top of the map layers
           if (this.map.getLayer(layerObj.id)) {
             this.map.moveLayer(layerObj.id);
