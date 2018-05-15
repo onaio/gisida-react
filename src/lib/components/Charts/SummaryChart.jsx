@@ -44,6 +44,8 @@ const mapStateToProps = (state, ownProps) => {
     if (typeof layerObj.isChartMin === 'undefined') {
       isChartMin = true;
       legendBottom = 40;
+    } else if (layerObj.isChartMin) {
+      isChartMin = layerObj.isChartMin;
     }
   }
 
