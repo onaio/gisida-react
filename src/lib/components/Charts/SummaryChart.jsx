@@ -9,22 +9,25 @@ require('./SummaryChart.scss');
 
 
 const mapStateToProps = (state, ownProps) => {
-  const MAP = state[ownProps.mapId] || { layers: {}};
-  const layers = MAP.layers;
-  let layerObj
-  let layersObj = []
+  const MAP = { ...(state[ownProps.mapId] || { layers: {} }) };
+  const { layers } = MAP;
+
+  let layerObj;
+  let layersObj = [];
   let currentRegion
   let sumChartObj;
   let isChartMin;
   let legendBottom;  
+
   // Get visible layer 
   Object.keys(layers).forEach((key) => {
-    const layer = layers[key];
+    const layer = { ...layers[key] };
     if (layer.charts && layer.visible) {
       layerObj = layer;
       layersObj.push(layerObj);
     } 
   });
+  layerObj = { ...MAP.layers[MAP.activeLayerId] };
 
   // Set layer to undefined of layer is from diffrent region
   currentRegion = state.REGIONS.filter(region => region.current)[0];
@@ -49,15 +52,16 @@ const mapStateToProps = (state, ownProps) => {
 
   if (layerObj && layerObj.charts && sumChartObj) {
     return {
+      MAP,
       layerId: layerObj.id,
       layer: sumChartObj,
-      layersObj: layersObj,
-      isChartMin: isChartMin,
-      legendBottom: legendBottom,
+      layersObj,
+      isChartMin,
+      legendBottom,
       locations: {},
       showMinimize: true
     }
-  } else return { showMinimize: false}
+  } else return { showMinimize: false, isChartMin: true }
 }
 
 class SummaryChart extends React.Component {
@@ -302,7 +306,9 @@ class SummaryChart extends React.Component {
       }
     }
 
-    if (primaryChart) {
+    const isChartMin = typeof this.state.isChartMin === 'undefined' || this.state.isChartMin;
+
+    if (primaryChart && !isChartMin) {
       const primaryChartHeight = chartHeight >= 141 ? chartHeight : 141;
       switch (primaryChart.type) {
         case 'column':
@@ -339,6 +345,8 @@ class SummaryChart extends React.Component {
           );
           break;
       }
+    } else {
+      primarySumChart = null;
     }
 
     return (
@@ -346,8 +354,12 @@ class SummaryChart extends React.Component {
         <SumChartMinimize
           toggleChart={this.toggleChart}
           bottom={buttonBottom}
-          mapId={this.props.mapId}/>
-        {!this.state.isChartMin && primarySumChart ? primarySumChart : ''}
+          mapId={this.props.mapId}
+          isChartMin={isChartMin}
+        />
+
+        {!isChartMin && primarySumChart ? primarySumChart : ''}
+
         {doShowModal && sumCharts.length ? (
           <div className={`sumChartModal ${this.props.mapId}`}>
             <div className="sumChartModalHeader">
@@ -372,6 +384,7 @@ class SummaryChart extends React.Component {
             tabIndex={-1}
           />
           : ''}
+
       </div>
     );
   } return (<div/>)

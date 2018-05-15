@@ -76,8 +76,10 @@ class SumColumnChart extends React.Component {
 
   constructor(props) {
     super(props);
-    const { layerId, layerData, chartSpec, layer, isPrimary, locations } = this.props;
+    const { layerId, chartSpec, layer, isPrimary, locations } = this.props;
     const { chartHeight, chartWidth, isFullBleed, isChartMin } = this.props;
+
+    const layerData = [...(this.props.layerData || [])];
 
     this.state = {
       isChartMin: isPrimary ? isChartMin : false,
@@ -88,7 +90,7 @@ class SumColumnChart extends React.Component {
       chartWidth,
       isFullBleed,
       isPrimary,
-      seriesName: layerData.label,
+      seriesName: layer.label,
       seriesData: SumColumnChart.buildColData(layerData, chartSpec, layer, locations),
     };
   }
