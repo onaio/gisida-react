@@ -518,7 +518,7 @@ class Map extends Component {
     let formattedLabel;
     let htmlLabel;
     const { id } = layerObj;
-    const labels = typeof timeseries[layerObj.id] !== 'undefined'
+    const labels = timeseries && typeof timeseries[layerObj.id] !== 'undefined'
       ? layerObj.labels.labels[timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]]
       : layerObj.labels.labels;
 
