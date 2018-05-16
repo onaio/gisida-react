@@ -11,6 +11,7 @@ const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {}}
   return {
     layerObj: MAP.layers[MAP.activeLayerId],
+    lastLayerSelected: MAP.layers[MAP.lastLayerSelected],
     layersData: buildLayersObj(MAP.layers),
     MAP,
     mapId: ownProps.mapId,
@@ -36,9 +37,9 @@ export class Legend extends React.Component {
   }
 
   render() {
-    const { layerObj, mapId } = this.props;
+    const { layerObj, mapId, lastLayerSelected } = this.props;
 
-    if (!layerObj) {
+    if (!layerObj || !lastLayerSelected) {
       return false;
     }
 
@@ -94,7 +95,7 @@ export class Legend extends React.Component {
         });
       }
 
-      if (this.props.layersData[this.props.layersData.length - 1].id === layer.id) {
+      if (lastLayerSelected.id === layer.id) {
         if (circleLayerType) {
           primaryLegend = (
             <div
