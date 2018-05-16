@@ -88,15 +88,19 @@ export class Legend extends React.Component {
         </div>);
         }
         if (fillLayerNoBreaks && !layer.parent) {
+          const fillWidth = (100 / layer.categories.color.filter(c =>
+            c !== "transparent").length).toString();
+
           layer.categories.color.forEach((color, index) => {
-            const fillWidth = (100 / layer.categories.color.length).toString();
-            background.push((
-              <li
-                key={index}
-                style={{ background: color, width: fillWidth + '%' }}>
-                {layer.categories.label[index]}
-              </li>
-            ));
+            if (color !== "transparent") {
+              background.push((
+                <li
+                  key={index}
+                  style={{ background: color, width: `${fillWidth}%` }}>
+                  {layer.categories.label[index]}
+                </li>
+              ));
+            }
           });
 
           const legendClass = layer.categories ? 'legend-label' : '';
