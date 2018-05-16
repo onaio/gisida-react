@@ -143,17 +143,21 @@ export class Legend extends React.Component {
           }
 
           colorLegend.forEach((color, index) => {
-            const firstVal = breaks[index - 1] !== undefined ? breaks[index - 1] : 0;
-            const lastVal = color === colorLegend[colorLegend.length - 1] || breaks[index] === undefined ? Math.max(...dataValues) : breaks[index];
-            background.push((
-              <li
-                key={index}
-                className={`background-block-${layer.id}-${mapId}`}
-                data-tooltip={`${formatNum(firstVal, 1)}-${formatNum(lastVal, 1)}${legendSuffix}`}
-                style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colorLegend.length) + '%' }}
-              >
-              </li>
-            ));
+            const stopsIndex = layerObj.stops[4].indexOf(color);
+
+            if (stopsIndex !== -1) {
+              const firstVal = stopsIndex ? layerObj.stops[3][stopsIndex - 1] : 0;
+              const lastVal = layerObj.stops[3][stopsIndex];
+              background.push((
+                <li
+                  key={index}
+                  className={`background-block-${layer.id}-${mapId}`}
+                  data-tooltip={`${formatNum(firstVal, 1)}-${formatNum(lastVal, 1)}${legendSuffix}`}
+                  style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colorLegend.length) + '%' }}
+                >
+                </li>
+              ));
+            }
           });
 
           primaryLegend = (
