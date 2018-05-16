@@ -39,7 +39,7 @@ export class Legend extends React.Component {
   render() {
     const { layerObj, mapId, lastLayerSelected } = this.props;
 
-    if (!layerObj || !lastLayerSelected) {
+    if (!layerObj) {
       return false;
     }
 
@@ -95,7 +95,7 @@ export class Legend extends React.Component {
         });
       }
 
-      if (lastLayerSelected.id === layer.id) {
+      if (lastLayerSelected && lastLayerSelected.id === layer.id) {
         if (circleLayerType) {
           primaryLegend = (
             <div
