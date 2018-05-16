@@ -37,9 +37,11 @@ export class Legend extends React.Component {
 
   render() {
     const { layerObj, mapId } = this.props;
+
     if (!layerObj) {
       return false;
     }
+
     const legendItems = [];
 
     let primaryLegend;
@@ -54,40 +56,45 @@ export class Legend extends React.Component {
 
       let background = [];
 
-      // let uniqueStops;
+      let uniqueStops;
 
-      // const quantiles = [];
+      const quantiles = [];
 
-      // if (circleLayerType && layer.styleSpec && layer.styleSpec.paint) {
-      //   const stopVals = [];
-      //   layer.styleSpec.paint['circle-radius'].stops.forEach((s) => {
-      //      stopVals.push(s[1]);
-      //   });
+      if (circleLayerType && layer.breaks && layer.stopsData && layer.styleSpec && layer.styleSpec.paint) {
+        const stopVals = [];
+        layer.stopsData.forEach((s) => {
+           stopVals.push(s[1]);
+        });
 
-      //   uniqueStops = [...new Set(stopVals)];
+        layer.styleSpec.paint['circle-radius'].stops.forEach((s) => {
+          stopVals.push(s[1]);
+        });
 
-      //   uniqueStops.forEach((s) => {
-      //     quantiles.push((
-      //       <div className="legend-symbols">
-      //         <span
-      //           style={
-      //             {
-      //               background: layer.categories.color,
-      //               width: `${s * 2}px`,
-      //               height: `${s * 2}px`,
-      //               margin: `0px -${uniqueStops.indexOf(s) + 3}px`
-      //             }
-      //             }
-      //         ></span>
-      //         <p>{s}</p>
-      //       </div>
-      //     ));
-      //   });
-      // }
+        uniqueStops = [...new Set(stopVals)].sort((a, b) => a - b);
 
 
+        uniqueStops.forEach((s) => {
+          quantiles.push((
+            <span
+              className="circle-container"
+              key={s}>
+              <span
+                style={
+                  {
+                    background: layer.categories.color,
+                    width: `${s * 2}px`,
+                    height: `${s * 2}px`,
+                    margin: `0px ${uniqueStops.indexOf(s) + 2}px`
+                  }
+                }
+              ></span>
+              <p>{layer.breaks[uniqueStops.indexOf(s)]}</p>
+              </span>
+          ));
+        });
+      }
 
-      if (layerObj.id === layer.id) {
+      if (this.props.layersData[this.props.layersData.length - 1].id === layer.id) {
         if (circleLayerType) {
           primaryLegend = (
             <div
@@ -101,21 +108,7 @@ export class Legend extends React.Component {
               {layer.label}
             </b>
             <div className="legend-symbols">
-              <span
-                className="circle-sm"
-                style={{ background: layer.categories.color }}
-              >
-              </span>
-              <span
-                className="circle-md"
-                style={{ background: layer.categories.color }}
-              >
-              </span>
-              <span
-                className="circle-lg"
-                style={{ background: layer.categories.color }}
-              >
-              </span>
+              {quantiles}
             </div>
             <span>{layer.credit}</span>
           </div>);
@@ -242,21 +235,7 @@ export class Legend extends React.Component {
               {layer.label}
             </b>
             <div className="legend-symbols">
-              <span
-                className="circle-sm"
-                style={{ background: layer.categories.color }}
-              >
-              </span>
-              <span
-                className="circle-md"
-                style={{ background: layer.categories.color }}
-              >
-              </span>
-              <span
-                className="circle-lg"
-                style={{ background: layer.categories.color }}
-              >
-              </span>
+              {quantiles}
             </div>
             <span>{layer.credit}</span>
           </div>  

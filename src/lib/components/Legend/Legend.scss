@@ -2,7 +2,7 @@
   position: absolute;
   bottom: 40px;
   right: 20px;
-  width: 300px;
+  width: 320px;
   background-color: #f7f6ef;
   z-index: 1000;
   color: #555;
@@ -101,6 +101,28 @@
 
 .legend-shapes {
   position: relative;
+
+  .legend-symbols {
+    min-width: 320px;
+
+    .circle-container {
+      display: inline-grid;
+      min-width: 5px;
+      min-height: 5px;
+      position: relative;
+      text-align: center;
+      padding: 0 4px;
+
+      span {
+        display: inline-block;
+        border-radius: 50%;
+      }
+
+      p {
+        padding-top: 5px;
+      }
+    }
+  }
 
   .circle-sm {
     height: 6px;
