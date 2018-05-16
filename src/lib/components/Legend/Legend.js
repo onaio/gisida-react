@@ -56,6 +56,10 @@ export class Legend extends React.Component {
 
       if (layerObj.id === layer.id) {
         if (circleLayerType) {
+          const circleBGcolor = Array.isArray(layer.categories.color)
+            ? layer.categories.color
+            : [layer.categories.color];
+
           primaryLegend = (
         <div
           id={`legend-${layer.id}-${mapId}`}
@@ -70,17 +74,17 @@ export class Legend extends React.Component {
           <div className="legend-symbols">
           <span
             className="circle-sm"
-            style={{ background: layer.categories.color }}
+            style={{ background: circleBGcolor[0] }}
           >
           </span>
           <span
             className="circle-md"
-            style={{ background: layer.categories.color }}
+            style={{ background: circleBGcolor[Math.floor(circleBGcolor.length / 2)] }}
           >
           </span>
           <span
             className="circle-lg"
-            style={{ background: layer.categories.color }}
+            style={{ background: circleBGcolor[circleBGcolor.length - 1] }}
           >
           </span>
           </div>
