@@ -125,7 +125,7 @@ export class Legend extends React.Component {
         } if (fillLayerWithBreaks && layerObj.stops && layer.stops && !layer.parent) {
           const { stopsData, breaks, colors, Data } = layer;
 
-          const dataValues = Data.map(values => values[layer.property]);
+          const dataValues = Data.map(values => parseInt(values[layer.property], 10));
           const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
 
@@ -308,7 +308,7 @@ export class Legend extends React.Component {
       } else if (fillLayerWithBreaks && layer.stops && !layer.parent) {
         const { stopsData, breaks, colors, Data } = layer;
 
-        const dataValues = Data.map(values => values[layer.property]);
+        const dataValues = Data.map(values => parseInt(values[layer.property], 10));
         const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
         const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
 
