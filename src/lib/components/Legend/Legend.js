@@ -11,6 +11,7 @@ const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {}}
   return {
     layerObj: MAP.layers[MAP.activeLayerId],
+    lastLayerSelected: MAP.layers[MAP.lastLayerSelected],
     layersData: buildLayersObj(MAP.layers),
     MAP,
     mapId: ownProps.mapId,
@@ -36,10 +37,12 @@ export class Legend extends React.Component {
   }
 
   render() {
-    const { layerObj, mapId } = this.props;
+    const { layerObj, mapId, lastLayerSelected } = this.props;
+
     if (!layerObj) {
       return false;
     }
+
     const legendItems = [];
 
     let primaryLegend;
@@ -49,47 +52,67 @@ export class Legend extends React.Component {
       const circleLayerType = (layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible);
       const symbolLayer = (layer && layer.credit && layer.categories &&  layer.categories.shape && layer.type !== 'circle'); 
       const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
-      const fillLayerWithBreaks = (!fillLayerNoBreaks && layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle');
+      const fillLayerWithBreaks = (layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle' && layer.categories && layer.categories.breaks === 'yes');
       const activeLayerSelected =  this.props.primaryLayer === layer.id ? 'primary' : '';
 
       let background = [];
 
-      if (layerObj.id === layer.id) {
-        if (circleLayerType) {
-          const circleBGcolor = Array.isArray(layer.categories.color)
-            ? layer.categories.color
-            : [layer.categories.color];
+      let uniqueStops;
 
+      const quantiles = [];
+
+      if (circleLayerType && layer.breaks && layer.stopsData && layer.styleSpec && layer.styleSpec.paint) {
+        const stopVals = [];
+        layer.stopsData.forEach((s) => {
+           stopVals.push(s[1]);
+        });
+
+        layer.styleSpec.paint['circle-radius'].stops.forEach((s) => {
+          stopVals.push(s[1]);
+        });
+
+        uniqueStops = [...new Set(stopVals)].sort((a, b) => a - b);
+
+        uniqueStops.forEach((s) => {
+          quantiles.push((
+            <span
+              className="circle-container"
+              key={s}>
+              <span
+                style={
+                  {
+                    background: Array.isArray(layer.categories.color) ? layer.categories.color[uniqueStops.indexOf(s)]
+                      : layer.categories.color,
+                    width: `${s * 2}px`,
+                    height: `${s * 2}px`,
+                    margin: `0px ${uniqueStops.indexOf(s) + 2}px`
+                  }
+                }
+              ></span>
+              <p>{layer.breaks[uniqueStops.indexOf(s)]}</p>
+              </span>
+          ));
+        });
+      }
+
+      if (lastLayerSelected && lastLayerSelected.id === layer.id) {
+        if (circleLayerType) {
           primaryLegend = (
-        <div
-          id={`legend-${layer.id}-${mapId}`}
-          className={`legend-shapes legend-row ${activeLayerSelected}`}
-          data-layer={`${layer.id}`}
-          onClick={(e) => this.onUpdatePrimaryLayer(e)}
-          key={l}
-        >
-          <b>
-            {layer.label}
-          </b>
-          <div className="legend-symbols">
-          <span
-            className="circle-sm"
-            style={{ background: circleBGcolor[0] }}
+            <div
+            id={`legend-${layer.id}-${mapId}`}
+            className={`legend-shapes legend-row ${activeLayerSelected}`}
+            data-layer={`${layer.id}`}
+            key={l}
+            onClick={(e) => this.onUpdatePrimaryLayer(e)}
           >
-          </span>
-          <span
-            className="circle-md"
-            style={{ background: circleBGcolor[Math.floor(circleBGcolor.length / 2)] }}
-          >
-          </span>
-          <span
-            className="circle-lg"
-            style={{ background: circleBGcolor[circleBGcolor.length - 1] }}
-          >
-          </span>
-          </div>
-          <span>{layer.credit}</span>
-        </div>);
+            <b>
+              {layer.label}
+            </b>
+            <div className="legend-symbols">
+              {quantiles}
+            </div>
+            <span>{layer.credit}</span>
+          </div>);
         }
         if (fillLayerNoBreaks && !layer.parent) {
           const fillWidth = (100 / layer.categories.color.filter(c =>
@@ -130,7 +153,7 @@ export class Legend extends React.Component {
               </span>
             </div>
           );
-        } if (fillLayerWithBreaks && layerObj.stops && layer.stops && !layer.parent) {
+        } if (fillLayerWithBreaks && layer.stops && !layer.parent) {
           const { stopsData, breaks, colors, Data } = layer;
 
           const dataValues = Data.map(values => parseInt(values[layer.property], 10));
@@ -221,24 +244,10 @@ export class Legend extends React.Component {
               {layer.label}
             </b>
             <div className="legend-symbols">
-              <span
-                className="circle-sm"
-                style={{ background: layer.categories.color }}
-              >
-              </span>
-              <span
-                className="circle-md"
-                style={{ background: layer.categories.color }}
-              >
-              </span>
-              <span
-                className="circle-lg"
-                style={{ background: layer.categories.color }}
-              >
-              </span>
+              {quantiles}
             </div>
             <span>{layer.credit}</span>
-          </div>
+          </div>  
         ));
       } else if (symbolLayer) {
         layer.categories.color.forEach((color, index) => {
@@ -323,10 +332,9 @@ export class Legend extends React.Component {
         ));
       } else if (fillLayerWithBreaks && layer.stops && !layer.parent) {
         const { stopsData, breaks, colors, Data } = layer;
-
-          const dataValues = Data.map(values => parseInt(values[layer.property], 10));
-          const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
-          const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
+        const dataValues = Data.map(values => parseInt(values[layer.property], 10));
+        const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
+        const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
 
           if (colorLegend.includes('transparent') && !(colors).includes('transparent')) {
             colors.splice(0, 0, 'transparent');

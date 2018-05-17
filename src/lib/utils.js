@@ -144,11 +144,13 @@ export function isFiltered(options, isOriginal) {
 }
 
 export function buildLayersObj(layers) {
-  let layersObj = [];
+  const layersObj = [];
+  let layerObj;
   Object.keys(layers).forEach((key) => {
-    const layer = layers[key];
-    if (layer.visible) {
-      layersObj.push(layer);
+    const layer = { ...layers[key]};
+    if (layer.visible && !layer.parent) {
+      layerObj = layer;
+      layersObj.push(layerObj);
     }
   });
 

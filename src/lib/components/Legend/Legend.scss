@@ -2,7 +2,7 @@
   position: absolute;
   bottom: 40px;
   right: 20px;
-  width: 300px;
+  width: 320px;
   background-color: #f7f6ef;
   z-index: 1000;
   color: #555;
@@ -27,6 +27,40 @@
 
   [data-visible="false"] {
     display: none;
+  }
+}
+
+.circle-legend {
+  background-color: #f7f6ef;
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  padding: 10px;
+  position: absolute;
+  min-width: 150px;
+  z-index: 1;
+
+  h4 {
+    margin: 0 0 10px;
+    display: block !important;
+  }
+
+  p {
+    margin-left: 40px;
+    position: absolute;
+    display: block;
+    top: 0;
+  }
+
+  div {
+    position: relative;
+
+    span {
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+      opacity: 0.8;
+    }
   }
 }
 
@@ -67,6 +101,28 @@
 
 .legend-shapes {
   position: relative;
+
+  .legend-symbols {
+    min-width: 320px;
+
+    .circle-container {
+      display: inline-grid;
+      min-width: 5px;
+      min-height: 5px;
+      position: relative;
+      text-align: center;
+      padding: 0 4px;
+
+      span {
+        display: inline-block;
+        border-radius: 50%;
+      }
+
+      p {
+        padding-top: 5px;
+      }
+    }
+  }
 
   .circle-sm {
     height: 6px;
