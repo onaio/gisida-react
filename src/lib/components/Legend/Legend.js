@@ -11,6 +11,7 @@ const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {}}
   return {
     layerObj: MAP.layers[MAP.activeLayerId],
+    lastLayerSelected: MAP.layers[MAP.lastLayerSelected],
     layersData: buildLayersObj(MAP.layers),
     MAP,
     mapId: ownProps.mapId,
@@ -36,10 +37,12 @@ export class Legend extends React.Component {
   }
 
   render() {
-    const { layerObj, mapId } = this.props;
+    const { layerObj, mapId, lastLayerSelected } = this.props;
+
     if (!layerObj) {
       return false;
     }
+
     const legendItems = [];
 
     let primaryLegend;
@@ -49,54 +52,82 @@ export class Legend extends React.Component {
       const circleLayerType = (layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible);
       const symbolLayer = (layer && layer.credit && layer.categories &&  layer.categories.shape && layer.type !== 'circle'); 
       const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
-      const fillLayerWithBreaks = (!fillLayerNoBreaks && layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle');
+      const fillLayerWithBreaks = (layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle' && layer.categories && layer.categories.breaks === 'yes');
       const activeLayerSelected =  this.props.primaryLayer === layer.id ? 'primary' : '';
 
       let background = [];
 
-      if (layerObj.id === layer.id) {
+      let uniqueStops;
+
+      const quantiles = [];
+
+      if (circleLayerType && layer.breaks && layer.stopsData && layer.styleSpec && layer.styleSpec.paint) {
+        const stopVals = [];
+        layer.stopsData.forEach((s) => {
+           stopVals.push(s[1]);
+        });
+
+        layer.styleSpec.paint['circle-radius'].stops.forEach((s) => {
+          stopVals.push(s[1]);
+        });
+
+        uniqueStops = [...new Set(stopVals)].sort((a, b) => a - b);
+
+        uniqueStops.forEach((s) => {
+          quantiles.push((
+            <span
+              className="circle-container"
+              key={s}>
+              <span
+                style={
+                  {
+                    background: Array.isArray(layer.categories.color) ? layer.categories.color[uniqueStops.indexOf(s)]
+                      : layer.categories.color,
+                    width: `${s * 2}px`,
+                    height: `${s * 2}px`,
+                    margin: `0px ${uniqueStops.indexOf(s) + 2}px`
+                  }
+                }
+              ></span>
+              <p>{layer.breaks[uniqueStops.indexOf(s)]}</p>
+              </span>
+          ));
+        });
+      }
+
+      if (lastLayerSelected && lastLayerSelected.id === layer.id) {
         if (circleLayerType) {
           primaryLegend = (
-        <div
-          id={`legend-${layer.id}-${mapId}`}
-          className={`legend-shapes legend-row ${activeLayerSelected}`}
-          data-layer={`${layer.id}`}
-          onClick={(e) => this.onUpdatePrimaryLayer(e)}
-          key={l}
-        >
-          <b>
-            {layer.label}
-          </b>
-          <div className="legend-symbols">
-          <span
-            className="circle-sm"
-            style={{ background: layer.categories.color }}
+            <div
+            id={`legend-${layer.id}-${mapId}`}
+            className={`legend-shapes legend-row ${activeLayerSelected}`}
+            data-layer={`${layer.id}`}
+            key={l}
+            onClick={(e) => this.onUpdatePrimaryLayer(e)}
           >
-          </span>
-          <span
-            className="circle-md"
-            style={{ background: layer.categories.color }}
-          >
-          </span>
-          <span
-            className="circle-lg"
-            style={{ background: layer.categories.color }}
-          >
-          </span>
-          </div>
-          <span>{layer.credit}</span>
-        </div>);
+            <b>
+              {layer.label}
+            </b>
+            <div className="legend-symbols">
+              {quantiles}
+            </div>
+            <span>{layer.credit}</span>
+          </div>);
         }
         if (fillLayerNoBreaks && !layer.parent) {
+          const fillWidth = (100 / layer.categories.color.filter(c =>
+            c !== "transparent").length).toString();
+
           layer.categories.color.forEach((color, index) => {
-            const fillWidth = (100 / layer.categories.color.length).toString();
-            background.push((
-              <li
-                key={index}
-                style={{ background: color, width: fillWidth + '%' }}>
-                {layer.categories.label[index]}
-              </li>
-            ));
+            if (color !== "transparent") {
+              background.push((
+                <li
+                  key={index}
+                  style={{ background: color, width: `${fillWidth}%` }}>
+                  {layer.categories.label[index]}
+                </li>
+              ));
+            }
           });
 
           const legendClass = layer.categories ? 'legend-label' : '';
@@ -122,10 +153,10 @@ export class Legend extends React.Component {
               </span>
             </div>
           );
-        } if (fillLayerWithBreaks && layerObj.stops && layer.stops && !layer.parent) {
+        } if (fillLayerWithBreaks && layer.stops && !layer.parent) {
           const { stopsData, breaks, colors, Data } = layer;
 
-          const dataValues = Data.map(values => values[layer.property]);
+          const dataValues = Data.map(values => parseInt(values[layer.property], 10));
           const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
 
@@ -135,17 +166,21 @@ export class Legend extends React.Component {
           }
 
           colorLegend.forEach((color, index) => {
-            const firstVal = breaks[index - 1] !== undefined ? breaks[index - 1] : 0;
-            const lastVal = color === colorLegend[colorLegend.length - 1] || breaks[index] === undefined ? Math.max(...dataValues) : breaks[index];
-            background.push((
-              <li
-                key={index}
-                className={`background-block-${layer.id}-${mapId}`}
-                data-tooltip={`${formatNum(firstVal, 1)}-${formatNum(lastVal, 1)}${legendSuffix}`}
-                style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colorLegend.length) + '%' }}
-              >
-              </li>
-            ));
+            const stopsIndex = layerObj.stops[4].indexOf(color);
+
+            if (stopsIndex !== -1) {
+              const firstVal = stopsIndex ? layerObj.stops[3][stopsIndex - 1] : 0;
+              const lastVal = layerObj.stops[3][stopsIndex];
+              background.push((
+                <li
+                  key={index}
+                  className={`background-block-${layer.id}-${mapId}`}
+                  data-tooltip={`${formatNum(firstVal, 1)}-${formatNum(lastVal, 1)}${legendSuffix}`}
+                  style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colorLegend.length) + '%' }}
+                >
+                </li>
+              ));
+            }
           });
 
           primaryLegend = (
@@ -209,24 +244,10 @@ export class Legend extends React.Component {
               {layer.label}
             </b>
             <div className="legend-symbols">
-              <span
-                className="circle-sm"
-                style={{ background: layer.categories.color }}
-              >
-              </span>
-              <span
-                className="circle-md"
-                style={{ background: layer.categories.color }}
-              >
-              </span>
-              <span
-                className="circle-lg"
-                style={{ background: layer.categories.color }}
-              >
-              </span>
+              {quantiles}
             </div>
             <span>{layer.credit}</span>
-          </div>
+          </div>  
         ));
       } else if (symbolLayer) {
         layer.categories.color.forEach((color, index) => {
@@ -271,15 +292,19 @@ export class Legend extends React.Component {
         ));
 
       } else if (fillLayerNoBreaks && !layer.parent) {
+        const fillWidth = (100 / layer.categories.color.filter(c =>
+          c !== "transparent").length).toString();
+
         layer.categories.color.forEach((color, index) => {
-          const fillWidth = (100 / layer.categories.color.length).toString();
-          background.push((
-            <li
-              key={index}
-              style={{ background: color, width: fillWidth + '%' }}>
-              {layer.categories.label[index]}
-            </li>
-          ));
+          if (color !== "transparent") {
+            background.push((
+              <li
+                key={index}
+                style={{ background: color, width: `${fillWidth}%` }}>
+                {layer.categories.label[index]}
+              </li>
+            ));
+          }
         });
 
         const legendClass = layer.categories ? 'legend-label' : '';
@@ -307,29 +332,32 @@ export class Legend extends React.Component {
         ));
       } else if (fillLayerWithBreaks && layer.stops && !layer.parent) {
         const { stopsData, breaks, colors, Data } = layer;
-
-        const dataValues = Data.map(values => values[layer.property]);
+        const dataValues = Data.map(values => parseInt(values[layer.property], 10));
         const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
         const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
 
-        if (colorLegend.includes('transparent') && !(colors).includes('transparent')) {
-          colors.splice(0, 0, 'transparent');
-          breaks.splice(1, 0, breaks[0]);
-        }
+          if (colorLegend.includes('transparent') && !(colors).includes('transparent')) {
+            colors.splice(0, 0, 'transparent');
+            breaks.splice(1, 0, breaks[0]);
+          }
 
-        colorLegend.forEach((color, index) => {
-          const firstVal = breaks[index - 1] !== undefined ? breaks[index - 1] : 0;
-          const lastVal = color === colorLegend[colorLegend.length - 1] || breaks[index] === undefined ? Math.max(...dataValues) : breaks[index];
-          background.push((
-            <li
-              key={index}
-              className={`background-block-${layer.id}-${mapId}`}
-              data-tooltip={`${formatNum(firstVal, 1)}-${formatNum(lastVal, 1)}${legendSuffix}`}
-              style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colorLegend.length) + '%' }}
-            >
-            </li>
-          ));
-        });
+          colorLegend.forEach((color, index) => {
+            const stopsIndex = layerObj.stops[4].indexOf(color);
+
+            if (stopsIndex !== -1) {
+              const firstVal = stopsIndex ? layerObj.stops[3][stopsIndex - 1] : 0;
+              const lastVal = layerObj.stops[3][stopsIndex];
+              background.push((
+                <li
+                  key={index}
+                  className={`background-block-${layer.id}-${mapId}`}
+                  data-tooltip={`${formatNum(firstVal, 1)}-${formatNum(lastVal, 1)}${legendSuffix}`}
+                  style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colorLegend.length) + '%' }}
+                >
+                </li>
+              ));
+            }
+          });
 
         legendItems.unshift((
           <div

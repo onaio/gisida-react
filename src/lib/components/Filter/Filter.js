@@ -16,9 +16,9 @@ const mapStateToProps = (state, ownProps) => {
     FILTER: state.FILTER,
     layerObj: MAP.layers[MAP.filter.layerId],
     doShowProfile: MAP.showProfile,
-    showFilterPanel: MAP.showFilterPanel,
+    showFilterPanel: MAP.showFilterPanel && MAP.primaryLayer === MAP.filter.layerId,
     layersObj: buildLayersObj(MAP.layers),
-    showFilterBtn: MAP.filter.layerId,
+    showFilterBtn: MAP.filter.layerId && MAP.primaryLayer === MAP.filter.layerId,
     layerData: MAP.layers,
     detailView: MAP.detailView,
   }
@@ -831,11 +831,13 @@ export class Filter extends Component {
     return (
     <div>
       {
-          this.props.showFilterBtn ?
-            <button
-            className={`filterButton glyphicon glyphicon-filter${this.props.showFilterPanel ? ' open' : ''}`}
+        this.props.showFilterBtn ?
+          <button
+            className={`filterButton glyphicon glyphicon-filter${
+              this.props.showFilterPanel ? ' open' : ''
+            }`}
             onClick={() => { this.handleFilterClick(); }}
-              style={{ right: sidebarOffset }}
+            style={{ right: sidebarOffset }}
           /> : ''
         }
 

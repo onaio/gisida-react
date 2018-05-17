@@ -97,6 +97,12 @@ class Menu extends Component {
   render() {
     const mapId = this.props.mapId;
     const categories = this.props.categories;
+    let sortedCategories;
+    if (categories && categories.length > 0) {
+      sortedCategories = categories.sort((a, b) =>
+        a.category.localeCompare(b.category)
+      );
+    }
     const regions = this.props.regions;
     const currentRegion = this.props.currentRegion;
     const preparedLayers = this.props.preparedLayers;
@@ -146,7 +152,7 @@ class Menu extends Component {
                         </ul>
                       </li> : <li />}
                     {(categories && categories.length) > 0 ?
-                      categories.map((category, i) =>
+                      sortedCategories.map((category, i) =>
                         (<li className="sector" key={i}>
                           <a onClick={e => this.onCategoryClick(e, category.category)}>{category.category}
                             <span
