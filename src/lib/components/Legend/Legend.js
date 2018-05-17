@@ -73,7 +73,6 @@ export class Legend extends React.Component {
 
         uniqueStops = [...new Set(stopVals)].sort((a, b) => a - b);
 
-
         uniqueStops.forEach((s) => {
           quantiles.push((
             <span
@@ -82,7 +81,8 @@ export class Legend extends React.Component {
               <span
                 style={
                   {
-                    background: layer.categories.color,
+                    background: Array.isArray(layer.categories.color) ? layer.categories.color[uniqueStops.indexOf(s)]
+                      : layer.categories.color,
                     width: `${s * 2}px`,
                     height: `${s * 2}px`,
                     margin: `0px ${uniqueStops.indexOf(s) + 2}px`
@@ -97,10 +97,6 @@ export class Legend extends React.Component {
 
       if (lastLayerSelected && lastLayerSelected.id === layer.id) {
         if (circleLayerType) {
-          const circleBGcolor = Array.isArray(layer.categories.color)
-            ? layer.categories.color
-            : [layer.categories.color];
-
           primaryLegend = (
             <div
             id={`legend-${layer.id}-${mapId}`}
