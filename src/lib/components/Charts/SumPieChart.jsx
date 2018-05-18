@@ -109,7 +109,7 @@ class SumPieChart extends React.Component {
         itemStyle: {
           lineHeight: 21,
         },
-        labelFormat: '{name}%',
+        labelFormat: chartSpec.percentSuffix ? '{name}%' : '{name}',
         verticalAlign: 'middle',
         x: 110,
         y: 0,
