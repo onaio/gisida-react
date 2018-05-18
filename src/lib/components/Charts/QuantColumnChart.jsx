@@ -80,6 +80,7 @@ class QuantColumnChart extends React.Component {
           visible: false,
           endOnTick: false,
         }}
+        isPercent={false}
         pointFormatterFunc={QuantColumnChart.pointFormatterFunc}
         seriesData={seriesData}
       />
