@@ -167,6 +167,7 @@ class SumColumnChart extends React.Component {
         <ColumnChart
           seriesTitle={chartSpec.title}
           categories={seriesData.categories}
+          isPercent={chartSpec && chartSpec.percentSuffix}
           seriesData={seriesData.data}
           targetMark={1}
           chartWidth={chartWidth}
