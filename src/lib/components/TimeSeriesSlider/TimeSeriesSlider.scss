@@ -3,7 +3,7 @@
   position: absolute;
   z-index: 1004;
   border-radius: 5px;
-  width: 150px;
+  min-width: 150px;
   border: 2px solid rgba(0, 0, 0, 0.15);
   padding: 5px;
   right: 50px;
@@ -12,5 +12,9 @@
   label {
     color: #000;
     font-size: 14px;
+  }
+
+  select {
+    float: right;
   }
 }

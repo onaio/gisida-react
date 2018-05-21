@@ -413,6 +413,7 @@ class Map extends Component {
 
       if (timeSeriesLayers.includes(id)) {
         tsObj = timeseries[id];
+        tsObj.temporalIndex = timeSeriesObj.allPeriods.indexOf(currPeriod);
 
         const {
           temporalIndex, stops, colorStops, strokeWidthStops,
