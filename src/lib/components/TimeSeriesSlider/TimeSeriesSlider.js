@@ -51,6 +51,7 @@ class TimeSeriesSlider extends React.Component {
         ));
       }
     }
+    console.log("per array", periodArr);
     return periodArr;
   }
 
@@ -69,17 +70,6 @@ class TimeSeriesSlider extends React.Component {
   constructor(props) {
     super(props);
     this.handleMouseUp = this.handleMouseUp.bind(this);
-
-    if (!this.props.timeSeriesObj) {
-      return null;
-    }
-
-    const { period, temporalIndex } = this.props.timeSeriesObj;
-    this.state = {
-      periods: period,
-      index: temporalIndex,
-      period: period[temporalIndex],
-    };
   }
 
   componentWillMount() {
@@ -144,36 +134,36 @@ class TimeSeriesSlider extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.timeSeriesObj && nextProps.timeSeriesObj.period) {
+    if (nextProps.timeSeriesObj) {
       const { allPeriods, period, temporalIndex } = nextProps.timeSeriesObj;
       this.setState({
         periods: this.state.currentYear === 'All' ? allPeriods : period,
         index: temporalIndex,
         period: period[temporalIndex],
-      }); 
+      });
     }
   }
 
   componentWillUpdate(nextProps, nextState) {
     if (nextProps.timeSeriesObj) {
-      const { allPeriods, period, temporalIndex } = nextProps.timeSeriesObj;
+      const { allPeriods, period } = nextProps.timeSeriesObj;
       const { currentYear } = nextState;
       if (currentYear !== this.state.currentYear) {
         this.setState({
           currentYear: currentYear,
-          index: temporalIndex,
           periods: currentYear === 'All' ? allPeriods : period,
         });
+      } else {
+        if (typeof this.props.timeSeriesObj === 'undefined') {
+          this.setState({
+            currentYear: 'All',
+            index: allPeriods.length - 1,
+            periods: allPeriods,
+            period: allPeriods[allPeriods.length - 1],
+          });
+        }
       }
     }
-  }
-
-  componentWillUnmount() {
-    this.setState({
-      index: 0,
-      period: 0,
-      currentYear: 'All',
-    });
   }
 
   onAnnualSelectorChange(e) {
@@ -200,7 +190,7 @@ class TimeSeriesSlider extends React.Component {
     // const annualPeriods = ['2017', '2018'];
     // const isAnnualperiod = annualPeriods.indexOf(period) !== -1;
     // console.log("is annual period", isAnnualperiod);
-    this.updateTimeseriesState(temporalIndex, this.props.timeSeriesObj, cy);
+    this.updateTimeseriesState(temporalIndex.toString(), this.props.timeSeriesObj, cy);
   }
 
   handleMouseUp(e) {
