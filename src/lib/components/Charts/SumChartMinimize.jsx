@@ -6,22 +6,23 @@ const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId];
   return {
     showFilterPanel: MAP.showFilterPanel,
-  }
+    isMin: ownProps.isChartMin,
+    bottom: ownProps.bottom,
+    label: ownProps.label,
+  };
 }
 
 class SumChartMinimize extends React.Component {
   constructor(props) {
     super(props);
+    const { isMin, bottom, label } = this.props;
     this.handleClick = this.handleClick.bind(this);
-    this.state = {
-      isMin: false,
-      bottom: this.props.bottom,
-      label: this.props.label,
-    };
+    this.state = { isMin, bottom, label };
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ bottom: nextProps.bottom });
+    const { isMin, bottom, label } = nextProps;
+    this.setState({ isMin, bottom, label });
   }
 
   handleClick(e) {
@@ -37,8 +38,8 @@ class SumChartMinimize extends React.Component {
         role="button"
         tabIndex="-1"
         onClick={(e) => { this.handleClick(e); }}
-        title={`${this.state.isMin ? 'Show' : 'Hide'} Summary Charts`}
-        style={{ bottom: this.state.bottom, right: this.props.showFilterPanel ? '286px' : '35px' }}
+        title={`${this.props.isMin ? 'Show' : 'Hide'} Summary Charts`}
+        style={{ bottom: this.props.bottom, right: this.props.showFilterPanel ? '286px' : '35px' }}
         data-icon-credit="Created by Barracuda from the Noun Project"
         data-icon-credit-url="https://thenounproject.com/barracuda/collection/chart/?i=1217547"
       >
