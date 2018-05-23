@@ -166,7 +166,7 @@ export class Legend extends React.Component {
           }
 
           colorLegend.forEach((color, index) => {
-            const stopsIndex = layerObj.stops[4].indexOf(color);
+            const stopsIndex = layerObj.stops ? layerObj.stops[4].indexOf(color) : -1;
 
             if (stopsIndex !== -1) {
               const firstVal = stopsIndex ? layerObj.stops[3][stopsIndex - 1] : 0;
@@ -342,7 +342,7 @@ export class Legend extends React.Component {
           }
 
           colorLegend.forEach((color, index) => {
-            const stopsIndex = layerObj.stops[4].indexOf(color);
+            const stopsIndex = layerObj.stops ? layerObj.stops[4].indexOf(color) : -1;
 
             if (stopsIndex !== -1) {
               const firstVal = stopsIndex ? layerObj.stops[3][stopsIndex - 1] : 0;
