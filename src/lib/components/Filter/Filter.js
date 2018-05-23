@@ -100,7 +100,7 @@ export class Filter extends Component {
         filter.options = [...filters[filterKey].quantitativeValues];
       } else {
         options = filters[filterKey].filterValues;
-        optionKeys = Object.keys(options);
+        optionKeys = Object.keys(options).filter((o) => o.length > 0);
         // loop over all options
         for (o = 0; o < optionKeys.length; o += 1) {
           optionKey = optionKeys[o];
