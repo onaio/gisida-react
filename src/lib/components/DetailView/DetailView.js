@@ -12,6 +12,8 @@ const mapStateToProps = (state, ownProps) => {
   return {
     APP: state.APP,
     MAP: MAP,
+    mapId: ownProps.mapId,
+    isSplitScreen: state.VIEW && state.VIEW.splitScreen,
     layerObj,
     detailView: detailView && detailView.model,
     properties: detailView && detailView.properties,
@@ -75,6 +77,7 @@ class DetailView extends Component {
 
   render() {
     const { UID, spec, title, subTitle, parsedBasicInfo } = this.state;
+    const { mapId, isSplitScreen } = this.props;
     if (this.props.MAP.showFilterPanel || !UID || !spec) return null;
 
     const detailList = [];
@@ -100,8 +103,10 @@ class DetailView extends Component {
       }
     }
 
+    const sidebarRight = mapId === 'map-1' && isSplitScreen ? '48%' : '0';
+
     return (
-      <div className="detail-view-wrapper">
+      <div className="detail-view-wrapper" style={{ right: sidebarRight }}>
         <a
           className="close-btn"
           title="Close profile view"
