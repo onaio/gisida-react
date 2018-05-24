@@ -16,7 +16,7 @@ const mapStateToProps = (state, ownProps) => {
     REGIONS,
     MAP,
     VIEW,
-    timeSeriesObj: MAP.timeseries ? MAP.timeseries[MAP.visibleLayerId]: null,
+    timeSeriesObj: MAP.timeseries ? MAP.timeseries[MAP.activeLayerId]: null,
     timeseries:  MAP.timeseries,
     layersObj: MAP.layers ? buildLayersObj(MAP.layers) : {},
     layerObj: MAP.layers ? MAP.layers[MAP.activeLayerId]: null,
