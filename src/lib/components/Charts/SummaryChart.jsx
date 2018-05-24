@@ -52,6 +52,7 @@ const mapStateToProps = (state, ownProps) => {
   if (layerObj && layerObj.charts && sumChartObj) {
     return {
       layerId: layerObj.id,
+      activeLayerId: MAP.activeLayerId,
       layer: sumChartObj,
       layersObj: layersObj,
       isChartMin: isChartMin,
@@ -265,7 +266,13 @@ class SummaryChart extends React.Component {
   }
 
   render() {
-    if (this.state && Object.keys(this.state).length > 2 && this.props.showMinimize) {
+    if (!this.state
+      || Object.keys(this.state).length < 2
+      || !this.props.showMinimize
+      || this.props.activeLayerId !== this.props.layerId) {
+      return null;
+    }
+
     const { layerId, layerData, layer, charts, primaryChart, locations } = this.state;
     const { doShowModal, chartHeight, buttonBottom, isFullBleed, chartWidth } = this.state;
     let chartKey = '';
@@ -348,6 +355,7 @@ class SummaryChart extends React.Component {
 
     return (
       <div>
+        {primarySumChart || sumCharts.length ? '' : ''}
         <SumChartMinimize
           toggleChart={this.toggleChart}
           bottom={buttonBottom}
@@ -379,8 +387,7 @@ class SummaryChart extends React.Component {
           : ''}
       </div>
     );
-  } return (<div/>)
-}
+  }
 }
 
 SummaryChart.propTypes = {
