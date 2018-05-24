@@ -571,7 +571,7 @@ class Map extends Component {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
     }
     if (this.props.showFilterPanel) {
-      mapWidth = 'calc(100% - 250px)';
+      mapWidth = this.props.mapId === 'map-1' ? 'calc(100% - 250px)' : '48%';
     }
     if (this.props.showDetailView) {
       mapWidth = 'calc(100% - 345px)'
