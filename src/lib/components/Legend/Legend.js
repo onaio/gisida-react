@@ -175,7 +175,7 @@ export class Legend extends React.Component {
                 <li
                   key={index}
                   className={`background-block-${layer.id}-${mapId}`}
-                  data-tooltip={`${formatNum(firstVal, 1)}-${formatNum(lastVal, 1)}${legendSuffix}`}
+                  data-tooltip={`${(typeof formatNum(firstVal, 1) === 'undefined' ? 0 : formatNum(firstVal, 1))}-${(typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1))}${legendSuffix}`}
                   style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colors.length) + '%' }}
                 >
                 </li>
@@ -211,7 +211,7 @@ export class Legend extends React.Component {
                 className={`${mapId}`}
                 style={{ position: 'absolute', listStyle: 'none', display: 'inline', right: '3%' }}
               >
-                {formatNum(lastVal, 1)}
+                {typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)}
                 {legendSuffix}
               </li>
             </ul>
@@ -352,7 +352,7 @@ export class Legend extends React.Component {
                 <li
                   key={index}
                   className={`background-block-${layer.id}-${mapId}`}
-                  data-tooltip={`${formatNum(firstVal, 1)}-${formatNum(lastVal, 1)}${legendSuffix}`}
+                  data-tooltip={`${typeof formatNum(firstVal, 1) === 'undefined' ? 0 : formatNum(firstVal, 1)}-${typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)}${legendSuffix}`}
                   style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colors.length) + '%' }}
                 >
                 </li>
@@ -388,7 +388,7 @@ export class Legend extends React.Component {
                 className={`${mapId}`}
                 style={{ position: 'absolute', listStyle: 'none', display: 'inline', right: '3%' }}
               >
-                {formatNum(lastVal, 1)}
+                {typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)}
                 {legendSuffix}
               </li>
             </ul>
