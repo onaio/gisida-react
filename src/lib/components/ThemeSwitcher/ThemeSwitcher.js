@@ -107,35 +107,39 @@ export class ThemeSwitcher extends React.Component {
     }
   }
 
-  toggleThemeSwitcher() {
+  toggleThemeSwitcher(e) {
+    e.preventDefault();
     this.setState({
       active: !this.state.active,
     });
   }
 
   render() {
-    const { showFilterPanel } = this.props;
+    const { showFilterPanel, mapId } = this.props;
+    const { active } = this.state;
     if (!showFilterPanel) {
       return false;
     }
     return (
       <div>
         {showFilterPanel ?
-          <div className="wrap">
+          <div
+            className="wrap"
+            style={{ right: mapId === 'map-1' ? '-180px' : '75px'}}>
             <div
               role="button"
               tabIndex="0"
               className="btn-group btn-toggle theme-toggle"
-              onClick={() => this.toggleThemeSwitcher()}
+              onClick={(e) => this.toggleThemeSwitcher(e)}
             >
               <button
-                className={`glyphicon glyphicon-list-alt theme-toggle-btn ${!this.state.active ? 'light' : 'dark'}`}
-                alt={`Theme: ${!this.state.active ? 'light' : 'dark'}`}
+                className={`glyphicon glyphicon-list-alt theme-toggle-btn ${!active ? 'light' : 'dark'}`}
+                alt={`Theme: ${!active ? 'light' : 'dark'}`}
               />
             </div>
           </div> : ''}
-        <style media={!this.state.active ? 'screen' : 'none'}>
-          {this.state.active ? this.css.trim() : this.css}
+        <style media={!active ? 'screen' : 'none'}>
+          {active ? this.css.trim() : this.css}
         </style>
       </div>
     );
