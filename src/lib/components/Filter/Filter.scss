@@ -210,6 +210,10 @@
   display: flex;
   flex-flow: column nowrap;
 
+  &.isSplitScreen {
+    right: 48%;
+  }
+
   span.filter-option-label {
     display: inline-block;
     width: 70%;
