@@ -30,7 +30,7 @@ export class ThemeSwitcher extends React.Component {
     this.css = `
     .filter-container {
       background: #eae3bc !important;
-      color: #444 !important;
+      color: #555 !important;
     }
     .filter-section-options {
       background: #f7f6ef !important;
@@ -42,7 +42,11 @@ export class ThemeSwitcher extends React.Component {
     .filter-section-options .filter-item a.filter-option {
       color: #555 !important;
       font-weight: 600 !important;
-      font-size: 14px;
+      font-size: 12px;
+    }
+    .filter-container span.filter-option-label {
+      color: #555 !important;
+      font-size: 12px;
     }
     .filter-section-options .filterGroup {
       background: #f7f6ef !important;
