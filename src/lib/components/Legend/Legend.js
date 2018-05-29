@@ -154,9 +154,7 @@ export class Legend extends React.Component {
             </div>
           );
         } if (fillLayerWithBreaks && layer.stops && !layer.parent) {
-          const { stopsData, breaks, colors, Data } = layer;
-
-          const dataValues = Data.map(values => parseInt(values[layer.property], 10));
+          const { stopsData, breaks, colors } = layer;
           const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
 
@@ -165,18 +163,20 @@ export class Legend extends React.Component {
             breaks.splice(1, 0, breaks[0]);
           }
 
-          colorLegend.forEach((color, index) => {
-            const stopsIndex = layerObj.stops[4].indexOf(color);
+          let lastVal;
+
+          colors.forEach((color, index) => {
+            const stopsIndex = layerObj.stops ? layerObj.stops[4].indexOf(color) : -1;
 
             if (stopsIndex !== -1) {
               const firstVal = stopsIndex ? layerObj.stops[3][stopsIndex - 1] : 0;
-              const lastVal = layerObj.stops[3][stopsIndex];
+              lastVal = layerObj.stops[3][stopsIndex];
               background.push((
                 <li
                   key={index}
                   className={`background-block-${layer.id}-${mapId}`}
-                  data-tooltip={`${formatNum(firstVal, 1)}-${formatNum(lastVal, 1)}${legendSuffix}`}
-                  style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colorLegend.length) + '%' }}
+                  data-tooltip={`${(typeof formatNum(firstVal, 1) === 'undefined' ? 0 : formatNum(firstVal, 1))}-${(typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1))}${legendSuffix}`}
+                  style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colors.length) + '%' }}
                 >
                 </li>
               ));
@@ -211,7 +211,7 @@ export class Legend extends React.Component {
                 className={`${mapId}`}
                 style={{ position: 'absolute', listStyle: 'none', display: 'inline', right: '3%' }}
               >
-                {formatNum(Math.max(...dataValues), 1)}
+                {typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)}
                 {legendSuffix}
               </li>
             </ul>
@@ -331,8 +331,7 @@ export class Legend extends React.Component {
           </div>
         ));
       } else if (fillLayerWithBreaks && layer.stops && !layer.parent) {
-        const { stopsData, breaks, colors, Data } = layer;
-        const dataValues = Data.map(values => parseInt(values[layer.property], 10));
+        const { stopsData, breaks, colors } = layer;
         const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
         const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
 
@@ -341,18 +340,20 @@ export class Legend extends React.Component {
             breaks.splice(1, 0, breaks[0]);
           }
 
-          colorLegend.forEach((color, index) => {
-            const stopsIndex = layerObj.stops[4].indexOf(color);
+          let lastVal;
+
+          colors.forEach((color, index) => {
+            const stopsIndex = layerObj.stops ? layerObj.stops[4].indexOf(color) : -1;
 
             if (stopsIndex !== -1) {
               const firstVal = stopsIndex ? layerObj.stops[3][stopsIndex - 1] : 0;
-              const lastVal = layerObj.stops[3][stopsIndex];
+              lastVal = layerObj.stops[3][stopsIndex];
               background.push((
                 <li
                   key={index}
                   className={`background-block-${layer.id}-${mapId}`}
-                  data-tooltip={`${formatNum(firstVal, 1)}-${formatNum(lastVal, 1)}${legendSuffix}`}
-                  style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colorLegend.length) + '%' }}
+                  data-tooltip={`${typeof formatNum(firstVal, 1) === 'undefined' ? 0 : formatNum(firstVal, 1)}-${typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)}${legendSuffix}`}
+                  style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colors.length) + '%' }}
                 >
                 </li>
               ));
@@ -387,7 +388,7 @@ export class Legend extends React.Component {
                 className={`${mapId}`}
                 style={{ position: 'absolute', listStyle: 'none', display: 'inline', right: '3%' }}
               >
-                {formatNum(Math.max(...dataValues), 1)}
+                {typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)}
                 {legendSuffix}
               </li>
             </ul>

@@ -52,12 +52,14 @@ const mapStateToProps = (state, ownProps) => {
   if (layerObj && layerObj.charts && sumChartObj) {
     return {
       layerId: layerObj.id,
+      activeLayerId: MAP.activeLayerId,
       layer: sumChartObj,
       layersObj: layersObj,
       isChartMin: isChartMin,
       legendBottom: legendBottom,
       locations: {},
-      showMinimize: true
+      showMinimize: true,
+      menuIsOpen: MAP.menuIsOpen,
     }
   } else return { showMinimize: false}
 }
@@ -91,10 +93,10 @@ class SummaryChart extends React.Component {
     return { charts, primaryChart };
   }
 
-  static calcChartWidth(mapId) {
+  static calcChartWidth(mapId, menuIsOpen) {
     const windowWidth = $(window).outerWidth();
     const $sectors = $(`#${mapId}-menu-wrapper .sectors-menu`);
-    const sectorsMenuWidth = $sectors.css('display') === 'block' ? $sectors.outerWidth() : 0;
+    const sectorsMenuWidth = menuIsOpen ? $sectors.outerWidth() : 0;
     const menuIsFixedLeft = $(window).outerHeight() === $('#menu').outerHeight() &&
       !$('#menu').offset().top && !$('#menu').offset().left;
     const menuWidth = (menuIsFixedLeft ? $('#menu').outerWidth() : 0) + 20;
@@ -162,7 +164,7 @@ class SummaryChart extends React.Component {
         locationMap[locations[locationKeys[l]]] = locationKeys[l];
       }
 
-      const primaryChartPosition =  SummaryChart.calcChartWidth(mapId);
+      const primaryChartPosition =  SummaryChart.calcChartWidth(mapId, true);
 
       $(`.legend.${this.props.mapId}`).css('bottom', legendBottom);
   
@@ -186,12 +188,12 @@ class SummaryChart extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (Object.keys(nextProps).length > 2 && nextProps.layer) {
-      const { layerId, layer, mapId, isChartMin, legendBottom } = nextProps;
+      const { layerId, layer, mapId, isChartMin, legendBottom, menuIsOpen } = nextProps;
       const legendPosition = SummaryChart.calcLegendPosition(mapId);
       const chartSpecs = SummaryChart.defineCharts(layer.charts);
       const primaryChartPosition = chartSpecs && !chartSpecs.primaryChart
         ? { chartWidth: 0, isFullBleed: false }
-        : SummaryChart.calcChartWidth(mapId);
+        : SummaryChart.calcChartWidth(mapId, menuIsOpen);
 
       $(`.legend.${mapId}`).css('bottom', legendBottom);
       this.setState({
@@ -205,6 +207,7 @@ class SummaryChart extends React.Component {
         charts: chartSpecs.charts,
         primaryChart: chartSpecs.primaryChart,
         isChartMin,
+        menuIsOpen,
         doShowModal: layerId === this.state && this.state.layerId ? this.state.doShowModal : false,
         chartWidth: primaryChartPosition.chartWidth,
         isFullBleed: primaryChartPosition.isFullBleed,
@@ -223,10 +226,10 @@ class SummaryChart extends React.Component {
   }
 
   moveMapLedgend(chartHeight) {
-    const { isChartMin, layerId } = this.state;
+    const { isChartMin, layerId, menuIsOpen } = this.state;
     const { mapId } = this.props;
     const legendPosition = SummaryChart.calcLegendPosition(mapId);
-    const primaryChartPosition = SummaryChart.calcChartWidth(mapId);
+    const primaryChartPosition = SummaryChart.calcChartWidth(mapId, menuIsOpen);
     const legendBottom = isChartMin
       ? 40
       : primaryChartPosition.isFullBleed
@@ -263,7 +266,13 @@ class SummaryChart extends React.Component {
   }
 
   render() {
-    if (this.state && Object.keys(this.state).length > 2 && this.props.showMinimize) {
+    if (!this.state
+      || Object.keys(this.state).length < 2
+      || !this.props.showMinimize
+      || this.props.activeLayerId !== this.props.layerId) {
+      return null;
+    }
+
     const { layerId, layerData, layer, charts, primaryChart, locations } = this.state;
     const { doShowModal, chartHeight, buttonBottom, isFullBleed, chartWidth } = this.state;
     let chartKey = '';
@@ -325,6 +334,7 @@ class SummaryChart extends React.Component {
               chartWidth={chartWidth}
               isFullBleed={isFullBleed}
               calcChartWidth={SummaryChart.calcChartWidth}
+              menuIsOpen={this.state.menuIsOpen}
               locations={locations}
               isPrimary
             >
@@ -345,6 +355,7 @@ class SummaryChart extends React.Component {
 
     return (
       <div>
+        {primarySumChart || sumCharts.length ? '' : ''}
         <SumChartMinimize
           toggleChart={this.toggleChart}
           bottom={buttonBottom}
@@ -376,8 +387,7 @@ class SummaryChart extends React.Component {
           : ''}
       </div>
     );
-  } return (<div/>)
-}
+  }
 }
 
 SummaryChart.propTypes = {

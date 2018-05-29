@@ -30,7 +30,7 @@ export class ThemeSwitcher extends React.Component {
     this.css = `
     .filter-container {
       background: #eae3bc !important;
-      color: #444 !important;
+      color: #555 !important;
     }
     .filter-section-options {
       background: #f7f6ef !important;
@@ -42,7 +42,11 @@ export class ThemeSwitcher extends React.Component {
     .filter-section-options .filter-item a.filter-option {
       color: #555 !important;
       font-weight: 600 !important;
-      font-size: 14px;
+      font-size: 12px;
+    }
+    .filter-container span.filter-option-label {
+      color: #555 !important;
+      font-size: 12px;
     }
     .filter-section-options .filterGroup {
       background: #f7f6ef !important;
@@ -107,35 +111,39 @@ export class ThemeSwitcher extends React.Component {
     }
   }
 
-  toggleThemeSwitcher() {
+  toggleThemeSwitcher(e) {
+    e.preventDefault();
     this.setState({
       active: !this.state.active,
     });
   }
 
   render() {
-    const { showFilterPanel } = this.props;
+    const { showFilterPanel, mapId } = this.props;
+    const { active } = this.state;
     if (!showFilterPanel) {
       return false;
     }
     return (
       <div>
         {showFilterPanel ?
-          <div className="wrap">
+          <div
+            className="wrap"
+            style={{ right: mapId === 'map-1' ? '-180px' : '75px'}}>
             <div
               role="button"
               tabIndex="0"
               className="btn-group btn-toggle theme-toggle"
-              onClick={() => this.toggleThemeSwitcher()}
+              onClick={(e) => this.toggleThemeSwitcher(e)}
             >
               <button
-                className={`glyphicon glyphicon-list-alt theme-toggle-btn ${!this.state.active ? 'light' : 'dark'}`}
-                alt={`Theme: ${!this.state.active ? 'light' : 'dark'}`}
+                className={`glyphicon glyphicon-list-alt theme-toggle-btn ${!active ? 'light' : 'dark'}`}
+                alt={`Theme: ${!active ? 'light' : 'dark'}`}
               />
             </div>
           </div> : ''}
-        <style media={!this.state.active ? 'screen' : 'none'}>
-          {this.state.active ? this.css.trim() : this.css}
+        <style media={!active ? 'screen' : 'none'}>
+          {active ? this.css.trim() : this.css}
         </style>
       </div>
     );

@@ -68,7 +68,9 @@ class SumPieChart extends React.Component {
           dataMap[dBreak] = {
             count: 0,
             color: Array.isArray(colors) ? colors[dBreak] : colors,
-            label: `${!dBreak ? 0 : breaks[dBreak - 1]} - ${breaks[dBreak]}`,
+            label: layer.categories && layer.categories.label && layer.categories.label[dBreak]
+              ? layer.categories.label[dBreak]
+              : `${!dBreak ? 0 : breaks[dBreak - 1]} - ${breaks[dBreak]}`,
           };
         }
         dataMap[dBreak].count += 1;

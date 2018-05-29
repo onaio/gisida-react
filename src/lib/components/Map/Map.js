@@ -16,7 +16,7 @@ const mapStateToProps = (state, ownProps) => {
     REGIONS,
     MAP,
     VIEW,
-    timeSeriesObj: MAP.timeseries ? MAP.timeseries[MAP.visibleLayerId]: null,
+    timeSeriesObj: MAP.timeseries ? MAP.timeseries[MAP.activeLayerId]: null,
     timeseries:  MAP.timeseries,
     layersObj: MAP.layers ? buildLayersObj(MAP.layers) : {},
     layerObj: MAP.layers ? MAP.layers[MAP.activeLayerId]: null,
@@ -571,10 +571,10 @@ class Map extends Component {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
     }
     if (this.props.showFilterPanel) {
-      mapWidth = 'calc(100% - 250px)';
+      mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 250px)` : '48%';
     }
     if (this.props.showDetailView) {
-      mapWidth = 'calc(100% - 345px)'
+      mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 345px)` : '48%';
     }
     return (
       <div>
