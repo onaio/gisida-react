@@ -26,7 +26,7 @@ export class StyleSelector extends Component {
     const sidebarOffset = '0';
     
     return (
-      <div className="leaflet-left leaflet-top leaflet-right layer-selector" style={{ right: sidebarOffset }}>
+      <div className="leaflet-left leaflet-top leaflet-right layer-selector" style={{ right: sidebarOffset }} data-html2canvas-ignore>
         <div aria-haspopup="true" className="leaflet-control leaflet-control-layers">
           <a title="styles" className="leaflet-control-layers-toggle"> </a>
           <form className="leaflet-control-layers-list">

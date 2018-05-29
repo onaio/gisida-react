@@ -36,7 +36,8 @@ class Map extends Component {
       mapboxgl.accessToken = accessToken;
       this.map = new mapboxgl.Map(mapConfig);
       window.maps.push(this.map);
-      this.map.addControl(new mapboxgl.NavigationControl());
+      this.map.controls = new mapboxgl.NavigationControl();
+      this.map.addControl(this.map.controls);
   
       // Handle Map Load Event
       this.map.on('load', () => {
