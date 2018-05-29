@@ -617,5 +617,4 @@ Export.propTypes = {
   mapId: PropTypes.string.isRequired,
   map: PropTypes.objectOf(PropTypes.any).isRequired,
   config: PropTypes.objectOf(PropTypes.any).isRequired,
-  btnStyle: PropTypes.objectOf(PropTypes.any).isRequired,
 };
