@@ -225,7 +225,7 @@ class Map extends Component {
           const layer = layers[key];
           // Add layer to map if visible
           if (!this.map.getLayer(layer.id) && layer.visible && layer.styleSpec) {
-            this.map.addLayer(layer.styleSpec);
+            this.map.addLayer({ ...layer.styleSpec });
 
             // if layer has a highlight layer
             if (layer.filters && layer.filters.highlight) {
@@ -457,7 +457,7 @@ class Map extends Component {
               defaultValue = layerObj.type === 'circle' ? 0 : 'rgba(0,0,0,0)';
               paintProperty = layerObj.type === 'circle' ? 'circle-radius' : 'fill-color';
               newStops = {
-                property: layerObj.source.join[0],
+                property: layerObj.categories['vector-prop'] || layerObj.source.join[0],
                 stops: stops[index],
                 type: 'categorical',
                 default: defaultValue,
@@ -465,12 +465,12 @@ class Map extends Component {
 
               if (layerObj.type === 'circle' && layerObj.categories.color instanceof Array) {
                 newColorStops = {
-                  property: layerObj.source.join[0],
+                  property: layerObj.categories['vector-prop'] || layerObj.source.join[0],
                   stops: colorStops[index],
                   type: 'categorical',
                 };
                 newStrokeStops = {
-                  property: layerObj.source.join[0],
+                  property: layerObj.categories['vector-prop'] || layerObj.source.join[0],
                   stops: strokeWidthStops[index],
                   type: 'categorical',
                 };
