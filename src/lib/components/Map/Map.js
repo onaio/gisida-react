@@ -8,6 +8,13 @@ const mapStateToProps = (state, ownProps) => {
   const { APP, STYLES, REGIONS, VIEW } = state;
   const mapId = ownProps.mapId || 'map-1';
   const MAP = state[mapId] || { blockLoad: true };
+  const activeLayers = [];
+  Object.keys(MAP.layers).forEach((key) => {
+    const layer = MAP.layers[key];
+    if (layer.visible && layer.type !== 'chart') {
+      activeLayers.push(key);
+    }
+  });
   MAP.blockLoad = VIEW ? (!VIEW.splitScreen && mapId !== 'map-1') : false;
   return {
     mapId,
@@ -22,7 +29,8 @@ const mapStateToProps = (state, ownProps) => {
     layerObj: MAP.layers ? MAP.layers[MAP.activeLayerId]: null,
     primaryLayer: MAP.primaryLayer,
     showDetailView: !!MAP.detailView,
-    showFilterPanel: !!MAP.showFilterPanel
+    showFilterPanel: !!MAP.showFilterPanel,
+    activeLayers,
   }
 }
 
@@ -83,6 +91,19 @@ class Map extends Component {
     // this.addMapClickEvents()
     // this.addMouseMoveEvents()
     // etc
+    this.map.on('mousemove', (e) => {
+      const { activeLayers, layerObj } = this.props;
+      const features = this.map.queryRenderedFeatures(e.point, {
+        layers: activeLayers.filter(i => this.map.getLayer(i) !== undefined)
+      });
+      const feature = features.find(f => f.layer.id === layerObj.id);
+      if (!feature) {
+        return false;
+      }
+      this.map.getCanvas().style.cursor = layerObj['detail-view']
+        ? 'pointer' : '';
+      return true;
+    });
     this.map.on('click', this.onFeatureClick.bind(this));
   }
 
@@ -94,6 +115,7 @@ class Map extends Component {
 
     if (feature && layerObj['detail-view']) {
       const newZoom = this.map.getZoom() < 7.5 ? 7.5 : this.map.getZoom();
+      this.map.getCanvas().style.cursor = 'pointer';
       this.map.easeTo({
         center: e.lngLat,
         zoom: newZoom
