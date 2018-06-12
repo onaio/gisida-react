@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goog.gl/fbAQLP
+
+exports[`TimeSeriesSlider TimeSeriesSlider component renderes correctly 1`] = `
+  <div
+    className="series"
+    style={{ right: this.props.showFilterPanel ? '310px' : '50px'}}>
+    <label
+      id={`${this.props.mapId}-label`}
+      className="label"
+      htmlFor="slider"
+    >{this.state.period}</label>
+    {this.state.periods.length > 1 ?
+      <input
+        id={`${this.props.mapId}-slider`}
+        className="slider"
+        type="range"
+        list={`${this.props.mapId}-datalist`}
+        max={this.state.periods.length - 1}
+        value={this.state.index}
+        onChange={(e) => { this.handleMouseUp(e); }}
+        data-html2canvas-ignore
+      /> : null}
+    <datalist id={`${this.props.mapId}-datalist`}>
+      {this.state.periods.map((p, i) => <option key={i}>{i}</option>)}
+    </datalist>
+  </div>
+`;
+
+//values are not updated
