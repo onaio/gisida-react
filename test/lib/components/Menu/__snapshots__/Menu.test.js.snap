@@ -1,0 +1,79 @@
+// Jest Snapshot v1, https://goog.gl/fbAQLP
+
+exports[`Menu Menu component renderes correctly 1`] = `
+  <div>
+    {this.props.children ? this.props.children :
+      <div>
+        {this.props.loaded ?
+          // Menu Wrapper
+          <div id={`${mapId}-menu-wrapper`} className="menu-wrapper">
+            {/* Open button menu */}
+            <a onClick={e => this.onToggleMenu(e)} className="open-btn"
+              style={{ display: this.state.openMenu ? 'none' : 'block' }}>
+              <span className="glyphicon glyphicon-menu-hamburger"></span>
+            </a>
+            {/* Menu */}
+            <div id={`${mapId}-menu`} className="sectors-menu"
+              style={{ display: this.state.openMenu ? 'block' : 'none' }}>
+              {/* Close menu button */}
+              <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
+                <span className="glyphicon glyphicon-remove"></span>
+              </a>
+              {/* Menu List*/}
+              <ul className="sectors">
+                {regions && regions.length ?
+                  <li className="sector">
+                    <a onClick={e => this.onCategoryClick(e, 'Regions')}>Regions
+                      <span className="caret" />
+                    </a>
+                    <ul className="layers">
+                      {regions && regions.length ?
+                        regions.map((region, i) =>
+                          (<li className={`region ${mapId}`} key={region.name}>
+                            <input
+                              id={region.name}
+                              key={region.name}
+                              name="region"
+                              type="radio"
+                              value={region.name}
+                              checked={!!region.current}
+                              onChange={e => this.onRegionClick(e)}
+                            />
+                            <label htmlFor={region.name}>{region.name}</label>
+                          </li>)) :
+                        <li></li>
+                      }
+                    </ul>
+                  </li> : <li />}
+                {(categories && categories.length) > 0 ?
+                  sortedCategories.map((category, i) =>
+                    (<li className="sector" key={i}>
+                      <a onClick={e => this.onCategoryClick(e, category.category)}>{category.category}
+                        <span
+                          className={"category glyphicon " +
+                            (this.state.openCategories.includes(category.category) ?
+                              "glyphicon-chevron-down" : "glyphicon-chevron-right")}
+                        />
+                      </a>
+                      {
+                        this.state.openCategories.includes(category.category) ?
+                          <Layers
+                            mapId={mapId}
+                            layers={category.layers}
+                            currentRegion={currentRegion}
+                            preparedLayers={preparedLayers}
+                          />
+                          : <ul />}
+                    </li>)) :
+                  <li></li>
+                }
+              </ul>
+            </div>
+          </div> : ''}
+      </div>
+    }
+  </div>
+`;
+
+//if statements at the beginning setting vals, not JSX stuff
+//values are not updated

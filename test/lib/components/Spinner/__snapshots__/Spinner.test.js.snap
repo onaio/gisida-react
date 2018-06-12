@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goog.gl/fbAQLP
+
+exports[`Spinner Spinner component renderes correctly 1`] = `
+<div
+        className="spinner"
+        id={'`spinner-${this.props.mapId}`'}
+        style={{ display: this.props.MAP.showSpinner ? 'block' : 'none'}} />
+`;
+
+//values are not updated

@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goog.gl/fbAQLP
+
+exports[`FilterSelector FilterSelector component renderes correctly 1`] = `
+  <div className="multiselect">
+  <div className="selectBox" onClick={(e) => this.showCheckboxes()}>
+      <select>
+      <option>{this.state.name}</option>
+      </select>
+      <div className="overSelect"></div>
+    </div>
+    <div id="checkboxes">
+      {Object.keys(this.state.options).map(val =>
+      (<label key={`label_${val}`} htmlFor={val}>
+          <input
+            type="checkbox"
+            id={val}
+            key={`input_${val}`}
+            value={val}
+            onChange={(e) => {
+              this.updateOptions(e.target.value);
+            }}
+            checked={this.state.options[val]}
+        />{val}
+      </label>))
+      }
+    </div>
+  </div>
+`;
+
+//if certain things, this renders
+	//otherwise, just renders <nav />, makes sense, just not sure as to why
+	//this if loop is done here, maybe a double check?
+//values are not updated
