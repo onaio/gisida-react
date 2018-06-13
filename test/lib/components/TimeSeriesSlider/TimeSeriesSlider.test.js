@@ -3,9 +3,9 @@ import { TimeSeriesSlider }  from '../../../../src/lib/components/TimeSeriesSlid
 import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
-//declare certain variables
+//const timeSeriesObj = 
+
 const componentWrapper = shallow(
-	//need to update these values
 	<TimeSeriesSlider 
 		mapId='map-1'
 		timeSeriesObj={{}}

@@ -3,9 +3,7 @@ import { Map }  from '../../../../src/lib/components/Map/Map.js'
 import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
-//declare certain variables
 const componentWrapper = shallow(
-	//no PropTypes?
 	<Map />
 );
 

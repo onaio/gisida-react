@@ -3,11 +3,11 @@ import { FilterSelector }  from '../../../../src/lib/components/FilterSelector/F
 import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
-//declare certain variables
+const layerObj = {'testlayer': 'layer1'};
+
 const componentWrapper = shallow(
-	//need to update these values. not sure if this is necessary bc defaultProps
 	<FilterSelector 
-		layerObj={{}}
+		layerObj={layerObj}
 	/>
 );
 
