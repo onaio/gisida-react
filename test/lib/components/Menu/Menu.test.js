@@ -3,11 +3,12 @@ import { Menu }  from '../../../../src/lib/components/Menu/Menu.js'
 import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
-//declare certain variables
+//const categories = 
+
 const componentWrapper = shallow(
-	//not sure about these values 
+
 	<Menu 
-		menuId=''
+		menuId= 'menu-1'
 		categories={[]}
 	/>
 );
