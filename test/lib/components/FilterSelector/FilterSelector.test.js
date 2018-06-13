@@ -5,8 +5,10 @@ import toJson from 'enzyme-to-json';
 
 //declare certain variables
 const componentWrapper = shallow(
-	//seems like JSX goes in here 
-	<FilterSelector />
+	//need to update these values. not sure if this is necessary bc defaultProps
+	<FilterSelector 
+		layerObj={{}}
+	/>
 );
 
 describe('FilterSelector', () => {

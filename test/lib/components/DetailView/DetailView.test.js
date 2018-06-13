@@ -5,7 +5,7 @@ import toJson from 'enzyme-to-json';
 
 //declare certain variables
 const componentWrapper = shallow(
-	//seems like JSX goes in here 
+	//no propTypes, so no vals?
 	<DetailView />
 );
 

@@ -5,8 +5,11 @@ import toJson from 'enzyme-to-json';
 
 //declare certain variables
 const componentWrapper = shallow(
-	//seems like JSX goes in here 
-	<Spinner />
+	//not sure about the right values here
+	<Spinner 
+		mapId='map-1'
+		MAP={{}}
+	/>
 );
 
 describe('Spinner', () => {

@@ -5,8 +5,12 @@ import toJson from 'enzyme-to-json';
 
 //declare certain variables
 const componentWrapper = shallow(
-	//seems like JSX goes in here 
-	<TimeSeriesSlider />
+	//need to update these values
+	<TimeSeriesSlider 
+		mapId='map-1'
+		timeSeriesObj={{}}
+		updateTimeseriesState={function}
+	/>
 );
 
 describe('TimeSeriesSlider', () => {
