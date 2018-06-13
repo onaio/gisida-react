@@ -5,8 +5,11 @@ import toJson from 'enzyme-to-json';
 
 //declare certain variables
 const componentWrapper = shallow(
-	//seems like JSX goes in here 
-	<Menu />
+	//not sure about these values 
+	<Menu 
+		menuId=''
+		categories={[]}
+	/>
 );
 
 describe('Menu', () => {

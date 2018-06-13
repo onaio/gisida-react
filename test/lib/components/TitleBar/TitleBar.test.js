@@ -5,8 +5,10 @@ import toJson from 'enzyme-to-json';
 
 //declare certain variables
 const componentWrapper = shallow(
-	//seems like JSX goes in here 
-	<TitleBar />
+	//need to update these values
+	<TitleBar 
+		appConfig={{}}
+	/>
 );
 
 describe('TitleBar', () => {
