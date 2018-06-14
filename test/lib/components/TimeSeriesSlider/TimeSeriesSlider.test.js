@@ -3,12 +3,13 @@ import { TimeSeriesSlider }  from '../../../../src/lib/components/TimeSeriesSlid
 import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
-//const timeSeriesObj = updateTimeseriesState={function()}
+//updateTimeseriesState={function()}
+//passes but still not passing this which says it's required
+//need to figure out what pass in here!
 
 const componentWrapper = shallow(
 	<TimeSeriesSlider 
 		mapId='map-1'
-		timeSeriesObj={{}}
 		
 	/>
 );
