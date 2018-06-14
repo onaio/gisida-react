@@ -18,7 +18,7 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-class TitleBar extends React.Component{
+export class TitleBar extends React.Component{
 
 render() {
   const { appConfig } = this.props;

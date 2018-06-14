@@ -32,7 +32,7 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-class DetailView extends Component {
+export class DetailView extends Component {
   constructor(props) {
     super(props);
     this.state = {

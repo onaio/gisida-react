@@ -24,7 +24,7 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-class FilterSelector extends React.Component {
+export class FilterSelector extends React.Component {
 
   filterData = (filterOptions) => {
     const dispatch = this.props.dispatch;
