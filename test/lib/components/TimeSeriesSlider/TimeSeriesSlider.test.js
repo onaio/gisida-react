@@ -3,13 +3,13 @@ import { TimeSeriesSlider }  from '../../../../src/lib/components/TimeSeriesSlid
 import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
-//const timeSeriesObj = 
+//const timeSeriesObj = updateTimeseriesState={function()}
 
 const componentWrapper = shallow(
 	<TimeSeriesSlider 
 		mapId='map-1'
 		timeSeriesObj={{}}
-		updateTimeseriesState={function}
+		
 	/>
 );
 

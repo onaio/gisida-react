@@ -1,15 +1,12 @@
 import React from 'react';
-import { DetailView }  from '../../../../src/lib/components/DetailView/DetailView.js'
+import { DetailView }  from '../../../../src/lib/components/DetailView/DetailView';
 import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
-//declare certain variables
-const componentWrapper = shallow(
-	//no propTypes, so no vals?
-	<DetailView />
-);
-
 describe('DetailView', () => {
+	const componentWrapper = shallow(
+	<DetailView />
+	);
 	it('DetailView component renders correctly', () => {
 		const json = toJson(componentWrapper)
 		expect(json).toMatchSnapshot();
