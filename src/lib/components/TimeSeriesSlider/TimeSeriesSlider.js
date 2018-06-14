@@ -29,7 +29,7 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-class TimeSeriesSlider extends React.Component {
+export class TimeSeriesSlider extends React.Component {
   constructor(props) {
     super(props);
     this.handleMouseUp = this.handleMouseUp.bind(this);

@@ -3,10 +3,11 @@ import { DetailView }  from '../../../../src/lib/components/DetailView/DetailVie
 import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
-describe('DetailView', () => {
-	const componentWrapper = shallow(
+const componentWrapper = shallow(
 	<DetailView />
 	);
+
+describe('DetailView', () => {
 	it('DetailView component renders correctly', () => {
 		const json = toJson(componentWrapper)
 		expect(json).toMatchSnapshot();
