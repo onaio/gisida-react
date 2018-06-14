@@ -4,7 +4,10 @@ import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
 const componentWrapper = shallow(
-	<DetailView />
+	<DetailView 
+	  MAP={{}}
+	/>
+
 	);
 
 describe('DetailView', () => {
