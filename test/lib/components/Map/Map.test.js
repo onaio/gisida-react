@@ -3,6 +3,8 @@ import { Map }  from '../../../../src/lib/components/Map/Map.js'
 import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
+//not running because mapboxgl is not defined
+
 const componentWrapper = shallow(
 	<Map />
 );
