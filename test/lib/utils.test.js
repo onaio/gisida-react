@@ -28,6 +28,10 @@ describe('getLastIndex', () => {
     expect(utils.getLastIndex(['a', 'b', 'c', 'd', 'e'], 'c')).toBe(2);
   });
 
+  test('Gets correct index for item', () => {
+    expect(utils.getLastIndex(['a', 'b', 'c', 'd', 'a'], 'a')).toBe(4);
+  });
+
   test('Returns undefined if item does not exist in array', () => {
     expect(utils.getLastIndex(['a', 'b', 'c', 'd', 'e'], 'f')).toBeUndefined();
   });
