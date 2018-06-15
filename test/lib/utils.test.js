@@ -4,6 +4,10 @@ import * as utils from '../../src/lib/utils';
 import exInputForNewSeries from '/fixtures/is-new-series-data-input.js/';
 
 describe('formatNum', () => {
+  
+  test('Formats 100 correctly', () => {
+    expect(utils.formatNum(100, 1)).toBe(100);
+  });
 
   test('Formats 1000 correctly', () => {
     expect(utils.formatNum(1000, 1)).toBe('1k');
