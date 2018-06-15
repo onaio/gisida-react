@@ -2,6 +2,9 @@ import * as utils from '../../src/lib/utils';
 
 //for isNewSeriesData:
 import exInputForNewSeries from '/fixtures/is-new-series-data-input.js/';
+// groupBy:
+import exInputForGroupBy from '/fixtures/group-by-input.js';
+import exOutputForGroupBy from '/fixtures/group-by-output.js';
 
 describe('formatNum', () => {
   
@@ -90,6 +93,17 @@ describe('hexToRgbA', () => {
     expect(utils.hexToRgbA('#fbafff')).toThrow(new Error('Bad Hex'));
   }); 
 */
+})
+
+describe('groupBy', () => {
+
+  test('Returns the correct object', () => {
+    expect(utils.groupBy(exInputForGroupBy[0],'Services')).toEqual(exOutputForGroupBy[0]);
+  });
+
+  test('Returns the correct object', () => {
+    expect(utils.groupBy(exInputForGroupBy[1],'Services')).toEqual(exOutputForGroupBy[1]);
+  });
 
 })
 
