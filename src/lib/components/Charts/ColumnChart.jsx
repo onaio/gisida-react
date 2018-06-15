@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from 'highcharts';
 import { isNewSeriesData } from './../../utils';
 
-class ColumnChart extends React.Component {
+export class ColumnChart extends React.Component {
   static pointFormatterFunc() {
     return `<span>${this.y}%</span>`;
   }
