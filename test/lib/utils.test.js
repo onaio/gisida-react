@@ -58,10 +58,9 @@ describe('hexToRgbA', () => {
   test('Converts Hex (without alpha) properly to RGBA', () => {
     expect(utils.hexToRgbA('#fbafff')).toBe('rgba(251, 175, 255, 1)');
   });
-
-/* NOT SURE IF THIS IS CORRECT SYNTAX
+/* for some reason only working with gisida?
   test('Throw an error for a bad hex', () => {
-    expect(hexToRgbA('#fbafff')).toThrow(new Error('Bad Hex'));
+    expect(utils.hexToRgbA('#fbafff')).toThrow(new Error('Bad Hex'));
   }); 
 */
 
