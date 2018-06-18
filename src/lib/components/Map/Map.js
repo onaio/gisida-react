@@ -109,18 +109,19 @@ class Map extends Component {
 
   onFeatureClick(e) {
     const activeLayers = this.props.layersObj.map(l => l.id)
-    const { layerObj, mapId } = this.props;
+    const { mapId } = this.props;
     const features = this.map.queryRenderedFeatures(e.point, { layers: activeLayers });
-    const feature = features.find(f => f.layer.id === layerObj.id);
+    const feature = features[0];
 
-    if (feature && layerObj['detail-view']) {
+    const activeLayerObj = this.props.layersObj.find((l) => l.id === feature.layer.id);
+
+    if (feature && activeLayerObj['detail-view']) {
       const newZoom = this.map.getZoom() < 7.5 ? 7.5 : this.map.getZoom();
-      this.map.getCanvas().style.cursor = 'pointer';
       this.map.easeTo({
         center: e.lngLat,
         zoom: newZoom
       });
-      buildDetailView(mapId, layerObj, feature.properties, this.props.dispatch);
+      buildDetailView(mapId, activeLayerObj, feature.properties, this.props.dispatch);
     }
   }
 
