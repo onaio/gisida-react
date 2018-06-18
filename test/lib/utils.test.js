@@ -98,11 +98,7 @@ describe('hexToRgbA', () => {
 describe('groupBy', () => {
 
   test('Returns the correct object', () => {
-    expect(utils.groupBy(exInputForGroupBy[0],'Services')).toEqual(exOutputForGroupBy[0]);
-  });
-
-  test('Returns the correct object', () => {
-    expect(utils.groupBy(exInputForGroupBy[1],'Services')).toEqual(exOutputForGroupBy[1]);
+    expect(utils.groupBy(exInputForGroupBy[0],'Services')).toEqual(exOutputForGroupBy);
   });
 
 })
