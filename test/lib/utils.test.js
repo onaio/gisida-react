@@ -1,10 +1,10 @@
 import * as utils from '../../src/lib/utils';
 
 //for isNewSeriesData:
-import exInputForNewSeries from '/fixtures/is-new-series-data-input.js/';
+import exInputForNewSeries from '../fixtures/is-new-series-data-input.js/';
 // groupBy:
-import exInputForGroupBy from '/fixtures/group-by-input.js';
-import exOutputForGroupBy from '/fixtures/group-by-output.js';
+import exInputForGroupBy from '../fixtures/group-by-input.js';
+import exOutputForGroupBy from '../fixtures/group-by-output.js';
 
 describe('formatNum', () => {
   
@@ -98,7 +98,7 @@ describe('hexToRgbA', () => {
 describe('groupBy', () => {
 
   test('Returns the correct object', () => {
-    expect(utils.groupBy(exInputForGroupBy[0],'Services')).toEqual(exOutputForGroupBy);
+    expect(utils.groupBy(exInputForGroupBy[0],'Other Services')).toEqual(exOutputForGroupBy);
   });
 
 })
