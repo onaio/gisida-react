@@ -14,12 +14,13 @@ const exInputForGroupBy =
 }], //1
 [{
   'Type of site': 'Hospital',
-  'Services': 'OTP'
+  'Services': {
+    'Service 1': 'OTP',
+    'Service 2': 'MCH'
+  }
 }, {
-  'Type of site': 'hospital',
   'Services': 'MCH Other'
 }, {
-  'Type of site': 'Health post',
   'Services': 'MCH Other',
   'Other Services': 'Nutrition Counseling'
 }]];

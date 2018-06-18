@@ -98,9 +98,12 @@ describe('hexToRgbA', () => {
 describe('groupBy', () => {
 
   test('Returns the correct object', () => {
-    expect(utils.groupBy(exInputForGroupBy[0],'Other Services')).toEqual(exOutputForGroupBy);
+    expect(utils.groupBy(exInputForGroupBy[0],'Other Services')).toEqual(exOutputForGroupBy[0]);
   });
 
+  test('Returns the correct object', () => {
+    expect(utils.groupBy(exInputForGroupBy[1],'Type of site')).toEqual(exOutputForGroupBy[1]);
+  });
 })
 
 
