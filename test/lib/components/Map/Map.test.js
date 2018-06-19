@@ -5,8 +5,13 @@ import toJson from 'enzyme-to-json';
 
 //not running because mapboxgl is not defined
 
+const style = {width:"100%",display:"inline"};
+
 const componentWrapper = shallow(
-	<Map />
+	<Map 
+		id='map-1'
+		style={style}
+	/>
 );
 
 describe('Map', () => {

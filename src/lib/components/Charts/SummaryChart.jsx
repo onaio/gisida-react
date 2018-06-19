@@ -63,7 +63,7 @@ const mapStateToProps = (state, ownProps) => {
   } else return { showMinimize: false}
 }
 
-class SummaryChart extends React.Component {
+export class SummaryChart extends React.Component {
   static defineCharts(chartSpec) {
     const chartKeys = Object.keys(chartSpec);
     const charts = [];

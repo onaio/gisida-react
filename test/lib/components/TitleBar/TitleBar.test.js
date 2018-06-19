@@ -7,7 +7,7 @@ import toJson from 'enzyme-to-json';
 
 const componentWrapper = shallow(
 	<TitleBar 
-		appConfig={{}}
+		appConfig={{loaded:true}}
 	/>
 );
 

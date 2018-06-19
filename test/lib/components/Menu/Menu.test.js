@@ -9,7 +9,7 @@ const componentWrapper = shallow(
 
 	<Menu 
 		menuId= 'menu-1'
-		categories={[]}
+		categories = {[]}
 	/>
 );
 
