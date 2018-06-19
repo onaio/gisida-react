@@ -12,11 +12,25 @@ const mapStateToProps = (state, ownProps) => {
   // let layers;
 
   if (Object.keys(LAYERS.groups).length) {
+    const groupMapper = (layer) => {
+      if (typeof layer === 'string') {
+        return MAP.layers[layer];
+      }
+
+      const subGroup = {};
+      Object.keys(layer).forEach(l => {
+        subGroup[l] = {
+          category: l,
+          layers: layer[l].map(groupMapper).filter((l) => typeof l !== 'undefined'),
+        }
+      });
+      return subGroup;
+    };
     // build list of LAYERS.categories populated with layers from MAP.layers 
     categories = Object.keys(LAYERS.groups).map((group) => {
       return {
         category: group,
-        layers: LAYERS.groups[group].map((l) => MAP.layers[l])
+        layers: LAYERS.groups[group].map(groupMapper)
           .filter((l) => typeof l !== 'undefined'),
       };
     });
