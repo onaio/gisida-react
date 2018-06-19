@@ -10,7 +10,8 @@ import toJson from 'enzyme-to-json';
 const componentWrapper = shallow(
 	<TimeSeriesSlider 
 		mapId='map-1'
-		
+		timeseries={{visibility:false}}
+		showFilterPanel={false}
 	/>
 );
 

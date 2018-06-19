@@ -5,7 +5,7 @@ import toJson from 'enzyme-to-json';
 
 const componentWrapper = shallow(
 	<DetailView 
-	  MAP={{}}
+	  MAP={{timeseries: {visibility:true}}}
 	/>
 
 	);
