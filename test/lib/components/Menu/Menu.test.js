@@ -4,12 +4,24 @@ import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
 //const categories = 
+//menuId= 'menu-1'
+//		categories = {[]}
+const isSplitScreen = true;
 
 const componentWrapper = shallow(
 
 	<Menu 
-		menuId= 'menu-1'
-		categories = {[]}
+		toggleSingleScreen={jest.fn()}
+    toggleSplitScreen={jest.fn()}
+    appConfig={{
+        appIcon: 'test.jpg',
+        appName: 'test app',
+        appNameDesc: 'This is a test app',
+        appColor: '#aaa',
+    }}
+    isSplitScreen={isSplitScreen}
+    menuId='menu-1'
+    categories={[]}
 	/>
 );
 
