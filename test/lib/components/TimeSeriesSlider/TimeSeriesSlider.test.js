@@ -3,17 +3,17 @@ import { TimeSeriesSlider }  from '../../../../src/lib/components/TimeSeriesSlid
 import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
-//updateTimeseriesState={function()}
-//passes but still not passing this which says it's required
-//need to figure out what pass in here!
-//from inspection, bound updateTimeseriesState() is what is being passed in
-//but this is not working for the tests
+//probably need to pass something here for it actually include something in 
+//the snapshot
+//timeSeriesObj={{}}
+
+const updateTimeseriesState = jest.fn();
 
 const componentWrapper = shallow(
 	<TimeSeriesSlider 
 		mapId='map-1'
-		timeSeriesObj={{}}
-		updateTimeseriesState={bound updateTimeseriesState()}
+		
+		updateTimeseriesState={updateTimeseriesState}
 	/>
 );
 
