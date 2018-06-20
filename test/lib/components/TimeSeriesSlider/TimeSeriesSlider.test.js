@@ -6,12 +6,14 @@ import toJson from 'enzyme-to-json';
 //updateTimeseriesState={function()}
 //passes but still not passing this which says it's required
 //need to figure out what pass in here!
+//from inspection, bound updateTimeseriesState() is what is being passed in
+//but this is not working for the tests
 
 const componentWrapper = shallow(
 	<TimeSeriesSlider 
 		mapId='map-1'
-		timeseries={{visibility:false}}
-		showFilterPanel={false}
+		timeSeriesObj={{}}
+		updateTimeseriesState={bound updateTimeseriesState()}
 	/>
 );
 
