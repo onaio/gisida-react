@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
 import { detectIE, buildLayersObj, detailViewData, orderLayers } from '../../utils';
 import './Map.scss';
+import mapboxgl from 'mapbox-gl';
 
 const mapStateToProps = (state, ownProps) => {
   const { APP, STYLES, REGIONS, VIEW, FILTER, LOC } = state;
