@@ -9,9 +9,9 @@ import toJson from 'enzyme-to-json';
 
 const componentWrapper = shallow(
 	<SumChartMinimize 
-		toggleChart={function}
+		toggleChart={bound toggleChart()}
 		label=''
-		bottom={number}
+		bottom={52}
 	/>
 );
 
