@@ -9,7 +9,7 @@ const style = {width:"100%",display:"inline"};
 
 const componentWrapper = shallow(
 	<Map 
-		id='map-1'
+		mapId='map-1'
 		style={style}
 	/>
 );
