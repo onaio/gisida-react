@@ -81,8 +81,11 @@ export class Legend extends React.Component {
               <span
                 style={
                   {
-                    background: Array.isArray(layer.categories.color) ? layer.categories.color[uniqueStops.indexOf(s)]
-                      : layer.categories.color,
+                    background: Array.isArray(layer.categories.color)
+                      ? layer.categories.color[uniqueStops.indexOf(s)]
+                      : layer.colors.length
+                        ? layer.colors[uniqueStops.indexOf(s)]
+                        : layer.categories.color,
                     width: `${s * 2}px`,
                     height: `${s * 2}px`,
                     margin: `0px ${uniqueStops.indexOf(s) + 2}px`
