@@ -56,7 +56,7 @@ export class Layers extends Component {
             layerItem = layerItem.concat([
               (
                 <a
-                  key={i}
+                  key={`${d}-${i}-link`}
                   className="sub-category"
                   onClick={(e) => this.toggleSubMenu(e)}
                 >
@@ -68,7 +68,7 @@ export class Layers extends Component {
               ),
               (this.state.isOpen ?
                 <Layers
-                  key={d}
+                  key={`${d}-${i}`}
                   mapId={mapId}
                   layers={layer[d].layers}
                   currentRegion={currentRegion}
