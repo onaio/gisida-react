@@ -1,11 +1,9 @@
-/*
-
-Still Not entirely defined
-
 import React from 'react';
 import { AdvancedFilter }  from '../../../../src/lib/components/Filter/AdvancedFilter.js'
 import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
+
+const setFilterQueries = jest.fn();
 
 const componentWrapper = shallow(
 	<AdvancedFilter 
@@ -13,7 +11,7 @@ const componentWrapper = shallow(
 		filterKey=''
 		queries={[]}
 		dataType=''
-		setFilterQueries={function}
+		setFilterQueries={setFilterQueries}
 	/>
 );
 
@@ -23,5 +21,3 @@ describe('AdvancedFilter', () => {
 		expect(json).toMatchSnapshot();
 	})
 });
-
-*/

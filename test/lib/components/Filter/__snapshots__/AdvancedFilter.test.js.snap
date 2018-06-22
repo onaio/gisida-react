@@ -1,0 +1,64 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AdvancedFilter AdvancedFilter component renders correctly 1`] = `
+<div
+  className="advanced-controls-container"
+>
+  <div
+    className="advanced-controls"
+    key="0"
+  >
+    <select
+      onChange={[Function]}
+      role="button"
+    >
+      <option
+        label="contains"
+        selected="selected"
+      >
+        contains
+      </option>
+      <option
+        label="does not contain"
+      >
+        does not contain
+      </option>
+      <option
+        label="starts with"
+      >
+        starts with
+      </option>
+      <option
+        label="does not start with"
+      >
+        does not start with
+      </option>
+      <option
+        label="is"
+      >
+        is
+      </option>
+      <option
+        label="is not"
+      >
+        is not
+      </option>
+    </select>
+    <input
+      className="advanced-search"
+      data-type="advanced-filter"
+      onChange={[Function]}
+      type="text"
+      value=""
+    />
+    <div>
+      <span
+        className="glyphicon glyphicon-plus"
+        onClick={[Function]}
+        role="button"
+        tabIndex="0"
+      />
+    </div>
+  </div>
+</div>
+`;
