@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from 'highcharts';
 import { isNewSeriesData } from '../../utils';
 
-class PieChart extends React.Component {
+export class PieChart extends React.Component {
 
   static tootltipPointFormatter() {
     return `${this.y.toLocaleString()}`;

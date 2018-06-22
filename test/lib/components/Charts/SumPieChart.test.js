@@ -1,7 +1,3 @@
-/*
-
-Still Not entirely defined, also not sure about JSX vs JS 
-
 import React from 'react';
 import { SumPieChart }  from '../../../../src/lib/components/Charts/SumPieChart.jsx'
 import { shallow } from 'enzyme';
@@ -22,5 +18,3 @@ describe('SumPieChart', () => {
 		expect(json).toMatchSnapshot();
 	})
 });
-
-*/

@@ -1,16 +1,12 @@
-/*
-
-NOT SURE WHAT'S GOING ON HERE COMPARED TO REACT DEVTOOLS
-ALSO FAILING SAYING $ IS NOT DEFINED?
-
-
 import React from 'react';
 import { SummaryChart }  from '../../../../src/lib/components/Charts/SummaryChart.jsx'
 import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
-//saveChartState={function}
-//legendBottom={number}
+//Error receiving:
+	//ReferenceError: $ is not defined
+
+const saveChartState = jest.fn();
 
 const componentWrapper = shallow(
 	<SummaryChart 
@@ -21,7 +17,8 @@ const componentWrapper = shallow(
 		locations={{}}
 		showMinimize={true}
 		isChartMin={true}
-		
+		saveChartState={saveChartState}
+		legendBottom={52}
 	/>
 );
 
@@ -31,5 +28,3 @@ describe('SummaryChart', () => {
 		expect(json).toMatchSnapshot();
 	})
 });
-
-*/

@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SumPieChart SumPieChart component renders correctly 1`] = `
+<div
+  className="pie"
+>
+  <PieChart
+    chartHeight={225}
+    chartSpacing={
+      Object {
+        "spacing": Array [
+          10,
+          100,
+          10,
+          0,
+        ],
+      }
+    }
+    chartWidth={325}
+    dataLabelOptions={false}
+    donut={50}
+    legendOptions={
+      Object {
+        "align": "right",
+        "floating": true,
+        "itemStyle": Object {
+          "lineHeight": 21,
+        },
+        "labelFormat": "{name}",
+        "layout": "vertical",
+        "verticalAlign": "middle",
+        "x": 110,
+        "y": 0,
+      }
+    }
+    seriesData={Array []}
+    showInLegend={true}
+    titleOptions={false}
+    tooltipOptions={
+      Object {
+        "backgroundColor": "rgba(255,255,255,0)",
+        "borderWidth": 0,
+        "formatter": [Function],
+        "positioner": [Function],
+        "shadow": false,
+        "useHTML": true,
+      }
+    }
+  />
+</div>
+`;

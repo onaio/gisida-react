@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SumChartMinimize SumChartMinimize component renders correctly 1`] = `
+<a
+  className="toggleChart"
+  data-icon-credit="Created by Barracuda from the Noun Project"
+  data-icon-credit-url="https://thenounproject.com/barracuda/collection/chart/?i=1217547"
+  onClick={[Function]}
+  role="button"
+  style={
+    Object {
+      "bottom": 52,
+      "right": "35px",
+    }
+  }
+  tabIndex="-1"
+  title="Hide Summary Charts"
+>
+  <span />
+</a>
+`;

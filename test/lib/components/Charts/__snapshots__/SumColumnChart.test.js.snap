@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SumColumnChart SumColumnChart component renders correctly 1`] = `
+<div
+  className="column"
+  style={
+    Object {
+      "bottom": "0px",
+      "height": "30px",
+      "right": "340px",
+      "width": 30,
+    }
+  }
+>
+  <ColumnChart
+    categories={Array []}
+    chartHeight={30}
+    chartWidth={30}
+    seriesData={Array []}
+    targetMark={1}
+  />
+</div>
+`;

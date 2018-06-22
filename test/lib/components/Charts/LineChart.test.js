@@ -1,20 +1,18 @@
-/*
-
-Still Not entirely defined, also not sure about JSX vs JS 
-
 import React from 'react';
 import { LineChart }  from '../../../../src/lib/components/Charts/LineChart.jsx'
 import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
+const pointClickCallback = jest.fn();
+
 const componentWrapper = shallow(
 	<LineChart 
 		series={{}}
-		chartTitle=''
-		chartHeight={number}
-		categories={[]}
+		chartTitle='ex-title'
+		chartHeight={30}
+		categories={{}}
 		indicator=''
-		pointClickCallback={function}
+		pointClickCallback={pointClickCallback}
 	/>
 );
 
@@ -24,5 +22,3 @@ describe('LineChart', () => {
 		expect(json).toMatchSnapshot();
 	})
 });
-
-*/
