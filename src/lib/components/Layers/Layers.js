@@ -5,15 +5,24 @@ import Layer from '../Layer/Layer';
 export class Layers extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      isOpen: false,
-    };
+    const groups = {};
+    if (this.props.layers) {
+      this.props.layers.forEach((layer) => {
+        if (!layer.id) {
+          Object.keys(layer).forEach((l) => {
+            groups[l] = { isOpen: false };
+          });
+        }
+      })
+    }
+    this.state = groups;
   }
 
-  toggleSubMenu(e) {
+  toggleSubMenu(e, layer) {
     e.preventDefault();
     this.setState({
-      isOpen: !this.state.isOpen,
+      ...this.state,
+      [layer]: { isOpen: !this.state[layer].isOpen },
     });
   }
 
@@ -58,15 +67,15 @@ export class Layers extends Component {
                 <a
                   key={`${d}-${i}-link`}
                   className="sub-category"
-                  onClick={(e) => this.toggleSubMenu(e)}
+                  onClick={(e) => this.toggleSubMenu(e, d)}
                 >
                   {d}
                   <span
-                    className={`category glyphicon glyphicon-chevron-${this.state.isOpen ? 'down' : 'right'}`}
+                    className={`category glyphicon glyphicon-chevron-${this.state[d].isOpen ? 'down' : 'right'}`}
                   />
                 </a>
               ),
-              (this.state.isOpen ?
+              (this.state[d].isOpen ?
                 <Layers
                   key={`${d}-${i}`}
                   mapId={mapId}
