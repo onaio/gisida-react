@@ -1,7 +1,3 @@
-/*
-
-Still Not entirely defined, also not sure about JSX vs JS 
-
 import React from 'react';
 import { QuantColumnChart }  from '../../../../src/lib/components/Charts/QuantColumnChart.jsx'
 import { shallow } from 'enzyme';
@@ -20,5 +16,3 @@ describe('QuantColumnChart', () => {
 		expect(json).toMatchSnapshot();
 	})
 });
-
-*/

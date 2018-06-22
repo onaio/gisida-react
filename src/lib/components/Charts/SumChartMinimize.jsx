@@ -11,7 +11,7 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-class SumChartMinimize extends React.Component {
+export class SumChartMinimize extends React.Component {
   constructor(props) {
     super(props);
     this.handleClick = this.handleClick.bind(this);

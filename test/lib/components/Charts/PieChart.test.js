@@ -1,20 +1,19 @@
-/*
-
-Still Not entirely defined, also not sure about JSX vs JS 
-
 import React from 'react';
 import { PieChart }  from '../../../../src/lib/components/Charts/PieChart.jsx'
 import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
+//Error receiving:
+	//TypeError: Cannot read property 'nodeName' of undefined
+
 const componentWrapper = shallow(
 	<PieChart 
-		seriesName=''
+		seriesName='ex-name'
 		seriesData={{}}
-		seriesTitle=''
-		chartWidth={number}
-		chartHeight={number}
-		donut={number}
+		seriesTitle='ex-title'
+		chartWidth={30}
+		chartHeight={30}
+		donut={30}
 	/>
 );
 
@@ -24,5 +23,3 @@ describe('PieChart', () => {
 		expect(json).toMatchSnapshot();
 	})
 });
-
-*/

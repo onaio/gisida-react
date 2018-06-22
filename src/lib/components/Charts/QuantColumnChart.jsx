@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ColumnChart from './ColumnChart';
 
-class QuantColumnChart extends React.Component {
+export class QuantColumnChart extends React.Component {
   static buildSeries(data, passing) {
     // const data = Data.sort((a, b) => a - b);
     const optionCounts = {};

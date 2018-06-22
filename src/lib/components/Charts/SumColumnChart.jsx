@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import ColumnChart from './ColumnChart';
 import { debounce, hexToRgbA, parseColValue } from '../../utils';
 
-class SumColumnChart extends React.Component {
+export class SumColumnChart extends React.Component {
   static buildColData(layerData, chartSpec, layer, locations) {
     if (!chartSpec) return [];
 

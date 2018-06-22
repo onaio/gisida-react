@@ -1,15 +1,13 @@
-/*
-
-Still Not entirely defined, also not sure about JSX vs JS 
-
 import React from 'react';
 import { SumChartMinimize }  from '../../../../src/lib/components/Charts/SumChartMinimize.jsx'
 import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
+const toggleChart = jest.fn();
+
 const componentWrapper = shallow(
 	<SumChartMinimize 
-		toggleChart={bound toggleChart()}
+		toggleChart={toggleChart}
 		label=''
 		bottom={52}
 	/>
@@ -21,5 +19,3 @@ describe('SumChartMinimize', () => {
 		expect(json).toMatchSnapshot();
 	})
 });
-
-*/

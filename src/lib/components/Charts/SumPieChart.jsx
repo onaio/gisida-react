@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import PieChart from './PieChart';
 import { hexToRgbA, parseColValue } from '../../utils';
 
-class SumPieChart extends React.Component {
+export class SumPieChart extends React.Component {
   static tooltipFormatter() {
     return `<div style="text-align:center;">
               <b style="font-size:30px">${this.y}</b>
