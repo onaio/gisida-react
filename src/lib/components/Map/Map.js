@@ -7,7 +7,7 @@ import './Map.scss';
 const mapStateToProps = (state, ownProps) => {
   const { APP, STYLES, REGIONS, VIEW } = state;
   const mapId = ownProps.mapId || 'map-1';
-  const MAP = state[mapId] || { blockLoad: true };
+  const MAP = state[mapId] || { blockLoad: true, layers: {}};
   const activeLayers = [];
   Object.keys(MAP.layers).forEach((key) => {
     const layer = MAP.layers[key];

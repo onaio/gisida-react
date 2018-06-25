@@ -48,6 +48,10 @@
   .layers {
     padding: 20px 0 20px 20px;
 
+    .layers {
+      padding: 0px 0 8px 20px;
+    }
+
     li.layer {
       position: relative;
       display: block;
@@ -60,6 +64,19 @@
       label {
         display: inline;
         margin: 0 0 10px 5px;
+      }
+    }
+
+    .sub-category {
+      padding: 9px 20px !important;
+      margin-right: 2px;
+      margin-left: -16px;
+      position: relative;
+      bottom: 20px;
+      font-weight: normal !important;
+
+      .category {
+        color: #777;
       }
     }
   }
