@@ -288,7 +288,6 @@ export class Filter extends Component {
         nextProps.dispatch(Actions.filtersUpdated(nextProps.mapId, layerId));
       });
     }
-    window.GisidaMap = this.map;
   }
 
   onCloseClick = (e) => {
@@ -433,7 +432,8 @@ export class Filter extends Component {
     // Apply layerFilter to mapbox layer
     this.props.dispatch(Actions.setLayerFilter(mapId, layerId, nextFilters));
     // Update FILTER store state
-    buildFilterState(mapId, filterOptions, filters, layerId, dispatch);
+    const newFilterState = buildFilterState(filterOptions, filters);
+    dispatch(Actions.saveFilterState(mapId, layerId, newFilterState));
 
     return true;
   }
