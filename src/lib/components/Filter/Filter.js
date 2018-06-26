@@ -399,10 +399,11 @@ export class Filter extends Component {
     let newFilters;
     let options;
     let optionKeys;
+    let regenStops = false;
     // loop through all filters
     for (let f = 0; f < filterKeys.length; f += 1) {
       // chec if the filter is actually filtered
-      if (filters[filterKeys[f]].isFiltered) {
+      if (filters[filterKeys[f]].isFiltered && filterOptions[filterKeys[f]].type !== 'stops') {
         newFilters = ['any'];
         if (filters[filterKeys[f]].dataType === 'ordinal') {
           // define the options and option keys for this filter
@@ -426,14 +427,25 @@ export class Filter extends Component {
         if (newFilters.length > 1) {
           nextFilters.push(newFilters);
         }
+      } else if (filters[filterKeys[f]].isFiltered) {
+        regenStops = true;
       }
     }
 
-    // Apply layerFilter to mapbox layer
-    this.props.dispatch(Actions.setLayerFilter(mapId, layerId, nextFilters));
     // Update FILTER store state
-    const newFilterState = buildFilterState(filterOptions, filters);
+    const newFilterState = buildFilterState(filterOptions, filters, layerObj, regenStops);
     dispatch(Actions.saveFilterState(mapId, layerId, newFilterState));
+
+    if (regenStops) {
+      // console.log('fauxLayerObj', newFilterState.fauxLayerObj.source.data);
+
+      // 4. remove layer from map
+      // 5. add layer to map with fauxLayerObj
+      // 6. apply vector filter if necessary (or is this already handled by regenerating Stops?)
+    } else if (nextFilters.length > 1) {
+      // Apply layerFilter to mapbox layer
+      this.props.dispatch(Actions.setLayerFilter(mapId, layerId, nextFilters));
+    }
 
     return true;
   }
