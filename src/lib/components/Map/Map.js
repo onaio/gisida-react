@@ -112,7 +112,7 @@ class Map extends Component {
     const { mapId } = this.props;
     const features = this.map.queryRenderedFeatures(e.point, { layers: activeLayers });
     const feature = features[0];
-
+    if (!feature) return false;
     const activeLayerObj = this.props.layersObj.find((l) => l.id === feature.layer.id);
 
     if (feature && activeLayerObj['detail-view']) {

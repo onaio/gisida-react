@@ -48,7 +48,7 @@ export class Legend extends React.Component {
     const { layerObj, mapId, lastLayerSelected, timeSeriesObj  } = this.props;
 
     if (!layerObj || !timeSeriesObj) {
-      return false;
+      return null;
     }
 
     const legendItems = [];
@@ -66,10 +66,8 @@ export class Legend extends React.Component {
       let background = [];
 
       const quantiles = [];
-
-      if (circleLayerType && layer.breaks && layer.stopsData && layer.styleSpec && layer.styleSpec.paint) {
-        const { temporalIndex } = timeSeriesObj;
-
+      const { temporalIndex } = timeSeriesObj;
+      if (circleLayerType && layer.breaks && layer.stops && layer.stops[0][temporalIndex]) {
         const currentColorStops = [...new Set(layer.stops[0][temporalIndex].map(d => d[1]))];
         const currentRadiusStops = [...new Set(layer.stops[1][temporalIndex].map(d => d[1]))];
         const currentBreakStops = [...new Set(layer.stops[6][temporalIndex])]
