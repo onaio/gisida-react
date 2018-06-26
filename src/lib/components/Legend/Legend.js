@@ -9,8 +9,16 @@ import './Legend.scss';
 
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {}}
+  let timeLayer;
+  buildLayersObj(MAP.layers).forEach((layer) => {
+    if (layer && layer.visible && layer.aggregate && layer.aggregate.timeseries) {
+      timeLayer = layer.id;
+    }
+  });
+  timeLayer = MAP.timeseries[MAP.primaryLayer] ? MAP.primaryLayer : timeLayer;
   return {
     layerObj: MAP.layers[MAP.activeLayerId],
+    timeSeriesObj: state[ownProps.mapId].timeseries[timeLayer],
     lastLayerSelected: MAP.layers[MAP.lastLayerSelected],
     layersData: buildLayersObj(MAP.layers),
     MAP,
@@ -37,9 +45,9 @@ export class Legend extends React.Component {
   }
 
   render() {
-    const { layerObj, mapId, lastLayerSelected } = this.props;
+    const { layerObj, mapId, lastLayerSelected, timeSeriesObj  } = this.props;
 
-    if (!layerObj) {
+    if (!layerObj || !timeSeriesObj) {
       return false;
     }
 
@@ -57,23 +65,16 @@ export class Legend extends React.Component {
 
       let background = [];
 
-      let uniqueStops;
-
       const quantiles = [];
 
       if (circleLayerType && layer.breaks && layer.stopsData && layer.styleSpec && layer.styleSpec.paint) {
-        const stopVals = [];
-        layer.stopsData.forEach((s) => {
-           stopVals.push(s[1]);
-        });
+        const { temporalIndex } = timeSeriesObj;
 
-        layer.styleSpec.paint['circle-radius'].stops.forEach((s) => {
-          stopVals.push(s[1]);
-        });
+        const currentColorStops = [...new Set(layer.stops[0][temporalIndex].map(d => d[1]))];
+        const currentRadiusStops = [...new Set(layer.stops[1][temporalIndex].map(d => d[1]))];
+        const currentBreakStops = [...new Set(layer.stops[6][temporalIndex])]
 
-        uniqueStops = [...new Set(stopVals)].sort((a, b) => a - b);
-
-        uniqueStops.forEach((s) => {
+        currentRadiusStops.forEach((s, i) => {
           quantiles.push((
             <span
               className="circle-container"
@@ -81,18 +82,14 @@ export class Legend extends React.Component {
               <span
                 style={
                   {
-                    background: Array.isArray(layer.categories.color)
-                      ? layer.categories.color[uniqueStops.indexOf(s)]
-                      : layer.colors.length
-                        ? layer.colors[uniqueStops.indexOf(s)]
-                        : layer.categories.color,
+                    background: `${currentColorStops[i]}`,
                     width: `${s * 2}px`,
                     height: `${s * 2}px`,
-                    margin: `0px ${uniqueStops.indexOf(s) + 2}px`
+                    margin: `0px ${currentRadiusStops[i] / 2}px`
                   }
                 }
               ></span>
-              <p>{layer.breaks[uniqueStops.indexOf(s)]}</p>
+              <p>{currentBreakStops[i]}</p>
               </span>
           ));
         });

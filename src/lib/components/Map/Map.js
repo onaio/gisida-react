@@ -486,10 +486,10 @@ class Map extends Component {
                 default: defaultValue,
               };
 
-              if (layerObj.type === 'circle' && layerObj.categories.color instanceof Array) {
+              if (layerObj.type === 'circle' && (layerObj.categories.color instanceof Array || layerObj.colorStops)) {
                 newColorStops = {
                   property: layerObj.categories['vector-prop'] || layerObj.source.join[0],
-                  stops: colorStops[index],
+                  stops: layerObj.stops[0][index],
                   type: 'categorical',
                 };
                 newStrokeStops = {
