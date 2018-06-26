@@ -5,11 +5,13 @@ import { Actions, prepareLayer } from 'gisida'
 
 
 const mapStateToProps = (state, ownProps) => {
+  const { APP } = state;
   const MAP = state[ownProps.mapId]
   if (!!!MAP) {
     debugger
   }
   return {
+    APP,
     timeSeriesObj: MAP.timeseries[MAP.visibleLayerId],
     timeseries: MAP.timeseries,
     layers: MAP.layers
@@ -20,11 +22,23 @@ export class Layer extends Component {
 
   onLayerToggle = layer => {
     // dispatch toggle layer action
-    const mapId = this.props.mapId;
+    const { mapId, APP } = this.props;
     if (!mapId) {
       return null;
     }
     this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
+
+    if (layer.visible) {
+      window.maps.forEach((e) => {
+        e.easeTo({
+          center: {
+            lng: APP.mapConfig.center[0],
+            lat: APP.mapConfig.center[1],
+          },
+          zoom: APP.mapConfig.zoom,
+        });
+      });
+    }
 
     // Prepare layer if layer had not been loaded
     if (!layer.loaded && !layer.isLoading) {
