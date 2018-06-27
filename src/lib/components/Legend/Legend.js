@@ -8,7 +8,8 @@ import Parser from 'html-react-parser';
 import './Legend.scss';
 
 const mapStateToProps = (state, ownProps) => {
-  const MAP = state[ownProps.mapId] || { layers: {}}
+  const mapId = ownProps.mapId || 'map-1';
+  const MAP = state[mapId] || { layers: {}, timeseries: {} }
   let timeLayer;
   buildLayersObj(MAP.layers).forEach((layer) => {
     if (layer && layer.visible && layer.aggregate && layer.aggregate.timeseries) {
@@ -18,7 +19,7 @@ const mapStateToProps = (state, ownProps) => {
   timeLayer = MAP.timeseries[MAP.primaryLayer] ? MAP.primaryLayer : timeLayer;
   return {
     layerObj: MAP.layers[MAP.activeLayerId],
-    timeSeriesObj: state[ownProps.mapId].timeseries[timeLayer],
+    timeSeriesObj: MAP.timeseries[timeLayer],
     lastLayerSelected: MAP.layers[MAP.lastLayerSelected],
     layersData: buildLayersObj(MAP.layers),
     MAP,
