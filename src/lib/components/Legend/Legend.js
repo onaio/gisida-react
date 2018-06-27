@@ -70,7 +70,7 @@ export class Legend extends React.Component {
       if (circleLayerType && layer.breaks && layer.stops && layer.stops[0][temporalIndex]) {
         const currentColorStops = [...new Set(layer.stops[0][temporalIndex].map(d => d[1]))];
         const currentRadiusStops = [...new Set(layer.stops[1][temporalIndex].map(d => d[1]))];
-        const currentBreakStops = [...new Set(layer.stops[6][temporalIndex])]
+        const currentBreakStops = [...new Set(layer.stops[6][temporalIndex])];
 
         currentRadiusStops.forEach((s, i) => {
           quantiles.push((
@@ -427,6 +427,7 @@ Legend.propTypes = {
   layersData: PropTypes.arrayOf(PropTypes.any).isRequired,
   MAP: PropTypes.objectOf(PropTypes.any).isRequired,
   primaryLayer: PropTypes.string.isRequired,
+  timeSeriesObj: PropTypes.objectOf(PropTypes.any),
 };
 
 export default connect(mapStateToProps)(Legend);

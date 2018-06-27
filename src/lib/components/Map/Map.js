@@ -439,7 +439,7 @@ class Map extends Component {
         tsObj = timeseries[id];
 
         const {
-          temporalIndex, stops, colorStops, strokeWidthStops,
+          temporalIndex, stops, strokeWidthStops,
         } = tsObj;
 
         index = parseInt(temporalIndex, 10);
