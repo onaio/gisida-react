@@ -112,7 +112,7 @@ class Map extends Component {
     const { mapId } = this.props;
     const features = this.map.queryRenderedFeatures(e.point, { layers: activeLayers });
     const feature = features[0];
-
+    if (!feature) return false;
     const activeLayerObj = this.props.layersObj.find((l) => l.id === feature.layer.id);
 
     if (feature && activeLayerObj['detail-view']) {
@@ -439,7 +439,7 @@ class Map extends Component {
         tsObj = timeseries[id];
 
         const {
-          temporalIndex, stops, colorStops, strokeWidthStops,
+          temporalIndex, stops, strokeWidthStops,
         } = tsObj;
 
         index = parseInt(temporalIndex, 10);
@@ -486,10 +486,10 @@ class Map extends Component {
                 default: defaultValue,
               };
 
-              if (layerObj.type === 'circle' && layerObj.categories.color instanceof Array) {
+              if (layerObj.type === 'circle' && (layerObj.categories.color instanceof Array || layerObj.colorStops)) {
                 newColorStops = {
                   property: layerObj.categories['vector-prop'] || layerObj.source.join[0],
-                  stops: colorStops[index],
+                  stops: layerObj.stops[0][index],
                   type: 'categorical',
                 };
                 newStrokeStops = {
