@@ -12,12 +12,16 @@ class HorizontalBarChart extends React.Component {
     const {
       chartTitle,
       categories,
-      series
+      series,
+      chartHeight,
+      chartWidth
     } = this.props;
 
     this.state = {
       chart: {
-        type: 'bar'
+        type: 'bar',
+        height: chartHeight || 400,
+        width: chartWidth || 800,
       },
       title: {
         text: chartTitle || null
@@ -34,6 +38,9 @@ class HorizontalBarChart extends React.Component {
         title: {
           text: null
         },
+        labels: {
+          overflow: 'justify'
+        }
       },
       legend: {
         enabled: false,
@@ -86,6 +93,9 @@ class HorizontalBarChart extends React.Component {
 HorizontalBarChart.propTypes = {
   series: PropTypes.arrayOf(PropTypes.any).isRequired,
   categories: PropTypes.arrayOf(PropTypes.any).isRequired,
+  chartTitle: PropTypes.string,
+  chartHeight: PropTypes.number,
+  chartWidth: PropTypes.number,
 };
 
 export default HorizontalBarChart;
