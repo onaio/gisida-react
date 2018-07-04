@@ -3,6 +3,7 @@
 exports[`StyleSelector StyleSelector component renderes correctly 1`] = `
 <div
   className="leaflet-left leaflet-top leaflet-right layer-selector"
+  data-html2canvas-ignore={true}
   style={
     Object {
       "right": "0",

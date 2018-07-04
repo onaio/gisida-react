@@ -1,7 +1,7 @@
 .glyphicon.filterButton {
   position: fixed;
   right: 10px;
-  top: 155px;
+  top: 195px;
   height: 32px;
   width: 32px;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
@@ -195,20 +195,24 @@
   transition: all 0.5s ease-in-out;
   -webkit-transition: all 0.5s ease-in-out;
   box-shadow: 0 1px 7px rgba(0, 0, 0, 0.4);
-  font-size: 0.9em;
-  font-family: proxima-nova, sans-serif;
+  font-size: 12px;
+  font-family: 'Montserrat', sans-serif;
   line-height: 20px;
   margin: 0.2em;
   position: fixed;
   z-index: 1;
   right: 0;
   top: 0;
-  letter-spacing: 0.01em;
+  letter-spacing: inherit;
   bottom: 0;
   float: right;
   height: 100%;
   display: flex;
   flex-flow: column nowrap;
+
+  &.isSplitScreen {
+    right: 48%;
+  }
 
   span.filter-option-label {
     display: inline-block;
@@ -551,6 +555,7 @@
     font-weight: 500 !important;
     display: block;
     position: relative;
+    font-weight: 600 !important;
 
     &:focus {
       outline: none;

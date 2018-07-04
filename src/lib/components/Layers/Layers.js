@@ -3,12 +3,35 @@ import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
 
 export class Layers extends Component {
+  constructor(props) {
+    super(props);
+    const groups = {};
+    if (this.props.layers) {
+      this.props.layers.forEach((layer) => {
+        if (!layer.id) {
+          Object.keys(layer).forEach((l) => {
+            groups[l] = { isOpen: false };
+          });
+        }
+      })
+    }
+    this.state = groups;
+  }
+
+  toggleSubMenu(e, layer) {
+    e.preventDefault();
+    this.setState({
+      ...this.state,
+      [layer]: { isOpen: !this.state[layer].isOpen },
+    });
+  }
+
   render() {
     const { mapId, layers, currentRegion, preparedLayers } = this.props;
 
     let layerKeys;
     let layerObj;
-    const layerItem = [];
+    let layerItem = [];
     const subLayerIds = [];
 
     if (!preparedLayers) {
@@ -26,15 +49,44 @@ export class Layers extends Component {
       }
     }
 
-    layers.map((layer) => {
-      if ((!currentRegion || (layer.region && layer.region === currentRegion)) && !subLayerIds.includes(layer.id)) {
-        layerItem.push(
-          (<Layer
+    layers.forEach((layer) => {
+      if ((!currentRegion
+        || (layer.region
+          && layer.region === currentRegion))
+        && !subLayerIds.includes(layer.id)) {
+        if (layer.id) {
+          layerItem.push((<Layer
             key={layer.id}
             mapId={mapId}
             layer={layer}
-          />)
-        );
+          />))
+        } else {
+          Object.keys(layer).forEach((d, i) => {
+            layerItem = layerItem.concat([
+              (
+                <a
+                  key={`${d}-${i}-link`}
+                  className="sub-category"
+                  onClick={(e) => this.toggleSubMenu(e, d)}
+                >
+                  {d}
+                  <span
+                    className={`category glyphicon glyphicon-chevron-${this.state[d].isOpen ? 'down' : 'right'}`}
+                  />
+                </a>
+              ),
+              (this.state[d].isOpen ?
+                <Layers
+                  key={`${d}-${i}`}
+                  mapId={mapId}
+                  layers={layer[d].layers}
+                  currentRegion={currentRegion}
+                  preparedLayers={preparedLayers}
+                />
+              : null)
+            ]);
+          });
+        }
       }
       return null;
     });

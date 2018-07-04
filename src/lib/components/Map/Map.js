@@ -7,7 +7,14 @@ import './Map.scss';
 const mapStateToProps = (state, ownProps) => {
   const { APP, STYLES, REGIONS, VIEW } = state;
   const mapId = ownProps.mapId || 'map-1';
-  const MAP = state[mapId] || { blockLoad: true };
+  const MAP = state[mapId] || { blockLoad: true, layers: {}};
+  const activeLayers = [];
+  Object.keys(MAP.layers).forEach((key) => {
+    const layer = MAP.layers[key];
+    if (layer.visible && layer.type !== 'chart') {
+      activeLayers.push(key);
+    }
+  });
   MAP.blockLoad = VIEW ? (!VIEW.splitScreen && mapId !== 'map-1') : false;
   return {
     mapId,
@@ -16,13 +23,14 @@ const mapStateToProps = (state, ownProps) => {
     REGIONS,
     MAP,
     VIEW,
-    timeSeriesObj: MAP.timeseries ? MAP.timeseries[MAP.visibleLayerId]: null,
+    timeSeriesObj: MAP.timeseries ? MAP.timeseries[MAP.activeLayerId]: null,
     timeseries:  MAP.timeseries,
     layersObj: MAP.layers ? buildLayersObj(MAP.layers) : {},
     layerObj: MAP.layers ? MAP.layers[MAP.activeLayerId]: null,
     primaryLayer: MAP.primaryLayer,
     showDetailView: !!MAP.detailView,
-    showFilterPanel: !!MAP.showFilterPanel
+    showFilterPanel: !!MAP.showFilterPanel,
+    activeLayers,
   }
 }
 
@@ -36,7 +44,8 @@ class Map extends Component {
       mapboxgl.accessToken = accessToken;
       this.map = new mapboxgl.Map(mapConfig);
       window.maps.push(this.map);
-      this.map.addControl(new mapboxgl.NavigationControl());
+      this.map.controls = new mapboxgl.NavigationControl();
+      this.map.addControl(this.map.controls);
   
       // Handle Map Load Event
       this.map.on('load', () => {
@@ -82,22 +91,37 @@ class Map extends Component {
     // this.addMapClickEvents()
     // this.addMouseMoveEvents()
     // etc
+    this.map.on('mousemove', (e) => {
+      const { activeLayers, layerObj } = this.props;
+      const features = this.map.queryRenderedFeatures(e.point, {
+        layers: activeLayers.filter(i => this.map.getLayer(i) !== undefined)
+      });
+      const feature = features.find(f => f.layer.id === layerObj.id);
+      if (!feature) {
+        return false;
+      }
+      this.map.getCanvas().style.cursor = layerObj['detail-view']
+        ? 'pointer' : '';
+      return true;
+    });
     this.map.on('click', this.onFeatureClick.bind(this));
   }
 
   onFeatureClick(e) {
     const activeLayers = this.props.layersObj.map(l => l.id)
-    const { layerObj, mapId } = this.props;
+    const { mapId } = this.props;
     const features = this.map.queryRenderedFeatures(e.point, { layers: activeLayers });
-    const feature = features.find(f => f.layer.id === layerObj.id);
+    const feature = features[0];
+    if (!feature) return false;
+    const activeLayerObj = this.props.layersObj.find((l) => l.id === feature.layer.id);
 
-    if (feature && layerObj['detail-view']) {
+    if (feature && activeLayerObj['detail-view']) {
       const newZoom = this.map.getZoom() < 7.5 ? 7.5 : this.map.getZoom();
       this.map.easeTo({
         center: e.lngLat,
         zoom: newZoom
       });
-      buildDetailView(mapId, layerObj, feature.properties, this.props.dispatch);
+      buildDetailView(mapId, activeLayerObj, feature.properties, this.props.dispatch);
     }
   }
 
@@ -224,7 +248,7 @@ class Map extends Component {
           const layer = layers[key];
           // Add layer to map if visible
           if (!this.map.getLayer(layer.id) && layer.visible && layer.styleSpec) {
-            this.map.addLayer(layer.styleSpec);
+            this.map.addLayer({ ...layer.styleSpec });
 
             // if layer has a highlight layer
             if (layer.filters && layer.filters.highlight) {
@@ -415,7 +439,7 @@ class Map extends Component {
         tsObj = timeseries[id];
 
         const {
-          temporalIndex, stops, colorStops, strokeWidthStops,
+          temporalIndex, stops, strokeWidthStops,
         } = tsObj;
 
         index = parseInt(temporalIndex, 10);
@@ -456,20 +480,20 @@ class Map extends Component {
               defaultValue = layerObj.type === 'circle' ? 0 : 'rgba(0,0,0,0)';
               paintProperty = layerObj.type === 'circle' ? 'circle-radius' : 'fill-color';
               newStops = {
-                property: layerObj.source.join[0],
+                property: layerObj.categories['vector-prop'] || layerObj.source.join[0],
                 stops: stops[index],
                 type: 'categorical',
                 default: defaultValue,
               };
 
-              if (layerObj.type === 'circle' && layerObj.categories.color instanceof Array) {
+              if (layerObj.type === 'circle' && (layerObj.categories.color instanceof Array || layerObj.colorStops)) {
                 newColorStops = {
-                  property: layerObj.source.join[0],
-                  stops: colorStops[index],
+                  property: layerObj.categories['vector-prop'] || layerObj.source.join[0],
+                  stops: layerObj.stops[0][index],
                   type: 'categorical',
                 };
                 newStrokeStops = {
-                  property: layerObj.source.join[0],
+                  property: layerObj.categories['vector-prop'] || layerObj.source.join[0],
                   stops: strokeWidthStops[index],
                   type: 'categorical',
                 };
@@ -571,10 +595,10 @@ class Map extends Component {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
     }
     if (this.props.showFilterPanel) {
-      mapWidth = 'calc(100% - 250px)';
+      mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 250px)` : '48%';
     }
     if (this.props.showDetailView) {
-      mapWidth = 'calc(100% - 345px)'
+      mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 345px)` : '48%';
     }
     return (
       <div>

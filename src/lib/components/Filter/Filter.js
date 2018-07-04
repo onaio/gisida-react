@@ -13,6 +13,7 @@ const mapStateToProps = (state, ownProps) => {
     APP: state.APP,
     MAP,
     mapId,
+    isSplitScreen: state.VIEW && state.VIEW.splitScreen,
     FILTER: state.FILTER,
     layerObj: MAP.layers[MAP.filter.layerId],
     doShowProfile: MAP.showProfile,
@@ -100,7 +101,7 @@ export class Filter extends Component {
         filter.options = [...filters[filterKey].quantitativeValues];
       } else {
         options = filters[filterKey].filterValues;
-        optionKeys = Object.keys(options);
+        optionKeys = Object.keys(options).filter((o) => o.length > 0);
         // loop over all options
         for (o = 0; o < optionKeys.length; o += 1) {
           optionKey = optionKeys[o];
@@ -758,6 +759,7 @@ export class Filter extends Component {
   }
 
   render() {
+    const { isSplitScreen, mapId } = this.props;
     const { filters, isMac, globalSearchField } = this.state;
     const filterKeys = filters ? Object.keys(filters) : {};
     const filterItems = [];
@@ -822,11 +824,18 @@ export class Filter extends Component {
     }
 
     const doClear = isFilterable || this.state.isFiltered || this.isMapFiltered();
-    const sidebarOffset = this.props.showFilterPanel
+    let sidebarOffset = this.props.showFilterPanel
       ? '260px'
       : !!this.props.detailView
       ? '355px'
       : '10px';
+
+    if (isSplitScreen && mapId === 'map-1') {
+      sidebarOffset = `calc(48% + ${sidebarOffset})`
+    }
+
+    const filterClasses = `${isMac ? ' mac' : ''}${isSplitScreen
+      && mapId === 'map-1' ? ' isSplitScreen' : ''}`;
 
     return (
     <div>
@@ -844,7 +853,7 @@ export class Filter extends Component {
         {
           this.props.showFilterPanel  ?
             <div>
-              <div className={`profile-view-container filter-container${isMac ? ' mac' : ''}`}>
+              <div className={`profile-view-container filter-container${filterClasses}`}>
                 {<button
                   className="filter-search"
                 

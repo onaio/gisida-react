@@ -12,11 +12,25 @@ const mapStateToProps = (state, ownProps) => {
   // let layers;
 
   if (Object.keys(LAYERS.groups).length) {
+    const groupMapper = (layer) => {
+      if (typeof layer === 'string') {
+        return MAP.layers[layer];
+      }
+
+      const subGroup = {};
+      Object.keys(layer).forEach(l => {
+        subGroup[l] = {
+          category: l,
+          layers: layer[l].map(groupMapper).filter((l) => typeof l !== 'undefined'),
+        }
+      });
+      return subGroup;
+    };
     // build list of LAYERS.categories populated with layers from MAP.layers 
     categories = Object.keys(LAYERS.groups).map((group) => {
       return {
         category: group,
-        layers: LAYERS.groups[group].map((l) => MAP.layers[l])
+        layers: LAYERS.groups[group].map(groupMapper)
           .filter((l) => typeof l !== 'undefined'),
       };
     });
@@ -60,6 +74,7 @@ const mapStateToProps = (state, ownProps) => {
     currentRegion: currentRegion,
     loaded: state.APP.loaded,
     preparedLayers: MAP.layers,
+    menuIsOpen: MAP.menuIsOpen,
   };
 }
 
@@ -68,13 +83,13 @@ class Menu extends Component {
     super(props)
     this.state = {
       openCategories: [],
-      openMenu: true
     }
   }
 
   onToggleMenu = (e) => {
     e.preventDefault();
-    this.setState({ openMenu: !this.state.openMenu });
+    const { dispatch } = this.props;
+    dispatch(Actions.toggleMenu(this.props.mapId));
   }
 
   onCategoryClick = (e, category) => {
@@ -115,12 +130,12 @@ class Menu extends Component {
               <div id={`${mapId}-menu-wrapper`} className="menu-wrapper">
                 {/* Open button menu */}
                 <a onClick={e => this.onToggleMenu(e)} className="open-btn"
-                  style={{ display: this.state.openMenu ? 'none' : 'block' }}>
+                  style={{ display: this.props.menuIsOpen ? 'none' : 'block' }}>
                   <span className="glyphicon glyphicon-menu-hamburger"></span>
                 </a>
                 {/* Menu */}
                 <div id={`${mapId}-menu`} className="sectors-menu"
-                  style={{ display: this.state.openMenu ? 'block' : 'none' }}>
+                  style={{ display: this.props.menuIsOpen ? 'block' : 'none' }}>
                   {/* Close menu button */}
                   <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
                     <span className="glyphicon glyphicon-remove"></span>

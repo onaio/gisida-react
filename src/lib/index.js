@@ -21,6 +21,7 @@ import LineChart from './components/Charts/LineChart';
 import ColumnChart from './components/Charts/BarChartStacked';
 import BarChartStacked from './components/Charts/BarChartStacked';
 import ThemeSwitcher from './components/ThemeSwitcher/ThemeSwitcher';
+import Export from './components/Export/Export';
 
 export {
   App,
@@ -39,4 +40,5 @@ export {
   ColumnChart,
   BarChartStacked,
   ThemeSwitcher,
+  Export,
 }

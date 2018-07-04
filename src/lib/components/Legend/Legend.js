@@ -8,9 +8,18 @@ import Parser from 'html-react-parser';
 import './Legend.scss';
 
 const mapStateToProps = (state, ownProps) => {
-  const MAP = state[ownProps.mapId] || { layers: {}}
+  const mapId = ownProps.mapId || 'map-1';
+  const MAP = state[mapId] || { layers: {}, timeseries: {} }
+  let timeLayer;
+  buildLayersObj(MAP.layers).forEach((layer) => {
+    if (layer && layer.visible && layer.aggregate && layer.aggregate.timeseries) {
+      timeLayer = layer.id;
+    }
+  });
+  timeLayer = MAP.timeseries[MAP.primaryLayer] ? MAP.primaryLayer : timeLayer;
   return {
     layerObj: MAP.layers[MAP.activeLayerId],
+    timeSeriesObj: MAP.timeseries[timeLayer],
     lastLayerSelected: MAP.layers[MAP.lastLayerSelected],
     layersData: buildLayersObj(MAP.layers),
     MAP,
@@ -37,10 +46,10 @@ export class Legend extends React.Component {
   }
 
   render() {
-    const { layerObj, mapId, lastLayerSelected } = this.props;
+    const { layerObj, mapId, lastLayerSelected, timeSeriesObj  } = this.props;
 
-    if (!layerObj) {
-      return false;
+    if (!layerObj || !timeSeriesObj) {
+      return null;
     }
 
     const legendItems = [];
@@ -57,23 +66,14 @@ export class Legend extends React.Component {
 
       let background = [];
 
-      let uniqueStops;
-
       const quantiles = [];
+      const { temporalIndex } = timeSeriesObj;
+      if (circleLayerType && layer.breaks && layer.stops && layer.stops[0][temporalIndex]) {
+        const currentColorStops = [...new Set(layer.stops[0][temporalIndex].map(d => d[1]))];
+        const currentRadiusStops = [...new Set(layer.stops[1][temporalIndex].map(d => d[1]))];
+        const currentBreakStops = [...new Set(layer.stops[6][temporalIndex])];
 
-      if (circleLayerType && layer.breaks && layer.stopsData && layer.styleSpec && layer.styleSpec.paint) {
-        const stopVals = [];
-        layer.stopsData.forEach((s) => {
-           stopVals.push(s[1]);
-        });
-
-        layer.styleSpec.paint['circle-radius'].stops.forEach((s) => {
-          stopVals.push(s[1]);
-        });
-
-        uniqueStops = [...new Set(stopVals)].sort((a, b) => a - b);
-
-        uniqueStops.forEach((s) => {
+        currentRadiusStops.forEach((s, i) => {
           quantiles.push((
             <span
               className="circle-container"
@@ -81,15 +81,14 @@ export class Legend extends React.Component {
               <span
                 style={
                   {
-                    background: Array.isArray(layer.categories.color) ? layer.categories.color[uniqueStops.indexOf(s)]
-                      : layer.categories.color,
+                    background: `${currentColorStops[i]}`,
                     width: `${s * 2}px`,
                     height: `${s * 2}px`,
-                    margin: `0px ${uniqueStops.indexOf(s) + 2}px`
+                    margin: `0px ${currentRadiusStops[i] / 2}px`
                   }
                 }
               ></span>
-              <p>{layer.breaks[uniqueStops.indexOf(s)]}</p>
+              <p>{currentBreakStops[i]}</p>
               </span>
           ));
         });
@@ -154,9 +153,7 @@ export class Legend extends React.Component {
             </div>
           );
         } if (fillLayerWithBreaks && layer.stops && !layer.parent) {
-          const { stopsData, breaks, colors, Data } = layer;
-
-          const dataValues = Data.map(values => parseInt(values[layer.property], 10));
+          const { stopsData, breaks, colors } = layer;
           const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
 
@@ -165,18 +162,20 @@ export class Legend extends React.Component {
             breaks.splice(1, 0, breaks[0]);
           }
 
-          colorLegend.forEach((color, index) => {
-            const stopsIndex = layerObj.stops[4].indexOf(color);
+          let lastVal;
+
+          colors.forEach((color, index) => {
+            const stopsIndex = layerObj.stops ? layerObj.stops[4].indexOf(color) : -1;
 
             if (stopsIndex !== -1) {
               const firstVal = stopsIndex ? layerObj.stops[3][stopsIndex - 1] : 0;
-              const lastVal = layerObj.stops[3][stopsIndex];
+              lastVal = layerObj.stops[3][stopsIndex];
               background.push((
                 <li
                   key={index}
                   className={`background-block-${layer.id}-${mapId}`}
-                  data-tooltip={`${formatNum(firstVal, 1)}-${formatNum(lastVal, 1)}${legendSuffix}`}
-                  style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colorLegend.length) + '%' }}
+                  data-tooltip={`${(typeof formatNum(firstVal, 1) === 'undefined' ? 0 : formatNum(firstVal, 1))}-${(typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1))}${legendSuffix}`}
+                  style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colors.length) + '%' }}
                 >
                 </li>
               ));
@@ -211,7 +210,7 @@ export class Legend extends React.Component {
                 className={`${mapId}`}
                 style={{ position: 'absolute', listStyle: 'none', display: 'inline', right: '3%' }}
               >
-                {formatNum(Math.max(...dataValues), 1)}
+                {typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)}
                 {legendSuffix}
               </li>
             </ul>
@@ -331,8 +330,7 @@ export class Legend extends React.Component {
           </div>
         ));
       } else if (fillLayerWithBreaks && layer.stops && !layer.parent) {
-        const { stopsData, breaks, colors, Data } = layer;
-        const dataValues = Data.map(values => parseInt(values[layer.property], 10));
+        const { stopsData, breaks, colors } = layer;
         const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
         const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
 
@@ -341,18 +339,20 @@ export class Legend extends React.Component {
             breaks.splice(1, 0, breaks[0]);
           }
 
-          colorLegend.forEach((color, index) => {
-            const stopsIndex = layerObj.stops[4].indexOf(color);
+          let lastVal;
+
+          colors.forEach((color, index) => {
+            const stopsIndex = layerObj.stops ? layerObj.stops[4].indexOf(color) : -1;
 
             if (stopsIndex !== -1) {
               const firstVal = stopsIndex ? layerObj.stops[3][stopsIndex - 1] : 0;
-              const lastVal = layerObj.stops[3][stopsIndex];
+              lastVal = layerObj.stops[3][stopsIndex];
               background.push((
                 <li
                   key={index}
                   className={`background-block-${layer.id}-${mapId}`}
-                  data-tooltip={`${formatNum(firstVal, 1)}-${formatNum(lastVal, 1)}${legendSuffix}`}
-                  style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colorLegend.length) + '%' }}
+                  data-tooltip={`${typeof formatNum(firstVal, 1) === 'undefined' ? 0 : formatNum(firstVal, 1)}-${typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)}${legendSuffix}`}
+                  style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colors.length) + '%' }}
                 >
                 </li>
               ));
@@ -387,7 +387,7 @@ export class Legend extends React.Component {
                 className={`${mapId}`}
                 style={{ position: 'absolute', listStyle: 'none', display: 'inline', right: '3%' }}
               >
-                {formatNum(Math.max(...dataValues), 1)}
+                {typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)}
                 {legendSuffix}
               </li>
             </ul>
@@ -428,6 +428,7 @@ Legend.propTypes = {
   layersData: PropTypes.arrayOf(PropTypes.any).isRequired,
   MAP: PropTypes.objectOf(PropTypes.any).isRequired,
   primaryLayer: PropTypes.string.isRequired,
+  timeSeriesObj: PropTypes.objectOf(PropTypes.any),
 };
 
 export default connect(mapStateToProps)(Legend);
