@@ -13,6 +13,7 @@ import PieChart from './components/Charts/PieChart';
 import LineChart from './components/Charts/LineChart';
 import ThemeSwitcher from './components/ThemeSwitcher/ThemeSwitcher';
 import Export from './components/Export/Export';
+import HorizontalBarChart from './components/Charts/HorizontalBarChart';
 
 export {
   App,
@@ -28,6 +29,7 @@ export {
   Spinner,
   PieChart,
   LineChart,
+  HorizontalBarChart,
   ThemeSwitcher,
   Export,
 }
