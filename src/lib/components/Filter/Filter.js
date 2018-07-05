@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Actions, generateFilterOptions, buildFilterState, clearFilterState, prepareLayer } from 'gisida';
+import {
+  Actions,
+  generateFilterOptions,
+  buildFilterState,
+  clearFilterState,
+  prepareLayer
+} from 'gisida';
 import { buildLayersObj } from '../../utils';
 import FilterSelector from './FilterSelector';
 import './Filter.scss';
@@ -101,7 +107,9 @@ export class Filter extends Component {
         filter.options = [...filters[filterKey].quantitativeValues];
       } else {
         options = filters[filterKey].filterValues;
-        optionKeys = Object.keys(options).filter((o) => o.length > 0);
+        optionKeys = Object.keys(options)
+          .filter(o => o.length > 0)
+          .filter(o => o !== 'undefined');
         // loop over all options
         for (o = 0; o < optionKeys.length; o += 1) {
           optionKey = optionKeys[o];
@@ -437,6 +445,21 @@ export class Filter extends Component {
     dispatch(Actions.saveFilterState(mapId, layerId, newFilterState));
 
     if (regenStops) {
+      const { fauxLayerObj } = newFilterState;
+      this.map = this.props.mapId === 'map-1'
+      ? window.maps[0]
+      : window.maps[1];
+
+      if (this.map.getLayer(layerId)) {
+        this.map.removeLayer(layerId);
+        if (this.map.getSource(layerId)) {
+          this.map.removeSource(layerId)
+        }
+      }
+
+      prepareLayer(mapId, fauxLayerObj, this.props.dispatch, true);
+      // this.props.dispatch(Actions.setLayerFilter(mapId, fauxLayerObj.id, nextFilters));
+
       // console.log('fauxLayerObj', newFilterState.fauxLayerObj.source.data);
       // window.GisidaMap.removeLayer(layerId);
       // window.GisidaMap.removeSource(layerId);

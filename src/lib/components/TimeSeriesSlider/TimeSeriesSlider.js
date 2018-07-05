@@ -14,7 +14,7 @@ const mapStateToProps = (state, ownProps) => {
       timeLayer = layer.id;
     }
   });
-  timeLayer = MAP.timeseries[MAP.primaryLayer] ? MAP.primaryLayer : timeLayer;
+  timeLayer = MAP.primaryLayer && MAP.primaryLayer.length && MAP.timeseries[MAP.primaryLayer] ? MAP.primaryLayer : timeLayer;
   return {
     timeSeriesObj: MAP.timeseries[timeLayer],
     timeseries: MAP.timeseries,
@@ -100,7 +100,7 @@ class TimeSeriesSlider extends React.Component {
     return this.props.timeSeriesObj ? (
       <div
         className="series"
-        style={{ right: this.props.showFilterPanel ? '310px' : '50px'}}>
+        style={{ right: '50px'}}>
         <label
           id={`${this.props.mapId}-label`}
           className="label"
