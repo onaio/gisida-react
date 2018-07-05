@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, addPopUp, sortLayers, addChart, buildDetailView } from 'gisida';
+import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
 import { detectIE, buildLayersObj } from '../../utils';
 import './Map.scss';
 
@@ -268,7 +268,14 @@ class Map extends Component {
                 this.map.addLayer(highlightLayer);
               }
             }
-          } 
+          } else if (this.map.getLayer(layer.id) && nextProps.MAP.reloadLayerId === layer.id) {
+            // 1) remove layer and source
+            this.map.removeLayer(layer.id);
+            this.map.removeSource(layer.id);
+            // 2) dispatch action to set reloadLayerId to null
+            this.props.dispatch(Actions.layerReloaded(mapId));
+            prepareLayer(mapId, layer, this.props.dispatch);
+          }
           // Change visibility if layer is already on map
           this.changeVisibility(layer.id, layer.visible);
           if (layer.layers) {

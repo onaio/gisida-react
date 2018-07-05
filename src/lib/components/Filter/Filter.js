@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Actions, generateFilterOptions, buildFilterState, clearFilterState } from 'gisida';
+import { Actions, generateFilterOptions, buildFilterState, clearFilterState, prepareLayer } from 'gisida';
 import { buildLayersObj } from '../../utils';
 import FilterSelector from './FilterSelector';
 import './Filter.scss';
@@ -438,7 +438,10 @@ export class Filter extends Component {
 
     if (regenStops) {
       // console.log('fauxLayerObj', newFilterState.fauxLayerObj.source.data);
-
+      // window.GisidaMap.removeLayer(layerId);
+      // window.GisidaMap.removeSource(layerId);
+      // prepareLayer(mapId, newFilterState.fauxLayerObj, dispatch);
+      this.props.dispatch(Actions.addLayer(mapId, newFilterState.fauxLayerObj));
       // 4. remove layer from map
       // 5. add layer to map with fauxLayerObj
       // 6. apply vector filter if necessary (or is this already handled by regenerating Stops?)
