@@ -5,8 +5,7 @@ import {
   Actions,
   generateFilterOptions,
   buildFilterState,
-  clearFilterState,
-  prepareLayer
+  clearFilterState
 } from 'gisida';
 import { buildLayersObj } from '../../utils';
 import FilterSelector from './FilterSelector';
@@ -381,10 +380,20 @@ export class Filter extends Component {
     const filterState = {
       filterOptions,
       filters: this.buildFiltersMap(filterOptions),
-      aggregate: this.props.layerObj.aggregate,
+      aggregate: { ...this.props.layerObj.aggregate },
       isFiltered: false,
     };
     clearFilterState(mapId, filterState, layerId, dispatch);
+
+    // Reload layer if necessary to re-aggregate / restore layer stops
+    if (this.props.FILTER[layerId]
+      &&  this.props.FILTER[layerId].originalLayerObj
+      && filterOptions
+      && Object.keys(filterOptions).map(f => filterOptions[f].type).includes('stops')) {
+      
+      // Reload layer to re-aggregate and re-add layer
+      this.props.dispatch(Actions.addLayer(mapId, this.props.FILTER[layerId].originalLayerObj));
+    }
     return true;
   }
 
