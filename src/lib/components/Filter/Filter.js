@@ -446,28 +446,9 @@ export class Filter extends Component {
 
     if (regenStops) {
       const { fauxLayerObj } = newFilterState;
-      this.map = this.props.mapId === 'map-1'
-      ? window.maps[0]
-      : window.maps[1];
-
-      if (this.map.getLayer(layerId)) {
-        this.map.removeLayer(layerId);
-        if (this.map.getSource(layerId)) {
-          this.map.removeSource(layerId)
-        }
-      }
-
-      prepareLayer(mapId, fauxLayerObj, this.props.dispatch, true);
-      // this.props.dispatch(Actions.setLayerFilter(mapId, fauxLayerObj.id, nextFilters));
-
-      // console.log('fauxLayerObj', newFilterState.fauxLayerObj.source.data);
-      // window.GisidaMap.removeLayer(layerId);
-      // window.GisidaMap.removeSource(layerId);
-      // prepareLayer(mapId, newFilterState.fauxLayerObj, dispatch);
-      this.props.dispatch(Actions.addLayer(mapId, newFilterState.fauxLayerObj));
-      // 4. remove layer from map
-      // 5. add layer to map with fauxLayerObj
-      // 6. apply vector filter if necessary (or is this already handled by regenerating Stops?)
+      this.map = this.props.mapId === 'map-1' ? window.maps[0] : window.maps[1];
+      // Reload layer to re-aggregate and re-add layer
+      this.props.dispatch(Actions.addLayer(mapId, fauxLayerObj));
     } else if (nextFilters.length > 1) {
       // Apply layerFilter to mapbox layer
       this.props.dispatch(Actions.setLayerFilter(mapId, layerId, nextFilters));
