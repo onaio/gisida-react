@@ -321,7 +321,6 @@ export class Filter extends Component {
   }
 
   onFilterOptionClick = (e, filterKey) => {
-    e.stopPropagation();
     const { filters } = this.state;
     const option = filters[filterKey].options[e.target.value];
     const nextOptions = Object.assign(
@@ -394,7 +393,6 @@ export class Filter extends Component {
       &&  this.props.FILTER[layerId].originalLayerObj
       && filterOptions
       && Object.keys(filterOptions).map(f => filterOptions[f].type).includes('stops')) {
-      
       // Reload layer to re-aggregate and re-add layer
       this.props.dispatch(Actions.addLayer(mapId, oldLayerObj));
     }
@@ -454,6 +452,16 @@ export class Filter extends Component {
     }
 
     // Update FILTER store state
+    const { FILTER } = this.props;
+
+    if (!FILTER[layerId].originalLayerObj) {
+      const newFilterState = buildFilterState(filterOptions, filters, layerObj, regenStops);
+      const { originalLayerObj } = newFilterState;
+      this.setState({
+        oldLayerObj: originalLayerObj,
+      });
+    }
+
     const newFilterState = buildFilterState(filterOptions, filters, layerObj, regenStops);
     dispatch(Actions.saveFilterState(mapId, layerId, newFilterState));
 
@@ -465,12 +473,6 @@ export class Filter extends Component {
       // Apply layerFilter to mapbox layer
       this.props.dispatch(Actions.setLayerFilter(mapId, layerId, nextFilters));
     }
-
-    const { originalLayerObj } = newFilterState;
-
-    this.setState({
-      oldLayerObj: originalLayerObj,
-    });
 
     return true;
   }
