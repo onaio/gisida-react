@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, addPopUp, sortLayers, addChart, buildDetailView } from 'gisida';
+import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
 import { detectIE, buildLayersObj } from '../../utils';
 import './Map.scss';
 
@@ -123,6 +123,7 @@ class Map extends Component {
       });
       buildDetailView(mapId, activeLayerObj, feature.properties, this.props.dispatch);
     }
+    return true;
   }
 
   findNextLayer(activelayersData, nextLayer) {
@@ -268,7 +269,16 @@ class Map extends Component {
                 this.map.addLayer(highlightLayer);
               }
             }
-          } 
+          } else if (this.map.getLayer(layer.id) && nextProps.MAP.reloadLayerId === layer.id) {
+            // 1) remove layer and source
+            let doUpdateTsLayer = true;
+            let filterOptions = false;
+            this.map.removeLayer(layer.id);
+            this.map.removeSource(layer.id);
+            // 2) dispatch action to set reloadLayerId to null
+            this.props.dispatch(Actions.layerReloaded(mapId));
+            prepareLayer(mapId, layer, this.props.dispatch, filterOptions, doUpdateTsLayer);
+          }
           // Change visibility if layer is already on map
           this.changeVisibility(layer.id, layer.visible);
           if (layer.layers) {
@@ -543,7 +553,7 @@ class Map extends Component {
     let htmlLabel;
     const { id } = layerObj;
     const labels = timeseries && typeof timeseries[layerObj.id] !== 'undefined'
-      ? layerObj.labels.labels[timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]]
+      ? layerObj.labels.labels[timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]] || layerObj.labels.labels
       : layerObj.labels.labels;
 
     for (let l = 0; l < labels.length; l += 1) {
