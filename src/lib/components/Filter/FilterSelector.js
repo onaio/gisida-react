@@ -55,6 +55,11 @@ export class FilterSelector extends Component {
     this.props.searchFilterOptions(e, filterKey);
   }
 
+  onFilterOptionClick = (e, filterKey) => {
+    e.stopPropagation();
+    this.props.onFilterOptionClick(e, filterKey);
+  }
+
   render() {
     const { options, isLinux, dataType, queriedOptionKeys } = this.state;
     const { filterKey, doAdvFiltering,  toggleAllOn, queries } = this.props;
@@ -81,7 +86,7 @@ export class FilterSelector extends Component {
               id={optionKeys[i]}
               value={optionKeys[i]}
               checked={option.enabled}
-              onChange={(e) => { this.props.onFilterOptionClick(e, filterKey); }}
+              onChange={(e) => { this.onFilterOptionClick(e, filterKey); }}
             />
             <label
               htmlFor={optionKeys[i]}
