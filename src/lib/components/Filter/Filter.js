@@ -107,8 +107,7 @@ export class Filter extends Component {
       } else {
         options = filters[filterKey].filterValues;
         optionKeys = Object.keys(options)
-          .filter(o => o.length > 0)
-          .filter(o => o !== 'undefined');
+          .filter(o => o.length > 0 && o !== 'undefined');
         // loop over all options
         for (o = 0; o < optionKeys.length; o += 1) {
           optionKey = optionKeys[o];
