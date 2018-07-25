@@ -14,6 +14,7 @@ import LineChart from './components/Charts/LineChart';
 import ThemeSwitcher from './components/ThemeSwitcher/ThemeSwitcher';
 import Export from './components/Export/Export';
 import HorizontalBarChart from './components/Charts/HorizontalBarChart';
+import ColumnChart from './components/Charts/ColumnChart';
 
 export {
   App,
@@ -30,6 +31,7 @@ export {
   PieChart,
   LineChart,
   HorizontalBarChart,
+  ColumnChart,
   ThemeSwitcher,
   Export,
 }
