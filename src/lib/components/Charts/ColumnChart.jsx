@@ -62,7 +62,10 @@ class ColumnChart extends React.Component {
         useHTML: true,
         shared: true,
         headerFormat: '<b>{point.key}: </b>',
-        pointFormat: '{point.y}',
+        //pointFormat: '',
+        pointFormatter: pointFormatterFunc || function pointFormatterFunc() {
+          return `<span>${this.y.toLocaleString()}</span>`;
+        },
         //shadow: false,
         //backgroundColor: 'transparent',
         //borderWidth: 0,
