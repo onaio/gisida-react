@@ -622,7 +622,8 @@ class Map extends Component {
           (
             <div id={this.props.mapId} style={{
               width: mapWidth,
-              display: this.props.MAP.blockLoad ? 'none' : 'inline'
+              display: this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
+                ? 'none' : 'inline',
             }} >
               <div className="widgets">
                 {/* Render Children elemets with mapId prop added to each child  */}

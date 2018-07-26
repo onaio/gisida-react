@@ -61,7 +61,19 @@ export class Layer extends Component {
           onChange={e => this.onLayerToggle(layer)}
           checked={!!layer.visible}
         />
-        <label htmlFor={`${layer.id}-${mapId}`} >{layer.label}</label>
+        <label
+          htmlFor={`${layer.id}-${mapId}`} >
+          {layer.label}
+          {layer.layers ?
+            <i
+              data-balloon="Grouped"
+              data-balloon-pos="up"
+            >
+              <span
+                className="glyphicon glyphicon-th-list"
+              />
+            </i> : null}
+        </label>
       </li>
     );
   }
