@@ -59,13 +59,14 @@ class ColumnChart extends React.Component {
         },
       ],
       tooltip: {
-        useHTML: false,
-        headerFormat: '',
-        pointForamt: '',
-        shadow: false,
-        backgroundColor: 'transparent',
-        borderWidth: 0,
-        padding: 0,
+        useHTML: true,
+        shared: true,
+        headerFormat: '<b>{point.key}: </b>',
+        pointFormat: '{point.y}',
+        //shadow: false,
+        //backgroundColor: 'transparent',
+        //borderWidth: 0,
+        //padding: 0,
       },
       title: {
         text: seriesTitle || null,
@@ -75,10 +76,10 @@ class ColumnChart extends React.Component {
       },
       plotOptions: {
         column: {
-          showInLegend: false,
-          pointPadding: 0,
+        showInLegend: false,
+          pointPadding: 0.2,
           borderWidth: 0,
-          tooltip: {
+        /*tooltip: {
             distance: 0,
             padding: 0,
             pointFormatter: pointFormatterFunc || function pointFormatterFunc() {
@@ -88,7 +89,7 @@ class ColumnChart extends React.Component {
                 return `<span>${this.y}</span>`;
               }
             },
-          },
+          },*/
         },
       },
       series: [{
