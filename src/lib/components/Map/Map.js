@@ -516,8 +516,6 @@ class Map extends Component {
 
   addLabels(layerObj, timeseries) {
     let el;
-    let formattedLabel;
-    let htmlLabel;
     const { id } = layerObj;
     const labels = timeseries && typeof timeseries[layerObj.id] !== 'undefined'
       ? layerObj.labels.labels[timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]]
@@ -526,10 +524,7 @@ class Map extends Component {
     for (let l = 0; l < labels.length; l += 1) {
       el = document.createElement('div');
       el.className = `map-label label-${id}`;
-      const filteredLabel = labels[l].label.split("").filter((s) => s !== "<" && s !== ">" && s !== "/" && s !== "b" && s !== "r");
-      formattedLabel = filteredLabel.join("").replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-      htmlLabel = `<b>${formattedLabel}</b>`
-      el.innerHTML = htmlLabel;
+      el.innerHTML = labels[l].label;
       new mapboxgl.Marker(el, {
         offset: labels[l].offset,
       })
