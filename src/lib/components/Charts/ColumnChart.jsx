@@ -26,8 +26,8 @@ class ColumnChart extends React.Component {
     this.state = {
       chart: {
         type: 'column',
-        height: chartHeight || 225,
-        width: chartWidth || 600,
+        height: chartHeight || null,
+        width: chartWidth || null,
         backgroundColor: 'rgba(255,255,255,0)',
         spacingTop: 15,
         spacintRight: 10,
