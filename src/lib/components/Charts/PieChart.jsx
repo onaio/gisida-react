@@ -140,11 +140,11 @@ PieChart.propTypes = {
   chartWidth: PropTypes.number.isRequired,
   chartHeight: PropTypes.number.isRequired,
   donut: PropTypes.number.isRequired,
-  tooltipOptions: PropTypes.objectOf(PropTypes.any),
-  dataLabelOptions: PropTypes.objectOf(PropTypes.any),
-  legendOptions: PropTypes.objectOf(PropTypes.any),
-  chartSpacing: PropTypes.objectOf(PropTypes.any),
-  titleOptions: PropTypes.objectOf(PropTypes.any),
+  tooltipOptions: PropTypes.bool,
+  dataLabelOptions: PropTypes.bool,
+  legendOptions: PropTypes.bool,
+  chartSpacing: PropTypes.bool,
+  titleOptions: PropTypes.bool,
   showInLegend: PropTypes.bool,
 };
 
