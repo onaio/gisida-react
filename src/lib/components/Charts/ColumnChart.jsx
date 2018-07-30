@@ -165,7 +165,7 @@ class ColumnChart extends React.Component {
 }
 
 ColumnChart.propTypes = {
-  seriesData: PropTypes.objectOf(PropTypes.any).isRequired,
+  seriesData: PropTypes.arrayOf(PropTypes.any).isRequired,
   seriesTitle: PropTypes.string.isRequired,
   chartWidth: PropTypes.number.isRequired,
   chartHeight: PropTypes.number.isRequired,
