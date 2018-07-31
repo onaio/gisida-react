@@ -92,7 +92,7 @@ export class Legend extends React.Component {
                     }
                   }
                 ></span>
-                <p>{currentBreakStops[i]}</p>
+                <p>{currentBreakStops[i].toLocaleString()}</p>
               </span>
             ));
           });
@@ -125,7 +125,7 @@ export class Legend extends React.Component {
                   }
                 }
               ></span>
-              <p>{layer.breaks[uniqueStops.indexOf(s)]}</p>
+              <p>{Number(layer.breaks[uniqueStops.indexOf(s)]).toLocaleString()}</p>
             </span>
           ));
         });
