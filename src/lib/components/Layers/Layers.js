@@ -26,19 +26,18 @@ export class Layers extends Component {
       }
     }
 
-    layers.sort((a, b) => a.label.localeCompare(b.label))
-      .map((layer) => {
-        if ((!currentRegion || (layer.region && layer.region === currentRegion)) && !subLayerIds.includes(layer.id)) {
-          layerItem.push(
-            (<Layer
-              key={layer.id}
-              mapId={mapId}
-              layer={layer}
-            />)
-          );
-        }
-        return null;
-      });
+    layers.map((layer) => {
+      if ((!currentRegion || (layer.region && layer.region === currentRegion)) && !subLayerIds.includes(layer.id)) {
+        layerItem.push(
+          (<Layer
+            key={layer.id}
+            mapId={mapId}
+            layer={layer}
+          />)
+        );
+      }
+      return null;
+    });
 
     return (
       <ul className="layers">
