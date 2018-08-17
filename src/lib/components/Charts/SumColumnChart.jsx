@@ -77,7 +77,7 @@ class SumColumnChart extends React.Component {
   constructor(props) {
     super(props);
     const { layerId, layerData, chartSpec, layer, isPrimary, locations } = this.props;
-    const { chartHeight, chartWidth, isFullBleed, isChartMin } = this.props;
+    const { chartHeight, chartWidth, isFullBleed, isChartMin, menuIsOpen } = this.props;
 
     this.state = {
       isChartMin: isPrimary ? isChartMin : false,
@@ -88,6 +88,7 @@ class SumColumnChart extends React.Component {
       chartWidth,
       isFullBleed,
       isPrimary,
+      menuIsOpen,
       seriesName: layerData.label,
       seriesData: SumColumnChart.buildColData(layerData, chartSpec, layer, locations),
     };
@@ -108,7 +109,7 @@ class SumColumnChart extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { layerId, layerData, chartSpec, layer, isPrimary, locations } = nextProps;
+    const { layerId, layerData, chartSpec, layer, isPrimary, menuIsOpen, locations } = nextProps;
     const { chartHeight, chartWidth, isFullBleed, isChartMin } = nextProps;
 
     this.setState({
@@ -119,7 +120,10 @@ class SumColumnChart extends React.Component {
       chartHeight,
       chartWidth,
       isFullBleed,
+      menuIsOpen,
       seriesData: SumColumnChart.buildColData(layerData, chartSpec, layer, locations),
+    }, () => {
+      this.props.calcChartWidth(this.props.mapId, menuIsOpen)
     });
   }
 
@@ -167,6 +171,7 @@ class SumColumnChart extends React.Component {
         <ColumnChart
           seriesTitle={chartSpec.title}
           categories={seriesData.categories}
+          isPercent={chartSpec && chartSpec.percentSuffix}
           seriesData={seriesData.data}
           targetMark={1}
           chartWidth={chartWidth}

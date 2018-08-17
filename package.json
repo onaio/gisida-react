@@ -72,11 +72,14 @@
     "camelcase": "^4.1.0",
     "colorbrewer": "^1.1.0",
     "enzyme-adapter-react-16": "^1.1.1",
-    "gisida": "^0.0.8",
+    "gisida": "1.0.0",
     "highcharts": "^6.0.6",
     "html-react-parser": "^0.4.2",
+    "jquery": "^3.3.1",
     "rc-slider": "^8.6.1",
-    "react-redux": "^5.0.6"
+    "react-load-script": "^0.0.6",
+    "react-redux": "^5.0.6",
+    "redux": "^4.0.0"
   },
   "devDependencies": {
     "autoprefixer": "7.1.2",

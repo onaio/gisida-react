@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Export component renderes correctly 1`] = `
+<div>
+  <a
+    className="export-modal-btn export-btn-map-1"
+    href="#"
+    onClick={[Function]}
+    style={
+      Object {
+        "right": "10px",
+      }
+    }
+  >
+    <span
+      className="glyphicon glyphicon-camera"
+    />
+  </a>
+</div>
+`;

@@ -20,6 +20,7 @@ class ColumnChart extends React.Component {
       yAxis,
       yAxisLabel,
       pointFormatterFunc,
+      isPercent,
     } = this.props;
 
     this.state = {
@@ -80,7 +81,13 @@ class ColumnChart extends React.Component {
           tooltip: {
             distance: 0,
             padding: 0,
-            pointFormatter: pointFormatterFunc || ColumnChart.pointFormatterFunc,
+            pointFormatter: pointFormatterFunc || function pointFormatterFunc() {
+              if (isPercent) {
+                return `<span>${this.y}%</span>`;
+              } else {
+                return `<span>${this.y}</span>`;
+              }
+            },
           },
         },
       },
@@ -109,7 +116,9 @@ class ColumnChart extends React.Component {
     } = nextProps;
 
     if (isNewSeriesData(this.state.series[0].data, seriesData)) {
-      this.chart.destroy();
+      if (this.chart) {
+        this.chart.destroy();
+      }
 
       this.setState({
         chart: Object.assign({}, this.state.chart, {

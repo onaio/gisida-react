@@ -16,7 +16,7 @@ const mapStateToProps = (state, ownProps) => {
     REGIONS,
     MAP,
     VIEW,
-    timeSeriesObj: MAP.timeseries ? MAP.timeseries[MAP.visibleLayerId]: null,
+    timeSeriesObj: MAP.timeseries ? MAP.timeseries[MAP.activeLayerId]: null,
     timeseries:  MAP.timeseries,
     layersObj: MAP.layers ? buildLayersObj(MAP.layers) : {},
     layerObj: MAP.layers ? MAP.layers[MAP.activeLayerId]: null,
@@ -36,7 +36,8 @@ class Map extends Component {
       mapboxgl.accessToken = accessToken;
       this.map = new mapboxgl.Map(mapConfig);
       window.maps.push(this.map);
-      this.map.addControl(new mapboxgl.NavigationControl());
+      this.map.controls = new mapboxgl.NavigationControl();
+      this.map.addControl(this.map.controls);
   
       // Handle Map Load Event
       this.map.on('load', () => {
@@ -121,9 +122,9 @@ class Map extends Component {
       if (parentLayer.layers) {
         const sublayers = parentLayer.layers;
         if (sublayers) {
-          for (let l = 0; l < sublayers.length; l += 1) {
-            if (this.map.getLayer(sublayers[l])) {
-              this.map.moveLayer(sublayers[l]);
+          for (let s = 0; s < sublayers.length; s += 1) {
+            if (this.map.getLayer(sublayers[s])) {
+              this.map.moveLayer(sublayers[s]);
             }
           }
         }
@@ -135,7 +136,7 @@ class Map extends Component {
     }
 
     // Move the selected primary layer to the top of the map layers
-    if (!nextLayerObj.parent && this.map.getLayer(nextLayerId)) {
+    if (!nextLayerObj.layers && this.map.getLayer(nextLayerId)) {
       this.map.moveLayer(nextLayerId);
     }
     let layerObj;
@@ -143,9 +144,9 @@ class Map extends Component {
     for (let i = activeLayersData.length - 1; i >= 0; i -= 1) {
       layerObj = activeLayersData[i];
       // If 'layerObj' is not a fill OR the selected primary layer
-      if (layerObj.type !== 'fill' && layerObj.id === nextLayerId) {
+      if (layerObj.type !== 'fill' && layerObj.id !== nextLayerId && !layerObj.parent) {
         // If 'layerObj' is not the same type as the selected
-        if (layerObj.type === nextLayerObj.type) {
+        if (layerObj.type !== nextLayerObj.type) {
           // Move 'layerObj' to the top of the map layers
           if (this.map.getLayer(layerObj.id)) {
             this.map.moveLayer(layerObj.id);
@@ -261,7 +262,7 @@ class Map extends Component {
               // newStops = { id: layer.id, period, timefield };
               data = layer.source.data.filter(d => d[timefield] === period[period.length - 1]);
             }
-            addChart(layer, data, this.map);
+            addChart(layer, data, this.map, mapId);
           } else {
              $(`.marker-chart-${layer.id}-${mapId}`).remove();
           }
@@ -516,8 +517,7 @@ class Map extends Component {
   addLabels(layerObj, timeseries) {
     let el;
     const { id } = layerObj;
-    const { offset } = layerObj.labels;
-    const labels = typeof timeseries[layerObj.id] !== 'undefined'
+    const labels = timeseries && typeof timeseries[layerObj.id] !== 'undefined'
       ? layerObj.labels.labels[timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]]
       : layerObj.labels.labels;
 
@@ -525,7 +525,9 @@ class Map extends Component {
       el = document.createElement('div');
       el.className = `map-label label-${id}`;
       el.innerHTML = labels[l].label;
-      new mapboxgl.Marker(el, { offset })
+      new mapboxgl.Marker(el, {
+        offset: labels[l].offset,
+      })
         .setLngLat(labels[l].coordinates)
         .addTo(this.map);
     }
@@ -565,10 +567,10 @@ class Map extends Component {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
     }
     if (this.props.showFilterPanel) {
-      mapWidth = 'calc(100% - 250px)';
+      mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 250px)` : '48%';
     }
     if (this.props.showDetailView) {
-      mapWidth = 'calc(100% - 345px)'
+      mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 345px)` : '48%';
     }
     return (
       <div>

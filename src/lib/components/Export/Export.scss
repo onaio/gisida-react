@@ -1,0 +1,206 @@
+.export-modal-btn {
+    width: 34px;
+    background: #fff;
+    z-index: 500;
+    right: 8px;
+    top: 150px;
+    display: block;
+    position: absolute;
+    font-size: 18px;
+    text-align: center;
+    line-height: 1.8;
+    color: #222;
+    border: 2px solid #cdcdcd;
+    border-radius: 7px;
+  }
+  
+  #screenshot-modal {
+    z-index: 1001;
+    position: fixed;
+    top: 10vh;
+    right: 25%;
+    left: 25%;
+    background: white;
+    min-height: 150px;
+    border-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
+  
+    @media (max-width: 1080px) {
+      right: 20%;
+      left: 20%;
+    }
+  
+    @media (max-width: 850px) {
+      right: 15%;
+      left: 15%;
+    }
+  
+    .closeBtn {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      cursor: pointer;
+  
+      &:hover,
+      &:active,
+      &:focus {
+        outline: none;
+      }
+    }
+  
+    .exportOptions {
+      display: block;
+      padding: 14px;
+  
+      h3 {
+        font-weight: bold;
+        margin-top: 8px;
+      }
+  
+      h5 {
+        font-weight: bold;
+        margin-top: 18px;
+      }
+  
+      label {
+        font-weight: normal;
+      }
+  
+      .resRange {
+        width: 50%;
+        display: inline-block;
+        margin-right: 2%;
+      }
+  
+      .resValue {
+        width: 9%;
+      }
+  
+      .dimensions {
+        margin-top: 12px;
+      }
+  
+      .dimHeight,
+      .dimWidth {
+        width: 15%;
+        margin: 0 3px 0 6px;
+  
+        &.disabled {
+          color: #aaa !important;
+        }
+      }
+  
+      .toFitToBounds {
+        margin-top: 12px;
+      }
+  
+      .titleText {
+        display: block;
+        margin-bottom: 6px;
+        width: 61%;
+      }
+  
+      .titleRender,
+      .fitMap {
+        display: inline-block;
+        margin-right: 6px;
+      }
+  
+      .boundsNote {
+        font-size: 12px;
+        padding-top: 12px;
+        font-style: italic;
+        color: #888;
+      }
+  
+      .ratioOptions {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        text-align: left;
+  
+        li {
+          display: inline-block;
+          margin-right: 12px;
+  
+          div {
+            cursor: pointer;
+            height: 100px;
+            background: #fff;
+            border: 2px solid #ddd;
+  
+            &.selected {
+              background: #ddd;
+            }
+  
+            &:focus {
+              outline: none;
+            }
+          }
+  
+          span {
+            display: block;
+            text-align: center;
+          }
+        }
+      }
+    }
+  
+    .export-btn {
+      background: #fff;
+      right: 14px;
+      bottom: 14px;
+      position: absolute;
+      text-align: center;
+      line-height: 1.8;
+      color: #222;
+      border: 2px solid #cdcdcd;
+      border-radius: 7px;
+      cursor: pointer;
+      padding: 0 6px;
+  
+      &:hover,
+      &:active,
+      &:focus {
+        text-decoration: none;
+        outline: none;
+      }
+    }
+  }
+  
+  #exportEl {
+    position: absolute;
+  
+    .topLeft,
+    .topRight,
+    .bottomLeft,
+    .bottomRight {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    }
+  
+    .topLeft {
+      transform-origin: top left;
+    }
+  
+    .topRight {
+      transform-origin: top right;
+    }
+  
+    .bottomLeft {
+      transform-origin: bottom left;
+    }
+  
+    .bottomRight {
+      transform-origin: bottom right;
+    }
+  }
+  
+  #mapTitle {
+    position: absolute;
+    z-index: 10001;
+  }
+  
