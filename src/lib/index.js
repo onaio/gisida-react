@@ -16,9 +16,7 @@ import Export from './components/Export/Export';
 import HorizontalBarChart from './components/Charts/HorizontalBarChart';
 import ColumnChart from './components/Charts/ColumnChart';
 
-import RouterWrapper from './routes/router';
-import PrivateRoute from './routes/privateRoute';
-import PublicRoute from './routes/publicRoute';
+import Router from './routes/router';
 
 export {
   App,
@@ -38,7 +36,5 @@ export {
   ColumnChart,
   ThemeSwitcher,
   Export,
-  RouterWrapper,
-  PrivateRoute,
-  PublicRoute,
+  Router,
 }
