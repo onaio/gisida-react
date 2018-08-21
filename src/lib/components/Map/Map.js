@@ -82,7 +82,7 @@ class Map extends Component {
       this.map.on('zoom', this.handleLabelsOnMapZoom.bind(this))
 
       // Dispach map rendered to indicate map was rendered
-      this.props.dispatch(Actions.mapRendered(mapId));
+      this.props.dispatch(Actions.mapRendered(mapId, true));
     }
   }
 
