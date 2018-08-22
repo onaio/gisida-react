@@ -16,6 +16,8 @@ import Export from './components/Export/Export';
 import HorizontalBarChart from './components/Charts/HorizontalBarChart';
 import ColumnChart from './components/Charts/ColumnChart';
 
+import Callback from './components/Callback/Callback';
+
 import Router from './routes/router';
 
 export {
@@ -37,4 +39,5 @@ export {
   ThemeSwitcher,
   Export,
   Router,
+  Callback,
 }
