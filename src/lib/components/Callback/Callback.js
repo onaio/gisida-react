@@ -1,29 +1,48 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions } from 'gisida';
+import { Actions, SupAuthZ } from 'gisida';
+import { resolve } from 'dns';
+import { reject } from 'rsvp';
 
 class Callback extends Component {
-
   constructor(props) {
     super(props);
     this.state = {};
+    if (SupAuthZ) {
+      this.authZ = new SupAuthZ({ ...props.global.APP });
+    }
   }
 
-  // componentWillMount() {
-  //   const { dispatch } = this.props;
-  //   const accessToken = this.getAccessToken();
-  //   dispatch(Actions.loginUser(accessToken));
-  //   // dispatch(getUserForms(accessToken))
-  // }
+  componentWillMount() {
+    const { dispatch } = this.props;
+    const accessToken = this.getAccessToken();
+    // dispatch(Actions.loginUser(accessToken));
+    // dispatch(getUserForms(accessToken))
 
-  // getParameterByName(name) {
-  //   var match = RegExp('[#&]' + name + '=([^&]*)').exec(window.location.hash);
-  //   return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-  // }
+    // const authorization = this.authZ.authorizeUser(accessToken);
+  }
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    const accessToken = this.getAccessToken();
+    
+    // run through promises checking 
+    this.authZ.getUser(accessToken)
+      .then(this.authZgetAuthConfig)
+      .then(this.authZcheckAuthConfig)
+      .then((res) => {
+        
+      });
+  }
+
+  getParameterByName(name) {
+    var match = RegExp('[#&]' + name + '=([^&]*)').exec(window.location.hash);
+    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+  }
  
-  // getAccessToken() {
-  //   return this.getParameterByName('access_token');
-  // }
+  getAccessToken() {
+    return this.getParameterByName('access_token');
+  }
 
   render() {
     return (
