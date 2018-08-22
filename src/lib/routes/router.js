@@ -1,37 +1,51 @@
 import React from 'react';
-import * as RRD from 'react-router-dom';
+import {
+  Router as RRouter,
+  Redirect as RRedirect,
+  Link as RLink
+} from 'react-router-dom';
 import { history } from './history';
 import PrivateRoute from './privateRoute';
 import PublicRoute from './publicRoute';
 
-// Wrapper component for React Router Router DOM <Router>, passing props to children
-export class Wrapper extends React.Component {
-  render() {
-    return <RRD.Router history={history}>
-      <div>
-        {React.Children.map(this.props.children, child =>
-          React.cloneElement(child, {...child.props, ...this.props }))}
-      </div>
-    </RRD.Router>
+// Router Builder Functions
+const Redirect = (to) => <RRedirect to={to || '/'} />;
+const Link = (to) => <RLink to={to || '/'} />;
+const Wrapper = (history) => {
+  // Wrapper component for React Router Router DOM <Router>, passing props to children
+  return class Wrapper extends React.Component {
+    render() {
+      return <RRouter history={history}>
+        <div>
+          {React.Children.map(this.props.children, child =>
+            React.cloneElement(child, {...child.props, ...this.props }))}
+        </div>
+      </RRouter>
+    }
   }
-};
-
-// React Router DOM Builder Functions
-export const Redirect = (to) => <RRD.Redirect to={to || '/'} />;
-export const Link = (to) => <RRD.Link to={to || '/'} />;
-
-// React Router DOM Methods
-export const push = (to) => { history.push(to); }
-
-// Gisida React Router Module
-export const Router = {
-  Wrapper,
-  Redirect,
-  Link,
-  PrivateRoute,
-  PublicRoute,
-  push,
-  history,
 }
 
-export default Router;
+// Gisida React Router Module
+class Router {
+  static instance; // define Singleton Instance - move this to const outside of class?
+  constructor() {
+    // check for Singleton Instance
+    if (this.instance) {
+      return this.instance;
+    }
+    // define history singleton
+    this.history = history;
+    
+    // Builder Methods for react-router-dom components
+    this.Wrapper = Wrapper(this.history);
+    this.PrivateRoute = PrivateRoute;
+    this.PublicRoute = PublicRoute;
+    this.Redirect = Redirect;
+    this.Link = Link;
+
+    // Define this as Singleton Instance
+    this.instance = this;
+  }
+}
+
+export default new Router();
