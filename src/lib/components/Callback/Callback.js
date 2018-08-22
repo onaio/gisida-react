@@ -9,21 +9,21 @@ class Callback extends Component {
     this.state = {};
   }
 
-  componentWillMount() {
-    const { dispatch } = this.props;
-    const accessToken = this.getAccessToken();
-    dispatch(Actions.loginUser(accessToken));
-    // dispatch(getUserForms(accessToken))
-  }
+  // componentWillMount() {
+  //   const { dispatch } = this.props;
+  //   const accessToken = this.getAccessToken();
+  //   dispatch(Actions.loginUser(accessToken));
+  //   // dispatch(getUserForms(accessToken))
+  // }
 
-  getParameterByName(name) {
-    var match = RegExp('[#&]' + name + '=([^&]*)').exec(window.location.hash);
-    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-  }
+  // getParameterByName(name) {
+  //   var match = RegExp('[#&]' + name + '=([^&]*)').exec(window.location.hash);
+  //   return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+  // }
  
-  getAccessToken() {
-    return this.getParameterByName('access_token');
-  }
+  // getAccessToken() {
+  //   return this.getParameterByName('access_token');
+  // }
 
   render() {
     return (
