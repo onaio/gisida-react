@@ -4,8 +4,7 @@ import {
   Redirect as RRedirect,
   Link as RLink
 } from 'react-router-dom';
-import { history } from './history';
-// import { history } from 'gisida'; 
+import { history } from 'gisida';
 import PrivateRoute from './privateRoute';
 import PublicRoute from './publicRoute';
 
