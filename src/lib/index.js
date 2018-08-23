@@ -9,10 +9,14 @@ import DetailView from './components/DetailView/DetailView';
 import Filter from './components/Filter/Filter';
 import TimeSeriesSlider from './components/TimeSeriesSlider/TimeSeriesSlider';
 import Spinner from './components/Spinner/Spinner';
-import PieChart from './components/Charts/PieChart';
-import LineChart from './components/Charts/LineChart';
 import ThemeSwitcher from './components/ThemeSwitcher/ThemeSwitcher';
 import Export from './components/Export/Export';
+
+// Gisida charts
+import PieChart from './components/Charts/PieChart';
+import LineChart from './components/Charts/LineChart';
+import ColumnChart from './components/Charts/BarChartStacked';
+import BarChartStacked from './components/Charts/BarChartStacked';
 
 export {
   App,
@@ -28,6 +32,8 @@ export {
   Spinner,
   PieChart,
   LineChart,
+  ColumnChart,
+  BarChartStacked,
   ThemeSwitcher,
   Export,
 }

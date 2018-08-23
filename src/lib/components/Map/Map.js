@@ -7,7 +7,7 @@ import './Map.scss';
 const mapStateToProps = (state, ownProps) => {
   const { APP, STYLES, REGIONS, VIEW } = state;
   const mapId = ownProps.mapId || 'map-1';
-  const MAP = state[mapId] || { blockLoad: true };
+  const MAP = state[mapId] || { blockLoad: true, layers: {} };
   MAP.blockLoad = VIEW ? (!VIEW.splitScreen && mapId !== 'map-1') : false;
   return {
     mapId,
@@ -584,7 +584,8 @@ class Map extends Component {
           (
             <div id={this.props.mapId} style={{
               width: mapWidth,
-              display: this.props.MAP.blockLoad ? 'none' : 'inline'
+              display: this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
+              ? 'none' : 'inline'
             }} >
               <div className="widgets">
                 {/* Render Children elemets with mapId prop added to each child  */}
