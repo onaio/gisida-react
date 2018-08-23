@@ -30,6 +30,7 @@ class Callback extends Component {
         if (!res.ok) {
           this.history.push('/login');
         } else {
+          dispatch(Actions.receiveLogin(user));
           localStorage.setItem('access_token', accessToken);
           this.history.push('/');
         }
