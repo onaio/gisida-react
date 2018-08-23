@@ -1,37 +1,38 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, SupAuthZ } from 'gisida';
-import { resolve } from 'dns';
-import { reject } from 'rsvp';
+import { Actions, SupAuthZ, history } from 'gisida';
+// import { stat } from 'fs';
+// import { resolve } from 'dns';
+// import { reject } from 'rsvp';
 
 class Callback extends Component {
   constructor(props) {
     super(props);
     this.state = {};
-    if (SupAuthZ) {
-      this.authZ = new SupAuthZ({ ...props.global.APP });
-    }
+    this.history = history;
   }
 
   componentWillMount() {
     const { dispatch } = this.props;
     const accessToken = this.getAccessToken();
-    // dispatch(Actions.loginUser(accessToken));
-    // dispatch(getUserForms(accessToken))
-
-    // const authorization = this.authZ.authorizeUser(accessToken);
-  }
-
-  componentDidMount() {
-    const { dispatch } = this.props;
-    const accessToken = this.getAccessToken();
-    
-    // run through promises checking 
+    dispatch(Actions.receiveToken(accessToken));
+    const state = dispatch(Actions.getCurrentState());
+    console.log("state", this.props.global);
+    if (SupAuthZ) {
+      this.authZ = new SupAuthZ({
+        ...state.APP,
+        ...state.AUTH,
+      });
+    }
     this.authZ.getUser(accessToken)
-      .then(this.authZgetAuthConfig)
-      .then(this.authZcheckAuthConfig)
-      .then((res) => {
-        
+      .then(this.getAuthConfig)
+      .then(({ user, res }) => {
+        if (!res.ok) {
+          this.history.push('/login');
+        } else {
+          localStorage.setItem('access_token', accessToken);
+          this.history.push('/');
+        }
       });
   }
 
