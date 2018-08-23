@@ -1,18 +1,23 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, SupAuthZ, history } from 'gisida';
-// import { stat } from 'fs';
-// import { resolve } from 'dns';
-// import { reject } from 'rsvp';
 
 class Callback extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { loaded: false };
     this.history = history;
   }
 
-  componentWillMount() {
+  componentWillReceiveProps(nextProps) {
+    if (!this.state.loaded
+      && nextProps.global.APP
+      && nextProps.global.APP.loaded) {
+      this.setState({ loaded: true }, this.authorizeUser);
+    }
+  }
+
+  authorizeUser() {
     const { dispatch } = this.props;
     const accessToken = this.getAccessToken();
     dispatch(Actions.receiveToken(accessToken));
