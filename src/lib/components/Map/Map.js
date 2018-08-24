@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, addPopUp, sortLayers, addChart, buildDetailView } from 'gisida';
+import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
 import { detectIE, buildLayersObj } from '../../utils';
 import './Map.scss';
 
@@ -245,7 +245,14 @@ class Map extends Component {
                 this.map.addLayer(highlightLayer);
               }
             }
-          } 
+          } else if (this.map.getLayer(layer.id) && nextProps.MAP.reloadLayerId === layer.id) {
+            let filterOptions = nextProps.MAP.filter.filterOptionsPrev;
+            this.map.removeLayer(layer.id);
+            this.map.removeSource(layer.id);
+
+            this.props.dispatch(Actions.layerReloaded(mapId));
+            prepareLayer(mapId, layer, this.props.dispatch, filterOptions);
+          }
           // Change visibility if layer is already on map
           this.changeVisibility(layer.id, layer.visible);
           if (layer.layers) {
@@ -291,7 +298,7 @@ class Map extends Component {
       // Update Labels
       this.removeLabels();
       for (let l = 0; l < layersObj.length; l += 1) {
-        if (layersObj[l].id === primaryLayer && layersObj[l].labels && layersObj[l].labels.labels) {
+        if (layersObj[l].id === primaryLayer && layersObj[l].labels && layersObj[l].labels.labels && layersObj[l].labels.labels) {
           this.addLabels(this.props.layersObj[l], this.props.timeseries);
         }
       }
@@ -521,6 +528,10 @@ class Map extends Component {
       ? layerObj.labels.labels[timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]]
       : layerObj.labels.labels;
 
+    if (!labels) {
+      return false;
+    }
+    
     for (let l = 0; l < labels.length; l += 1) {
       el = document.createElement('div');
       el.className = `map-label label-${id}`;
@@ -561,12 +572,13 @@ class Map extends Component {
   }
 
   render() {
+    const { layerObj } = this.props;
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
     let mapWidth = '100%';
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
     }
-    if (this.props.showFilterPanel) {
+    if (this.props.showFilterPanel && !(layerObj.aggregate && layerObj.aggregate.filterIsPrev)) {
       mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 250px)` : '48%';
     }
     if (this.props.showDetailView) {
