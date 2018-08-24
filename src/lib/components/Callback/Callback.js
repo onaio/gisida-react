@@ -7,39 +7,44 @@ class Callback extends Component {
     super(props);
     this.state = { loaded: false };
     this.history = history;
-  }
 
-  componentWillReceiveProps(nextProps) {
-    if (!this.state.loaded
-      && nextProps.global.APP
-      && nextProps.global.APP.loaded) {
-      this.setState({ loaded: true }, this.authorizeUser);
-    }
-  }
-
-  authorizeUser() {
-    const { dispatch } = this.props;
-    const accessToken = this.getAccessToken();
-    dispatch(Actions.receiveToken(accessToken));
-    const state = dispatch(Actions.getCurrentState());
-    console.log("state", this.props.global);
+    const state = props.dispatch(Actions.getCurrentState());
     if (SupAuthZ) {
       this.authZ = new SupAuthZ({
         ...state.APP,
         ...state.AUTH,
       });
     }
-    this.authZ.getUser(accessToken)
-      .then(this.getAuthConfig)
-      .then(({ user, res }) => {
-        if (!res.ok) {
-          this.history.push('/login');
-        } else {
-          dispatch(Actions.receiveLogin(user));
-          localStorage.setItem('access_token', accessToken);
-          this.history.push('/');
-        }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!this.state.loaded
+      && nextProps.global.APP
+      && nextProps.global.APP.loaded) {
+      this.setState({ 
+        loaded: true,
+        APP: { ...nextProps.global.APP },
+       }, () => {
+        this.authorizeUser(this.state.APP);
       });
+    }
+  }
+
+  async authorizeUser(APP) {
+    const { dispatch } = this.props;
+    const accessToken = this.getAccessToken();
+    dispatch(Actions.receiveToken(accessToken));
+
+    const userIsAuthorized = await this.authZ.authorizeUser(APP, accessToken, () => true);
+
+    if (!userIsAuthorized) {
+      return this.history.push('/login');
+    }
+    
+    const user = await this.authZ.getUser(accessToken);
+    dispatch(Actions.receiveLogin(user));
+    localStorage.setItem('access_token', accessToken);
+    return this.history.push('/');
   }
 
   getParameterByName(name) {
