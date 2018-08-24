@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Actions, generateFilterOptions, buildFilterState, clearFilterState } from 'gisida';
+import { Actions, generateFilterOptions, generateFilterOptionsPrev,
+  buildFilterState, clearFilterState } from 'gisida';
 import { buildLayersObj } from '../../utils';
 import FilterSelector from './FilterSelector';
+import FilterSelectorPrev from './FilterSelectorPrev';
 import './Filter.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -257,6 +259,11 @@ export class Filter extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (!nextProps.layerObj) return false;
+
+    const { layerObj } = nextProps;
+    if ( layerObj.aggregate && layerObj.aggregate.filterIsPrev) {
+      return false;
+    }
 
     const layerId = nextProps.layerObj.id;
 
@@ -759,8 +766,9 @@ export class Filter extends Component {
   }
 
   render() {
-    const { isSplitScreen, mapId } = this.props;
+    const { isSplitScreen, mapId, layerObj } = this.props;
     const { filters, isMac, globalSearchField } = this.state;
+    const filterIsPrev = layerObj && layerObj.aggregate && layerObj.aggregate.filterIsPrev;
     const filterKeys = filters ? Object.keys(filters) : {};
     const filterItems = [];
     let filter;
@@ -824,7 +832,7 @@ export class Filter extends Component {
     }
 
     const doClear = isFilterable || this.state.isFiltered || this.isMapFiltered();
-    let sidebarOffset = this.props.showFilterPanel
+    let sidebarOffset = this.props.showFilterPanel && !filterIsPrev
       ? '260px'
       : !!this.props.detailView
       ? '355px'
@@ -836,7 +844,6 @@ export class Filter extends Component {
 
     const filterClasses = `${isMac ? ' mac' : ''}${isSplitScreen
       && mapId === 'map-1' ? ' isSplitScreen' : ''}`;
-
     return (
     <div>
       {
@@ -851,7 +858,7 @@ export class Filter extends Component {
         }
 
         {
-          this.props.showFilterPanel  ?
+          this.props.showFilterPanel && !filterIsPrev ?
             <div>
               <div className={`profile-view-container filter-container${filterClasses}`}>
                 {<button
@@ -936,7 +943,14 @@ export class Filter extends Component {
                   </div>
                 </div>
               </div>
-            </div> : ''
+            </div> : this.props.showFilterPanel && filterIsPrev ?
+            (
+              <FilterSelectorPrev
+                layerObj={layerObj}
+                dispatch={this.props.dispatch}
+                mapId={this.props.mapId}
+              />
+            ) : null
         }  
       
       </div>  

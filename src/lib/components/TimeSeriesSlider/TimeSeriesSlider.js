@@ -100,7 +100,7 @@ class TimeSeriesSlider extends React.Component {
     return this.props.timeSeriesObj ? (
       <div
         className="series"
-        style={{ right: this.props.showFilterPanel ? '310px' : '50px'}}>
+        style={{ right: '50px'}}>
         <label
           id={`${this.props.mapId}-label`}
           className="label"
