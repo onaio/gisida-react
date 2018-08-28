@@ -46,16 +46,13 @@
   }
 
   .layers {
-    padding: 20px 0 20px 20px;
-
-    .layers {
-      padding: 0px 0 8px 20px;
-    }
+    padding: 0px 0 0 20px;
 
     li.layer {
       position: relative;
       display: block;
       width: 100%;
+      padding-top: 10px;
     }
 
     li.region {
@@ -63,16 +60,15 @@
       
       label {
         display: inline;
-        margin: 0 0 10px 5px;
+        margin: 0 0 0 5px;
       }
     }
 
-    .sub-category {
+    a.sub-category {
       padding: 9px 20px !important;
       margin-right: 2px;
       margin-left: -16px;
       position: relative;
-      bottom: 20px;
       font-weight: normal !important;
 
       .category {
@@ -87,13 +83,13 @@
     font-size: 12px;
     width: 80%;
     display: block;
-    margin: 0 0 10px 20px;
+    margin: 0 0 0 20px;
   }
 
   input[type='checkbox'] {
     position: absolute;
     left: 0;
-    top: -2px;
+    top: 10px;
   }
 }
 
