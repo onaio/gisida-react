@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, SupAuthZ, history } from 'gisida';
+import { Actions, SupAuth, history } from 'gisida';
 
 class Callback extends Component {
   constructor(props) {
@@ -9,8 +9,8 @@ class Callback extends Component {
     this.history = history;
 
     const state = props.dispatch(Actions.getCurrentState());
-    if (SupAuthZ) {
-      this.authZ = new SupAuthZ({
+    if (SupAuth) {
+      this.authZ = new SupAuth({
         ...state.APP,
         ...state.AUTH,
       });
@@ -35,7 +35,7 @@ class Callback extends Component {
     const accessToken = this.getAccessToken();
     dispatch(Actions.receiveToken(accessToken));
 
-    const userIsAuthorized = await this.authZ.authorizeUser(APP, accessToken, () => true);
+    const userIsAuthorized = await this.authZ.authorizeUser(APP, accessToken);
 
     if (!userIsAuthorized) {
       return this.history.push('/login');
@@ -43,7 +43,6 @@ class Callback extends Component {
     
     const user = await this.authZ.getUser(accessToken);
     dispatch(Actions.receiveLogin(user));
-    localStorage.setItem('access_token', accessToken);
     return this.history.push('/');
   }
 
