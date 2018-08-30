@@ -10,10 +10,7 @@ class Callback extends Component {
 
     const state = props.dispatch(Actions.getCurrentState());
     if (SupAuth) {
-      this.authZ = new SupAuth({
-        ...state.APP,
-        ...state.AUTH,
-      });
+      this.authZ = SupAuth;
     }
   }
 
