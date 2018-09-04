@@ -7,11 +7,6 @@ class Callback extends Component {
     super(props);
     this.state = { loaded: false };
     this.history = history;
-
-    const state = props.dispatch(Actions.getCurrentState());
-    if (SupAuth) {
-      this.authZ = SupAuth;
-    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -32,13 +27,13 @@ class Callback extends Component {
     const accessToken = this.getAccessToken();
     dispatch(Actions.receiveToken(accessToken));
 
-    const userIsAuthorized = await this.authZ.authorizeUser(APP, accessToken);
+    const userIsAuthorized = await SupAuth.authorizeUser(APP, accessToken);
 
     if (!userIsAuthorized) {
       return this.history.push('/login');
     }
     
-    const user = await this.authZ.getUser(accessToken);
+    const user = await SupAuth.getUser(accessToken);
     dispatch(Actions.receiveLogin(user));
     return this.history.push('/');
   }
