@@ -63,7 +63,7 @@ export class Layers extends Component {
         } else {
           Object.keys(layer).forEach((d, i) => {
             layerItem = layerItem.concat([
-              (
+              (<li>
                 <a
                   key={`${d}-${i}-link`}
                   className="sub-category"
@@ -74,15 +74,15 @@ export class Layers extends Component {
                     className={`category glyphicon glyphicon-chevron-${this.state[d].isOpen ? 'down' : 'right'}`}
                   />
                 </a>
-              ),
+              </li>),
               (this.state[d].isOpen ?
-                <Layers
-                  key={`${d}-${i}`}
-                  mapId={mapId}
-                  layers={layer[d].layers}
-                  currentRegion={currentRegion}
-                  preparedLayers={preparedLayers}
-                />
+                  <Layers
+                    key={`${d}-${i}`}
+                    mapId={mapId}
+                    layers={layer[d].layers}
+                    currentRegion={currentRegion}
+                    preparedLayers={preparedLayers}
+                  />
               : null)
             ]);
           });
