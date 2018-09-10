@@ -18,6 +18,7 @@ const mapStateToProps = (state, ownProps) => {
     APP: state.APP,
     MAP,
     mapId,
+    oldLayerObj: MAP.oldLayerObj,
     isSplitScreen: state.VIEW && state.VIEW.splitScreen,
     FILTER: state.FILTER,
     layerObj: MAP.layers[MAP.filter.layerId],
@@ -369,8 +370,8 @@ export class Filter extends Component {
     if (!isFilterable) {
       return false;
     }
-    const { layerId, filterOptions, oldLayerObj } = this.state;
-    const { mapId, dispatch } = this.props;
+    const { layerId, filterOptions } = this.state;
+    const { mapId, dispatch, oldLayerObj } = this.props;
     // Clear layerFilter from mapbox layer
     dispatch(Actions.setLayerFilter(mapId, layerId, null));
 
@@ -456,9 +457,7 @@ export class Filter extends Component {
     if (!FILTER[layerId].originalLayerObj) {
       const newFilterState = buildFilterState(filterOptions, filters, layerObj, regenStops);
       const { originalLayerObj } = newFilterState;
-      this.setState({
-        oldLayerObj: originalLayerObj,
-      });
+      dispatch(Actions.resetFilteredLayer(mapId, originalLayerObj));
     }
 
     const newFilterState = buildFilterState(filterOptions, filters, layerObj, regenStops);

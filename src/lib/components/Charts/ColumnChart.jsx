@@ -26,8 +26,8 @@ class ColumnChart extends React.Component {
     this.state = {
       chart: {
         type: 'column',
-        height: chartHeight || 225,
-        width: chartWidth || 600,
+        height: chartHeight || null,
+        width: chartWidth || null,
         backgroundColor: 'rgba(255,255,255,0)',
         spacingTop: 15,
         spacintRight: 10,
@@ -59,13 +59,17 @@ class ColumnChart extends React.Component {
         },
       ],
       tooltip: {
-        useHTML: false,
-        headerFormat: '',
-        pointForamt: '',
-        shadow: false,
-        backgroundColor: 'transparent',
-        borderWidth: 0,
-        padding: 0,
+        useHTML: true,
+        shared: true,
+        headerFormat: '<b>{point.key}: </b>',
+        //pointFormat: '',
+        pointFormatter: pointFormatterFunc || function pointFormatterFunc() {
+          return `<span>${this.y.toLocaleString()}</span>`;
+        },
+        //shadow: false,
+        //backgroundColor: 'transparent',
+        //borderWidth: 0,
+        //padding: 0,
       },
       title: {
         text: seriesTitle || null,
@@ -75,10 +79,10 @@ class ColumnChart extends React.Component {
       },
       plotOptions: {
         column: {
-          showInLegend: false,
-          pointPadding: 0,
+        showInLegend: false,
+          pointPadding: 0.2,
           borderWidth: 0,
-          tooltip: {
+        /*tooltip: {
             distance: 0,
             padding: 0,
             pointFormatter: pointFormatterFunc || function pointFormatterFunc() {
@@ -88,7 +92,7 @@ class ColumnChart extends React.Component {
                 return `<span>${this.y}</span>`;
               }
             },
-          },
+          },*/
         },
       },
       series: [{
@@ -122,8 +126,8 @@ class ColumnChart extends React.Component {
 
       this.setState({
         chart: Object.assign({}, this.state.chart, {
-          height: chartHeight || 250,
-          width: chartWidth || 600,
+          height: chartHeight || null,
+          width: chartWidth || null,
         }),
         title: {
           text: seriesTitle || null,
@@ -161,7 +165,7 @@ class ColumnChart extends React.Component {
 }
 
 ColumnChart.propTypes = {
-  seriesData: PropTypes.objectOf(PropTypes.any).isRequired,
+  seriesData: PropTypes.arrayOf(PropTypes.any).isRequired,
   seriesTitle: PropTypes.string.isRequired,
   chartWidth: PropTypes.number.isRequired,
   chartHeight: PropTypes.number.isRequired,
