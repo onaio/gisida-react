@@ -246,12 +246,13 @@ class Map extends Component {
               }
             }
           } else if (this.map.getLayer(layer.id) && nextProps.MAP.reloadLayerId === layer.id) {
+            let doUpdateTSlayer = true;
             let filterOptions = nextProps.MAP.filter.filterOptionsPrev;
             this.map.removeLayer(layer.id);
             this.map.removeSource(layer.id);
 
             this.props.dispatch(Actions.layerReloaded(mapId));
-            prepareLayer(mapId, layer, this.props.dispatch, filterOptions);
+            prepareLayer(mapId, layer, this.props.dispatch, filterOptions, doUpdateTSlayer);
           }
           // Change visibility if layer is already on map
           this.changeVisibility(layer.id, layer.visible);

@@ -69,7 +69,7 @@ class FilterSelectorPrev extends React.Component {
     const options = this.state.options;
     options[val] = !options[val];
     this.props.dispatch(Actions.saveFilterOptions(mapId, options));
-    // this.props.dispatch(Actions.addLayer(mapId, layerObj));
+    this.props.dispatch(Actions.addLayer(mapId, layerObj));
   }
 
   render() {
