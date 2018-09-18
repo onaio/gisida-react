@@ -29,7 +29,10 @@ class Callback extends Component {
 
     const userIsAuthorized = await SupAuth.authorizeUser(APP, accessToken);
 
-    if (!userIsAuthorized) {
+    if (!userIsAuthorized || !accessToken) {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('authConfig');
       return this.history.push('/login');
     }
     
