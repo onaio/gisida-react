@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, SupAuth, history } from 'gisida';
 
+const { defaultUnSupAuthZ:deAuthZ } = SupAuth;
+
 class Callback extends Component {
   constructor(props) {
     super(props);
@@ -30,12 +32,9 @@ class Callback extends Component {
     const userIsAuthorized = await SupAuth.authorizeUser(APP, accessToken);
 
     if (!userIsAuthorized || !accessToken) {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('authConfig');
+      deAuthZ();
       return this.history.push('/login');
     }
-    
     const user = await SupAuth.getUser(accessToken);
     dispatch(Actions.receiveLogin(user));
     return this.history.push('/');
