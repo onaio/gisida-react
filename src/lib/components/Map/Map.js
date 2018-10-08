@@ -594,7 +594,7 @@ class Map extends Component {
     let maxZoom;
     let zoom = this.map.getZoom();
     let isRendered;
-    this.props.layersObj.forEach(layerObj => {
+    this.props && this.props.layersObj && this.props.layersObj.forEach(layerObj => {
       if (layerObj.labels) {
         minZoom = layerObj.labels.minZoom || layerObj.labels.minzoom || 0;
         maxZoom = layerObj.labels.maxZoom || layerObj.labels.maxzoom || 22;
