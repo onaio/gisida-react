@@ -157,14 +157,12 @@ class SummaryChart extends React.Component {
   constructor(props) {
     super(props);
     if (Object.keys(this.props).length > 2) {
-      const { layerId, layer, mapId, isChartMin, legendBottom, locations } = this.props;
+      const { layerId, layer, isChartMin, legendBottom, locations } = this.props;
       const locationMap = {};
       const locationKeys = Object.keys(locations || {});
       for (let l = 0; l < locationKeys.length; l += 1) {
         locationMap[locations[locationKeys[l]]] = locationKeys[l];
       }
-
-      const primaryChartPosition =  SummaryChart.calcChartWidth(mapId, true);
 
       $(`.legend.${this.props.mapId}`).css('bottom', legendBottom);
   
@@ -173,8 +171,8 @@ class SummaryChart extends React.Component {
         layer,
         isChartMin,
         doShowModal: false,
-        chartWidth: primaryChartPosition.chartWidth,
-        isFullBleed: primaryChartPosition.isFullBleed,
+        chartWidth: null,
+        isFullBleed: null,
         locations: locationMap,
       };
     }
@@ -183,7 +181,12 @@ class SummaryChart extends React.Component {
       this.onOpenModalClick = this.onOpenModalClick.bind(this);
       this.onCloseModalClick = this.onCloseModalClick.bind(this);
       this.toggleChart = this.toggleChart.bind(this);
+  }
 
+  componentDidMount() {
+    const { mapId, menuIsOpen } = this.props;
+    SummaryChart.calcChartWidth(mapId, menuIsOpen);
+    window.addEventListener('resize', SummaryChart.calcChartWidth(mapId, menuIsOpen));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -215,6 +218,10 @@ class SummaryChart extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    window.removeEventListener('resize', SummaryChart.calcChartWidth);
+  }
+
   onOpenModalClick(e) {
     if (e) e.preventDefault();
     this.setState({ doShowModal: !this.state.doShowModal });
@@ -226,13 +233,13 @@ class SummaryChart extends React.Component {
   }
 
   moveMapLedgend(chartHeight) {
-    const { isChartMin, layerId, menuIsOpen } = this.state;
-    const { mapId } = this.props;
+    const { isChartMin, layerId } = this.state;
+    const { mapId, menuIsOpen } = this.props;
+    const { chartWidth, isFullBleed } = SummaryChart.calcChartWidth(mapId, menuIsOpen);
     const legendPosition = SummaryChart.calcLegendPosition(mapId);
-    const primaryChartPosition = SummaryChart.calcChartWidth(mapId, menuIsOpen);
     const legendBottom = isChartMin
       ? 40
-      : primaryChartPosition.isFullBleed
+      : isFullBleed
       ? (chartHeight || legendPosition.height) + 20
       : 40;
 
@@ -244,8 +251,8 @@ class SummaryChart extends React.Component {
 
     this.setState({
       buttonBottom,
-      chartWidth: primaryChartPosition.chartWidth,
-      isFullBleed: primaryChartPosition.isFullBleed,
+      chartWidth: chartWidth,
+      isFullBleed: isFullBleed,
     }, () => {
       this.saveChartState(layerId, this.state.isChartMin, legendBottom);
     });
@@ -333,8 +340,8 @@ class SummaryChart extends React.Component {
               chartHeight={primaryChartHeight}
               chartWidth={chartWidth}
               isFullBleed={isFullBleed}
-              calcChartWidth={SummaryChart.calcChartWidth}
               menuIsOpen={this.state.menuIsOpen}
+              calcChartWidth={SummaryChart.calcChartWidth}
               locations={locations}
               isPrimary
             >
