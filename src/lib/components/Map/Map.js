@@ -8,7 +8,9 @@ const mapStateToProps = (state, ownProps) => {
   const { APP, STYLES, REGIONS, VIEW } = state;
   const mapId = ownProps.mapId || 'map-1';
   const MAP = state[mapId] || { blockLoad: true };
-  MAP.blockLoad = VIEW ? (!VIEW.splitScreen && mapId !== 'map-1') : false;
+  MAP.blockLoad = mapId === 'map-1'
+    ? false
+    : !VIEW || !VIEW.splitScreen;
   return {
     mapId,
     APP,
@@ -545,19 +547,21 @@ class Map extends Component {
     let maxZoom;
     let zoom = this.map.getZoom();
     let isRendered;
-    this.props.layersObj.forEach(layerObj => {
-      if (layerObj.labels) {
-        minZoom = layerObj.labels.minZoom || layerObj.labels.minzoom || 0;
-        maxZoom = layerObj.labels.maxZoom || layerObj.labels.maxzoom || 22;
-        isRendered = (document.getElementsByClassName(`label-${layerObj.id}`)).length;
+    if (this.props && this.props.layersObj) {
+      this.props.layersObj.forEach(layerObj => {
+        if (layerObj.labels) {
+          minZoom = layerObj.labels.minZoom || layerObj.labels.minzoom || 0;
+          maxZoom = layerObj.labels.maxZoom || layerObj.labels.maxzoom || 22;
+          isRendered = (document.getElementsByClassName(`label-${layerObj.id}`)).length;
 
-        if (zoom < minZoom || zoom > maxZoom) {
-          this.removeLabels(`label-${layerObj.id}`);
-        } else if (!isRendered) {
-          this.addLabels(layerObj);
+          if (zoom < minZoom || zoom > maxZoom) {
+            this.removeLabels(`label-${layerObj.id}`);
+          } else if (!isRendered) {
+            this.addLabels(layerObj);
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   render() {
