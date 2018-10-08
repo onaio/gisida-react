@@ -68,13 +68,14 @@ class TimeSeriesSlider extends React.Component {
             {
               temporalIndex,
               data: periodData[period[temporalIndex]].data,
+              adminFilter: periodData[period[temporalIndex]].adminFilter,
             },
           );
         }
       }
     }
 
-    this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries))
+    this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, layerId))
   }
 
   componentWillReceiveProps(nextProps) {
