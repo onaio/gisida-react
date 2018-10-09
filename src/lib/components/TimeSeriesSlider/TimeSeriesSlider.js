@@ -68,7 +68,8 @@ class TimeSeriesSlider extends React.Component {
             {
               temporalIndex,
               data: periodData[period[temporalIndex]].data,
-              adminFilter: periodData[period[temporalIndex]].adminFilter,
+              adminFilter: periodData[period[temporalIndex]].adminFilter
+                && [...periodData[period[temporalIndex]].adminFilter],
             },
           );
         }
