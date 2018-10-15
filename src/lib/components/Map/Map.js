@@ -343,8 +343,11 @@ class Map extends Component {
 
   buildFilters() {
     const { layerObj, mapId } = this.props;
+    if (!layerObj || !this.map.getLayer(layerObj.id)) {
+      return false
+    };
+
     this.props.dispatch(Actions.filtersUpdated(mapId));
-    if (!layerObj) return false;
     const layerId = layerObj.id;
 
     const filterKeys = Object.keys(layerObj.filters);
