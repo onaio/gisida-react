@@ -387,7 +387,6 @@ export class Filter extends Component {
     };
 
     clearFilterState(mapId, filterState, layerId, dispatch);
-
     // Reload layer if necessary to re-aggregate / restore layer stops
     if (this.props.FILTER[layerId]
       &&  this.props.FILTER[layerId].originalLayerObj
@@ -489,7 +488,7 @@ export class Filter extends Component {
     } = (this.buildNextFilters(prevFilters[filterKey].options, prevFilters, filterKey, true));
 
     const { filterOptions } = this.state;
-    const filterState = buildFilterState(filterOptions, nextFilters, layerObj, false);
+    const filterState = buildFilterState(filterOptions, nextFilters, layerObj, true);
     dispatch(Actions.saveFilterState(mapId, layerObj.id, filterState));
   }
 

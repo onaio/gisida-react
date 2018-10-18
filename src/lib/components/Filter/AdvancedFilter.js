@@ -376,9 +376,9 @@ export class AdvancedFilter extends React.Component {
           type="text"
           className="advanced-search"
           data-type="advanced-filter"
-          // ref={(el) => { this[`searchEl`] = el; }}
           value={query.val}
-          onChange={(e) => { this.onInputChange(e, q); }}
+          // ref={(el) => { this[`searchEl`] = el; }}
+          onChange={(e) => this.onInputChange(e, q)}
         />
       ) : this.buildQuantInputEl(query, q);
 
