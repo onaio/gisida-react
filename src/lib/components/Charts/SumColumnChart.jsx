@@ -110,7 +110,8 @@ class SumColumnChart extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const { layerId, layerData, chartSpec, layer, isPrimary, menuIsOpen, locations } = nextProps;
-    const { chartHeight, chartWidth, isFullBleed, isChartMin } = nextProps;
+    const { chartHeight, isChartMin, calcChartWidth } = nextProps;
+    const { chartWidth, isFullBleed } = calcChartWidth(nextProps.mapId, nextProps.menuIsOpen);
 
     this.setState({
       layerId,
@@ -122,14 +123,13 @@ class SumColumnChart extends React.Component {
       isFullBleed,
       menuIsOpen,
       seriesData: SumColumnChart.buildColData(layerData, chartSpec, layer, locations),
-    }, () => {
-      this.props.calcChartWidth(this.props.mapId, menuIsOpen)
     });
   }
 
   componentWillUnmount() {
     if (this.state.isPrimary) {
       this.props.moveMapLedgend();
+      this.props.calcChartWidth(this.props.mapId, this.props.menuIsOpen);
       $(window).off('toggleSector', this.setChartWidth);
       $(window).off('resize', this.d_setChartWidth);
     }
@@ -138,7 +138,7 @@ class SumColumnChart extends React.Component {
   setChartWidth(e, payload) {
     const { mapId } = payload || e.data;
     if (mapId === this.props.mapId) {
-      const chartPosition = this.props.calcChartWidth(mapId);
+      const chartPosition = this.props.calcChartWidth(mapId, this.props.menuIsOpen);
       if (chartPosition.isFullBleed !== this.state.isFullBleed) {
         this.props.moveMapLedgend(this.state.chartHeight);
       } else {
