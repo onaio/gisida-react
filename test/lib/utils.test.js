@@ -29,3 +29,40 @@ describe('getLastIndex', () => {
     expect(utils.getLastIndex(['a', 'b', 'c', 'd', 'e'], 'f')).toBeUndefined();
   });
 })
+
+describe('isNewSeriesData', () => {
+
+  test('Returns true for different arrays', () => {
+    expect(utils.isNewSeriesData(['a','b','c'],['a','c','b'])).toBe(true);
+  });
+
+  test('Returns true for different arrays', () => {
+    expect(utils.isNewSeriesData(['a','b','c'],['a'])).toBe(true);
+  });
+
+  test('Returns false for same arrays', () => {
+    expect(utils.isNewSeriesData(['a','b','c'],['a','b','c'])).toBe(false);
+  });
+})
+
+describe('hexToRgbA', () => {
+
+  test('Converts Hex (with alpha) properly to RGBA', () => {
+    expect(utils.hexToRgbA('#fbafff',0.8)).toBe('rgba(251, 175, 255, 0.8)');
+  });
+
+  test('Converts Hex (with alpha) properly to RGBA', () => {
+    expect(utils.hexToRgbA('#FFDC00',1)).toBe('rgba(255, 220, 0, 1)');
+  });
+
+  test('Converts Hex (without alpha) properly to RGBA', () => {
+    expect(utils.hexToRgbA('#fbafff')).toBe('rgba(251, 175, 255, 1)');
+  });
+
+/* NOT SURE IF THIS IS CORRECT SYNTAX
+  test('Throw an error for a bad hex', () => {
+    expect(hexToRgbA('#fbafff')).toThrow(new Error('Bad Hex'));
+  }); 
+*/
+
+})

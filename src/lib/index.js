@@ -11,11 +11,12 @@ import TimeSeriesSlider from './components/TimeSeriesSlider/TimeSeriesSlider';
 import Spinner from './components/Spinner/Spinner';
 import ThemeSwitcher from './components/ThemeSwitcher/ThemeSwitcher';
 import Export from './components/Export/Export';
+import HorizontalBarChart from './components/Charts/HorizontalBarChart';
+import ColumnChart from './components/Charts/ColumnChart';
 
 // Gisida charts
 import PieChart from './components/Charts/PieChart';
 import LineChart from './components/Charts/LineChart';
-import ColumnChart from './components/Charts/BarChartStacked';
 import BarChartStacked from './components/Charts/BarChartStacked';
 
 export {
@@ -32,8 +33,9 @@ export {
   Spinner,
   PieChart,
   LineChart,
-  ColumnChart,
+  HorizontalBarChart,
   BarChartStacked,
+  ColumnChart,
   ThemeSwitcher,
   Export,
 }

@@ -1,8 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Actions, generateFilterOptions, generateFilterOptionsPrev,
-  buildFilterState, clearFilterState } from 'gisida';
+import {
+  Actions,
+  generateFilterOptions,
+  generateFilterOptionsPrev,
+  buildFilterState,
+  clearFilterState
+} from 'gisida';
 import { buildLayersObj } from '../../utils';
 import FilterSelector from './FilterSelector';
 import FilterSelectorPrev from './FilterSelectorPrev';
@@ -15,6 +20,7 @@ const mapStateToProps = (state, ownProps) => {
     APP: state.APP,
     MAP,
     mapId,
+    oldLayerObj: MAP.oldLayerObj,
     isSplitScreen: state.VIEW && state.VIEW.splitScreen,
     FILTER: state.FILTER,
     layerObj: MAP.layers[MAP.filter.layerId],
@@ -103,7 +109,8 @@ export class Filter extends Component {
         filter.options = [...filters[filterKey].quantitativeValues];
       } else {
         options = filters[filterKey].filterValues;
-        optionKeys = Object.keys(options).filter((o) => o.length > 0);
+        optionKeys = Object.keys(options)
+          .filter(o => o.length > 0 && o !== 'undefined');
         // loop over all options
         for (o = 0; o < optionKeys.length; o += 1) {
           optionKey = optionKeys[o];
@@ -295,7 +302,6 @@ export class Filter extends Component {
         nextProps.dispatch(Actions.filtersUpdated(nextProps.mapId, layerId));
       });
     }
-    window.GisidaMap = this.map;
   }
 
   onCloseClick = (e) => {
@@ -322,7 +328,6 @@ export class Filter extends Component {
   }
 
   onFilterOptionClick = (e, filterKey) => {
-    e.stopPropagation();
     const { filters } = this.state;
     const option = filters[filterKey].options[e.target.value];
     const nextOptions = Object.assign(
@@ -373,18 +378,31 @@ export class Filter extends Component {
       return false;
     }
     const { layerId, filterOptions } = this.state;
-    const { mapId, dispatch } = this.props;
+    const { mapId, dispatch, oldLayerObj } = this.props;
     // Clear layerFilter from mapbox layer
     dispatch(Actions.setLayerFilter(mapId, layerId, null));
 
     // Update FILTER state
+
     const filterState = {
       filterOptions,
       filters: this.buildFiltersMap(filterOptions),
-      aggregate: this.props.layerObj.aggregate,
+      aggregate: {
+        ...oldLayerObj.aggregate
+      },
       isFiltered: false,
     };
+
     clearFilterState(mapId, filterState, layerId, dispatch);
+
+    // Reload layer if necessary to re-aggregate / restore layer stops
+    if (this.props.FILTER[layerId]
+      &&  this.props.FILTER[layerId].originalLayerObj
+      && filterOptions
+      && Object.keys(filterOptions).map(f => filterOptions[f].type).includes('stops')) {
+      // Reload layer to re-aggregate and re-add layer
+      this.props.dispatch(Actions.addLayer(mapId, oldLayerObj));
+    }
     return true;
   }
 
@@ -407,10 +425,11 @@ export class Filter extends Component {
     let newFilters;
     let options;
     let optionKeys;
+    let regenStops = false;
     // loop through all filters
     for (let f = 0; f < filterKeys.length; f += 1) {
       // chec if the filter is actually filtered
-      if (filters[filterKeys[f]].isFiltered) {
+      if (filters[filterKeys[f]].isFiltered && filterOptions[filterKeys[f]].type !== 'stops') {
         newFilters = ['any'];
         if (filters[filterKeys[f]].dataType === 'ordinal') {
           // define the options and option keys for this filter
@@ -434,18 +453,38 @@ export class Filter extends Component {
         if (newFilters.length > 1) {
           nextFilters.push(newFilters);
         }
+      } else if (filters[filterKeys[f]].isFiltered) {
+        regenStops = true;
       }
     }
 
-    // Apply layerFilter to mapbox layer
-    this.props.dispatch(Actions.setLayerFilter(mapId, layerId, nextFilters));
     // Update FILTER store state
-    buildFilterState(mapId, filterOptions, filters, layerId, dispatch);
+    const { FILTER } = this.props;
+
+    if (!FILTER[layerId].originalLayerObj) {
+      const newFilterState = buildFilterState(filterOptions, filters, layerObj, regenStops);
+      const { originalLayerObj } = newFilterState;
+      dispatch(Actions.resetFilteredLayer(mapId, originalLayerObj));
+    }
+
+    const newFilterState = buildFilterState(filterOptions, filters, layerObj, regenStops);
+    dispatch(Actions.saveFilterState(mapId, layerId, newFilterState));
+
+    if (regenStops) {
+      const { fauxLayerObj } = newFilterState;
+      // Reload layer to re-aggregate and re-add layer
+      this.props.dispatch(Actions.addLayer(mapId, fauxLayerObj));
+    } else if (nextFilters.length > 1) {
+      // Apply layerFilter to mapbox layer
+      this.props.dispatch(Actions.setLayerFilter(mapId, layerId, nextFilters));
+    }
 
     return true;
   }
 
   setFilterQueries = (filterKey, nextQueries, queriedOptionKeys) => {
+    const { layerObj } = this.props;
+
     const prevFilters = Object.assign({}, this.state.filters);
     prevFilters[filterKey].queries = nextQueries;
     prevFilters[filterKey].queriedOptionKeys = queriedOptionKeys;
@@ -454,9 +493,8 @@ export class Filter extends Component {
       nextFilters,
     } = (this.buildNextFilters(prevFilters[filterKey].options, prevFilters, filterKey, true));
 
-    const { mapId, dispatch } = this.props;
-    const { filterOptions, layerId } = this.state;
-    buildFilterState(mapId, filterOptions, nextFilters, layerId, dispatch);
+    const { filterOptions } = this.state;
+    buildFilterState(filterOptions, nextFilters, layerObj, false);
   }
 
   searchFilterOptions = (e, filterKey) => {

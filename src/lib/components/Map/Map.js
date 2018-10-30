@@ -7,8 +7,20 @@ import './Map.scss';
 const mapStateToProps = (state, ownProps) => {
   const { APP, STYLES, REGIONS, VIEW } = state;
   const mapId = ownProps.mapId || 'map-1';
-  const MAP = state[mapId] || { blockLoad: true, layers: {} };
-  MAP.blockLoad = VIEW ? (!VIEW.splitScreen && mapId !== 'map-1') : false;
+
+  const MAP = state[mapId] || { blockLoad: true, layers: {}};
+  const activeLayers = [];
+  Object.keys(MAP.layers).forEach((key) => {
+    const layer = MAP.layers[key];
+    if (layer.visible && layer.type !== 'chart') {
+      activeLayers.push(key);
+    }
+  });
+
+  MAP.blockLoad = mapId === 'map-1'
+    ? false
+    : !VIEW || !VIEW.splitScreen;
+
   return {
     mapId,
     APP,
@@ -22,7 +34,8 @@ const mapStateToProps = (state, ownProps) => {
     layerObj: MAP.layers ? MAP.layers[MAP.activeLayerId]: null,
     primaryLayer: MAP.primaryLayer,
     showDetailView: !!MAP.detailView,
-    showFilterPanel: !!MAP.showFilterPanel
+    showFilterPanel: !!MAP.showFilterPanel,
+    activeLayers,
   }
 }
 
@@ -83,23 +96,39 @@ class Map extends Component {
     // this.addMapClickEvents()
     // this.addMouseMoveEvents()
     // etc
+    this.map.on('mousemove', (e) => {
+      const { activeLayers, layerObj } = this.props;
+      const features = this.map.queryRenderedFeatures(e.point, {
+        layers: activeLayers.filter(i => this.map.getLayer(i) !== undefined)
+      });
+      const feature = features.find(f => f.layer.id === layerObj.id);
+      if (!feature) {
+        return false;
+      }
+      this.map.getCanvas().style.cursor = layerObj['detail-view']
+        ? 'pointer' : '';
+      return true;
+    });
     this.map.on('click', this.onFeatureClick.bind(this));
   }
 
   onFeatureClick(e) {
     const activeLayers = this.props.layersObj.map(l => l.id)
-    const { layerObj, mapId } = this.props;
+    const { mapId } = this.props;
     const features = this.map.queryRenderedFeatures(e.point, { layers: activeLayers });
-    const feature = features.find(f => f.layer.id === layerObj.id);
+    const feature = features[0];
+    if (!feature) return false;
+    const activeLayerObj = this.props.layersObj.find((l) => l.id === feature.layer.id);
 
-    if (feature && layerObj['detail-view']) {
+    if (feature && activeLayerObj['detail-view']) {
       const newZoom = this.map.getZoom() < 7.5 ? 7.5 : this.map.getZoom();
       this.map.easeTo({
         center: e.lngLat,
         zoom: newZoom
       });
-      buildDetailView(mapId, layerObj, feature.properties, this.props.dispatch);
+      buildDetailView(mapId, activeLayerObj, feature.properties, this.props.dispatch);
     }
+    return true;
   }
 
   findNextLayer(activelayersData, nextLayer) {
@@ -225,7 +254,7 @@ class Map extends Component {
           const layer = layers[key];
           // Add layer to map if visible
           if (!this.map.getLayer(layer.id) && layer.visible && layer.styleSpec) {
-            this.map.addLayer(layer.styleSpec);
+            this.map.addLayer({ ...layer.styleSpec });
 
             // if layer has a highlight layer
             if (layer.filters && layer.filters.highlight) {
@@ -246,13 +275,13 @@ class Map extends Component {
               }
             }
           } else if (this.map.getLayer(layer.id) && nextProps.MAP.reloadLayerId === layer.id) {
-            let doUpdateTSlayer = true;
-            let filterOptions = nextProps.MAP.filter.filterOptionsPrev;
+            let doUpdateTslayer = true;
+            let filterOptions = nextProps.MAP.filter.filterOptionsPrev || false;
             this.map.removeLayer(layer.id);
             this.map.removeSource(layer.id);
 
             this.props.dispatch(Actions.layerReloaded(mapId));
-            prepareLayer(mapId, layer, this.props.dispatch, filterOptions, doUpdateTSlayer);
+            prepareLayer(mapId, layer, this.props.dispatch, filterOptions, doUpdateTslayer);
           }
           // Change visibility if layer is already on map
           this.changeVisibility(layer.id, layer.visible);
@@ -283,7 +312,7 @@ class Map extends Component {
       }
     }
     // Assign global variable for debugging purposes.
-    window.GisidaMap = this.map;
+    // window.GisidaMap = this.map;
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -424,7 +453,7 @@ class Map extends Component {
         tsObj = timeseries[id];
 
         const {
-          temporalIndex, stops, colorStops, strokeWidthStops,
+          temporalIndex, stops, strokeWidthStops,
         } = tsObj;
 
         index = parseInt(temporalIndex, 10);
@@ -465,20 +494,20 @@ class Map extends Component {
               defaultValue = layerObj.type === 'circle' ? 0 : 'rgba(0,0,0,0)';
               paintProperty = layerObj.type === 'circle' ? 'circle-radius' : 'fill-color';
               newStops = {
-                property: layerObj.source.join[0],
+                property: layerObj.categories['vector-prop'] || layerObj.source.join[0],
                 stops: stops[index],
                 type: 'categorical',
                 default: defaultValue,
               };
 
-              if (layerObj.type === 'circle' && layerObj.categories.color instanceof Array) {
+              if (layerObj.type === 'circle' && (layerObj.categories.color instanceof Array || layerObj.colorStops)) {
                 newColorStops = {
-                  property: layerObj.source.join[0],
-                  stops: colorStops[index],
+                  property: layerObj.categories['vector-prop'] || layerObj.source.join[0],
+                  stops: layerObj.stops[0][index],
                   type: 'categorical',
                 };
                 newStrokeStops = {
-                  property: layerObj.source.join[0],
+                  property: layerObj.categories['vector-prop'] || layerObj.source.join[0],
                   stops: strokeWidthStops[index],
                   type: 'categorical',
                 };
@@ -526,7 +555,7 @@ class Map extends Component {
     let el;
     const { id } = layerObj;
     const labels = timeseries && typeof timeseries[layerObj.id] !== 'undefined'
-      ? layerObj.labels.labels[timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]]
+      ? layerObj.labels.labels[timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]] || layerObj.labels.labels
       : layerObj.labels.labels;
 
     if (!labels) {
@@ -557,19 +586,21 @@ class Map extends Component {
     let maxZoom;
     let zoom = this.map.getZoom();
     let isRendered;
-    this.props.layersObj.forEach(layerObj => {
-      if (layerObj.labels) {
-        minZoom = layerObj.labels.minZoom || layerObj.labels.minzoom || 0;
-        maxZoom = layerObj.labels.maxZoom || layerObj.labels.maxzoom || 22;
-        isRendered = (document.getElementsByClassName(`label-${layerObj.id}`)).length;
+    if (this.props && this.props.layersObj) {
+      this.props.layersObj.forEach(layerObj => {
+        if (layerObj.labels) {
+          minZoom = layerObj.labels.minZoom || layerObj.labels.minzoom || 0;
+          maxZoom = layerObj.labels.maxZoom || layerObj.labels.maxzoom || 22;
+          isRendered = (document.getElementsByClassName(`label-${layerObj.id}`)).length;
 
-        if (zoom < minZoom || zoom > maxZoom) {
-          this.removeLabels(`label-${layerObj.id}`);
-        } else if (!isRendered) {
-          this.addLabels(layerObj);
+          if (zoom < minZoom || zoom > maxZoom) {
+            this.removeLabels(`label-${layerObj.id}`);
+          } else if (!isRendered) {
+            this.addLabels(layerObj);
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   render() {
@@ -597,8 +628,9 @@ class Map extends Component {
           (
             <div id={this.props.mapId} style={{
               width: mapWidth,
-              display: this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
-              ? 'none' : 'inline'
+              display: this.props.MAP.blockLoad
+                || (this.props.VIEW && !this.props.VIEW.showMap)
+                ? 'none' : 'inline'
             }} >
               <div className="widgets">
                 {/* Render Children elemets with mapId prop added to each child  */}
