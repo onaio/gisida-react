@@ -5,7 +5,7 @@ import { detectIE, buildLayersObj } from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
-  const { APP, STYLES, REGIONS, VIEW } = state;
+  const { APP, STYLES, REGIONS, VIEW, FILTER } = state;
   const mapId = ownProps.mapId || 'map-1';
 
   const MAP = state[mapId] || { blockLoad: true, layers: {}};
@@ -28,6 +28,7 @@ const mapStateToProps = (state, ownProps) => {
     REGIONS,
     MAP,
     VIEW,
+    FILTER,
     timeSeriesObj: MAP.timeseries ? MAP.timeseries[MAP.activeLayerId]: null,
     timeseries:  MAP.timeseries,
     layersObj: MAP.layers ? buildLayersObj(MAP.layers) : {},
@@ -282,7 +283,8 @@ class Map extends Component {
             this.map.removeSource(layer.id);
             // 2) dispatch action to set reloadLayerId to null
             this.props.dispatch(Actions.layerReloaded(mapId));
-            prepareLayer(mapId, layer, this.props.dispatch, filterOptions, doUpdateTsLayer);
+            const originalLayer = nextProps.FILTER[layer.id].isClear ? nextProps.MAP.oldLayerObj : layer;
+            prepareLayer(mapId, originalLayer, this.props.dispatch, filterOptions, doUpdateTsLayer);
           }
           // Change visibility if layer is already on map
           this.changeVisibility(layer.id, layer.visible);
@@ -319,10 +321,10 @@ class Map extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (this.map) {
       this.map.resize();
-      const { layersObj, primaryLayer } = this.props;
+      const { layersObj, primaryLayer, FILTER } = this.props;
       // Update Timeseries
       const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
-      if (doUpdateTSlayers) {
+      if (doUpdateTSlayers || (FILTER && FILTER[primaryLayer] && FILTER[primaryLayer].isClear)) {
         this.updateTimeseriesLayers();
       }
 
@@ -422,7 +424,7 @@ class Map extends Component {
   }
 
   updateTimeseriesLayers() {
-    const { timeSeriesObj, timeseries, layersObj } = this.props; 
+    const { timeSeriesObj, timeseries, layersObj, FILTER } = this.props;
     const timeSeriesLayers = Object.keys(timeseries);
 
     // determine what the currently timeperiod to see if layers should be hidden
@@ -468,7 +470,7 @@ class Map extends Component {
 
           // look through the layer periods for a match
           pIndex = timeseries[id].period.indexOf(currPeriod);
-          hasData = pIndex !== -1 ? timeseries[id].periodData[currPeriod].hasData : false;
+          hasData = pIndex !== -1 ? ((FILTER && FILTER[id] && FILTER[id].isClear) || timeseries[id].periodData[currPeriod].hasData) : false;
 
           // if the layer is in the map and has no period match, hide it
           if (!hasData || pIndex === -1) {
@@ -556,7 +558,7 @@ class Map extends Component {
     let el;
     const { id } = layerObj;
     const labels = timeseries && typeof timeseries[layerObj.id] !== 'undefined'
-      ? layerObj.labels.labels[timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]] || layerObj.labels.labels
+      ? layerObj.labels.labels[timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]]
       : layerObj.labels.labels;
 
     for (let l = 0; l < labels.length; l += 1) {

@@ -386,7 +386,7 @@ export class Filter extends Component {
       isFiltered: false,
     };
 
-    clearFilterState(mapId, filterState, layerId, dispatch);
+    clearFilterState(mapId, filterState, layerId, dispatch, true);
 
     // Reload layer if necessary to re-aggregate / restore layer stops
     if (this.props.FILTER[layerId]

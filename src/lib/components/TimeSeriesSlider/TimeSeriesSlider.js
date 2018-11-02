@@ -78,7 +78,7 @@ class TimeSeriesSlider extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.timeSeriesObj) {
+    if (nextProps.timeSeriesObj && nextProps.timeSeriesObj.periodData) {
       const { period, temporalIndex } = nextProps.timeSeriesObj;
       this.setState({
         periods: period,
