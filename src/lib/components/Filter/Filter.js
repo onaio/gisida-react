@@ -386,13 +386,15 @@ export class Filter extends Component {
       isFiltered: false,
     };
 
-    clearFilterState(mapId, filterState, layerId, dispatch, true);
+    const hasStops = Object.keys(filterOptions).map(f => filterOptions[f].type).includes('stops');
+
+    clearFilterState(mapId, filterState, layerId, dispatch, hasStops);
 
     // Reload layer if necessary to re-aggregate / restore layer stops
     if (this.props.FILTER[layerId]
       &&  this.props.FILTER[layerId].originalLayerObj
       && filterOptions
-      && Object.keys(filterOptions).map(f => filterOptions[f].type).includes('stops')) {
+      && hasStops) {
       // Reload layer to re-aggregate and re-add layer
       this.props.dispatch(Actions.addLayer(mapId, oldLayerObj));
     }
