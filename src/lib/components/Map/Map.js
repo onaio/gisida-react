@@ -563,6 +563,10 @@ class Map extends Component {
       ? layerObj.labels.labels[timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]]
       : layerObj.labels.labels;
 
+    if (!labels) {
+      return false;
+    }
+
     for (let l = 0; l < labels.length; l += 1) {
       el = document.createElement('div');
       el.className = `map-label label-${id}`;
