@@ -103,18 +103,13 @@ export class Legend extends React.Component {
           stopVals.push(s[1]);
         });
 
-        console.log("layer???", layer)
-
         layer.styleSpec.paint['circle-radius'].stops.forEach((s) => {
           stopVals.push(s[1]);
         });
 
         uniqueStops = [...new Set(stopVals)].sort((a, b) => a - b);
 
-        console.log("unique stops", uniqueStops)
-
         uniqueStops.forEach((s, i) => {
-          console.log("color???", layer.stops[4][i])
           quantiles.push((
             <span
               className="circle-container"
@@ -122,15 +117,15 @@ export class Legend extends React.Component {
               <span
                 style={
                   {
-                    background: Array.isArray(layer.categories.color) ? layer.categories.color[uniqueStops.indexOf(s)]
+                    background: Array.isArray(layer.categories.color) ? layer.categories.color[i]
                       : layer.stops[4][i],
                     width: `${s * 2}px`,
                     height: `${s * 2}px`,
-                    margin: `0px ${uniqueStops.indexOf(s) + 2}px`
+                    margin: `0px ${i + 2}px`
                   }
                 }
               ></span>
-              <p>{layer.breaks[uniqueStops.indexOf(s)]}</p>
+              <p>{layer.breaks[i]}</p>
             </span>
           ));
         });
