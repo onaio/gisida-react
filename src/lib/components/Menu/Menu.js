@@ -75,6 +75,7 @@ const mapStateToProps = (state, ownProps) => {
     loaded: state.APP.loaded,
     preparedLayers: MAP.layers,
     menuIsOpen: MAP.menuIsOpen,
+    openCategories: MAP.openCategories,
   };
 }
 
@@ -94,14 +95,9 @@ class Menu extends Component {
 
   onCategoryClick = (e, category) => {
     e.preventDefault();
-
-    const openCategories = this.state.openCategories;
+    const { openCategories } = this.props;
     const index = openCategories.indexOf(category);
-
-    if (index > -1) {
-      openCategories.splice(openCategories.indexOf(category), 1);
-    } else openCategories.push(category);
-    this.setState({ openCategories });
+    this.props.dispatch(Actions.toggleCategories(this.props.mapId, category, index))
   }
 
   onRegionClick = (e) => {
@@ -172,12 +168,12 @@ class Menu extends Component {
                           <a onClick={e => this.onCategoryClick(e, category.category)}>{category.category}
                             <span
                               className={"category glyphicon " +
-                                (this.state.openCategories.includes(category.category) ?
+                                (this.props.openCategories && this.props.openCategories.includes(category.category) ?
                                   "glyphicon-chevron-down" : "glyphicon-chevron-right")}
                             />
                           </a>
                           {
-                            this.state.openCategories.includes(category.category) ?
+                            this.props.openCategories && this.props.openCategories.includes(category.category) ?
                               <Layers
                                 mapId={mapId}
                                 layers={category.layers}

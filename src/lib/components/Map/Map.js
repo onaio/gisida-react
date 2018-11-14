@@ -7,6 +7,7 @@ import './Map.scss';
 const mapStateToProps = (state, ownProps) => {
   const { APP, STYLES, REGIONS, VIEW } = state;
   const mapId = ownProps.mapId || 'map-1';
+
   const MAP = state[mapId] || { blockLoad: true, layers: {}};
   const activeLayers = [];
   Object.keys(MAP.layers).forEach((key) => {
@@ -15,7 +16,11 @@ const mapStateToProps = (state, ownProps) => {
       activeLayers.push(key);
     }
   });
-  MAP.blockLoad = VIEW ? (!VIEW.splitScreen && mapId !== 'map-1') : false;
+
+  MAP.blockLoad = mapId === 'map-1'
+    ? false
+    : !VIEW || !VIEW.splitScreen;
+
   return {
     mapId,
     APP,
@@ -319,7 +324,7 @@ class Map extends Component {
       }
     }
     // Assign global variable for debugging purposes.
-    window.GisidaMap = this.map;
+    // window.GisidaMap = this.map;
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -560,8 +565,6 @@ class Map extends Component {
 
   addLabels(layerObj, timeseries) {
     let el;
-    let formattedLabel;
-    let htmlLabel;
     const { id } = layerObj;
     const labels = timeseries && typeof timeseries[layerObj.id] !== 'undefined'
       ? layerObj.labels.labels[timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]] || layerObj.labels.labels
@@ -570,10 +573,7 @@ class Map extends Component {
     for (let l = 0; l < labels.length; l += 1) {
       el = document.createElement('div');
       el.className = `map-label label-${id}`;
-      const filteredLabel = labels[l].label.split("").filter((s) => s !== "<" && s !== ">" && s !== "/" && s !== "b" && s !== "r");
-      formattedLabel = filteredLabel.join("").replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-      htmlLabel = `<b>${formattedLabel}</b>`
-      el.innerHTML = htmlLabel;
+      el.innerHTML = labels[l].label;
       new mapboxgl.Marker(el, {
         offset: labels[l].offset,
       })
@@ -594,19 +594,21 @@ class Map extends Component {
     let maxZoom;
     let zoom = this.map.getZoom();
     let isRendered;
-    this.props && this.props.layersObj && this.props.layersObj.forEach(layerObj => {
-      if (layerObj.labels) {
-        minZoom = layerObj.labels.minZoom || layerObj.labels.minzoom || 0;
-        maxZoom = layerObj.labels.maxZoom || layerObj.labels.maxzoom || 22;
-        isRendered = (document.getElementsByClassName(`label-${layerObj.id}`)).length;
+    if (this.props && this.props.layersObj) {
+      this.props.layersObj.forEach(layerObj => {
+        if (layerObj.labels) {
+          minZoom = layerObj.labels.minZoom || layerObj.labels.minzoom || 0;
+          maxZoom = layerObj.labels.maxZoom || layerObj.labels.maxzoom || 22;
+          isRendered = (document.getElementsByClassName(`label-${layerObj.id}`)).length;
 
-        if (zoom < minZoom || zoom > maxZoom) {
-          this.removeLabels(`label-${layerObj.id}`);
-        } else if (!isRendered) {
-          this.addLabels(layerObj);
+          if (zoom < minZoom || zoom > maxZoom) {
+            this.removeLabels(`label-${layerObj.id}`);
+          } else if (!isRendered) {
+            this.addLabels(layerObj);
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   render() {

@@ -126,8 +126,8 @@ class ColumnChart extends React.Component {
 
       this.setState({
         chart: Object.assign({}, this.state.chart, {
-          height: chartHeight || 250,
-          width: chartWidth || 600,
+          height: chartHeight || null,
+          width: chartWidth || null,
         }),
         title: {
           text: seriesTitle || null,

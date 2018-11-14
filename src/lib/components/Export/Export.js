@@ -601,7 +601,7 @@ export class Export extends Component {
             </div>
           ) : (
             <Script
-              url="http://html2canvas.hertzen.com/dist/html2canvas.min.js"
+              url="https://html2canvas.hertzen.com/dist/html2canvas.min.js"
               onLoad={() => { this.scriptIsLoaded(); }}
             />
           )
