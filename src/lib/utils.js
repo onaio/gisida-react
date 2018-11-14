@@ -156,3 +156,7 @@ export function buildLayersObj(layers) {
 
   return layersObj;
 }
+
+export function deepCopy(x) {
+  return JSON.parse(JSON.stringify(x));
+};
