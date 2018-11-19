@@ -491,8 +491,10 @@ export class Filter extends Component {
     } = (this.buildNextFilters(prevFilters[filterKey].options, prevFilters, filterKey, true));
 
     const { filterOptions } = this.state;
-    const filterState = buildFilterState(filterOptions, nextFilters, layerObj, true);
-    dispatch(Actions.saveFilterState(mapId, layerObj.id, filterState));
+    this.setState({
+      filters: nextFilters,
+    });
+    buildFilterState(filterOptions, nextFilters, layerObj, false);
   }
 
   searchFilterOptions = (e, filterKey) => {
