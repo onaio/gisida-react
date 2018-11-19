@@ -489,6 +489,9 @@ export class Filter extends Component {
     } = (this.buildNextFilters(prevFilters[filterKey].options, prevFilters, filterKey, true));
 
     const { filterOptions } = this.state;
+    this.setState({
+      filters: nextFilters,
+    });
     buildFilterState(filterOptions, nextFilters, layerObj, false);
   }
 
@@ -760,7 +763,7 @@ export class Filter extends Component {
     }
 
     if (isFiltered) {
-      nextFilters = this.buildFilteredFilters(filterKey, nextFilters);
+      nextFilters = this.buildFilteredFilters(filterKey, nextFilters)
     } else if (isResetable) {
       const layerFilters = this.getLayerFilter(this.props.layerObj.id);
       nextFilters = this.buildFiltersMap(filterOptions, layerFilters, nextFilters);
