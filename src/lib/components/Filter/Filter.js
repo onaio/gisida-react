@@ -489,6 +489,9 @@ export class Filter extends Component {
     } = (this.buildNextFilters(prevFilters[filterKey].options, prevFilters, filterKey, true));
 
     const { filterOptions } = this.state;
+    this.setState({
+      filters: nextFilters,
+    });
     buildFilterState(filterOptions, nextFilters, layerObj, false);
   }
 
