@@ -692,5 +692,13 @@
     background-color: #eee;
   }
 }
+html .filter-section-options .filter-item div.advanced-controls table {
+  width: calc(100% - 60px);
+  position: absolute;
+  float: none;
+  top: -42px;
+  left: 30px;
+}
+
 
 
