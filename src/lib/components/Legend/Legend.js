@@ -38,7 +38,9 @@ export class Legend extends React.Component {
   }
 
   onUpdatePrimaryLayer(e) {
-    e.preventDefault();
+    if (e.target.getAttribute('data-download') !== 'download') {
+       e.preventDefault();
+    }
     const { dispatch, mapId } = this.props;
     const targetLayer = e.currentTarget.getAttribute('data-layer');
     // dispatch primary layer id
@@ -56,6 +58,7 @@ export class Legend extends React.Component {
 
     let primaryLegend;
     let layer;
+    let exportLink = (<a className="glyphicon glyphicon-download-alt" data-download="download" target="_blank" href={this.props.layerObj.exportLink} download></a>);
     for (let l = 0; l < this.props.layersData.length; l += 1) {
       layer = this.props.layersData[l];
       const circleLayerType = (layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible);
@@ -130,7 +133,6 @@ export class Legend extends React.Component {
           ));
         });
       }
-
       if (lastLayerSelected && lastLayerSelected.id === layer.id) {
         if (circleLayerType) {
           primaryLegend = (
@@ -148,6 +150,10 @@ export class Legend extends React.Component {
                 {quantiles}
               </div>
               <span>{layer.credit}</span>
+              {this.props.layerObj.exportLink ?
+                exportLink : ''
+                    }
+
             </div>);
         }
         if (fillLayerNoBreaks && !layer.parent) {
@@ -187,6 +193,9 @@ export class Legend extends React.Component {
               <span>
                 {Parser(layer.credit)}
               </span>
+              {this.props.layerObj.exportLink ?
+                exportLink : ''
+                    }
             </div>
           );
         } if (fillLayerWithBreaks && layer.stops && !layer.parent) {
@@ -261,6 +270,9 @@ export class Legend extends React.Component {
                 </ul>
               </div>
               <span>{Parser(layer.credit)}</span>
+              {this.props.layerObj.exportLink ?
+                exportLink : ''
+                    }
             </div>
           );
 
@@ -268,7 +280,7 @@ export class Legend extends React.Component {
         continue;
       }
       if (circleLayerType) {
-        legendItems.unshift((
+        legendItems.unshift((       
           <div
             id={`legend-${layer.id}-${mapId}`}
             className={`legend-shapes legend-row ${activeLayerSelected}`}
@@ -283,6 +295,9 @@ export class Legend extends React.Component {
               {quantiles}
             </div>
             <span>{layer.credit}</span>
+            {this.props.layerObj.exportLink ?
+                exportLink : ''
+                    }
           </div>
         ));
       } else if (symbolLayer) {
@@ -324,6 +339,9 @@ export class Legend extends React.Component {
             <span>
               {Parser(layer.credit)}
             </span>
+            {this.props.layerObj.exportLink ?
+                exportLink : ''
+                    }
           </div>
         ));
 
@@ -364,6 +382,9 @@ export class Legend extends React.Component {
             <span>
               {Parser(layer.credit)}
             </span>
+            {this.props.layerObj.exportLink ?
+                exportLink : ''
+                    }
           </div>
         ));
       } else if (fillLayerWithBreaks && layer.stops && !layer.parent) {
@@ -428,6 +449,7 @@ export class Legend extends React.Component {
                 {legendSuffix}
               </li>
             </ul>
+            
             <div
               className="legend-fill"
             >
@@ -438,6 +460,9 @@ export class Legend extends React.Component {
               </ul>
             </div>
             <span>{Parser(layer.credit)}</span>
+            {this.props.layerObj.exportLink ?
+                exportLink : ''
+                    }
           </div>
         ));
       }
@@ -447,14 +472,13 @@ export class Legend extends React.Component {
     }
 
     legendItems.unshift(primaryLegend);
-
     return (
       <div>
         <div
           className={`legend ${mapId}`}
           style={{ right: this.props.showFilterPanel ? '30px' : '20px' }}>
           {legendItems}
-        </div>
+          </div>
       </div>
     );
   }
