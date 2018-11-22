@@ -20,6 +20,7 @@ const mapStateToProps = (state, ownProps) => {
     timeseries: MAP.timeseries,
     layers: MAP.layers,
     showFilterPanel: MAP.showFilterPanel,
+    timeLayer,
   }
 }
 
@@ -68,13 +69,15 @@ class TimeSeriesSlider extends React.Component {
             {
               temporalIndex,
               data: periodData[period[temporalIndex]].data,
+              adminFilter: periodData[period[temporalIndex]].adminFilter
+                && [...periodData[period[temporalIndex]].adminFilter],
             },
           );
         }
       }
     }
 
-    this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries))
+    this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, this.props.timeLayer))
   }
 
   componentWillReceiveProps(nextProps) {
