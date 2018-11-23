@@ -476,7 +476,7 @@ export class Filter extends Component {
   }
 
   setFilterQueries = (filterKey, nextQueries, queriedOptionKeys) => {
-    const { layerObj } = this.props;
+    const { layerObj, mapId, dispatch } = this.props;
 
     const prevFilters = Object.assign({}, this.state.filters);
     prevFilters[filterKey].queries = nextQueries;
@@ -487,7 +487,8 @@ export class Filter extends Component {
     } = (this.buildNextFilters(prevFilters[filterKey].options, prevFilters, filterKey, true));
 
     const { filterOptions } = this.state;
-    buildFilterState(filterOptions, nextFilters, layerObj, false);
+    const filterState = buildFilterState(filterOptions, nextFilters, layerObj, false);
+    dispatch(Actions.saveFilterState(mapId, layerObj.id, filterState));
   }
 
   searchFilterOptions = (e, filterKey) => {
