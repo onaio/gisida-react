@@ -252,7 +252,8 @@ export class Filter extends Component {
 
   handleFilterClick() {
     const { dispatch, mapId, layerId } = this.props;
-    window.maps[0].easeTo({
+    const availableMaps = ['map-1', 'map-2'];
+    window.maps[availableMaps.indexOf(mapId)].easeTo({
       center: {
         lng: this.props.APP.mapConfig.center[0],
         lat: this.props.APP.mapConfig.center[1],

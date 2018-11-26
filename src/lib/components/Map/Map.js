@@ -610,7 +610,6 @@ class Map extends Component {
 
   render() {
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
-    console.log(this.props);
    
     let mapWidth = '100%';
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
