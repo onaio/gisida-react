@@ -7,7 +7,6 @@ import './Map.scss';
 const mapStateToProps = (state, ownProps) => {
   const { APP, STYLES, REGIONS, VIEW, FILTER } = state;
   const mapId = ownProps.mapId || 'map-1';
-
   const MAP = state[mapId] || { blockLoad: true, layers: {}};
   const activeLayers = [];
   Object.keys(MAP.layers).forEach((key) => {
@@ -610,6 +609,8 @@ class Map extends Component {
 
   render() {
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
+    console.log(this.props);
+   
     let mapWidth = '100%';
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
@@ -630,7 +631,9 @@ class Map extends Component {
             </div>
           ) :
           (
-            <div id={this.props.mapId} style={{
+            <div id={this.props.mapId} 
+            className = {`${this.props.mapId === 'map-2' && this.props.showFilterPanel ? 'splitScreenClass': ''}` }
+            style={{
               width: mapWidth,
               display: this.props.MAP.blockLoad
                 || (this.props.VIEW && !this.props.VIEW.showMap)

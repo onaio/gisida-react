@@ -42,4 +42,11 @@
   top: 0;
   right: 0;
   border-left: 4px solid #fff;
+
+  &.splitScreenClass {
+  width: 34% !important;
+  right: 250px
+  }
+
 }
+
