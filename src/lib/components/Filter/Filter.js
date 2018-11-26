@@ -459,12 +459,12 @@ export class Filter extends Component {
     const { FILTER } = this.props;
 
     if (!FILTER[layerId].originalLayerObj) {
-      const newFilterState = buildFilterState(filterOptions, filters, layerObj, regenStops);
+      const newFilterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, regenStops);
       const { originalLayerObj } = newFilterState;
       dispatch(Actions.resetFilteredLayer(mapId, originalLayerObj));
     }
 
-    const newFilterState = buildFilterState(filterOptions, filters, layerObj, regenStops);
+    const newFilterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, regenStops);
     dispatch(Actions.saveFilterState(mapId, layerId, newFilterState));
 
     if (regenStops) {
@@ -491,10 +491,8 @@ export class Filter extends Component {
     } = (this.buildNextFilters(prevFilters[filterKey].options, prevFilters, filterKey, true));
 
     const { filterOptions } = this.state;
-    this.setState({
-      filters: nextFilters,
-    });
-    buildFilterState(filterOptions, nextFilters, layerObj, false);
+    const filterState = buildFilterState(mapId, filterOptions, nextFilters, layerObj, dispatch, true);
+    dispatch(Actions.saveFilterState(mapId, layerObj.id, filterState));
   }
 
   searchFilterOptions = (e, filterKey) => {
@@ -849,6 +847,7 @@ export class Filter extends Component {
           </a>
           {filter.isOpen ?
             <FilterSelector
+              mapId={mapId}
               filter={filter}
               filterKey={filterKeys[f]}
               onFilterOptionClick={this.onFilterOptionClick}

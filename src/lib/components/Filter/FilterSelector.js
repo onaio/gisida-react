@@ -62,7 +62,7 @@ export class FilterSelector extends Component {
 
   render() {
     const { options, isLinux, dataType, queriedOptionKeys } = this.state;
-    const { filterKey, doAdvFiltering,  toggleAllOn, queries } = this.props;
+    const { filterKey, doAdvFiltering,  toggleAllOn, queries, mapId } = this.props;
     if (!options || !(Object.keys(options)).length) {
       return null;
     }
@@ -83,13 +83,13 @@ export class FilterSelector extends Component {
           <li key={i} className={`optionItem${option.count ? '' : ' inactive'}`}>
             <input
               type="checkbox"
-              id={optionKeys[i]}
+              id={`${optionKeys[i]}-${mapId}`}
               value={optionKeys[i]}
               checked={option.enabled}
               onChange={(e) => { this.onFilterOptionClick(e, filterKey); }}
             />
             <label
-              htmlFor={optionKeys[i]}
+              htmlFor={`${optionKeys[i]}-${mapId}`}
               key={optionKeys[i]}
               data-count={option.count}
               className={`optionLabel${option.enabled ? ' enabled' : ''}`}
