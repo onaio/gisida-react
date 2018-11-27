@@ -201,7 +201,7 @@ class Map extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps){
+  componentWillReceiveProps(nextProps) {
     if (this.map) {
       this.map.resize();
     }
@@ -337,8 +337,15 @@ class Map extends Component {
     }
 
     // Update Layer Filters
-    if (this.props.MAP.doApplyFilters) {
-      this.buildFilters();
+    if (this.map && this.props.layerObj && this.map.getLayer(this.props.layerObj.id)) {
+      const { FILTER, primaryLayer } = this.props;
+      if (this.props.MAP.doApplyFilters ||
+        (FILTER && FILTER[primaryLayer]
+          && !FILTER[primaryLayer].doUpdate
+          && prevProps.FILTER[primaryLayer]
+          && prevProps.FILTER[primaryLayer].doUpdate)) {
+        this.buildFilters();
+      }
     }
   }
 

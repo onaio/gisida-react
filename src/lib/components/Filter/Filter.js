@@ -384,12 +384,13 @@ export class Filter extends Component {
       aggregate: {
         ...oldLayerObj.aggregate
       },
+      doUpdate: false,
       isFiltered: false,
     };
 
     const hasStops = Object.keys(filterOptions).map(f => filterOptions[f].type).includes('stops');
 
-    clearFilterState(mapId, filterState, layerId, dispatch, hasStops);
+    clearFilterState(mapId, filterState, layerId, dispatch, true);
 
     // Reload layer if necessary to re-aggregate / restore layer stops
     if (this.props.FILTER[layerId]
