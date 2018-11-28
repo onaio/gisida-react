@@ -217,6 +217,7 @@ export class Filter extends Component {
           ooKeys = Object.keys(oOptions);
 
           // Loop through all of the original filter options
+          
           for (let o = 0; o < ooKeys.length; o += 1) {
             ooKey = ooKeys[o];
             // If the filtered filter doesn't have the option, add it
@@ -297,7 +298,8 @@ export class Filter extends Component {
       });
     }
   }
-
+   
+  
   onCloseClick = (e) => {
     e.preventDefault();
     //TODO dispach close action
@@ -324,6 +326,7 @@ export class Filter extends Component {
   onFilterOptionClick = (e, filterKey) => {
     const { filters } = this.state;
     const option = filters[filterKey].options[e.target.value];
+    const updateFilters = Object.assign({}, filters);
     const nextOptions = Object.assign(
       {},
       filters[filterKey].options,
@@ -334,12 +337,13 @@ export class Filter extends Component {
         },
       },
     );
-
+    
+    updateFilters[filterKey].toggleAllOn = Object.keys(nextOptions).some(obj => nextOptions[obj].enabled === false);
+    
     const {
       isFiltered,
       nextFilters,
-    } = (this.buildNextFilters(nextOptions, filters, filterKey, true));
-
+    } = (this.buildNextFilters(nextOptions, updateFilters, filterKey, true));
     this.setState({
       isFiltered,
       filters: nextFilters,
@@ -357,7 +361,6 @@ export class Filter extends Component {
       option = options[optionKeys[o]];
       nextOptions[optionKeys[o]].enabled = option.count && !option.hidden ? toggleAllOn : false;
     }
-
     const { isFiltered, nextFilters } = (this.buildNextFilters(nextOptions, filters, filterKey));
 
     this.setState({
@@ -741,7 +744,7 @@ export class Filter extends Component {
     let nextFilter;
     let isFiltered = false;
     const filterKeys = Object.keys(nextFilters);
-
+    
     for (let i = 0; i < filterKeys.length; i += 1) {
       nextFilter = nextFilters[filterKeys[i]];
       nextFilter.isFiltered = this.isFiltered(nextFilter.options, nextFilter.isOriginal);
@@ -761,14 +764,17 @@ export class Filter extends Component {
       //   isFiltered = true;
       // }
     }
-
+    
+    if (Object.keys(nextFilters[filterKey].options).every(obj => nextFilters[filterKey].options[obj].enabled === true)) {
+        isResetable = false;
+    }
     if (isFiltered) {
       nextFilters = this.buildFilteredFilters(filterKey, nextFilters);
     } else if (isResetable) {
       const layerFilters = this.getLayerFilter(this.props.layerObj.id);
       nextFilters = this.buildFiltersMap(filterOptions, layerFilters, nextFilters);
     }
-
+  
     return { isFiltered, nextFilters };
   }
 
@@ -800,7 +806,6 @@ export class Filter extends Component {
       filters: nextFilters,
     });
   }
-
   render() {
     const { isSplitScreen, mapId } = this.props;
     const { filters, isMac, globalSearchField } = this.state;
@@ -866,8 +871,19 @@ export class Filter extends Component {
         </li>
       ));
     }
-
-    const doClear = isFilterable || this.state.isFiltered || this.isMapFiltered();
+    
+    let isClearable;
+    if (this.props && this.props.FILTER && this.props.layerObj) {
+    const {FILTER} = this.props;
+    const { id } = this.props && this.props.layerObj;
+    if (!(FILTER[id] && FILTER[id].aggregate && FILTER[id].aggregate['accepted-filter-values'].every(obj => obj === 'all')) &&
+    filter[id] && !(filter[id].isClear)){
+      isClearable = true;
+    }
+    
+    }
+    
+    const doClear = isFilterable || this.state.isFiltered || this.isMapFiltered()|| isClearable;
     let sidebarOffset = this.props.showFilterPanel
       ? '260px'
       : !!this.props.detailView
@@ -959,7 +975,7 @@ export class Filter extends Component {
                           <tr>
                             <td>
                               <button
-                                className={`${doClear ? '' : 'disabled'}`}
+                                className={`${doClear ? 'enabled' : 'disabled'}`}
                                 onClick={(e) => { this.onClearClick(e, doClear); }}
                               >
                                 Clear Filters
@@ -967,7 +983,7 @@ export class Filter extends Component {
                             </td>
                             <td>
                               <button
-                                className={`${isFilterable ? '' : 'disabled'}`}
+                                className={`${isFilterable ? 'enabled' : 'disabled'}`}
                                 onClick={(e) => { this.onApplyClick(e, isFilterable); }}
                               >
                                 Apply Filters
