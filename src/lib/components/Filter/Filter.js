@@ -796,7 +796,7 @@ export class Filter extends Component {
     
 
     if (isFiltered) {
-      nextFilters = this.state.isChecked ? nextFilters: this.buildFilteredFilters(filterKey, nextFilters);
+      nextFilters = this.state.isChecked ? nextFilters : this.buildFilteredFilters(filterKey, nextFilters);
     } else if (isResetable) {
       const layerFilters = this.getLayerFilter(this.props.layerObj.id);
       nextFilters = this.buildFiltersMap(filterOptions, layerFilters, nextFilters);
