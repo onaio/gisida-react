@@ -58,12 +58,12 @@ export class Filter extends Component {
       isLinux: (window.navigator.platform.indexOf('Linux') !== -1),
       globalSearchField: false,
       layersObj: this.props.layersObj,
-      isChecked: props.isChecked || false,
+      isOr: false,
     };
     this.handleChange = this.handleChange.bind(this);
   }
   handleChange () {
-    this.setState({ isChecked: !this.state.isChecked })
+    this.setState({ isOr: !this.state.isOr })
   }
   buildFiltersMap(filters, layerFilters, prevFilters) {
     const filterMap = {};
@@ -478,14 +478,15 @@ export class Filter extends Component {
 
     // Update FILTER store state
     const { FILTER } = this.props;
+    const { isOr } = this.state;
 
     if (!FILTER[layerId].originalLayerObj) {
-      const newFilterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, regenStops);
+      const newFilterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, regenStops, isOr);
       const { originalLayerObj } = newFilterState;
       dispatch(Actions.resetFilteredLayer(mapId, originalLayerObj));
     }
 
-    const newFilterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, regenStops);
+    const newFilterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, regenStops, isOr);
     dispatch(Actions.saveFilterState(mapId, layerId, newFilterState));
 
     if (regenStops) {
@@ -791,7 +792,7 @@ export class Filter extends Component {
     
 
     if (isFiltered) {
-      nextFilters = this.state.isChecked ? nextFilters : this.buildFilteredFilters(filterKey, nextFilters);
+      nextFilters = this.state.isOr ? nextFilters : this.buildFilteredFilters(filterKey, nextFilters);
     } else if (isResetable) {
       const layerFilters = this.getLayerFilter(this.props.layerObj.id);
       nextFilters = this.buildFiltersMap(filterOptions, layerFilters, nextFilters);
@@ -967,7 +968,7 @@ export class Filter extends Component {
                                   type="checkbox"
                                   id="operator-toggle-global"
                                   className="operator-toggle-global"
-                                  checked={this.state.isChecked}
+                                  checked={this.state.isOr}
                                   onChange={this.handleChange} />
                                 />
                                 <span className="slider" />
