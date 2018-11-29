@@ -768,8 +768,9 @@ export class Filter extends Component {
     if (Object.keys(nextFilters[filterKey].options).every(obj => nextFilters[filterKey].options[obj].enabled === true)) {
         isResetable = false;
     }
+
     if (isFiltered) {
-      nextFilters = this.buildFilteredFilters(filterKey, nextFilters);
+      nextFilters =  this.buildFilteredFilters(filterKey, nextFilters);
     } else if (isResetable) {
       const layerFilters = this.getLayerFilter(this.props.layerObj.id);
       nextFilters = this.buildFiltersMap(filterOptions, layerFilters, nextFilters);
@@ -877,7 +878,7 @@ export class Filter extends Component {
     const {FILTER} = this.props;
     const { id } = this.props && this.props.layerObj;
     if (!(FILTER[id] && FILTER[id].aggregate && FILTER[id].aggregate['accepted-filter-values'].every(obj => obj === 'all')) &&
-    filter[id] && !(filter[id].isClear)){
+    (FILTER[id] && !FILTER[id].isClear)){
       isClearable = true;
     }
     
