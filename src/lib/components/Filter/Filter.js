@@ -65,7 +65,6 @@ export class Filter extends Component {
   handleChange () {
     this.setState({ isChecked: !this.state.isChecked })
   }
-  debugger;
   buildFiltersMap(filters, layerFilters, prevFilters) {
     const filterMap = {};
     const filterKeys = Object.keys(filters);
@@ -316,13 +315,7 @@ export class Filter extends Component {
         nextProps.dispatch(Actions.filtersUpdated(nextProps.mapId, layerId));
       }
     });
-  }
-  componentWillUpdate(nextProps, nextState) {
-    console.log('next state', nextState);
-    console.log('next props', nextProps);
-  }
-   
-  
+  }  
   onCloseClick = (e) => {
     e.preventDefault();
     //TODO dispach close action
