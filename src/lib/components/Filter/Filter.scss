@@ -236,8 +236,83 @@
         margin-top: 15px !important;
         margin-bottom: 15px !important;
       }
-    }
+    .advanced-controls  {
+          position: relative;
+          width: 100%;
+          text-align: center;
+          margin-top: 55px;
+        
+        label.switch {
+          position: relative;
+          display: inline-block;
+          width: 32px;
+          height: 15px;
+          margin: 0;
+        span.slider::before {
+            content: "";
+            height: 15px;
+            width: 15px;
+            left: 0;
+            bottom: 0;
+            background-color: #444;
+            -webkit-transition: 0.3s;
+            transition: 0.3s;
+            position: absolute;
+        }
+      }
+      input.operator-toggle-global {
+        display: none;
+        
+        &:focus + .slider {
+          box-shadow: 0 0 1px #2196f3;
+        }
 
+        &:checked + .slider::before {
+          -webkit-transform: translateX(17px);
+          -ms-transform: translateX(17px);
+          transform: translateX(17px);
+        }
+    }
+      span.slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #191717;
+        -webkit-transition: 0.3s;
+        transition: 0.3s;
+    }
+      table {
+        width: calc(100% - 60px);
+        position: absolute;
+        float: none;
+        top: -42px;
+        left: 30px;
+    
+      tbody {
+        display: table-row-group;
+        vertical-align: middle;
+        border-color: inherit;
+    
+        tr {
+          display: table-row;
+          vertical-align: inherit;
+          border-color: inherit;
+        
+      
+        td:first-child {
+            text-align: right;
+        }
+        td:last-child {
+              text-align: left;
+          }
+        }
+      }
+    }
+  }
+}
     .search-column {
       position: relative;
       width: 100%;
@@ -359,7 +434,7 @@
     &:hover {
       cursor: pointer;
     }
-
+    
     div.search-column,
     div.advanced-controls {
       position: relative;

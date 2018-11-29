@@ -10,6 +10,7 @@ import {
 import { buildLayersObj } from '../../utils';
 import FilterSelector from './FilterSelector';
 import './Filter.scss';
+import 'rc-slider/assets/index.css';
 
 const mapStateToProps = (state, ownProps) => {
   const { mapId } = ownProps;
@@ -57,9 +58,14 @@ export class Filter extends Component {
       isLinux: (window.navigator.platform.indexOf('Linux') !== -1),
       globalSearchField: false,
       layersObj: this.props.layersObj,
+      isChecked: props.isChecked || false,
     };
+    this.handleChange = this.handleChange.bind(this);
   }
-
+  handleChange () {
+    this.setState({ isChecked: !this.state.isChecked })
+  }
+  debugger;
   buildFiltersMap(filters, layerFilters, prevFilters) {
     const filterMap = {};
     const filterKeys = Object.keys(filters);
@@ -310,6 +316,10 @@ export class Filter extends Component {
         nextProps.dispatch(Actions.filtersUpdated(nextProps.mapId, layerId));
       }
     });
+  }
+  componentWillUpdate(nextProps, nextState) {
+    console.log('next state', nextState);
+    console.log('next props', nextProps);
   }
    
   
@@ -735,7 +745,7 @@ export class Filter extends Component {
 
     return !isArrayEqual(outsideFilters, layerFilters);
   }
-
+  
   buildNextFilters = (nextOptions, filters, filterKey, isResetable) => {
     const { toggleAllOn } = filters[filterKey];
     const { filterOptions } = this.state;
@@ -785,9 +795,10 @@ export class Filter extends Component {
     if (Object.keys(nextFilters[filterKey].options).every(obj => nextFilters[filterKey].options[obj].enabled === true)) {
         isResetable = false;
     }
+    
 
     if (isFiltered) {
-      nextFilters =  this.buildFilteredFilters(filterKey, nextFilters);
+      nextFilters = this.state.isChecked ? nextFilters: this.buildFilteredFilters(filterKey, nextFilters);
     } else if (isResetable) {
       const layerFilters = this.getLayerFilter(this.props.layerObj.id);
       nextFilters = this.buildFiltersMap(filterOptions, layerFilters, nextFilters);
@@ -901,7 +912,7 @@ export class Filter extends Component {
     
     }
     
-    const doClear = isFilterable || this.state.isFiltered || this.isMapFiltered()|| isClearable;
+    const doClear = isFilterable || this.isMapFiltered()|| isClearable;
     let sidebarOffset = this.props.showFilterPanel
       ? '260px'
       : !!this.props.detailView
@@ -914,7 +925,7 @@ export class Filter extends Component {
 
     const filterClasses = `${isMac ? ' mac' : ''}${isSplitScreen
       && mapId === 'map-1' ? ' isSplitScreen' : ''}`;
-
+    
     return (
     <div>
       {
@@ -949,6 +960,31 @@ export class Filter extends Component {
                 <div className="profile-basic-details filter-header-section">
                   <div className="profile-header-section filter-header">
                     <h5>LAYER FILTERS</h5>
+                    <div className="advanced-controls">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td>And</td>
+                            <td>
+                              <label
+                                className="switch"
+                                htmlFor="operator-toggle-global"
+                              >
+                                <input
+                                  type="checkbox"
+                                  id="operator-toggle-global"
+                                  className="operator-toggle-global"
+                                  checked={this.state.isChecked}
+                                  onChange={this.handleChange} />
+                                />
+                                <span className="slider" />
+                              </label>
+                            </td>
+                            <td>Or</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                   {globalSearchField ?
                     <div className="search-column">
