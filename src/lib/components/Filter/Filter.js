@@ -14,7 +14,14 @@ import 'rc-slider/assets/index.css';
 
 const mapStateToProps = (state, ownProps) => {
   const { mapId } = ownProps;
-  const MAP = state[mapId] || { layers: {}, filter: {}};
+  const MAP = state[mapId] || { layers: {}, filter: {}, timeseries: {} };
+  let timeLayer;
+  buildLayersObj(MAP.layers).forEach((layer) => {
+    if (layer && layer.visible && layer.aggregate && layer.aggregate.timeseries) {
+      timeLayer = layer.id;
+    }
+  });
+  timeLayer = MAP.timeseries[MAP.primaryLayer] ? MAP.primaryLayer : timeLayer;
   return {
     APP: state.APP,
     MAP,
@@ -23,6 +30,7 @@ const mapStateToProps = (state, ownProps) => {
     isSplitScreen: state.VIEW && state.VIEW.splitScreen,
     FILTER: state.FILTER,
     layerObj: MAP.layers[MAP.filter.layerId],
+    timeseriesObj: MAP.timeseries[timeLayer],
     doShowProfile: MAP.showProfile,
     showFilterPanel: MAP.showFilterPanel && MAP.primaryLayer === MAP.filter.layerId,
     layersObj: buildLayersObj(MAP.layers),
@@ -210,6 +218,7 @@ export class Filter extends Component {
             label: originalFilters[filterKey].label,
             isOriginal: false,
             isFiltered: originalFilters[filterKey].isFiltered,
+            dataType: originalFilters[filterKey].dataType,
             toggleAllOn: originalFilters[filterKey].toggleAllOn,
             isOpen: filterIsOpen,
             doAdvFiltering: originalFilters[filterKey].doAdvFiltering,
@@ -217,7 +226,7 @@ export class Filter extends Component {
             queriedOptionKeys: originalFilters[filterKey].queriedOptionKeys,
           },
         );
-        if (nextFilter.type === 'ordinal') {
+        if (nextFilter.dataType === 'ordinal') {
           fOptions = filteredFilters[filterKey].options;
           oOptions = originalFilters[filterKey].options;
           ooKeys = Object.keys(oOptions);
@@ -271,16 +280,19 @@ export class Filter extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!nextProps.layerObj) return false;
+    if (!nextProps.layerObj || !nextProps.timeseriesObj) return false;
 
-    const layerId = nextProps.layerObj.id;
+    const { layerObj, timeseriesObj } = nextProps;
+
+    const layerId = layerObj.id;
 
     // Build new component state or retrieve it from FILTER store
     const filterState = nextProps.FILTER[layerId];
     const layerFilters = this.getLayerFilter(layerId); // this may be deprecated
     const filterOptions = filterState && filterState.filterOptions
       ? filterState.filterOptions
-      : nextProps.layerObj.filterOptions || {};
+      : (layerObj.aggregate && layerObj.aggregate.timeseries)
+        ? generateFilterOptions(timeseriesObj) : (layerObj.filterOptions || {});
 
     const filters = (filterState && filterState.filters)
       || (this.state.isFiltered && this.state.prevFilters)
@@ -293,16 +305,17 @@ export class Filter extends Component {
       || (filterState && filterState.doUpdate);
 
 
-    if (doUpdate) {
-      this.setState({
-        filters,
-        filterOptions,
-        layerId,
-        doShowProfile: false,
-      }, () => {
+    this.setState({
+      filters,
+      filterOptions,
+      timeseriesObj: nextProps.timeseriesObj,
+      layerId,
+      doShowProfile: false,
+    }, () => {
+      if (doUpdate) {
         nextProps.dispatch(Actions.filtersUpdated(nextProps.mapId, layerId));
-      });
-    }
+      }
+    });
   }
   componentWillUpdate(nextProps, nextState) {
     console.log('next state', nextState);
@@ -687,9 +700,11 @@ export class Filter extends Component {
       // }
     }
 
+    const { layerObj } = this.props;
+
     const newLayerObj = {
       aggregate,
-      source: this.props.layerObj.source,
+      source: (layerObj.aggregate && layerObj.aggregate.timeseries) ? this.props.timeseriesObj : layerObj.source,
       type: 'filteredFilter',
     };
     const newLayerOptions = generateFilterOptions(newLayerObj);
