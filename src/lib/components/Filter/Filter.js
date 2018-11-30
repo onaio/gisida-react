@@ -62,8 +62,10 @@ export class Filter extends Component {
     };
     this.handleChange = this.handleChange.bind(this);
   }
-  handleChange () {
-    this.setState({ isOr: !this.state.isOr })
+  handleChange (e) {
+    e.preventDefault();
+    this.onClearClick(null, true);
+    this.setState({ isOr: !this.state.isOr });
   }
   buildFiltersMap(filters, layerFilters, prevFilters) {
     const filterMap = {};
@@ -316,6 +318,7 @@ export class Filter extends Component {
       }
     });
   }  
+  
   onCloseClick = (e) => {
     e.preventDefault();
     //TODO dispach close action
@@ -386,7 +389,9 @@ export class Filter extends Component {
   }
 
   onClearClick = (e, isFilterable) => {
+    if(e) {
     e.preventDefault();
+    }
     if (!isFilterable) {
       return false;
     }
@@ -738,7 +743,7 @@ export class Filter extends Component {
     return !isArrayEqual(outsideFilters, layerFilters);
   }
   
-  buildNextFilters = (nextOptions, filters, filterKey, isResetable) => {
+  buildNextFilters = (nextOptions, filters, filterKey, isResetable) => {  
     const { toggleAllOn } = filters[filterKey];
     const { filterOptions } = this.state;
     let nextFilters = Object.assign(
@@ -897,7 +902,8 @@ export class Filter extends Component {
     if (this.props && this.props.FILTER && this.props.layerObj) {
     const {FILTER} = this.props;
     const { id } = this.props && this.props.layerObj;
-    if (!(FILTER[id] && FILTER[id].aggregate && FILTER[id].aggregate['accepted-filter-values'].every(obj => obj === 'all')) &&
+    if (!(FILTER[id] && FILTER[id].aggregate && FILTER[id].aggregate['accepted-filter-values'] &&
+    FILTER[id].aggregate['accepted-filter-values'].every(obj => obj === 'all')) &&
     (FILTER[id] && !FILTER[id].isClear)){
       isClearable = true;
     }
@@ -953,29 +959,15 @@ export class Filter extends Component {
                   <div className="profile-header-section filter-header">
                     <h5>LAYER FILTERS</h5>
                     <div className="advanced-controls">
-                      <table>
-                        <tbody>
-                          <tr>
-                            <td>And</td>
-                            <td>
-                              <label
-                                className="switch"
-                                htmlFor="operator-toggle-global"
-                              >
-                                <input
-                                  type="checkbox"
-                                  id="operator-toggle-global"
-                                  className="operator-toggle-global"
-                                  checked={this.state.isOr}
-                                  onChange={this.handleChange} />
-                                />
-                                <span className="slider" />
-                              </label>
-                            </td>
-                            <td>Or</td>
-                          </tr>
-                        </tbody>
-                      </table>
+                            <div> 
+                                <button
+                                  id="or-and"
+                                  onClick={(e) => { this.handleChange(e); }}
+                                  className={`${!this.state.isOr ? 'And' : 'Or'}`}
+                                  data-balloon={`${!this.state.isOr ? 'And' : 'Or'}`}
+                                  data-balloon-pos="right">
+                                </button>
+                            </div>
                     </div>
                   </div>
                   {globalSearchField ?
