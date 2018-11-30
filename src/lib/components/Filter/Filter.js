@@ -26,7 +26,7 @@ const mapStateToProps = (state, ownProps) => {
     APP: state.APP,
     MAP,
     mapId,
-    oldLayerObj: MAP.oldLayerObj,
+    oldLayerObj: MAP.oldLayerObjs ? MAP.oldLayerObjs[MAP.primaryLayer] : {},
     isSplitScreen: state.VIEW && state.VIEW.splitScreen,
     FILTER: state.FILTER,
     layerObj: MAP.layers[MAP.filter.layerId],
@@ -281,7 +281,7 @@ export class Filter extends Component {
   componentWillReceiveProps(nextProps) {
     if (!nextProps.layerObj || !nextProps.timeseriesObj) return false;
 
-    const { layerObj, timeseriesObj } = nextProps;
+    const { layerObj, timeseriesObj, oldLayerObj } = nextProps;
 
     const layerId = layerObj.id;
 
@@ -308,6 +308,7 @@ export class Filter extends Component {
       filters,
       filterOptions,
       timeseriesObj: nextProps.timeseriesObj,
+      oldLayerObj,
       layerId,
       doShowProfile: false,
     }, () => {
@@ -390,8 +391,8 @@ export class Filter extends Component {
     if (!isFilterable) {
       return false;
     }
-    const { layerId, filterOptions } = this.state;
-    const { mapId, dispatch, oldLayerObj } = this.props;
+    const { layerId, filterOptions, oldLayerObj } = this.state;
+    const { mapId, dispatch } = this.props;
     // Clear layerFilter from mapbox layer
     dispatch(Actions.setLayerFilter(mapId, layerId, null));
 
@@ -897,8 +898,9 @@ export class Filter extends Component {
     if (this.props && this.props.FILTER && this.props.layerObj) {
     const {FILTER} = this.props;
     const { id } = this.props && this.props.layerObj;
-    if (!(FILTER[id] && FILTER[id].aggregate && FILTER[id].aggregate['accepted-filter-values'].every(obj => obj === 'all')) &&
-    (FILTER[id] && !FILTER[id].isClear)){
+      if ((FILTER && FILTER[id] && FILTER[id].aggregate && FILTER[id].aggregate['accepted-filter-values']
+        && FILTER[id].aggregate['accepted-filter-values'].every(obj => obj === 'all'))
+        && (FILTER && FILTER[id] && !FILTER[id].isClear)) {
       isClearable = true;
     }
     
