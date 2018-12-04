@@ -15,6 +15,10 @@
     "color": "Oranges",
     "clusters": 7
   },
+  "popup": {
+    "header": "DISTRICT",
+    "body": "<b> {{ DISTRICT}} </b><br/> Beneficiary percentage: {{perce_Benf}}%"
+  },
   "credit": "Percentage of beneficiaries per county (Kenya National Bureau of Statistics - 2009)",
   "category": "Population"
 }

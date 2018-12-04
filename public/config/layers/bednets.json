@@ -13,6 +13,7 @@
   "type": "fill",
   "property": "bednet",
   "aggregate": {
+      "joinKey": ["Adm1Name"],
       "filter": ["County"],
       "sub-filter": [""],
       "accepted-filter-values": ["all"],
@@ -44,8 +45,8 @@
     ]
   },
   "popup": {
-    "header": "region",
-    "body": " Health Spending per person: {{Heath_Spending_Per_Person_}}%"
+    "header": "County",
+    "body": "Health Spending per person: {{Heath_Spending_Per_Person_}}%"
   },
   "join-key": {
     "County": "Adm1Name"

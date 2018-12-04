@@ -27,7 +27,7 @@ render() {
     {appConfig.loaded ?
       (<div className="menu" id="menu" style={{ background: appConfig.appColor }}>
         <div className="brand">
-          <img src={appConfig.appIcon} alt="UKAID" className="brand-icon" />
+          {!!appConfig.appIcon && <img src={appConfig.appIcon} alt="UKAID" className="brand-icon" />}
           <div className="brand-title">
             <span className="white">{appConfig.appName}</span>&nbsp;&nbsp; {appConfig.appNameDesc}</div>
         </div>
