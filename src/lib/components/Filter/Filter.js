@@ -281,7 +281,7 @@ export class Filter extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!nextProps.layerObj || !nextProps.timeseriesObj) return false;
+    if (!nextProps.layerObj) return false;
 
     const { layerObj, timeseriesObj, oldLayerObj } = nextProps;
 
@@ -292,7 +292,7 @@ export class Filter extends Component {
     const layerFilters = this.getLayerFilter(layerId); // this may be deprecated
     const filterOptions = filterState && filterState.filterOptions
       ? filterState.filterOptions
-      : (layerObj.aggregate && layerObj.aggregate.timeseries)
+      : (nextProps.timeseriesObj && layerObj.aggregate && layerObj.aggregate.timeseries)
         ? generateFilterOptions(timeseriesObj) : (layerObj.filterOptions || {});
 
     const filters = (filterState && filterState.filters)
@@ -407,7 +407,7 @@ export class Filter extends Component {
       filterOptions,
       filters: this.buildFiltersMap(filterOptions),
       aggregate: {
-        ...oldLayerObj.aggregate
+        ...(oldLayerObj && oldLayerObj.aggregate)
       },
       doUpdate: false,
       isFiltered: false,
@@ -433,7 +433,7 @@ export class Filter extends Component {
     if (!isFilterable) {
       return false;
     }
-    const { filters, layerId, filterOptions } = this.state;
+    const { filters, layerId, filterOptions, isOr } = this.state;
 
     const { layerObj, mapId, dispatch } = this.props;
 
@@ -442,7 +442,7 @@ export class Filter extends Component {
     }
 
     const filterKeys = Object.keys(filters);
-    const nextFilters = ['all'];
+    const nextFilters = [isOr ? 'any' : 'all'];
 
     let newFilters;
     let options;
@@ -461,7 +461,9 @@ export class Filter extends Component {
           for (let o = 0; o < optionKeys.length; o += 1) {
             if (options[optionKeys[o]].enabled) {
               // push filter expression into array of expressions
-              newFilters.push(['==', filterKeys[f], optionKeys[o]]);
+              const joinKey = layerObj.aggregate && layerObj.aggregate.joinKey;
+              const activeFilterKey = joinKey ? joinKey[f] : filterKeys[f];
+              newFilters.push(['==', activeFilterKey, optionKeys[o]]);
             }
           }
         } else {
@@ -482,9 +484,8 @@ export class Filter extends Component {
 
     // Update FILTER store state
     const { FILTER } = this.props;
-    const { isOr } = this.state;
 
-    if (!FILTER[layerId].originalLayerObj) {
+    if (FILTER[layerId] && !FILTER[layerId].originalLayerObj) {
       const newFilterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, regenStops, isOr);
       const { originalLayerObj } = newFilterState;
       dispatch(Actions.resetFilteredLayer(mapId, originalLayerObj));
@@ -517,7 +518,8 @@ export class Filter extends Component {
     } = (this.buildNextFilters(prevFilters[filterKey].options, prevFilters, filterKey, true));
 
     const { filterOptions } = this.state;
-    const filterState = buildFilterState(mapId, filterOptions, nextFilters, layerObj, dispatch, true);
+    const hasStops = Object.keys(filterOptions);
+    const filterState = buildFilterState(mapId, filterOptions, nextFilters, layerObj, dispatch, false);
     dispatch(Actions.saveFilterState(mapId, layerObj.id, filterState));
   }
 
