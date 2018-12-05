@@ -904,7 +904,7 @@ export class Filter extends Component {
     const {FILTER} = this.props;
     const { id } = this.props && this.props.layerObj;
       if ((FILTER && FILTER[id] && FILTER[id].aggregate && FILTER[id].aggregate['accepted-filter-values']
-        && FILTER[id].aggregate['accepted-filter-values'].every(obj => obj === 'all'))
+        && !FILTER[id].aggregate['accepted-filter-values'].every(obj => obj === 'all'))
         && (FILTER && FILTER[id] && !FILTER[id].isClear)) {
       isClearable = true;
     }
