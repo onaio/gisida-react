@@ -4,9 +4,7 @@ import { connect } from 'react-redux';
 import QuantColumnChart from './../Charts/QuantColumnChart';
 
 import 'rc-slider/assets/index.css';
-import Slider from 'rc-slider';
-const createSliderWithTooltip = Slider.createSliderWithTooltip;
-const Range = createSliderWithTooltip(Slider.Range);
+import Slider, { Range } from 'rc-slider';
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -296,17 +294,28 @@ export class AdvancedFilter extends React.Component {
           <Range
             min={min}
             max={max}
+            marks={
+              {
+                [val.min]: val.min.toString(),
+                [val.max]: val.max.toString()
+              }
+            }
             defaultValue={[val.min, val.max]}
             onChange={(e) => {
               this.onInputChange(e, q);
             }}
-            tipFormatter={value => `${value}`}
           />
         ) : (
           <Slider
             min={min}
             max={max}
             defaultValue={control === 'less than' ? val.max : val.min}
+            marks={
+              {
+                [val.min]: val.min.toString(),
+                [val.max]: val.max.toString()
+              }
+            }
             onChange={(e) => {
               this.onInputChange(control === 'less than' ? [val.min, e] : [e, val.max], q);
             }}
