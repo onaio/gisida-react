@@ -315,7 +315,7 @@ export class Filter extends Component {
       doShowProfile: false,
     }, () => {
       if (doUpdate) {
-        nextProps.dispatch(Actions.filtersUpdated(nextProps.mapId, layerId));
+        this.props.dispatch(Actions.filtersUpdated(nextProps.mapId, layerId));
       }
     });
   }  
@@ -519,7 +519,8 @@ export class Filter extends Component {
     } = (this.buildNextFilters(prevFilters[filterKey].options, prevFilters, filterKey, true));
 
     const { filterOptions } = this.state;
-    const filterState = buildFilterState(mapId, filterOptions, nextFilters, layerObj, dispatch, true);
+    const hasStops = Object.keys(filterOptions).map(f => filterOptions[f].type).includes('stops');
+    const filterState = buildFilterState(mapId, filterOptions, nextFilters, layerObj, dispatch, hasStops);
     dispatch(Actions.saveFilterState(mapId, layerObj.id, filterState));
   }
 
@@ -899,7 +900,7 @@ export class Filter extends Component {
           : ''}
         </li>
       ));
-    }
+  }
     
     let isClearable;
     if (this.props && this.props.FILTER && this.props.layerObj) {
