@@ -304,22 +304,22 @@ export class Filter extends Component {
     const doUpdate = (layerId !== this.state.layerId
       && (filterOptions && Object.keys(filterOptions).length > 0))
       || (filterState && filterState.doUpdate);
-
-
+    debugger
+    if (doUpdate) {
     this.setState({
       filters,
       filterOptions,
       timeseriesObj: nextProps.timeseriesObj,
       oldLayerObj,
-      layerId,
+      layerId: doUpdate ? layerId : null,
       doShowProfile: false,
     }, () => {
-      if (doUpdate) {
+      
         this.props.dispatch(Actions.filtersUpdated(nextProps.mapId, layerId));
-      }
+      
     });
   }  
-  
+ } 
   onCloseClick = (e) => {
     e.preventDefault();
     //TODO dispach close action
@@ -393,9 +393,11 @@ export class Filter extends Component {
     if(e) {
     e.preventDefault();
     }
+    debugger
     if (!isFilterable) {
       return false;
     }
+    debugger;
     const { layerId, filterOptions, oldLayerObj } = this.state;
     const { mapId, dispatch } = this.props;
     // Clear layerFilter from mapbox layer
@@ -414,7 +416,7 @@ export class Filter extends Component {
     };
 
     const hasStops = Object.keys(filterOptions).map(f => filterOptions[f].type).includes('stops');
-
+    
     clearFilterState(mapId, filterState, layerId, dispatch, true);
 
     // Reload layer if necessary to re-aggregate / restore layer stops
@@ -484,9 +486,8 @@ export class Filter extends Component {
 
     // Update FILTER store state
     const { FILTER } = this.props;
-    const { isOr } = this.state;
-
-    if (!FILTER[layerId].originalLayerObj) {
+    if (FILTER[layerId] && !FILTER[layerId].originalLayerObj) {
+      
       const newFilterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, regenStops, isOr);
       const { originalLayerObj } = newFilterState;
       dispatch(Actions.resetFilteredLayer(mapId, originalLayerObj));
