@@ -304,7 +304,6 @@ export class Filter extends Component {
     const doUpdate = (layerId !== this.state.layerId
       && (filterOptions && Object.keys(filterOptions).length > 0))
       || (filterState && filterState.doUpdate);
-    debugger
     if (doUpdate) {
     this.setState({
       filters,
@@ -393,11 +392,9 @@ export class Filter extends Component {
     if(e) {
     e.preventDefault();
     }
-    debugger
     if (!isFilterable) {
       return false;
     }
-    debugger;
     const { layerId, filterOptions, oldLayerObj } = this.state;
     const { mapId, dispatch } = this.props;
     // Clear layerFilter from mapbox layer
