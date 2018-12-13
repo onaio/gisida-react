@@ -76,7 +76,6 @@ export class Legend extends React.Component {
           const currentColorStops = [...new Set(layer.stops[0][temporalIndex].map(d => d[1]))];
           const currentRadiusStops = [...new Set(layer.stops[1][temporalIndex].map(d => d[1]))];
           const currentBreakStops = [...new Set(layer.stops[6][temporalIndex])];
-
           currentRadiusStops.forEach((s, i) => {
             quantiles.push((
               <span
@@ -190,9 +189,12 @@ export class Legend extends React.Component {
             </div>
           );
         } if (fillLayerWithBreaks && layer.stops && !layer.parent) {
-          const { stopsData, breaks, colors } = layer;
+          
+          const { stopsData, breaks } = layer;
           const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
+
+          let colors = layer.stops[0][timeSeriesObj.temporalIndex].map(d => d[1]);
 
           if (colorLegend.includes('transparent') && !(colors).includes('transparent')) {
             colors.splice(0, 0, 'transparent');
@@ -200,13 +202,14 @@ export class Legend extends React.Component {
           }
 
           let lastVal;
-
+          
+          var stopsBreak = [...new Set(layer.stops[6][timeSeriesObj.temporalIndex])]; 
           colors.forEach((color, index) => {
             const stopsIndex = layerObj.stops ? layerObj.stops[4].indexOf(color) : -1;
 
             if (stopsIndex !== -1) {
-              const firstVal = stopsIndex ? layerObj.stops[3][stopsIndex - 1] : 0;
-              lastVal = layerObj.stops[3][stopsIndex];
+              const firstVal = stopsIndex ? stopsBreak[stopsIndex - 1] : 0;
+              lastVal = stopsBreak[stopsIndex];
               background.push((
                 <li
                   key={index}
@@ -367,23 +370,23 @@ export class Legend extends React.Component {
           </div>
         ));
       } else if (fillLayerWithBreaks && layer.stops && !layer.parent) {
-        const { stopsData, breaks, colors } = layer;
+        const { stopsData, breaks } = layer;
         const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
         const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
-
+        let colors = layer.stops[0][timeSeriesObj.temporalIndex].map(d => d[1]);
         if (colorLegend.includes('transparent') && !(colors).includes('transparent')) {
           colors.splice(0, 0, 'transparent');
           breaks.splice(1, 0, breaks[0]);
         }
-
+        
         let lastVal;
-
+        let stopsBreak = [...new Set(layer.stops[6][timeSeriesObj.temporalIndex])];
         colors.forEach((color, index) => {
           const stopsIndex = layerObj.stops ? layerObj.stops[4].indexOf(color) : -1;
 
           if (stopsIndex !== -1) {
-            const firstVal = stopsIndex ? layerObj.stops[3][stopsIndex - 1] : 0;
-            lastVal = layerObj.stops[3][stopsIndex];
+            const firstVal = stopsIndex ? stopsBreak[stopsIndex - 1] : 0;
+            lastVal = stopsBreak[stopsIndex];
             background.push((
               <li
                 key={index}
