@@ -194,7 +194,7 @@ export class Legend extends React.Component {
           const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
 
-          let colors = layer.stops[0][timeSeriesObj.temporalIndex].map(d => d[1]);
+          let colors = [...new Set(layer.stops[0][timeSeriesObj.temporalIndex].map(d => d[1]))];
 
           if (colorLegend.includes('transparent') && !(colors).includes('transparent')) {
             colors.splice(0, 0, 'transparent');
@@ -373,7 +373,7 @@ export class Legend extends React.Component {
         const { stopsData, breaks } = layer;
         const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
         const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
-        let colors = layer.stops[0][timeSeriesObj.temporalIndex].map(d => d[1]);
+        let colors = [...new Set(layer.stops[0][timeSeriesObj.temporalIndex].map(d => d[1]))];
         if (colorLegend.includes('transparent') && !(colors).includes('transparent')) {
           colors.splice(0, 0, 'transparent');
           breaks.splice(1, 0, breaks[0]);
