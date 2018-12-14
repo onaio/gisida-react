@@ -114,16 +114,20 @@ class Menu extends Component {
         a.category.localeCompare(b.category)
       );
     }
-    const regions = this.props.regions;
-    const currentRegion = this.props.currentRegion;
-    const preparedLayers = this.props.preparedLayers;
+
+    const {disableDefault, children } = this.props;
+    debugger;
+    if (disableDefault) return children || null;
+
+    const { regions, currentRegion, preparedLayers, childrenPosition } = this.props;
+    const childrenPositionClass = childrenPosition || 'top';
+
     return (
       <div>
-        {this.props.children ? this.props.children :
           <div>
             {this.props.loaded ?
               // Menu Wrapper
-              <div id={`${mapId}-menu-wrapper`} className="menu-wrapper">
+              <div id={`${mapId}-menu-wrapper`} className={`menu-wrapper ${childrenPositionClass}`}>
                 {/* Open button menu */}
                 <a onClick={e => this.onToggleMenu(e)} className="open-btn"
                   style={{ display: this.props.menuIsOpen ? 'none' : 'block' }}>
@@ -136,6 +140,10 @@ class Menu extends Component {
                   <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
                     <span className="glyphicon glyphicon-remove"></span>
                   </a>
+
+                  {/* Children Elements (top) */}
+                  {(children && childrenPosition !== 'bottom') ? children : ''}
+
                   {/* Menu List*/}
                   <ul className="sectors">
                     {regions && regions.length ?
@@ -185,10 +193,12 @@ class Menu extends Component {
                       <li></li>
                     }
                   </ul>
+                  
+                  {/* Children Elements (top) */}
+                  {(children && childrenPosition === 'bottom') ? children : ''}
                 </div>
               </div> : ''}
           </div>
-        }
       </div>
     );
   }
