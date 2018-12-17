@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
-import { Actions, getSliderLayers } from 'gisida';
+import { Actions, getSliderLayers, generateStops } from 'gisida';
 import { buildLayersObj } from '../../utils';
+
+
 
 require('./TimeSeriesSlider.scss');
 
@@ -76,7 +78,10 @@ class TimeSeriesSlider extends React.Component {
         }
       }
     }
-
+    const { field } = sliderLayerObj.layerObj.aggregate.timeseries;
+    sliderLayerObj.data = sliderLayerObj.periodData[sliderLayerObj.period[nextIndex]].data;
+    const activeStops = generateStops(sliderLayerObj, field, this.props.dispatch);
+    nextTimeseries[sliderLayerObj.layerId].newBreaks = activeStops[3];
     this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, this.props.timeLayer))
   }
 
