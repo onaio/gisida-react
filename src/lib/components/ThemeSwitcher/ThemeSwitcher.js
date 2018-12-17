@@ -93,7 +93,11 @@ export class ThemeSwitcher extends React.Component {
     }
     .filter-section-options .filter-item div.advanced-controls label.switch span.slider::before {
       background-color: #A0A091;
-    }`;
+    }
+    .filter-footer .filter-footer-section .filter-footer-content table.filter-footer-controls td button.enabled {
+      color: inherit;
+    }
+    `;
   }
 
   componentWillMount() {
