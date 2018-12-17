@@ -707,6 +707,7 @@ export class Filter extends Component {
       aggregate,
       source: (layerObj.aggregate && layerObj.aggregate.timeseries) ? this.props.timeseriesObj : layerObj.source,
       type: 'filteredFilter',
+      'data-parse': layerObj['data-parse'],
     };
     const newLayerOptions = generateFilterOptions(newLayerObj);
     const filteredFilters = this.buildFiltersMap(newLayerOptions);
