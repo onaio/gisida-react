@@ -192,8 +192,9 @@ export class Legend extends React.Component {
           const { stopsData, breaks, colors } = layer;
           const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
-          if (colorLegend.includes('transparent') && !(colors).includes('transparent')) {
-            colors.splice(0, 0, 'transparent');
+          const activeColors = timeSeriesObj.newColors ? timeSeriesObj.newColors : layer.colors;
+          if (colorLegend.includes('transparent') && !(activeColors).includes('transparent')) {
+            activeColors.splice(0, 0, 'transparent');
             breaks.splice(1, 0, breaks[0]);
           }
           let lastVal;
