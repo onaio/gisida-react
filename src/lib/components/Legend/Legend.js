@@ -189,17 +189,20 @@ export class Legend extends React.Component {
             </div>
           );
         } if (fillLayerWithBreaks && layer.stops && !layer.parent) {
-          const { stopsData, breaks, colors } = layer;
+          const { stopsData, breaks} = layer;
           const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
-          if (colorLegend.includes('transparent') && !(colors).includes('transparent')) {
-            colors.splice(0, 0, 'transparent');
+          
+          const activeColors = timeSeriesObj ? [...new Set(layerObj.stops[0][timeSeriesObj.temporalIndex].map(d => d[1]))] : layer.colors;
+          if (colorLegend.includes('transparent') && !(activeColors).includes('transparent')) {
+            activeColors.splice(0, 0, 'transparent');
             breaks.splice(1, 0, breaks[0]);
           }
           let lastVal;
           const stopsBreak = timeSeriesObj.newBreaks ? timeSeriesObj.newBreaks : layerObj.stops[3];
-          colors.forEach((color, index) => {
-            const stopsIndex = layerObj.stops ? layerObj.stops[4].indexOf(color) : -1;  
+          activeColors.forEach((color, index) => {
+            const stopsIndex = layerObj.stops ? layerObj.stops[4].indexOf(color) : -1;
+
             if (stopsIndex !== -1) {
               const firstVal = stopsIndex ? stopsBreak[stopsIndex - 1] : 0;
               lastVal = stopsBreak[stopsIndex];
@@ -208,7 +211,7 @@ export class Legend extends React.Component {
                   key={index}
                   className={`background-block-${layer.id}-${mapId}`}
                   data-tooltip={`${(typeof formatNum(firstVal, 1) === 'undefined' ? 0 : formatNum(firstVal, 1))}-${(typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1))}${legendSuffix}`}
-                  style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colors.length) + '%' }}
+                  style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / activeColors.length) + '%' }}
                 >
                 </li>
               ));
@@ -363,18 +366,19 @@ export class Legend extends React.Component {
           </div>
         ));
       } else if (fillLayerWithBreaks && layer.stops && !layer.parent) {
-        const { stopsData, breaks, colors } = layer;
+        const { stopsData, breaks} = layer;
         const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
         const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
         
-        if (colorLegend.includes('transparent') && !(colors).includes('transparent')) {
-          colors.splice(0, 0, 'transparent');
+        const activeColors = timeSeriesObj ? [...new Set(layerObj.stops[0][timeSeriesObj.temporalIndex].map(d => d[1]))] : layer.colors;
+        if (colorLegend.includes('transparent') && !(activeColors).includes('transparent')) {
+          activeColors.splice(0, 0, 'transparent');
           breaks.splice(1, 0, breaks[0]);
         }
 
         let lastVal;
         const stopsBreak = timeSeriesObj.newBreaks ? timeSeriesObj.newBreaks : layerObj.stops[3];
-        colors.forEach((color, index) => {
+        activeColors.forEach((color, index) => {
           const stopsIndex = layerObj.stops ? layerObj.stops[4].indexOf(color) : -1;
 
           if (stopsIndex !== -1) {
@@ -385,7 +389,7 @@ export class Legend extends React.Component {
                 key={index}
                 className={`background-block-${layer.id}-${mapId}`}
                 data-tooltip={`${typeof formatNum(firstVal, 1) === 'undefined' ? 0 : formatNum(firstVal, 1)}-${typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)}${legendSuffix}`}
-                style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / colors.length) + '%' }}
+                style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / activeColors.length) + '%' }}
               >
               </li>
             ));
