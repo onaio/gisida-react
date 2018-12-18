@@ -112,6 +112,8 @@ export class Filter extends Component {
         isOriginal: true, // whether the filter has been filtered
         dataType: prevFilters ? prevFilters[filterKey].dataType
           : !filters[filterKey].quantitativeValues ? 'ordinal' : 'quantitative',
+        filterType: prevFilters ? prevFilters[filterKey].filterType
+          : filters[filterKey].filterType,
         options: {}, // actual filter options map
         isOpen: prevFilters ? prevFilters[filterKey].isOpen : false,
         doAdvFiltering: prevFilters ? prevFilters[filterKey].doAdvFiltering : false,
@@ -220,6 +222,7 @@ export class Filter extends Component {
             isOriginal: false,
             isFiltered: originalFilters[filterKey].isFiltered,
             dataType: originalFilters[filterKey].dataType,
+            filterType: originalFilters[filterKey].filterType,
             toggleAllOn: originalFilters[filterKey].toggleAllOn,
             isOpen: filterIsOpen,
             doAdvFiltering: originalFilters[filterKey].doAdvFiltering,
@@ -673,13 +676,15 @@ export class Filter extends Component {
           }
         }
         if (optionKeys.length === aggregate['accepted-filter-values'][f].length) {
-          aggregate['accepted-filter-values'][f] = 'all';
+          aggregate['accepted-filter-values'][f] = filter.filterType === 'multi' ? 'multi' : 'all';
         }
       // } else if (dataType === 'quantitative') {
       //   aggregate['accepted-filter-values'][f] = filter.isFiltered ?
       } else if (!filter.isFiltered)  {
         // if (filters[filterKey].isOriginal) {
-        aggregate['accepted-filter-values'][f] = filter.dataType === 'ordinal' ? 'all' : 'quant';
+        aggregate['accepted-filter-values'][f] = filter.dataType === 'ordinal'
+          ? (filter.filterType === 'multi' ? 'multi' : 'all')
+          : 'quant';
       }
 
       // if (typeof aggregate['accepted-sub-filter-values'][f] === 'string') {
@@ -761,6 +766,7 @@ export class Filter extends Component {
           options: nextOptions,
           isOpen: true,
           dataType: filters[filterKey].dataType,
+          filterType: filters[filterKey].filterType,
           doAdvFiltering: filters[filterKey].doAdvFiltering,
           queries: filters[filterKey].queries,
           queriedOptionKeys: filters[filterKey].queriedOptionKeys,
