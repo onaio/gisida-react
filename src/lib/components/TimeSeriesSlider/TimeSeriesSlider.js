@@ -16,7 +16,8 @@ const mapStateToProps = (state, ownProps) => {
       timeLayer = layer.id;
     }
   });
-  timeLayer = MAP.primaryLayer && MAP.primaryLayer.length && MAP.timeseries[MAP.primaryLayer] ? MAP.primaryLayer : timeLayer;
+  timeLayer = MAP.primaryLayer && MAP.primaryLayer.length &&
+    MAP.timeseries[MAP.primaryLayer] ? MAP.primaryLayer : timeLayer;
   return {
     timeSeriesObj: MAP.timeseries[timeLayer],
     timeseries: MAP.timeseries,
@@ -56,6 +57,7 @@ class TimeSeriesSlider extends React.Component {
       if (activeLayers.includes(layerId) && nextTimeseries[layerId]) {
         nextTimeseriesLayer = nextTimeseries[layerId];
         const { periodData } = nextTimeseriesLayer;
+
         period = nextTimeseriesLayer.period;
 
         if (layerId === sliderLayerObj.layerId) {
@@ -80,9 +82,13 @@ class TimeSeriesSlider extends React.Component {
     }
     const { field } = sliderLayerObj.layerObj.aggregate.timeseries;
     sliderLayerObj.data = sliderLayerObj.periodData[sliderLayerObj.period[nextIndex]].data;
+
     const activeStops = generateStops(sliderLayerObj, field, this.props.dispatch);
     nextTimeseries[sliderLayerObj.layerId].newBreaks = activeStops[3];
-    this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, this.props.timeLayer))
+
+    nextTimeseries[sliderLayerObj.layerId].newColors = [...new Set(activeStops[0][0].map(d => d[1]))];
+    this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, this.props.timeLayer));
+    
   }
 
   componentWillReceiveProps(nextProps) {
