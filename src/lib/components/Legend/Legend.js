@@ -194,14 +194,15 @@ export class Legend extends React.Component {
           const { stopsData, breaks} = layer;
           const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
-          const activeColors = timeSeriesObj && timeSeriesObj.newColors ? timeSeriesObj.newColors : layer.colors;
+          const activeColors = (timeSeriesObj && timeSeriesObj.newColors && layerObj.aggregate && layerObj.aggregate.timeseries)
+            ? timeSeriesObj.newColors : layer.colors;
           if (colorLegend.includes('transparent') && !(activeColors).includes('transparent')) {
             activeColors.splice(0, 0, 'transparent');
             breaks.splice(1, 0, breaks[0]);
           }
           let lastVal;
-          const stopsBreak = timeSeriesObj && timeSeriesObj.newBreaks ?
-            timeSeriesObj.newBreaks : layerObj && layerObj.stops && layerObj.stops[3];
+          const stopsBreak = (timeSeriesObj && timeSeriesObj.newBreaks && layerObj.aggregate && layerObj.aggregate.timeseries)
+            ? timeSeriesObj.newBreaks : layerObj && layerObj.stops && layerObj.stops[3];
 
           activeColors.forEach((color, index) => {
             const stopsIndex = layerObj.stops ? layerObj.stops[4].indexOf(color) : -1;
@@ -373,15 +374,16 @@ export class Legend extends React.Component {
         const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
         const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
         
-        const activeColors = timeSeriesObj && timeSeriesObj.newColors ? timeSeriesObj.newColors  : layer.colors;
+        const activeColors = (timeSeriesObj && timeSeriesObj.newColors && layerObj.aggregate && layerObj.aggregate.timeseries)
+          ? timeSeriesObj.newColors : layer.colors;
         if (colorLegend.includes('transparent') && !(activeColors).includes('transparent')) {
           activeColors.splice(0, 0, 'transparent');
           breaks.splice(1, 0, breaks[0]);
         }
 
         let lastVal;
-        const stopsBreak = timeSeriesObj && timeSeriesObj.newBreaks ? timeSeriesObj.newBreaks : 
-          layerObj && layerObj.stops && layerObj.stops[3];
+        const stopsBreak = (timeSeriesObj && timeSeriesObj.newBreaks && layerObj.aggregate && layerObj.aggregate.timeseries)
+          ? timeSeriesObj.newBreaks : layerObj && layerObj.stops && layerObj.stops[3];
         activeColors.forEach((color, index) => {
           const stopsIndex = layerObj.stops ? layerObj.stops[4].indexOf(color) : -1;
 
