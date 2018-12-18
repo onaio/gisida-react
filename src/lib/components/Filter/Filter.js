@@ -707,6 +707,7 @@ export class Filter extends Component {
       aggregate,
       source: (layerObj.aggregate && layerObj.aggregate.timeseries) ? this.props.timeseriesObj : layerObj.source,
       type: 'filteredFilter',
+      'data-parse': layerObj['data-parse'],
     };
     const newLayerOptions = generateFilterOptions(newLayerObj);
     const filteredFilters = this.buildFiltersMap(newLayerOptions);
@@ -943,13 +944,12 @@ export class Filter extends Component {
           this.props.showFilterPanel  ?
             <div>
               <div className={`profile-view-container filter-container${filterClasses}`}>
-                {<button
+                <button
                   className="filter-search"
-                
                   onClick={(e) => { this.showGlobalSearchField(e); }}
                 >
                   <span className="glyphicon glyphicon-search" />
-                </button>}
+                </button>
                 <button
                   className="close-btn filter-close"
                   title="Close Filters"
@@ -966,8 +966,8 @@ export class Filter extends Component {
                                   id="or-and"
                                   onClick={(e) => { this.handleChange(e); }}
                                   className={`${!this.state.isOr ? 'And' : 'Or'}`}
-                                  data-balloon={`${!this.state.isOr ? 'And' : 'Or'}`}
-                                  data-balloon-pos="right">
+                                  title={`Cross Filtering: ${!this.state.isOr ? 'And' : 'Or'}`}
+                                >
                                 </button>
                             </div>
                     </div>
