@@ -113,6 +113,12 @@ class Map extends Component {
     this.map.on('click', this.onFeatureClick.bind(this));
   }
 
+  componentWillUpdate (nextProps, nextState) {
+    if((this.props && this.props.primaryLayer) !== 
+        (nextProps && nextProps.primaryLayer)) {
+      this.updateTimeseriesLayers(nextProps);
+    }
+  }
   onFeatureClick(e) {
     const activeLayers = this.props.layersObj.map(l => l.id)
     const { mapId } = this.props;
@@ -434,12 +440,14 @@ class Map extends Component {
     return false;
   }
 
-  updateTimeseriesLayers() {
-    const { timeSeriesObj, timeseries, layersObj, FILTER } = this.props;
+  updateTimeseriesLayers(nextProps) {
+    const { timeSeriesObj, timeseries, layersObj, FILTER } = nextProps ?
+       nextProps : this.props;
     const timeSeriesLayers = Object.keys(timeseries);
 
     // determine what the currently timeperiod to see if layers should be hidden
-    const currPeriod = timeSeriesObj.period[timeSeriesObj.temporalIndex];
+    const currPeriod = timeSeriesObj && timeSeriesObj.period &&
+       timeSeriesObj.period[timeSeriesObj.temporalIndex];
 
     let tsObj;
     let layerObj;
