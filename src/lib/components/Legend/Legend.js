@@ -2,9 +2,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Actions, formatNum, hexToRgbA } from 'gisida';
+import { Actions, formatNum, hexToRgbA, generateStops } from 'gisida';
 import { buildLayersObj } from '../../utils';
-import Parser from 'html-react-parser';
+import Parser from 'html-react-parser';                                                                                                               
 import './Legend.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -18,6 +18,7 @@ const mapStateToProps = (state, ownProps) => {
   });
   timeLayer = MAP.timeseries[MAP.primaryLayer] ? MAP.primaryLayer : timeLayer;
   return {
+    timeseries: MAP.timeseries,
     layerObj: MAP.layers[MAP.activeLayerId],
     timeSeriesObj: MAP.timeseries[timeLayer],
     lastLayerSelected: MAP.layers[MAP.lastLayerSelected],
@@ -34,11 +35,31 @@ export class Legend extends React.Component {
     super(props);
     this.state = {
       setPrimary: false,
+      timeSeriesObj: undefined,
     };
   }
-  componentWillReceiveProps (nextProps) {
 
-  }
+ componentWillUpdate(nextProps, nextState) {
+   if (this.props.primaryLayer !== nextProps.primaryLayer) {
+     const { timeSeriesObj } = nextProps;
+     
+     if(timeSeriesObj && timeSeriesObj.layerObj && 
+        timeSeriesObj.layerObj.aggregate &&
+          timeSeriesObj.layerObj.aggregate.timeseries) {
+
+            const stops = generateStops(timeSeriesObj, 
+            timeSeriesObj.layerObj.aggregate.timeseries.field, 
+            this.props.dispatch);
+
+            timeSeriesObj.newBreaks = stops[3];
+            timeSeriesObj.newColors = [...new Set(stops[0][0].map(d => d[1]))];
+            
+            this.setState({
+              timeSeriesObj: timeSeriesObj
+            });
+     }
+   }
+ }
   onUpdatePrimaryLayer(e) {
     e.preventDefault();
     const { dispatch, mapId } = this.props;
@@ -191,12 +212,14 @@ export class Legend extends React.Component {
             </div>
           );
         } if (fillLayerWithBreaks && layer.stops && !layer.parent) {
-          const { stopsData, breaks, colors } = layer;
-          const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
+          const { stopsData, breaks} = layer;
+          const colorLegend = layer && layer.stopsData && [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
-          const activeColors = (timeSeriesObj && timeSeriesObj.newColors && layerObj.aggregate && layerObj.aggregate.timeseries)
-            ? timeSeriesObj.newColors : layer.colors;
-          if (colorLegend.includes('transparent') && !(activeColors).includes('transparent')) {
+
+          const activeColors = timeSeriesObj && timeSeriesObj.newColors ? 
+              timeSeriesObj.newColors : this.state.timeSeriesObj ? 
+                this.state.timeSeriesObj.newColors : layer.colors;
+          if (colorLegend && colorLegend.includes('transparent') && !(activeColors).includes('transparent')) {
             activeColors.splice(0, 0, 'transparent');
             breaks.splice(1, 0, breaks[0]);
           }
@@ -374,9 +397,8 @@ export class Legend extends React.Component {
         const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
         const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
         
-        const activeColors = (timeSeriesObj && timeSeriesObj.newColors && layerObj.aggregate && layerObj.aggregate.timeseries)
-          ? timeSeriesObj.newColors : layer.colors;
-        if (colorLegend.includes('transparent') && !(activeColors).includes('transparent')) {
+        const activeColors = timeSeriesObj && timeSeriesObj.newColors ? timeSeriesObj.newColors  : layer.colors;
+        if (colorLegend && colorLegend.includes('transparent') && !(activeColors).includes('transparent')) {
           activeColors.splice(0, 0, 'transparent');
           breaks.splice(1, 0, breaks[0]);
         }
