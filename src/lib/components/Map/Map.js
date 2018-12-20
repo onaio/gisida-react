@@ -8,6 +8,7 @@ const mapStateToProps = (state, ownProps) => {
   const { APP, STYLES, REGIONS, VIEW, FILTER } = state;
   const mapId = ownProps.mapId || 'map-1';
   const MAP = state[mapId] || { blockLoad: true, layers: {}};
+  const { detailView } = MAP;
   const activeLayers = [];
   Object.keys(MAP.layers).forEach((key) => {
     const layer = MAP.layers[key];
@@ -34,7 +35,7 @@ const mapStateToProps = (state, ownProps) => {
     layerObj: MAP.layers ? MAP.layers[MAP.activeLayerId]: null,
     primaryLayer: MAP.primaryLayer,
     oldLayerObj: MAP.oldLayerObjs ? MAP.oldLayerObjs[MAP.primaryLayer] : {},
-    showDetailView: !!MAP.detailView,
+    showDetailView: (detailView && detailView.model && detailView.model.UID),
     showFilterPanel: !!MAP.showFilterPanel,
     activeLayers,
   }
@@ -127,7 +128,13 @@ class Map extends Component {
         center: e.lngLat,
         zoom: newZoom
       });
-      buildDetailView(mapId, activeLayerObj, feature.properties, this.props.dispatch);
+      buildDetailView(
+        mapId,
+        activeLayerObj,
+        feature.properties,
+        this.props.dispatch,
+        this.props.timeSeriesObj
+      );
     }
     return true;
   }
