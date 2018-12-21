@@ -29,6 +29,7 @@ const mapStateToProps = (state, ownProps) => {
     MAP,
     VIEW,
     FILTER,
+    detailView: MAP.detailView,
     timeSeriesObj: MAP.timeseries ? MAP.timeseries[MAP.activeLayerId]: null,
     timeseries:  MAP.timeseries,
     layersObj: MAP.layers ? buildLayersObj(MAP.layers) : {},
@@ -626,7 +627,11 @@ class Map extends Component {
 
   render() {
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
-   
+    const { detailView, layerObj, timeSeriesObj } = this.props;
+    const detailViewProps = this.props.showDetailView && timeSeriesObj && timeSeriesObj.data && timeSeriesObj.data.length && timeSeriesObj.data.find(d => {
+      return d[layerObj.source.join[1]] === detailView.properties[layerObj.source.join[0]]
+    });
+    const showDetailView = timeSeriesObj ? detailViewProps && typeof detailViewProps !== undefined : this.props.showDetailView;
     let mapWidth = '100%';
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
@@ -634,7 +639,7 @@ class Map extends Component {
     if (this.props.showFilterPanel) {
       mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 250px)` : '48%';
     }
-    if (this.props.showDetailView) {
+    if (showDetailView) {
       mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 345px)` : '48%';
     }
     return (
