@@ -82,11 +82,12 @@ class TimeSeriesSlider extends React.Component {
     }
     const { field } = sliderLayerObj.layerObj.aggregate.timeseries;
     sliderLayerObj.data = sliderLayerObj.periodData[sliderLayerObj.period[nextIndex]].data;
+    const activeStops = generateStops(sliderLayerObj, field, this.props.dispatch, nextIndex,);
 
-    const activeStops = generateStops(sliderLayerObj, field, this.props.dispatch);
+    
     nextTimeseries[sliderLayerObj.layerId].newBreaks = activeStops[3];
 
-    nextTimeseries[sliderLayerObj.layerId].newColors = [...new Set(activeStops[0][0].map(d => d[1]))];
+    nextTimeseries[sliderLayerObj.layerId].newColors = [...new Set(sliderLayerObj.stops[nextIndex].map(d => d[1]))];
     this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, this.props.timeLayer));
     
   }
