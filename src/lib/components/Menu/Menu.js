@@ -115,9 +115,12 @@ class Menu extends Component {
       );
     }
 
-    const {disableDefault, children } = this.props;
-    debugger;
-    if (disableDefault) return children || null;
+    const {disableDefault } = this.props;
+    if (disableDefault) return this.props.children || null;
+
+    const children = React.Children.map(this.props.children, child => {
+      return React.cloneElement(child, { mapId });
+    })
 
     const { regions, currentRegion, preparedLayers, childrenPosition } = this.props;
     const childrenPositionClass = childrenPosition || 'top';

@@ -5,7 +5,7 @@ import { detectIE, buildLayersObj } from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
-  const { APP, STYLES, REGIONS, VIEW, FILTER } = state;
+  const { APP, STYLES, REGIONS, VIEW, FILTER, LOC } = state;
   const mapId = ownProps.mapId || 'map-1';
   const MAP = state[mapId] || { blockLoad: true, layers: {}};
   const activeLayers = [];
@@ -26,6 +26,7 @@ const mapStateToProps = (state, ownProps) => {
     STYLES,
     REGIONS,
     MAP,
+    LOC,
     VIEW,
     FILTER,
     timeSeriesObj: MAP.timeseries ? MAP.timeseries[MAP.activeLayerId]: null,
@@ -321,7 +322,20 @@ class Map extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (this.map) {
       this.map.resize();
-      const { layersObj, layerObj, primaryLayer, FILTER } = this.props;
+      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId } = this.props;
+
+      if (LOC && LOC.doUpdateMap === mapId && LOC.location) {
+        // const { bounds, boundsPadding, center, zoom } = LOC.location;
+        // if (bounds) {
+        //   this.map.fitBounds(bounds, {
+        //     padding: boundsPadding || 0,
+        //   });
+        // } else {
+        //   this.map.setCenter(center);
+        //   this.map.setZoom(zoom);
+        // }
+        Actions.locationUpdated(mapId);
+      }
       // Update Timeseries
       const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
       if ((layerObj && layerObj.aggregate && layerObj.aggregate.timeseries)
