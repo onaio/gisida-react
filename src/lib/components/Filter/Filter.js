@@ -432,7 +432,9 @@ export class Filter extends Component {
           for (let o = 0; o < optionKeys.length; o += 1) {
             if (options[optionKeys[o]].enabled) {
               // push filter expression into array of expressions
-              newFilters.push(['==', filterKeys[f], optionKeys[o]]);
+              const joinKey = layerObj.aggregate && layerObj.aggregate.joinKey;
+              const activeFilterKey = joinKey ? joinKey[f] : filterKeys[f];
+              newFilters.push(['==', activeFilterKey, optionKeys[o]]);
             }
           }
         } else {
@@ -476,7 +478,7 @@ export class Filter extends Component {
   }
 
   setFilterQueries = (filterKey, nextQueries, queriedOptionKeys) => {
-    const { layerObj } = this.props;
+    const { layerObj, mapId, dispatch } = this.props;
 
     const prevFilters = Object.assign({}, this.state.filters);
     prevFilters[filterKey].queries = nextQueries;
@@ -487,7 +489,8 @@ export class Filter extends Component {
     } = (this.buildNextFilters(prevFilters[filterKey].options, prevFilters, filterKey, true));
 
     const { filterOptions } = this.state;
-    buildFilterState(filterOptions, nextFilters, layerObj, false);
+    const filterState = buildFilterState(filterOptions, nextFilters, layerObj, false);
+    dispatch(Actions.saveFilterState(mapId, layerObj.id, filterState));
   }
 
   searchFilterOptions = (e, filterKey) => {
