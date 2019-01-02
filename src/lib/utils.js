@@ -148,7 +148,7 @@ export function buildLayersObj(layers) {
   let layerObj;
   Object.keys(layers).forEach((key) => {
     const layer = { ...layers[key]};
-    if (layer.visible && !layer.parent) {
+    if (layer.visible) {
       layerObj = layer;
       layersObj.push(layerObj);
     }
