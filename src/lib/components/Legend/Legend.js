@@ -236,7 +236,7 @@ componentWillReceiveProps(nextProps) {
 
           
           const activeColors =(timeSeriesObj && timeSeriesObj.newColors &&
-             layerObj.aggregate && layerObj.aggregate.tstateimeseries) ? 
+             layerObj.aggregate && layerObj.aggregate.timeseries) ? 
               timeSeriesObj.newColors : this.nextProps && this.nextProps.timeSeriesObj ? 
                 this.nextProps.timeSeriesObj.newColors : (timeSeriesObj && timeSeriesObj.stops 
                   && timeSeriesObj.temporalIndex) ?
