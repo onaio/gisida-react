@@ -295,7 +295,7 @@ export class Filter extends Component {
     const layerFilters = this.getLayerFilter(layerId); // this may be deprecated
     const filterOptions = filterState && filterState.filterOptions
       ? filterState.filterOptions
-      : (layerObj.aggregate && layerObj.aggregate.timeseries)
+      : (nextProps.timeseriesObj && layerObj.aggregate && layerObj.aggregate.timeseries)
         ? generateFilterOptions(timeseriesObj) : (layerObj.filterOptions || {});
 
     const filters = (filterState && filterState.filters)
@@ -409,7 +409,7 @@ export class Filter extends Component {
       filterOptions,
       filters: this.buildFiltersMap(filterOptions),
       aggregate: {
-        ...oldLayerObj.aggregate
+        ...(oldLayerObj && oldLayerObj.aggregate)
       },
       doUpdate: false,
       isFiltered: false,
@@ -435,7 +435,7 @@ export class Filter extends Component {
     if (!isFilterable) {
       return false;
     }
-    const { filters, layerId, filterOptions } = this.state;
+    const { filters, layerId, filterOptions, isOr } = this.state;
 
     const { layerObj, mapId, dispatch } = this.props;
 
@@ -444,7 +444,7 @@ export class Filter extends Component {
     }
 
     const filterKeys = Object.keys(filters);
-    const nextFilters = ['all'];
+    const nextFilters = [isOr ? 'any' : 'all'];
 
     let newFilters;
     let options;

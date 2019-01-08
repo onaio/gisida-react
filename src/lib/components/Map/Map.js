@@ -32,6 +32,7 @@ const mapStateToProps = (state, ownProps) => {
     layersObj: MAP.layers ? buildLayersObj(MAP.layers) : {},
     layerObj: MAP.layers ? MAP.layers[MAP.activeLayerId]: null,
     primaryLayer: MAP.primaryLayer,
+    oldLayerObj: MAP.oldLayerObjs ? MAP.oldLayerObjs[MAP.primaryLayer] : {},
     showDetailView: !!MAP.detailView,
     showFilterPanel: !!MAP.showFilterPanel,
     activeLayers,
@@ -325,10 +326,11 @@ class Map extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (this.map) {
       this.map.resize();
-      const { layersObj, primaryLayer, FILTER } = this.props;
+      const { layersObj, layerObj, primaryLayer, FILTER } = this.props;
       // Update Timeseries
       const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
-      if (doUpdateTSlayers || (FILTER && FILTER[primaryLayer] && FILTER[primaryLayer].isClear)) {
+      if ((layerObj && layerObj.aggregate && layerObj.aggregate.timeseries)
+        && (doUpdateTSlayers || (FILTER && FILTER[primaryLayer] && FILTER[primaryLayer].isClear))) {
         this.updateTimeseriesLayers();
       }
 
