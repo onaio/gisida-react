@@ -325,16 +325,16 @@ class Map extends Component {
       const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId } = this.props;
 
       if (LOC && LOC.doUpdateMap === mapId && LOC.location) {
-        // const { bounds, boundsPadding, center, zoom } = LOC.location;
-        // if (bounds) {
-        //   this.map.fitBounds(bounds, {
-        //     padding: boundsPadding || 0,
-        //   });
-        // } else {
-        //   this.map.setCenter(center);
-        //   this.map.setZoom(zoom);
-        // }
-        Actions.locationUpdated(mapId);
+        const { bounds, boundsPadding, center, zoom } = LOC.location;
+        if (bounds) {
+          this.map.fitBounds(bounds, {
+            padding: boundsPadding || 0,
+            linear: true,
+          });
+        } else {
+          this.map.easeTo({ center, zoom });
+        }
+        this.props.dispatch(Actions.locationUpdated(mapId));
       }
       // Update Timeseries
       const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
