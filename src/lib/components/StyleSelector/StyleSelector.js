@@ -38,7 +38,7 @@ export class StyleSelector extends Component {
     const { styles } = this.state;
     const sidebarOffset = '0';
     if (!styles) {
-      return false;
+      return null;
     }
     
     return (
