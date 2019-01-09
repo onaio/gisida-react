@@ -9,14 +9,16 @@ require('./TimeSeriesSlider.scss');
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {}, timeseries: {} };
   let timeLayer;
+  let timeSubLayer;
   buildLayersObj(MAP.layers).forEach((layer) => {
     if (layer && layer.visible && layer.aggregate && layer.aggregate.timeseries) {
       timeLayer = layer.id;
     }
   });
   timeLayer = MAP.primaryLayer && MAP.primaryLayer.length && MAP.timeseries[MAP.primaryLayer] ? MAP.primaryLayer : timeLayer;
+  timeSubLayer = MAP.primarySubLayer && MAP.primarySubLayer.length && MAP.timeseries[MAP.primarySubLayer] ? MAP.primarySubLayer : null;
   return {
-    timeSeriesObj: MAP.timeseries[timeLayer],
+    timeSeriesObj: MAP.timeseries[timeSubLayer || timeLayer],
     timeseries: MAP.timeseries,
     layers: MAP.layers,
     showFilterPanel: MAP.showFilterPanel,
