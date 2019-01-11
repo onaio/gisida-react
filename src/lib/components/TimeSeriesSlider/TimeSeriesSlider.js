@@ -43,7 +43,6 @@ class TimeSeriesSlider extends React.Component {
     const nextTimeseries = Object.assign({}, this.props.timeseries);
 
     const timeSeriesLayers = getSliderLayers(this.props.layers);
-    
     const activeLayers = [];
     const layers = [];
     const loadedlayers = this.props.layers;
@@ -85,24 +84,32 @@ class TimeSeriesSlider extends React.Component {
     const { field } = sliderLayerObj.layerObj.aggregate.timeseries;
     sliderLayerObj.data = sliderLayerObj.periodData[sliderLayerObj.period[nextIndex]].data;
     const activeStops = generateStops(sliderLayerObj, field, this.props.dispatch, nextIndex,);
-
     const { primaryLayer } = this.props;
     if (this.props.layers[primaryLayer].layers) {
-      this.props.layers[primaryLayer].layers.map(i =>
-         nextTimeseries[i].newBreaks = activeStops[3]);
-      this.props.layers[primaryLayer].layers.map(i => 
-        nextTimeseries[i].newColors = [...new Set(sliderLayerObj.colorStops[nextIndex].map(d => 
-          d[1]))]);
+      Object.keys(nextTimeseries).forEach((key) => {
+        if (nextTimeseries[key].layerObj 
+          && nextTimeseries[key].layerObj.parent) {
 
-      
-      this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, this.props.timeLayer));
+          const { field } = nextTimeseries[key].layerObj.aggregate.timeseries;
+          const activeStops = generateStops(nextTimeseries[key], field, this.props.dispatch, nextIndex);
+
+          nextTimeseries[key].newBreaks = activeStops[3];
+          console.log(nextTimeseries[key].colorStops)
+
+           nextTimeseries[key].newColors = [...new Set((nextTimeseries[key].colorStops[nextIndex] ? 
+           nextTimeseries[key].colorStops[nextIndex] : 
+           nextTimeseries[key].colorStops[nextTimeseries[key].temporalIndex]).map(d => d[1]))];
+
+          this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, nextTimeseries[key].layerId ));
+        }
+      })
     } else {
-    nextTimeseries[sliderLayerObj.layerId].newBreaks = activeStops[3];
+        nextTimeseries[sliderLayerObj.layerId].newBreaks = activeStops[3];
 
-    nextTimeseries[sliderLayerObj.layerId].newColors = [...new Set(sliderLayerObj.stops[nextIndex].map(d => d[1]))];
+        nextTimeseries[sliderLayerObj.layerId].newColors = [...new Set(sliderLayerObj.stops[nextIndex].map(d => d[1]))];
    
-    this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, this.props.timeLayer));
-  } 
+        this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, this.props.timeLayer));
+   } 
   }
 
   componentWillReceiveProps(nextProps) {
