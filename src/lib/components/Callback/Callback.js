@@ -15,7 +15,7 @@ class Callback extends Component {
     if (!this.state.loaded
       && nextProps.global.APP
       && nextProps.global.APP.loaded) {
-      this.setState({ 
+      this.setState({
         loaded: true,
         APP: { ...nextProps.global.APP },
        }, () => {
@@ -26,16 +26,15 @@ class Callback extends Component {
 
   async authorizeUser(APP) {
     const { dispatch } = this.props;
+    const { AUTH } = this.props.global;
     const accessToken = this.getAccessToken();
     dispatch(Actions.receiveToken(accessToken));
-
-    const userIsAuthorized = await SupAuth.authorizeUser(APP, accessToken);
-
+    const userIsAuthorized = await SupAuth.authorizeUser(APP, AUTH, accessToken);
     if (!userIsAuthorized || !accessToken) {
       deAuthZ();
       return this.history.push('/login');
     }
-    const user = await SupAuth.getUser(accessToken);
+    const user = await SupAuth.getUser(accessToken, dispatch);
     dispatch(Actions.receiveLogin(user));
     return this.history.push('/');
   }
