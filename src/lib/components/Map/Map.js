@@ -326,10 +326,12 @@ class Map extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (this.map) {
       this.map.resize();
-      const { layersObj, layerObj, primaryLayer, FILTER } = this.props;
+      const { layersObj, layerObj, primaryLayer, FILTER, timeSeriesObj } = this.props;
       // Update Timeseries
       const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
-      if ((layerObj && layerObj.aggregate && layerObj.aggregate.timeseries)
+      if (((layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) ||
+        (timeSeriesObj && timeSeriesObj.layerObj && timeSeriesObj.layerObj.aggregate &&
+         timeSeriesObj.layerObj.aggregate.timeseries))
         && (doUpdateTSlayers || (FILTER && FILTER[primaryLayer] && FILTER[primaryLayer].isClear))) {
         this.updateTimeseriesLayers();
       }
