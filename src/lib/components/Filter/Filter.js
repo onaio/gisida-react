@@ -516,13 +516,22 @@ export class Filter extends Component {
   setFilterQueries = (filterKey, nextQueries, queriedOptionKeys) => {
     const { layerObj, mapId, dispatch, FILTER } = this.props;
     const { isOr, filterOptions } = this.state;
-
     if (FILTER[this.state.layerId] && !FILTER[this.state.layerId].originalLayerObj) {
       this.buildOriginalObj(this.props, this.state);
     }
     const prevFilters = Object.assign({}, this.state.filters);
     prevFilters[filterKey].queries = nextQueries;
-    prevFilters[filterKey].queriedOptionKeys = queriedOptionKeys;
+    prevFilters[filterKey].queriedOptionKeys = [...new Set(queriedOptionKeys)];
+    const optionKeys = Object.keys(prevFilters[filterKey].options);
+    let option;
+    prevFilters[filterKey].toggleAllOn = !!!queriedOptionKeys && prevFilters[filterKey].doAdvFiltering;
+    for (let o = 0; o < optionKeys.length; o += 1) {
+      option = prevFilters[filterKey].options[optionKeys[o]];
+      prevFilters[filterKey].options[optionKeys[o]] = {
+        ...option,
+        enabled: queriedOptionKeys && queriedOptionKeys.includes(optionKeys[o]),
+      };
+    }
 
     const {
       nextFilters,
@@ -655,7 +664,7 @@ export class Filter extends Component {
       aggregate.filter[f] = filterKey;
       aggregate['accepted-filter-values'][f] = filter.queriedOptionKeys
         && filter.queriedOptionKeys.length
-        ? filter.queriedOptionKeys : [];
+        ? [...new Set(filter.queriedOptionKeys)] : [];
       // aggregate['sub-filter'][f] = '';
       // aggregate['accepted-sub-filter-values'][f] = '';
       aggregate['filter-label'][f] = filter.label || '';
