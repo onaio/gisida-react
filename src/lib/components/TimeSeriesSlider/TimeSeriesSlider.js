@@ -85,6 +85,9 @@ class TimeSeriesSlider extends React.Component {
     sliderLayerObj.data = sliderLayerObj.periodData[sliderLayerObj.period[nextIndex]].data;
     const activeStops = generateStops(sliderLayerObj, field, this.props.dispatch, nextIndex,);
     const { primaryLayer } = this.props;
+    
+    //add new breaks and stops for each sublayer in grouped layer
+    
     if (this.props.layers[primaryLayer].layers) {
       Object.keys(nextTimeseries).forEach((key) => {
         if (nextTimeseries[key].layerObj 
