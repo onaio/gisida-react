@@ -513,26 +513,66 @@ export class Filter extends Component {
     dispatch(Actions.resetFilteredLayer(mapId, originalLayerObj));
   }
 
+  buildFauxOptions(
+    stateFilters,
+    prevStatefilters,
+    filterKey,
+    doEnable,
+    nextQueries,
+    queriedOptionKeys) {
+    const nextQuery = queriedOptionKeys
+      && queriedOptionKeys.length
+      && nextQueries.find(d => d.matches.length === queriedOptionKeys.length);
+    const optionKeys = Object.keys(prevStatefilters[filterKey].options);
+    let option;
+    for (let o = 0; o < optionKeys.length; o += 1) {
+      const enableOrDisable = nextQuery
+        && nextQueries.indexOf(nextQuery) !== 0
+        && nextQuery.isOR
+        ? false : queriedOptionKeys && queriedOptionKeys.includes(optionKeys[o]);
+      option = stateFilters[filterKey].options[optionKeys[o]];
+      prevStatefilters[filterKey].options[optionKeys[o]] = {
+        ...option,
+        enabled: enableOrDisable || doEnable,
+      };
+    }
+    return prevStatefilters;
+  }
+
   setFilterQueries = (filterKey, nextQueries, queriedOptionKeys) => {
     const { layerObj, mapId, dispatch, FILTER } = this.props;
     const { isOr, filterOptions } = this.state;
     if (FILTER[this.state.layerId] && !FILTER[this.state.layerId].originalLayerObj) {
       this.buildOriginalObj(this.props, this.state);
     }
-    const prevFilters = Object.assign({}, this.state.filters);
-    prevFilters[filterKey].queries = nextQueries;
-    prevFilters[filterKey].queriedOptionKeys = [...new Set(queriedOptionKeys)];
-    const optionKeys = Object.keys(prevFilters[filterKey].options);
-    let option;
-    prevFilters[filterKey].toggleAllOn = !!!queriedOptionKeys && prevFilters[filterKey].doAdvFiltering;
-    for (let o = 0; o < optionKeys.length; o += 1) {
-      option = prevFilters[filterKey].options[optionKeys[o]];
-      prevFilters[filterKey].options[optionKeys[o]] = {
-        ...option,
-        enabled: queriedOptionKeys && queriedOptionKeys.includes(optionKeys[o]),
+    let prevFilters = Object.assign({}, this.state.filters);
+    const nextQuery = queriedOptionKeys
+      && queriedOptionKeys.length
+      && nextQueries.find(d => d.matches.length === queriedOptionKeys.length);
+    const compareQueries = this.state.filters[filterKey].queries.length
+      && nextQueries.length > this.state.filters[filterKey].queries.length;
+    if (compareQueries) {
+      prevFilters[filterKey].toggleAllOn = true;
+      prevFilters = {
+        ...this.buildFauxOptions(this.state.filters, prevFilters, filterKey, false)
+      };
+    } else {
+      prevFilters[filterKey].toggleAllOn = (nextQuery
+        && nextQueries.indexOf(nextQuery) !== 0
+        && nextQuery.isOR)
+        || (!!!queriedOptionKeys && prevFilters[filterKey].doAdvFiltering);
+      prevFilters = {
+        ...this.buildFauxOptions(
+          this.state.filters,
+          prevFilters,
+          filterKey,
+          null,
+          nextQueries,
+          queriedOptionKeys),
       };
     }
-
+    prevFilters[filterKey].queries = nextQueries;
+    prevFilters[filterKey].queriedOptionKeys = [...new Set(queriedOptionKeys)];
     const {
       nextFilters,
     } = (this.buildNextFilters(prevFilters[filterKey].options, prevFilters, filterKey, true));
