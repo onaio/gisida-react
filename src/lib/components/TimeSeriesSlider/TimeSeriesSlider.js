@@ -11,17 +11,19 @@ require('./TimeSeriesSlider.scss');
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {}, timeseries: {} };
   let timeLayer;
+  let timeSubLayer;
   buildLayersObj(MAP.layers).forEach((layer) => {
     if (layer && layer.visible && layer.aggregate && layer.aggregate.timeseries) {
       timeLayer = layer.id;
     }
   });
-  timeLayer = MAP.primaryLayer && MAP.primaryLayer.length &&
-    MAP.timeseries[MAP.primaryLayer] ? MAP.primaryLayer : timeLayer;
+  timeLayer = MAP.primaryLayer && MAP.primaryLayer.length && MAP.timeseries[MAP.primaryLayer] ? MAP.primaryLayer : timeLayer;
+  timeSubLayer = MAP.primarySubLayer && MAP.primarySubLayer.length && MAP.timeseries[MAP.primarySubLayer] ? MAP.primarySubLayer : null;
   return {
-    timeSeriesObj: MAP.timeseries[timeLayer],
+    timeSeriesObj: MAP.timeseries[timeSubLayer || timeLayer],
     timeseries: MAP.timeseries,
     layers: MAP.layers,
+    primaryLayer: MAP.primaryLayer,
     showFilterPanel: MAP.showFilterPanel,
     timeLayer,
   }
@@ -84,15 +86,27 @@ class TimeSeriesSlider extends React.Component {
     sliderLayerObj.data = sliderLayerObj.periodData[sliderLayerObj.period[nextIndex]].data;
     const activeStops = generateStops(sliderLayerObj, field, this.props.dispatch, nextIndex,);
 
-    
+    const { primaryLayer } = this.props;
+    if (this.props.layers[primaryLayer].layers) {
+      this.props.layers[primaryLayer].layers.map(i =>
+         nextTimeseries[i].newBreaks = activeStops[3]);
+      this.props.layers[primaryLayer].layers.map(i => 
+        nextTimeseries[i].newColors = [...new Set(sliderLayerObj.colorStops[nextIndex].map(d => 
+          d[1]))]);
+
+      
+      this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, this.props.timeLayer));
+    } else {
     nextTimeseries[sliderLayerObj.layerId].newBreaks = activeStops[3];
 
     nextTimeseries[sliderLayerObj.layerId].newColors = [...new Set(sliderLayerObj.stops[nextIndex].map(d => d[1]))];
+   
     this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, this.props.timeLayer));
-    
+  } 
   }
 
   componentWillReceiveProps(nextProps) {
+    
     if (nextProps.timeSeriesObj && nextProps.timeSeriesObj.periodData) {
       const { period, temporalIndex } = nextProps.timeSeriesObj;
       this.setState({

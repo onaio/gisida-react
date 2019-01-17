@@ -284,7 +284,7 @@ export class Filter extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!nextProps.layerObj) return false;
+    if (!nextProps.layerObj || !nextProps.timeseriesObj) return false;
 
     const { layerObj, timeseriesObj, oldLayerObj } = nextProps;
 
@@ -487,10 +487,7 @@ export class Filter extends Component {
     // Update FILTER store state
     const { FILTER } = this.props;
     if (FILTER[layerId] && !FILTER[layerId].originalLayerObj) {
-      
-      const newFilterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, regenStops, isOr);
-      const { originalLayerObj } = newFilterState;
-      dispatch(Actions.resetFilteredLayer(mapId, originalLayerObj));
+      this.buildOriginalObj(this.props, this.state);
     }
 
     const newFilterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, regenStops, isOr);
@@ -508,9 +505,21 @@ export class Filter extends Component {
     return true;
   }
 
-  setFilterQueries = (filterKey, nextQueries, queriedOptionKeys) => {
-    const { layerObj, mapId, dispatch } = this.props;
+  buildOriginalObj(props, state) {
+    const { layerObj, mapId, dispatch } = props;
+    const { filters, isOr, filterOptions } = state;
+    const filterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, true, isOr);
+    const { originalLayerObj } = filterState;
+    dispatch(Actions.resetFilteredLayer(mapId, originalLayerObj));
+  }
 
+  setFilterQueries = (filterKey, nextQueries, queriedOptionKeys) => {
+    const { layerObj, mapId, dispatch, FILTER } = this.props;
+    const { isOr, filterOptions } = this.state;
+
+    if (FILTER[this.state.layerId] && !FILTER[this.state.layerId].originalLayerObj) {
+      this.buildOriginalObj(this.props, this.state);
+    }
     const prevFilters = Object.assign({}, this.state.filters);
     prevFilters[filterKey].queries = nextQueries;
     prevFilters[filterKey].queriedOptionKeys = queriedOptionKeys;
@@ -519,9 +528,8 @@ export class Filter extends Component {
       nextFilters,
     } = (this.buildNextFilters(prevFilters[filterKey].options, prevFilters, filterKey, true));
 
-    const { filterOptions } = this.state;
     const hasStops = Object.keys(filterOptions).map(f => filterOptions[f].type).includes('stops');
-    const filterState = buildFilterState(mapId, filterOptions, nextFilters, layerObj, dispatch, hasStops);
+    const filterState = buildFilterState(mapId, filterOptions, nextFilters, layerObj, dispatch, hasStops, isOr);
     dispatch(Actions.saveFilterState(mapId, layerObj.id, filterState));
   }
 
