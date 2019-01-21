@@ -48,7 +48,7 @@ componentWillReceiveProps(nextProps) {
         timeSeriesObj.layerObj.aggregate &&
           timeSeriesObj.layerObj.aggregate.timeseries) {
        timeSeriesObj.newBreaks = stops[3];
-       timeSeriesObj.newColors = [...new Set(timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(d => d[1]))];
+       timeSeriesObj.newColors = [...new Set(timeSeriesObj.colorStops[timeSeriesObj.temporalIndex].map(d => d[1]))];
        this.setState({
          timeSeriesObj: timeSeriesObj
         })
@@ -67,7 +67,7 @@ componentWillReceiveProps(nextProps) {
             this.props.dispatch);
 
             timeSeriesObj.newBreaks = stops[3];
-            timeSeriesObj.newColors = [...new Set(timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(d => d[1]))];
+            timeSeriesObj.newColors = [...new Set(timeSeriesObj.colorStops[timeSeriesObj.temporalIndex].map(d => d[1]))];
             
             this.setState({
               timeSeriesObj: nextProps.timeSeriesObj
