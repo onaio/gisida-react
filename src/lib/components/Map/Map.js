@@ -336,8 +336,7 @@ class Map extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (this.map) {
       this.map.resize();
-      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId } = this.props;
-
+      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj } = this.props;
       if (LOC && LOC.doUpdateMap === mapId && LOC.location) {
         const { bounds, boundsPadding, center, zoom } = LOC.location;
         if (bounds) {
@@ -352,7 +351,7 @@ class Map extends Component {
       }
       // Update Timeseries
       const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
-      if ((layerObj && layerObj.aggregate && layerObj.aggregate.timeseries)
+      if (((layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) || timeSeriesObj)
         && (doUpdateTSlayers || (FILTER && FILTER[primaryLayer] && FILTER[primaryLayer].isClear))) {
         this.updateTimeseriesLayers();
       }
