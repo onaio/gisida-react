@@ -234,7 +234,7 @@ componentWillReceiveProps(nextProps) {
           const colorLegend = layer && layer.stopsData && [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
 
-          
+
           const activeColors =(timeSeriesObj && timeSeriesObj.newColors &&
              layerObj.aggregate && layerObj.aggregate.timeseries) ? 
               timeSeriesObj.newColors : this.nextProps && this.nextProps.timeSeriesObj ? 
@@ -433,7 +433,7 @@ componentWillReceiveProps(nextProps) {
         const { stopsData, breaks} = layer;
         const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
         const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
-        
+
         const activeColors =(timeSeriesObj && timeSeriesObj.newColors &&
           layerObj.aggregate && layerObj.aggregate.timeseries) ? 
            timeSeriesObj.newColors : this.state && this.state.timeSeriesObj ? 

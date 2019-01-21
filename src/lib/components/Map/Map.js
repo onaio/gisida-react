@@ -5,9 +5,10 @@ import { detectIE, buildLayersObj } from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
-  const { APP, STYLES, REGIONS, VIEW, FILTER } = state;
+  const { APP, STYLES, REGIONS, VIEW, FILTER, LOC } = state;
   const mapId = ownProps.mapId || 'map-1';
   const MAP = state[mapId] || { blockLoad: true, layers: {}};
+  const { detailView } = MAP;
   const activeLayers = [];
   Object.keys(MAP.layers).forEach((key) => {
     const layer = MAP.layers[key];
@@ -26,15 +27,17 @@ const mapStateToProps = (state, ownProps) => {
     STYLES,
     REGIONS,
     MAP,
+    LOC,
     VIEW,
     FILTER,
+    detailView: MAP.detailView,
     timeSeriesObj: MAP.timeseries ? MAP.timeseries[MAP.primarySubLayer || MAP.activeLayerId]: null,
     timeseries:  MAP.timeseries,
     layersObj: MAP.layers ? buildLayersObj(MAP.layers) : {},
     layerObj: MAP.layers ? MAP.layers[MAP.activeLayerId]: null,
     primaryLayer: MAP.primaryLayer,
     oldLayerObj: MAP.oldLayerObjs ? MAP.oldLayerObjs[MAP.primaryLayer] : {},
-    showDetailView: !!MAP.detailView,
+    showDetailView: (detailView && detailView.model && detailView.model.UID),
     showFilterPanel: !!MAP.showFilterPanel,
     activeLayers,
   }
@@ -133,7 +136,13 @@ class Map extends Component {
         center: e.lngLat,
         zoom: newZoom
       });
-      buildDetailView(mapId, activeLayerObj, feature.properties, this.props.dispatch);
+      buildDetailView(
+        mapId,
+        activeLayerObj,
+        feature.properties,
+        this.props.dispatch,
+        this.props.timeSeriesObj
+      );
     }
     return true;
   }
@@ -327,7 +336,20 @@ class Map extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (this.map) {
       this.map.resize();
-      const { layersObj, layerObj, primaryLayer, FILTER } = this.props;
+      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId } = this.props;
+
+      if (LOC && LOC.doUpdateMap === mapId && LOC.location) {
+        const { bounds, boundsPadding, center, zoom } = LOC.location;
+        if (bounds) {
+          this.map.fitBounds(bounds, {
+            padding: boundsPadding || 0,
+            linear: true,
+          });
+        } else {
+          this.map.easeTo({ center, zoom });
+        }
+        this.props.dispatch(Actions.locationUpdated(mapId));
+      }
       // Update Timeseries
       const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
       if ((layerObj && layerObj.aggregate && layerObj.aggregate.timeseries)
@@ -627,7 +649,11 @@ class Map extends Component {
 
   render() {
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
-   
+    const { detailView, layerObj, timeSeriesObj } = this.props;
+    const detailViewProps = this.props.showDetailView && timeSeriesObj && timeSeriesObj.data && timeSeriesObj.data.length && timeSeriesObj.data.find(d => {
+      return d[layerObj.source.join[1]] === detailView.properties[layerObj.source.join[0]]
+    });
+    const showDetailView = timeSeriesObj ? detailViewProps && typeof detailViewProps !== undefined : this.props.showDetailView;
     let mapWidth = '100%';
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
@@ -635,7 +661,7 @@ class Map extends Component {
     if (this.props.showFilterPanel) {
       mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 250px)` : '48%';
     }
-    if (this.props.showDetailView) {
+    if (showDetailView) {
       mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 345px)` : '48%';
     }
     return (
