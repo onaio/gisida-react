@@ -11,22 +11,26 @@ const mapStateToProps = (state, ownProps) => {
   const mapId = ownProps.mapId || 'map-1';
   const MAP = state[ownProps.mapId] || { layers: {}, timeseries: {} }
   let timeLayer;
-  buildLayersObj(MAP.layers).forEach((layer) => {
-    if (layer && layer.visible && layer.aggregate && layer.aggregate.timeseries) {
-      timeLayer = layer.id;
-    }
-  });
-  timeLayer = MAP.timeseries[MAP.primaryLayer] ? MAP.primaryLayer : timeLayer;
+  // buildLayersObj(MAP.layers).forEach((layer) => {
+  //   if (layer && layer.visible && layer.aggregate && layer.aggregate.timeseries) {
+  //     timeLayer = layer.id;
+  //   }
+  // });
+  //timeLayer = MAP.timeseries[MAP.primaryLayer] ? MAP.primaryLayer : timeLayer;
+  // let test = MAP.layers[MAP.primaryLayer].layers && MAP.layers[MAP.primaryLayer].aggregate.timeseries
+  let test2 = MAP.primaryLayer === MAP.layers && MAP.layers[MAP.primarySubLayer] && MAP.layers[MAP.primarySubLayer].parent ? MAP.primarySubLayer : null; 
   return {
     timeseries: MAP.timeseries,
     layerObj: MAP.layers[MAP.activeLayerId],
-    timeSeriesObj: MAP.timeseries[timeLayer],
+    timeSeriesObj: MAP.timeseries[test2 || MAP.primaryLayer],
     lastLayerSelected: MAP.layers[MAP.lastLayerSelected],
     layersData: buildLayersObj(MAP.layers),
     MAP,
     mapId,
+    layers : MAP.layers,
     primaryLayer: MAP.primaryLayer,
     showFilterPanel: MAP.showFilterPanel,
+    primarySubLayer: MAP.primarySubLayer,
   }
 }
 
@@ -87,7 +91,7 @@ componentWillReceiveProps(nextProps) {
   }
  
   render() {
-    const { layerObj, mapId, lastLayerSelected, timeSeriesObj } = this.props;
+    const { layerObj, mapId, lastLayerSelected, timeSeriesObj, layers, primaryLayer, primarySubLayer } = this.props;
     if (!layerObj) {
       return false;
     }
@@ -234,13 +238,13 @@ componentWillReceiveProps(nextProps) {
           const colorLegend = layer && layer.stopsData && [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
 
-
           const activeColors =(timeSeriesObj && timeSeriesObj.newColors &&
              layerObj.aggregate && layerObj.aggregate.timeseries) ? 
-              timeSeriesObj.newColors : this.nextProps && this.nextProps.timeSeriesObj ? 
-                this.nextProps.timeSeriesObj.newColors : (timeSeriesObj && timeSeriesObj.stops 
-                  && timeSeriesObj.temporalIndex) ?
-                [...new Set(timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(d => d[1]))]
+              timeSeriesObj.newColors : this.state && this.state.timeSeriesObj &&
+                layerObj && layerObj.aggregate && layerObj.aggregate.timeseries ? 
+                this.state.timeSeriesObj.newColors : (layerObj && layerObj.stops &&
+                   layerObj.stops[0] && layerObj.stops[0][0]) ?
+                [...new Set(layerObj.stops[0][0].map(d => d[1]))]
                 : layer.colors;
            
           if (colorLegend && colorLegend.includes('transparent') && !(activeColors).includes('transparent')) {
@@ -248,15 +252,20 @@ componentWillReceiveProps(nextProps) {
             breaks.splice(1, 0, breaks[0]);
           }
           let lastVal;
-          const stopsBreak = (timeSeriesObj && timeSeriesObj.newBreaks && layerObj.aggregate && layerObj.aggregate.timeseries)
-            ? timeSeriesObj.newBreaks : (this.nextProps && this.nextProps.timeSeriesObj &&
-              this.nextProps.timeSeriesObj.newBreaks && 
-              this.nextProps.layerObj.aggregate && this.nextProps.layerObj.aggregate.timeseries) ?
-              this.nextProps.timeSeriesObj.newBreaks :
-            layerObj && layerObj.stops && layerObj.stops[3];
+          const stopsBreak = (timeSeriesObj && timeSeriesObj.newBreaks && layerObj.aggregate &&
+            layerObj.aggregate.timeseries) ? 
+              timeSeriesObj.newBreaks : (layers[primaryLayer].layers) ?
+              (layerObj && layerObj.categories && layerObj.categories.breaks) :
+               layer.breaks;
           
           const lastBreaks = Math.max(...stopsBreak);
-          const layerStops = [...new Set(timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(d => d[1]))];
+          const layerStops = (timeSeriesObj && timeSeriesObj.stops && 
+            layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) ? 
+           [...new Set(timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(d => d[1]))] :
+           layerObj && layerObj.stops && layerObj.stops[0][0] ?
+            [...new Set(layerObj.stops[0][0].map(d => d[1]))] :
+            layer.categories.color;
+
           activeColors.forEach((color, index, activeColors) => {
             const stopsIndex = layerStops ? layerStops.indexOf(color) : -1;
             if (stopsIndex !== -1) {
@@ -433,14 +442,15 @@ componentWillReceiveProps(nextProps) {
         const { stopsData, breaks} = layer;
         const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
         const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
-
         const activeColors =(timeSeriesObj && timeSeriesObj.newColors &&
-          layerObj.aggregate && layerObj.aggregate.timeseries) ? 
-           timeSeriesObj.newColors : this.state && this.state.timeSeriesObj ? 
-             this.state.timeSeriesObj.newColors : (timeSeriesObj && timeSeriesObj.stops 
-               && timeSeriesObj.temporalIndex) ?
-             [...new Set(timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(d => d[1]))]
-             : layer.colors;
+          layerObj.aggregate && layerObj.aggregate.timeseries) || (layers 
+            && layers[primaryLayer] && layers[primaryLayer].layers) ? 
+            (timeSeriesObj && timeSeriesObj.newColors) || (layerObj && layerObj.categories 
+            && layerObj.categories.color) : this.state && this.state.timeSeriesObj &&
+             layerObj && layerObj.aggregate && layerObj.aggregate.timeseries ? 
+              this.state.timeSeriesObj.newColors : (layerObj && layerObj.stops) ?
+               [...new Set(layerObj.stops[0][0].map(d => d[1]))]
+                : layer.colors;
           if (colorLegend && colorLegend.includes('transparent') &&
           !(activeColors).includes('transparent')) {
             activeColors.splice(0, 0, 'transparent');
@@ -448,8 +458,10 @@ componentWillReceiveProps(nextProps) {
           }
 
         let lastVal;
-        const stopsBreak = (timeSeriesObj && timeSeriesObj.newBreaks && layerObj.aggregate && layerObj.aggregate.timeseries)
-          ? timeSeriesObj.newBreaks : layerObj && layerObj.stops && layerObj.stops[3];
+        const stopsBreak = (timeSeriesObj && timeSeriesObj.newBreaks && layerObj.aggregate &&
+          layerObj.aggregate.timeseries)
+          ? timeSeriesObj.newBreaks : layerObj && layerObj.stops 
+          && layerObj.stops[3] ? layerObj.stops[3] : layer.color ;
         activeColors.forEach((color, index) => {
           const stopsIndex = layerObj.stops ? layerObj.stops[4].indexOf(color) : -1;
 
