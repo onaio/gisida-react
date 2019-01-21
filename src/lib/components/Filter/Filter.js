@@ -284,7 +284,12 @@ export class Filter extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!nextProps.layerObj || !nextProps.timeseriesObj) return false;
+    if (!nextProps.layerObj || (nextProps.layerObj
+      && nextProps.layerObj.aggregate
+      && nextProps.layerObj.aggregate.timeseries
+      && !nextProps.timeseriesObj)) {
+        return false
+      };
 
     const { layerObj, timeseriesObj, oldLayerObj } = nextProps;
 
