@@ -10,19 +10,12 @@ import './Legend.scss';
 const mapStateToProps = (state, ownProps) => {
   const mapId = ownProps.mapId || 'map-1';
   const MAP = state[ownProps.mapId] || { layers: {}, timeseries: {} }
-  let timeLayer;
-  // buildLayersObj(MAP.layers).forEach((layer) => {
-  //   if (layer && layer.visible && layer.aggregate && layer.aggregate.timeseries) {
-  //     timeLayer = layer.id;
-  //   }
-  // });
-  //timeLayer = MAP.timeseries[MAP.primaryLayer] ? MAP.primaryLayer : timeLayer;
-  // let test = MAP.layers[MAP.primaryLayer].layers && MAP.layers[MAP.primaryLayer].aggregate.timeseries
-  let test2 = MAP.primaryLayer === MAP.layers && MAP.layers[MAP.primarySubLayer] && MAP.layers[MAP.primarySubLayer].parent ? MAP.primarySubLayer : null; 
+ 
+  let subLayerCheck = MAP.primaryLayer === MAP.layers && MAP.layers[MAP.primarySubLayer] && MAP.layers[MAP.primarySubLayer].parent ? MAP.primarySubLayer : null; 
   return {
     timeseries: MAP.timeseries,
     layerObj: MAP.layers[MAP.activeLayerId],
-    timeSeriesObj: MAP.timeseries[test2 || MAP.primaryLayer],
+    timeSeriesObj: MAP.timeseries[subLayerCheck || MAP.primaryLayer],
     lastLayerSelected: MAP.layers[MAP.lastLayerSelected],
     layersData: buildLayersObj(MAP.layers),
     MAP,

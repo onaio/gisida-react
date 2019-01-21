@@ -328,6 +328,9 @@ class Map extends Component {
       if (this.props.MAP.primaryLayer !== primaryLayer) {
         this.setPrimaryLayer(primaryLayer, activeLayerId, layers, activelayersData, activelayerObj);
       }
+      if (layers[primaryLayer] && layers[primaryLayer].location) {
+        this.map.easeTo(layers[primaryLayer].location);
+      }
     }
     // Assign global variable for debugging purposes.
     // window.GisidaMap = this.map;
@@ -352,9 +355,7 @@ class Map extends Component {
       }
       // Update Timeseries
       const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
-      if (((layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) || 
-       (timeSeriesObj && timeSeriesObj.layerObj && timeSeriesObj.layerObj.aggregate &&
-        timeSeriesObj.layerObj.aggregate.timeseries))
+      if (((layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) || (timeSeriesObj))
         && (doUpdateTSlayers || (FILTER && FILTER[primaryLayer] && FILTER[primaryLayer].isClear))) {
         this.updateTimeseriesLayers();
       }
