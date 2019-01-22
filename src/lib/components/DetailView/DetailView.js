@@ -128,7 +128,7 @@ class DetailView extends Component {
             {typeof detail.value !== 'string' && detail.value.parser ?
               Parser(detail.value)
             : (
-              <span>{detail.value}</span>
+              <span>{`${detail.valuePrefix ? `${detail.alt}: ` : ''}${detail.value}`}</span>
             )}
           </li>
         ));
