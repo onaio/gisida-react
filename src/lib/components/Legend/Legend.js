@@ -9,19 +9,30 @@ import './Legend.scss';
 
 const mapStateToProps = (state, ownProps) => {
   const mapId = ownProps.mapId || 'map-1';
-  const MAP = state[ownProps.mapId] || { layers: {}, timeseries: {} }
+  const MAP = state[ownProps.mapId] || { layers: {}, timeseries: {} };
+
+  let subLayerCheck;
+  if (MAP.layers && MAP.primaryLayer && MAP.layers[MAP.primaryLayer] && MAP.layers[MAP.primaryLayer].layers &&
+      MAP.layers[MAP.primaryLayer].layers.every(r => Object.keys(MAP.timeseries).includes(r))) {
+      subLayerCheck = (MAP.primaryLayer === (MAP.layers && MAP.layers[MAP.layers[MAP.primaryLayer].layers[0]] && 
+      MAP.layers[MAP.layers[MAP.primaryLayer].layers[0]].parent)) ? MAP.layers[MAP.primaryLayer].layers[0] : null;
+  } else {
+      subLayerCheck = (MAP.primaryLayer === (MAP.layers && MAP.layers[MAP.visibleLayerId] && 
+      MAP.layers[MAP.visibleLayerId].parent)) ? MAP.visibleLayerId : null;
+  }
 
   return {
     timeseries: MAP.timeseries,
     layers: MAP.layers,
     layerObj: MAP.layers[MAP.activeLayerId],
-    timeSeriesObj: MAP.timeseries[MAP.primaryLayer],
+    timeSeriesObj: MAP.timeseries[subLayerCheck || MAP.primaryLayer],
     lastLayerSelected: MAP.layers[MAP.lastLayerSelected],
     layersData: buildLayersObj(MAP.layers),
     MAP,
     mapId,
     primaryLayer: MAP.primaryLayer,
     showFilterPanel: MAP.showFilterPanel,
+    visibleLayerId: MAP.visibleLayerId,
   }
 }
 
@@ -94,7 +105,10 @@ componentWillReceiveProps(nextProps) {
   render() {
     const { layerObj, mapId, lastLayerSelected,
        timeSeriesObj, timeseries, layers, primaryLayer } = this.props;
-    if (!layerObj) {
+    if (!layerObj || ((layers[primaryLayer].layers && layers[primaryLayer].layers.length &&
+      layers[primaryLayer].layers && layers[primaryLayer].layers[0] &&
+      layers[layers[primaryLayer].layers[0]].aggregate &&
+       layers[layers[primaryLayer].layers[0]].aggregate.timeseries ) && (Object.keys(timeseries).length <= 0))) {
       return false;
     }
 
@@ -209,9 +223,8 @@ componentWillReceiveProps(nextProps) {
             </div>);
         }
         if (fillLayerNoBreaks && !layer.parent) {
-          debugger
           
-          if (layers[primaryLayer].layers) {
+          if (layers[primaryLayer].layers && timeSeriesObj) {
             let uls = [];
             let background_grouped = [];
 
@@ -289,7 +302,7 @@ componentWillReceiveProps(nextProps) {
 
               primaryLegend = (
               <div
-                  id={`legend-${layer.id}-${mapId}`}
+                  id={`legend-${layer.id}-${mapId}`} 
                   data-layer={`${layer.id}`}
                   onClick={(e) => this.onUpdatePrimaryLayer(e)}
                   key={l}
@@ -398,7 +411,9 @@ componentWillReceiveProps(nextProps) {
             breaks.splice(1, 0, breaks[0]);
           }
           const lastBreaks = Math.max(...stopsBreak);
-          const layerStops = [...new Set(layerObj.stops[0][0].map(d => d[1]))] ||
+          const layerStops = (layerObj && layerObj.stops &&
+           layerObj.stops[0] && layerObj.stops[0][0]) ?
+            [...new Set(layerObj.stops[0][0].map(d => d[1]))] :
             layerObj.colors
 
           activeColors.forEach((color, index, activeColors) => {
@@ -536,10 +551,8 @@ componentWillReceiveProps(nextProps) {
           </div>
         ));
 
-      } else if (fillLayerNoBreaks && !layer.parent) {
-        debugger
-        
-          if (layers[primaryLayer].layers && layerObj.id === layer.id) {
+      } else if (fillLayerNoBreaks && !layer.parent) {      
+          if (layers[primaryLayer].layers && layerObj.id === layer.id && timeSeriesObj) {
             let uls = [];
             let background_grouped = [];
             let subLayers = Object.keys(this.props.timeseries).map(d => {
@@ -615,7 +628,7 @@ componentWillReceiveProps(nextProps) {
 
               legendItems.unshift((
                 <div
-                    id={`legend-${layer.id}-${mapId}`}
+                    id={`legend-${layer.id}-${mapId}`} 
                     data-layer={`${layer.id}`}
                     onClick={(e) => this.onUpdatePrimaryLayer(e)}
                     key={l}
