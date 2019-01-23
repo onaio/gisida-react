@@ -143,7 +143,8 @@ componentWillReceiveProps(nextProps) {
         const { temporalIndex } = timeSeriesObj;
         if (circleLayerType && layer.breaks && layer.stops && layer.stops[0][temporalIndex]) {
           const currentColorStops = [...new Set(layer.stops[0][temporalIndex].map(d => d[1]))];
-          const currentRadiusStops = [...new Set(layer.stops[1][temporalIndex].map(d => d[1]))];
+          const currentRadiusStops = 
+          [...new Set(layer.stops[1][temporalIndex].map(d => d[1]))];
           const currentBreakStops = [...new Set(layer.stops[6][temporalIndex])];
 
           currentRadiusStops.forEach((s, i) => {
@@ -303,6 +304,7 @@ componentWillReceiveProps(nextProps) {
               primaryLegend = (
               <div
                   id={`legend-${layer.id}-${mapId}`} 
+                  className={`legend-row ${activeLayerSelected} grouped`}
                   data-layer={`${layer.id}`}
                   onClick={(e) => this.onUpdatePrimaryLayer(e)}
                   key={l}
@@ -377,7 +379,6 @@ componentWillReceiveProps(nextProps) {
           //add activeColors  fallback colors for timeseries layers
           if (layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) {
             // colors
-            console.log("timeSeriesObj", timeSeriesObj && timeSeriesObj.newColors);
             activeColors = (timeSeriesObj && timeSeriesObj.newColors) ||
 
              (this.state && this.state.timeSeriesObj &&
@@ -428,7 +429,7 @@ componentWillReceiveProps(nextProps) {
               } else {
                 lastVal = stopsBreak[stopsIndex];
               }
-              console.log(color);
+
               background.push((
                 <li
                   key={index}
@@ -629,6 +630,7 @@ componentWillReceiveProps(nextProps) {
               legendItems.unshift((
                 <div
                     id={`legend-${layer.id}-${mapId}`} 
+                    className={`legend-row ${activeLayerSelected} grouped`}
                     data-layer={`${layer.id}`}
                     onClick={(e) => this.onUpdatePrimaryLayer(e)}
                     key={l}
