@@ -29,12 +29,13 @@ export class Layer extends Component {
     this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
 
     if (layer.visible) {
+      const center = Array.isArray(APP.mapConfig.center) ? {
+        lng: APP.mapConfig.center[0],
+        lat: APP.mapConfig.center[1]
+      } : { ...APP.mapConfig.center };
       window.maps.forEach((e) => {
         e.easeTo({
-          center: {
-            lng: APP.mapConfig.center[0],
-            lat: APP.mapConfig.center[1],
-          },
+          center,
           zoom: APP.mapConfig.zoom,
         });
       });
