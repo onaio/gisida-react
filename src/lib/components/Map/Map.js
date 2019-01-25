@@ -370,6 +370,12 @@ class Map extends Component {
         activeObj.labels &&
         activeObj.labels.labels) {
         this.addLabels(activeObj, this.props.timeseries);
+        const minZoom = activeObj.labels.minZoom || activeObj.labels.minzoom || 0;
+        const maxZoom = activeObj.labels.maxZoom || activeObj.labels.maxzoom || 22;
+        const currentZoom = this.map.getZoom();
+        if (currentZoom < minZoom || currentZoom > maxZoom) {
+          this.removeLabels(`label-${activeObj.id}`);
+        }
       }
     }
 
