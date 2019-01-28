@@ -35,6 +35,9 @@ class LocationController extends React.Component {
 
   render() {
     const { locations, active } = this.props.state;
+    if (JSON.stringify(locations) === "{}") {
+      return null;
+    }
     return (<section className="location-controller">
       <h4 className="loc-title">Map Locations</h4>
       <ul className="loc-list">
