@@ -328,9 +328,6 @@ class Map extends Component {
       if (this.props.MAP.primaryLayer !== primaryLayer) {
         this.setPrimaryLayer(primaryLayer, activeLayerId, layers, activelayersData, activelayerObj);
       }
-      if (layers[primaryLayer] && layers[primaryLayer].location) {
-        this.map.easeTo(layers[primaryLayer].location);
-      }
     }
     // Assign global variable for debugging purposes.
     // window.GisidaMap = this.map;
@@ -361,9 +358,23 @@ class Map extends Component {
 
       // Update Labels
       this.removeLabels();
-      for (let l = 0; l < layersObj.length; l += 1) {
-        if (layersObj[l].id === primaryLayer && layersObj[l].labels && layersObj[l].labels.labels) {
-          this.addLabels(this.props.layersObj[l], this.props.timeseries);
+      const subLayerWithLabels = layersObj && layersObj.find((l) => {
+        if (layerObj && layerObj.layers) {
+          return l.parent === primaryLayer && l.labels && l.labels.labels
+        }
+        return null;
+      });
+      const activeObj = subLayerWithLabels || layerObj;
+      if (activeObj &&
+        ((layerObj.id === primaryLayer) || (subLayerWithLabels && (subLayerWithLabels.parent === primaryLayer))) &&
+        activeObj.labels &&
+        activeObj.labels.labels) {
+        this.addLabels(activeObj, this.props.timeseries);
+        const minZoom = activeObj.labels.minZoom || activeObj.labels.minzoom || 0;
+        const maxZoom = activeObj.labels.maxZoom || activeObj.labels.maxzoom || 22;
+        const currentZoom = this.map.getZoom();
+        if (currentZoom < minZoom || currentZoom > maxZoom) {
+          this.removeLabels(`label-${activeObj.id}`);
         }
       }
     }
