@@ -337,7 +337,8 @@ class Map extends Component {
     if (this.map) {
       this.map.resize();
       const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj } = this.props;
-      if (LOC && LOC.doUpdateMap === mapId && LOC.location) {
+      if (LOC && LOC.doUpdateMap === mapId && LOC.location &&
+         ((prevProps.LOC.active !== LOC.active) || (prevProps.layerObj.label !== layerObj.label)) ) {
         const { bounds, boundsPadding, center, zoom } = LOC.location;
         if (bounds) {
           this.map.fitBounds(bounds, {
