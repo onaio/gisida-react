@@ -121,7 +121,7 @@ class DetailView extends Component {
           <li key={i}>
             <i data-balloon={detail.alt} data-balloon-pos="up">
               <span
-                className={`glyphicon glyphicon-${detail.icon}`}
+                className={detail.icon}
                 style={detail.iconColor ? { color: detail.iconColor } : {}}
               />
             </i>
