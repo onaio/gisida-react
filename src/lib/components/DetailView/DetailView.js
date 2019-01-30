@@ -62,7 +62,12 @@ class DetailView extends Component {
       const { UID, title, subTitle, basicInfo } = detailView;
       const newParsedBasicInfo = [];
       let parsedDet;
-      const newProps = timeSeriesObj.data.find(d => d[layerObj.source.join[1]] === properties[layerObj.source.join[0]]);
+      let newProps;
+      (!timeSeriesObj.data.map(d => d[layerObj.source.join[1]]).includes(undefined)) ? 
+       newProps = timeSeriesObj.data.find(d =>
+         d[layerObj.source.join[1]] === properties[layerObj.source.join[0]]):
+        newProps = timeSeriesObj.data.map(d => 
+          d['properties']).find(d => d[layerObj.source.join[1]] === properties[layerObj.source.join[0]])
       if (!newProps) {
         this.setState({
           UID: null,
@@ -109,6 +114,7 @@ class DetailView extends Component {
   }
 
   render() {
+    
     const { UID, spec, title, subTitle, parsedBasicInfo } = this.state;
     const { mapId, isSplitScreen } = this.props;
     if (this.props.MAP.showFilterPanel || !UID || !spec) return null;
