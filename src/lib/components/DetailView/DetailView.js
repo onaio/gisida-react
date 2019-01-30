@@ -78,6 +78,7 @@ class DetailView extends Component {
         title,
         spec,
         subTitle,
+        layerObj,
         parsedBasicInfo: newParsedBasicInfo,
       });
     } else {
@@ -111,6 +112,7 @@ class DetailView extends Component {
     const { UID, spec, title, subTitle, parsedBasicInfo } = this.state;
     const { mapId, isSplitScreen } = this.props;
     if (this.props.MAP.showFilterPanel || !UID || !spec) return null;
+    console.log("child", this.props.children)
 
     const detailList = [];
     if (spec['basic-info']) {
