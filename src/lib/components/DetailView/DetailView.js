@@ -78,6 +78,7 @@ class DetailView extends Component {
         title,
         spec,
         subTitle,
+        layerObj,
         parsedBasicInfo: newParsedBasicInfo,
       });
     } else {
