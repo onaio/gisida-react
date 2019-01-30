@@ -653,7 +653,7 @@ class Map extends Component {
 
           if (zoom < minZoom || zoom > maxZoom) {
             this.removeLabels(`label-${layerObj.id}`);
-          } else if (!isRendered) {
+          } else if (!isRendered && (layerObj.id === this.props.primaryLayer)) {
             this.addLabels(layerObj);
           }
         }
