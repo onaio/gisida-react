@@ -340,7 +340,7 @@ class Map extends Component {
       this.map.resize();
       const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj } = this.props;
       if (LOC && LOC.doUpdateMap === mapId && LOC.location &&
-         ((prevProps.LOC.active !== LOC.active) || (prevProps.layerObj.label !== layerObj.label)) ) {
+         ((prevProps.LOC.active !== LOC.active) || (prevProps.layersObj.length !== layersObj.length)) ) {
         const { bounds, boundsPadding, center, zoom } = LOC.location;
         if (bounds) {
           this.map.fitBounds(bounds, {
