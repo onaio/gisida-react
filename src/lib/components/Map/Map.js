@@ -125,7 +125,9 @@ class Map extends Component {
   onFeatureClick(e) {
     const activeLayers = this.props.layersObj.map(l => l.id)
     const { mapId } = this.props;
-    const features = this.map.queryRenderedFeatures(e.point, { layers: activeLayers });
+    const features = this.map.queryRenderedFeatures(e.point, {
+      layers: activeLayers.filter(l => this.map.getLayer(l) !== undefined)
+    });
     const feature = features[0];
     if (!feature) return false;
     const activeLayerObj = this.props.layersObj.find((l) => l.id === feature.layer.id);
@@ -189,7 +191,7 @@ class Map extends Component {
     for (let i = activeLayersData.length - 1; i >= 0; i -= 1) {
       layerObj = activeLayersData[i];
       // If 'layerObj' is not a fill OR the selected primary layer
-      if (layerObj.type !== 'fill' && layerObj.id !== nextLayerId && !layerObj.parent) {
+      if (layerObj.type !== 'fill' && layerObj.id !== nextLayerId && !layerObj.layers && !layerObj.parent) {
         // If 'layerObj' is not the same type as the selected
         if (layerObj.type !== nextLayerObj.type) {
           // Move 'layerObj' to the top of the map layers
