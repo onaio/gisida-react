@@ -157,6 +157,16 @@ export function buildLayersObj(layers) {
   return layersObj;
 }
 
+export const parseColValue = (datum, col) => {
+  let val;
+  if (Number.isNaN(Number(datum[col]))) {
+    val = Number(datum[col].split(',').join(''));
+  } else {
+    val = Number(datum[col]);
+  }
+  return val;
+}
+
 export function deepCopy(x) {
   return JSON.parse(JSON.stringify(x));
 };

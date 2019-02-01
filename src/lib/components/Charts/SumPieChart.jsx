@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import PieChart from './PieChart';
-import { hexToRgbA } from '../../utils';
+import { hexToRgbA, parseColValue } from '../../utils';
 
 class SumPieChart extends React.Component {
   static tooltipFormatter() {
@@ -37,7 +37,7 @@ class SumPieChart extends React.Component {
     if (breaks) {
       dataBreaks = layerData.map((d) => {
         for (let b = 0; b < breaks.length; b += 1) {
-          if (d[column] <= breaks[b]) return b;
+          if (parseColValue(d, column) <= breaks[b]) return b;
         }
         return breaks.length - 1;
       });
