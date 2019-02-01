@@ -48,6 +48,12 @@ const isIE = detectIE();
 window.maps = [];
 
 class Map extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      map: undefined,
+    };
+  }
   initMap(accessToken, mapConfig, mapId) {
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;
@@ -340,7 +346,9 @@ class Map extends Component {
       this.map.resize();
       const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj } = this.props;
       if (LOC && LOC.doUpdateMap === mapId && LOC.location &&
-         ((prevProps.LOC.active !== LOC.active) || (prevProps.layersObj.length !== layersObj.length)) ) {
+         ((prevProps.LOC.active !== LOC.active) || (prevProps.layersObj.length !== layersObj.length) ||
+          (this.map.getZoom() !== LOC.location.zoom && LOC.location.doUpdateLOC))) {
+
         const { bounds, boundsPadding, center, zoom } = LOC.location;
         if (bounds) {
           this.map.fitBounds(bounds, {
@@ -351,6 +359,10 @@ class Map extends Component {
           this.map.easeTo({ center, zoom });
         }
         this.props.dispatch(Actions.locationUpdated(mapId));
+        debugger
+        if (this.props.LOC.location.doUpdateLOC) {
+          this.props.dispatch(Actions.toggleMapLocation(LOC.active));
+          }
       }
       // Update Timeseries
       const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
@@ -381,7 +393,6 @@ class Map extends Component {
         }
       }
     }
-
     // Update Layer Filters
     if (this.map && this.props.layerObj && this.map.getLayer(this.props.layerObj.id)) {
       const { FILTER, primaryLayer } = this.props;
@@ -394,6 +405,7 @@ class Map extends Component {
       }
     }
   }
+  
 
   buildFilters() {
     const { layerObj, mapId } = this.props;
