@@ -81,7 +81,7 @@ class SumPieChart extends React.Component {
     return Object.keys(dataMap).map(category => ({
       name: dataMap[category].label,
       y: dataMap[category].count,
-      x: chartSpec.level,
+      x: dataMap[category].count > 1 ? `${chartSpec.level}s` : chartSpec.level,
       color: hexToRgbA(dataMap[category].color, 0.8),
     }));
   }
