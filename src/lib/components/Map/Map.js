@@ -342,8 +342,7 @@ class Map extends Component {
       if (LOC && LOC.doUpdateMap === mapId && LOC.location &&
          ((prevProps.LOC.active !== LOC.active) || (prevProps.layersObj.length !== layersObj.length) ||
           (this.map.getZoom() !== LOC.location.zoom && LOC.location.doUpdateLOC))) {
-            console.log('===============>')
-
+            
         const { bounds, boundsPadding, center, zoom } = LOC.location;
         if (bounds) {
           this.map.fitBounds(bounds, {
