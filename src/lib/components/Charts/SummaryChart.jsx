@@ -9,7 +9,7 @@ require('./SummaryChart.scss');
 
 
 const mapStateToProps = (state, ownProps) => {
-  const MAP = state[ownProps.mapId] || { layers: {}};
+  const MAP = state[ownProps.mapId] || { layers: {} };
   const layers = MAP.layers;
   let layerObj
   let layersObj = []
@@ -21,11 +21,10 @@ const mapStateToProps = (state, ownProps) => {
   Object.keys(layers).forEach((key) => {
     const layer = layers[key];
     if (layer.charts && layer.visible) {
-      layerObj = layer;
-      layersObj.push(layerObj);
-    } 
+      layersObj.push(layer);
+    }
   });
-
+  layerObj = MAP.layers[MAP.primaryLayer || MAP.activeLayerId]
   // Set layer to undefined of layer is from diffrent region
   currentRegion = state.REGIONS.filter(region => region.current)[0];
   if (currentRegion) {
@@ -59,6 +58,7 @@ const mapStateToProps = (state, ownProps) => {
       legendBottom: legendBottom,
       locations: {},
       showMinimize: true,
+      primaryLayer: MAP.primaryLayer,
       menuIsOpen: MAP.menuIsOpen,
     }
   } else return { showMinimize: false}
@@ -214,6 +214,8 @@ class SummaryChart extends React.Component {
         doShowModal: layerId === this.state && this.state.layerId ? this.state.doShowModal : false,
         chartWidth: primaryChartPosition.chartWidth,
         isFullBleed: primaryChartPosition.isFullBleed,
+      }, () => {
+        this.moveMapLedgend();
       });
     }
   }
