@@ -48,12 +48,6 @@ const isIE = detectIE();
 window.maps = [];
 
 class Map extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      map: undefined,
-    };
-  }
   initMap(accessToken, mapConfig, mapId) {
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;
@@ -348,6 +342,7 @@ class Map extends Component {
       if (LOC && LOC.doUpdateMap === mapId && LOC.location &&
          ((prevProps.LOC.active !== LOC.active) || (prevProps.layersObj.length !== layersObj.length) ||
           (this.map.getZoom() !== LOC.location.zoom && LOC.location.doUpdateLOC))) {
+            console.log('===============>')
 
         const { bounds, boundsPadding, center, zoom } = LOC.location;
         if (bounds) {
@@ -359,7 +354,7 @@ class Map extends Component {
           this.map.easeTo({ center, zoom });
         }
         this.props.dispatch(Actions.locationUpdated(mapId));
-        debugger
+  
         if (this.props.LOC.location.doUpdateLOC) {
           this.props.dispatch(Actions.toggleMapLocation(LOC.active));
           }
