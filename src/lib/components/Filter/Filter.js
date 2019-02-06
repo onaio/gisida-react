@@ -5,9 +5,10 @@ import {
   Actions,
   generateFilterOptions,
   buildFilterState,
-  clearFilterState
+  clearFilterState,
+  lngLat,
 } from 'gisida';
-import { buildLayersObj, lngLat } from '../../utils';
+import { buildLayersObj} from '../../utils';
 import FilterSelector from './FilterSelector';
 import './Filter.scss';
 import 'rc-slider/assets/index.css';
@@ -514,6 +515,7 @@ export class Filter extends Component {
     const filterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, true, isOr);
     const { originalLayerObj } = filterState;
     dispatch(Actions.resetFilteredLayer(mapId, originalLayerObj));
+    
   }
 
   buildFauxOptions(

@@ -170,19 +170,3 @@ export const parseColValue = (datum, col) => {
 export function deepCopy(x) {
   return JSON.parse(JSON.stringify(x));
 };
-
-export function lngLat(LOC, APP) {
-  const center = LOC && LOC.location ? Array.isArray(LOC.location.center) ? {
-    lng: LOC.location.center[0],
-    lat: LOC.location.center[1]
-  } : 
-        
-  { ...LOC.location.center } : Array.isArray(APP.mapConfig.center) ? {
-    lng: APP.mapConfig.center[0],
-    lat: APP.mapConfig.center[1]
-  } : { ...APP.mapConfig.center };
-
-  const zoom = LOC && LOC.location ? LOC.location.zoom : APP.mapConfig.zoom
-
-  return {center, zoom};
-}

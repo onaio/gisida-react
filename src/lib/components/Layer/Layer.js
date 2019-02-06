@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux'
-import { Actions, prepareLayer } from 'gisida'
-import { lngLat } from '../../utils';
+import { connect } from 'react-redux';
+import { Actions, prepareLayer, lngLat } from 'gisida';
 
 
 const mapStateToProps = (state, ownProps) => {
