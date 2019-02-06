@@ -7,7 +7,7 @@ import {
   buildFilterState,
   clearFilterState
 } from 'gisida';
-import { buildLayersObj } from '../../utils';
+import { buildLayersObj, lngLat } from '../../utils';
 import FilterSelector from './FilterSelector';
 import './Filter.scss';
 import 'rc-slider/assets/index.css';
@@ -271,14 +271,12 @@ export class Filter extends Component {
   }
 
   handleFilterClick() {
-    const { dispatch, mapId, layerId } = this.props;
+    const { dispatch, mapId, layerId, APP, LOC } = this.props;
     const availableMaps = ['map-1', 'map-2'];
-    const center = Array.isArray(this.props.APP.mapConfig.center) ?
-    { lng: this.props.APP.mapConfig.center[0], lat: this.props.APP.mapConfig.center[1] } :
-     { ...this.props.APP.mapConfig.center }
+    const { center, zoom } = lngLat(LOC, APP);
     window.maps[availableMaps.indexOf(mapId)].easeTo({
       center,
-      zoom: this.props.APP.mapConfig.zoom,
+      zoom,
     });
     dispatch(Actions.toggleFilter(mapId, layerId));
   }

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
 import { Actions, prepareLayer } from 'gisida'
+import { lngLat } from '../../utils';
 
 
 const mapStateToProps = (state, ownProps) => {
@@ -28,19 +29,8 @@ export class Layer extends Component {
       return null;
     }
     this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
-
+    const {center, zoom } = lngLat(LOC, APP);
     if (layer.visible) {
-      const center = LOC && LOC.location ? Array.isArray(LOC.location.center) ? {
-        lng: LOC.location.center[0],
-        lat: LOC.location.center[1]
-      } : 
-            
-      { ...LOC.location.center } : Array.isArray(APP.mapConfig.center) ? {
-        lng: APP.mapConfig.center[0],
-        lat: APP.mapConfig.center[1]
-      } : { ...APP.mapConfig.center };
-
-      const zoom = LOC && LOC.location ? LOC.location.zoom : APP.mapConfig.zoom
         window.maps.forEach((e) => {
           e.easeTo({
             center,
