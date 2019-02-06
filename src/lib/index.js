@@ -4,6 +4,7 @@ import Menu from './components/Menu/Menu';
 import Map from './components/Map/Map';
 import StyleSelector from './components/StyleSelector/StyleSelector';
 import Legend from './components/Legend/Legend';
+import LocationController from './components/LocationController/LocationController';
 import SummaryChart from './components/Charts/SummaryChart';
 import DetailView from './components/DetailView/DetailView';
 import Filter from './components/Filter/Filter';
@@ -20,6 +21,7 @@ export {
   App,
   TitleBar,
   Menu,
+  LocationController,
   Map,
   StyleSelector,
   Legend,

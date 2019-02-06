@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ColumnChart from './ColumnChart';
-import { debounce, hexToRgbA } from '../../utils';
+import { debounce, hexToRgbA, parseColValue } from '../../utils';
 
 class SumColumnChart extends React.Component {
   static buildColData(layerData, chartSpec, layer, locations) {
@@ -16,13 +16,15 @@ class SumColumnChart extends React.Component {
     const column = chartSpec.column; // column name definied by host
     let catCol = '';
     let mapCol = false; // bool for whether or not to use the "locations" map
+    let parsedVal;
 
     // deifine which break each datum falls into
     let dataBreaks;
     if (breaks) {
       dataBreaks = layerData.map((d) => {
         for (let b = 0; b < breaks.length; b += 1) {
-          if (Number(d[column]) <= Number(breaks[b])) return b;
+          parsedVal = parseColValue(d, column);
+          if (parsedVal <= Number(breaks[b])) return b;
         }
         return breaks.length - 1;
       });
@@ -42,7 +44,7 @@ class SumColumnChart extends React.Component {
         };
       }
       dataMap[datum[catCol]].count += 1;
-      dataMap[datum[catCol]].sum += Number(datum[column]);
+      dataMap[datum[catCol]].sum += parseColValue(datum, column);
       if (dataBreaks) dataMap[datum[catCol]].color = hexToRgbA(colors[dataBreaks[i]], 0.8);
     }
 

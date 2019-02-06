@@ -103,11 +103,10 @@ class DetailView extends Component {
 
   onCloseClick(e) {
     e.preventDefault();
+    const center = Array.isArray(this.props.APP.mapConfig.center) ?
+    { lng: this.props.APP.mapConfig.center[0], lat: this.props.APP.mapConfig.center[1] } : { ...this.props.APP.mapConfig.center }
     window.maps[0].easeTo({
-      center: {
-        lng: this.props.APP.mapConfig.center[0],
-        lat: this.props.APP.mapConfig.center[1],
-      },
+      center,
       zoom: this.props.APP.mapConfig.zoom,
     });
     buildDetailView(this.props.mapId, null, null, this.props.dispatch);
@@ -129,7 +128,7 @@ class DetailView extends Component {
           <li key={i}>
             <i data-balloon={detail.alt} data-balloon-pos="up">
               <span
-                className={`glyphicon glyphicon-${detail.icon}`}
+                className={detail.icon}
                 style={detail.iconColor ? { color: detail.iconColor } : {}}
               />
             </i>
