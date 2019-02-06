@@ -273,11 +273,11 @@ export class Filter extends Component {
   handleFilterClick() {
     const { dispatch, mapId, layerId } = this.props;
     const availableMaps = ['map-1', 'map-2'];
+    const center = Array.isArray(this.props.APP.mapConfig.center) ?
+    { lng: this.props.APP.mapConfig.center[0], lat: this.props.APP.mapConfig.center[1] } :
+     { ...this.props.APP.mapConfig.center }
     window.maps[availableMaps.indexOf(mapId)].easeTo({
-      center: {
-        lng: this.props.APP.mapConfig.center[0],
-        lat: this.props.APP.mapConfig.center[1],
-      },
+      center,
       zoom: this.props.APP.mapConfig.zoom,
     });
     dispatch(Actions.toggleFilter(mapId, layerId));
