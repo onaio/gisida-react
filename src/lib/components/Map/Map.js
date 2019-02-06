@@ -125,7 +125,9 @@ class Map extends Component {
   onFeatureClick(e) {
     const activeLayers = this.props.layersObj.map(l => l.id)
     const { mapId } = this.props;
-    const features = this.map.queryRenderedFeatures(e.point, { layers: activeLayers });
+    const features = this.map.queryRenderedFeatures(e.point, {
+      layers: activeLayers.filter(l => this.map.getLayer(l) !== undefined)
+    });
     const feature = features[0];
     if (!feature) return false;
     const activeLayerObj = this.props.layersObj.find((l) => l.id === feature.layer.id);
@@ -189,7 +191,7 @@ class Map extends Component {
     for (let i = activeLayersData.length - 1; i >= 0; i -= 1) {
       layerObj = activeLayersData[i];
       // If 'layerObj' is not a fill OR the selected primary layer
-      if (layerObj.type !== 'fill' && layerObj.id !== nextLayerId && !layerObj.parent) {
+      if (layerObj.type !== 'fill' && layerObj.id !== nextLayerId && !layerObj.layers && !layerObj.parent) {
         // If 'layerObj' is not the same type as the selected
         if (layerObj.type !== nextLayerObj.type) {
           // Move 'layerObj' to the top of the map layers
@@ -328,9 +330,6 @@ class Map extends Component {
       if (this.props.MAP.primaryLayer !== primaryLayer) {
         this.setPrimaryLayer(primaryLayer, activeLayerId, layers, activelayersData, activelayerObj);
       }
-      if (layers[primaryLayer] && layers[primaryLayer].location) {
-        this.map.easeTo(layers[primaryLayer].location);
-      }
     }
     // Assign global variable for debugging purposes.
     // window.GisidaMap = this.map;
@@ -340,8 +339,10 @@ class Map extends Component {
     if (this.map) {
       this.map.resize();
       const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj } = this.props;
-
-      if (LOC && LOC.doUpdateMap === mapId && LOC.location) {
+      if (LOC && LOC.doUpdateMap === mapId && LOC.location &&
+         ((prevProps.LOC.active !== LOC.active) || (prevProps.layersObj.length !== layersObj.length) ||
+          (this.map.getZoom() !== LOC.location.zoom && LOC.location.doUpdateLOC))) {
+            
         const { bounds, boundsPadding, center, zoom } = LOC.location;
         if (bounds) {
           this.map.fitBounds(bounds, {
@@ -352,23 +353,40 @@ class Map extends Component {
           this.map.easeTo({ center, zoom });
         }
         this.props.dispatch(Actions.locationUpdated(mapId));
+  
+        if (this.props.LOC.location.doUpdateLOC) {
+          this.props.dispatch(Actions.toggleMapLocation(LOC.active));
+          }
       }
       // Update Timeseries
       const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
-      if (((layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) || (timeSeriesObj))
+      if (((layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) || timeSeriesObj)
         && (doUpdateTSlayers || (FILTER && FILTER[primaryLayer] && FILTER[primaryLayer].isClear))) {
         this.updateTimeseriesLayers();
       }
 
       // Update Labels
       this.removeLabels();
-      for (let l = 0; l < layersObj.length; l += 1) {
-        if (layersObj[l].id === primaryLayer && layersObj[l].labels && layersObj[l].labels.labels) {
-          this.addLabels(this.props.layersObj[l], this.props.timeseries);
+      const subLayerWithLabels = layersObj && layersObj.find((l) => {
+        if (layerObj && layerObj.layers) {
+          return l.parent === primaryLayer && l.labels && l.labels.labels
+        }
+        return null;
+      });
+      const activeObj = subLayerWithLabels || layerObj;
+      if (activeObj &&
+        ((layerObj.id === primaryLayer) || (subLayerWithLabels && (subLayerWithLabels.parent === primaryLayer))) &&
+        activeObj.labels &&
+        activeObj.labels.labels) {
+        this.addLabels(activeObj, this.props.timeseries);
+        const minZoom = activeObj.labels.minZoom || activeObj.labels.minzoom || 0;
+        const maxZoom = activeObj.labels.maxZoom || activeObj.labels.maxzoom || 22;
+        const currentZoom = this.map.getZoom();
+        if (currentZoom < minZoom || currentZoom > maxZoom) {
+          this.removeLabels(`label-${activeObj.id}`);
         }
       }
     }
-
     // Update Layer Filters
     if (this.map && this.props.layerObj && this.map.getLayer(this.props.layerObj.id)) {
       const { FILTER, primaryLayer } = this.props;
@@ -381,6 +399,7 @@ class Map extends Component {
       }
     }
   }
+  
 
   buildFilters() {
     const { layerObj, mapId } = this.props;
@@ -642,7 +661,7 @@ class Map extends Component {
 
           if (zoom < minZoom || zoom > maxZoom) {
             this.removeLabels(`label-${layerObj.id}`);
-          } else if (!isRendered) {
+          } else if (!isRendered && (layerObj.id === this.props.primaryLayer)) {
             this.addLabels(layerObj);
           }
         }

@@ -62,7 +62,12 @@ class DetailView extends Component {
       const { UID, title, subTitle, basicInfo } = detailView;
       const newParsedBasicInfo = [];
       let parsedDet;
-      const newProps = timeSeriesObj.data.find(d => d[layerObj.source.join[1]] === properties[layerObj.source.join[0]]);
+      let newProps;
+      (!timeSeriesObj.data.map(d => d[layerObj.source.join[1]]).includes(undefined)) ? 
+       newProps = timeSeriesObj.data.find(d =>
+         d[layerObj.source.join[1]] === properties[layerObj.source.join[0]]):
+        newProps = timeSeriesObj.data.map(d => 
+          d['properties']).find(d => d[layerObj.source.join[1]] === properties[layerObj.source.join[0]])
       if (!newProps) {
         this.setState({
           UID: null,
@@ -78,6 +83,7 @@ class DetailView extends Component {
         title,
         spec,
         subTitle,
+        layerObj,
         parsedBasicInfo: newParsedBasicInfo,
       });
     } else {
@@ -97,20 +103,21 @@ class DetailView extends Component {
 
   onCloseClick(e) {
     e.preventDefault();
+    const center = Array.isArray(this.props.APP.mapConfig.center) ?
+    { lng: this.props.APP.mapConfig.center[0], lat: this.props.APP.mapConfig.center[1] } : { ...this.props.APP.mapConfig.center }
     window.maps[0].easeTo({
-      center: {
-        lng: this.props.APP.mapConfig.center[0],
-        lat: this.props.APP.mapConfig.center[1],
-      },
+      center,
       zoom: this.props.APP.mapConfig.zoom,
     });
     buildDetailView(this.props.mapId, null, null, this.props.dispatch);
   }
 
   render() {
+    
     const { UID, spec, title, subTitle, parsedBasicInfo } = this.state;
     const { mapId, isSplitScreen } = this.props;
     if (this.props.MAP.showFilterPanel || !UID || !spec) return null;
+    console.log("child", this.props.children)
 
     const detailList = [];
     if (spec['basic-info']) {
@@ -121,14 +128,14 @@ class DetailView extends Component {
           <li key={i}>
             <i data-balloon={detail.alt} data-balloon-pos="up">
               <span
-                className={`glyphicon glyphicon-${detail.icon}`}
+                className={detail.icon}
                 style={detail.iconColor ? { color: detail.iconColor } : {}}
               />
             </i>
             {typeof detail.value !== 'string' && detail.value.parser ?
               Parser(detail.value)
             : (
-              <span>{detail.value}</span>
+              <span>{`${detail.prefix ? `${detail.prefix}: ` : detail.useAltAsPrefix ? `${detail.alt}: ` : ''}${detail.value}${detail.suffix ? `${detail.suffix}` : ''}`}</span>
             )}
           </li>
         ));

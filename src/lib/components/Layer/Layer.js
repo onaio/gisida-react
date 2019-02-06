@@ -5,13 +5,14 @@ import { Actions, prepareLayer } from 'gisida'
 
 
 const mapStateToProps = (state, ownProps) => {
-  const { APP } = state;
+  const { APP, LOC } = state;
   const MAP = state[ownProps.mapId]
   if (!!!MAP) {
     debugger
   }
   return {
     APP,
+    LOC,
     timeSeriesObj: MAP.timeseries[MAP.visibleLayerId],
     timeseries: MAP.timeseries,
     layers: MAP.layers
@@ -22,25 +23,31 @@ export class Layer extends Component {
 
   onLayerToggle = layer => {
     // dispatch toggle layer action
-    const { mapId, APP } = this.props;
+    const { mapId, APP, LOC } = this.props;
     if (!mapId) {
       return null;
     }
     this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
 
     if (layer.visible) {
-      const center = Array.isArray(APP.mapConfig.center) ? {
+      const center = LOC && LOC.location ? Array.isArray(LOC.location.center) ? {
+        lng: LOC.location.center[0],
+        lat: LOC.location.center[1]
+      } : 
+            
+      { ...LOC.location.center } : Array.isArray(APP.mapConfig.center) ? {
         lng: APP.mapConfig.center[0],
         lat: APP.mapConfig.center[1]
       } : { ...APP.mapConfig.center };
-      window.maps.forEach((e) => {
-        e.easeTo({
-          center,
-          zoom: APP.mapConfig.zoom,
-        });
-      });
-    }
 
+      const zoom = LOC && LOC.location ? LOC.location.zoom : APP.mapConfig.zoom
+        window.maps.forEach((e) => {
+          e.easeTo({
+            center,
+            zoom,
+          })
+        });  
+      } 
     // Prepare layer if layer had not been loaded
     if (!layer.loaded && !layer.isLoading) {
       prepareLayer(mapId, layer, this.props.dispatch);
