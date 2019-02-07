@@ -91,7 +91,7 @@ class Map extends Component {
       this.map.on('zoom', this.handleLabelsOnMapZoom.bind(this))
 
       // Dispach map rendered to indicate map was rendered
-      this.props.dispatch(Actions.mapRendered(mapId));
+      this.props.dispatch(Actions.mapRendered(mapId, true));
     }
   }
 
@@ -219,7 +219,18 @@ class Map extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidMount() {
+    const { MAP, APP, mapId } = this.props;
+    if (APP && MAP && mapId) {
+      const { isRendered, accessToken, mapConfig } = APP;
+      // Check if map is initialized, use mapId as container value
+      if (!isRendered && (!isIE || mapboxgl.supported()) && !MAP.blockLoad) {
+        this.initMap(accessToken, { ...mapConfig, container: mapId }, mapId);
+      }
+    }
+  }
+
+  componentWillReceiveProps(nextProps){
     if (this.map) {
       this.map.resize();
     }
