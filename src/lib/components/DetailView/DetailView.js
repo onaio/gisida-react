@@ -28,7 +28,7 @@ const mapStateToProps = (state, ownProps) => {
     properties: detailView && detailView.properties,
     spec: detailView && detailView.spec,
     children: ownProps.children,
-  };
+  }
 }
 
 class DetailView extends Component {
@@ -113,21 +113,20 @@ class DetailView extends Component {
   }
 
   render() {
-    
     const { UID, spec, title, subTitle, parsedBasicInfo } = this.state;
     const { mapId, isSplitScreen } = this.props;
     if (this.props.MAP.showFilterPanel || !UID || !spec) return null;
-    console.log("child", this.props.children)
-
     const detailList = [];
     if (spec['basic-info']) {
       let detail;
       for (let i = 0; i < parsedBasicInfo.length; i += 1) {
         detail = parsedBasicInfo[i];
         detailList.push((
-          <li key={i}>
+          detail && detail.icon ?
+          (<li key={i}>
             <i data-balloon={detail.alt} data-balloon-pos="up">
               <span
+                
                 className={detail.icon}
                 style={detail.iconColor ? { color: detail.iconColor } : {}}
               />
@@ -137,7 +136,15 @@ class DetailView extends Component {
             : (
               <span>{`${detail.prefix ? `${detail.prefix}: ` : detail.useAltAsPrefix ? `${detail.alt}: ` : ''}${detail.value}${detail.suffix ? `${detail.suffix}` : ''}`}</span>
             )}
-          </li>
+          </li>) : 
+           (<li key={i}>
+              <b> {`${detail.alt}:`} </b> 
+            {typeof detail.value !== 'string' && detail.value.parser ?
+              Parser(detail.value)
+            : (
+              <span>{detail.value}</span>
+            )}
+          </li>)
         ));
       }
     }
