@@ -54,7 +54,7 @@ class DetailView extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { layerObj, properties, spec, detailView } = nextProps;
+    const { layerObj, properties, spec, detailView, mapId } = nextProps;
     if (!layerObj || !spec || !properties || !detailView) {
       this.setState({ UID: null });
     } else if (nextProps.timeSeriesObj && detailView) {
@@ -97,6 +97,7 @@ class DetailView extends Component {
         properties,
         basicInfo,
         layerObj,
+        mapId,
       });
     }
   }
