@@ -48,6 +48,12 @@ const isIE = detectIE();
 window.maps = [];
 
 class Map extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      layersObj: this.props.layersObj,
+    }
+  }
   initMap(accessToken, mapConfig, mapId) {
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;
@@ -206,6 +212,10 @@ class Map extends Component {
     const nextlayersObj = activeLayersData.filter(lo => lo.id !== nextLayerId);
     nextlayersObj.push(nextLayerObj);
 
+    this.setState({
+      layersObj: nextlayersObj,
+    });
+
     return true;
   }
   
@@ -230,7 +240,7 @@ class Map extends Component {
     const currentStyle = nextProps.MAP.currentStyle;
     const currentRegion = nextProps.MAP.currentRegion;
     const reloadLayers = nextProps.MAP.reloadLayers;
-    const activelayersData = nextProps.layersObj;
+    const activelayersData = this.state.layersObj;
     const activelayerObj = nextProps.layerObj;
     const primaryLayer = nextProps.MAP.primaryLayer;
     const activeLayerId = nextProps.MAP.activeLayerId;
