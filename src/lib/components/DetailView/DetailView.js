@@ -70,7 +70,8 @@ class DetailView extends Component {
         return false;
       }
       for (let b = 0; b < basicInfo.length; b += 1) {
-        parsedDet = buildParsedBasicDetailItem(basicInfo[b], newProps);
+        parsedDet = buildParsedBasicDetailItem(basicInfo[b], newProps) ?
+         buildParsedBasicDetailItem(basicInfo[b], newProps): buildParsedBasicDetailItem(basicInfo[b], properties);
         if (parsedDet) newParsedBasicInfo.push(parsedDet);
       }
       this.setState({
