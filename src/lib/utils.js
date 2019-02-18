@@ -170,3 +170,28 @@ export const parseColValue = (datum, col) => {
 export function deepCopy(x) {
   return JSON.parse(JSON.stringify(x));
 };
+
+export function detailViewData(detailView, properties, layerObj, timeSeriesObj, showDetailView) {
+  let detailViewProps;
+  if (layerObj && layerObj['detail-view'] && layerObj['detail-view'].join && (showDetailView || properties)) {
+    detailViewProps = timeSeriesObj.data.find(d =>
+       (d.properties || d)[layerObj['detail-view'].join[0]] === (properties || detailView.properties)[layerObj['detail-view'].join[1]]);
+  }
+  if(detailViewProps === undefined) {
+  if (Array.isArray(layerObj && layerObj.source && layerObj.source.join && layerObj.source.join[1]) &&
+    (properties || showDetailView)) {
+    detailViewProps = (properties || detailView.properties)[layerObj.source.join[1][0]] ? 
+      timeSeriesObj.data.find(d => 
+        (d.properties || d)[layerObj.source.join[1][0]] === (properties || detailView.properties)[layerObj.source.join[2]])
+         : timeSeriesObj.data.find(d => 
+        (d.properties || d)[layerObj.source.join[1][1]] === (properties || detailView.properties)[layerObj.source.join[2]]);
+    } 
+    else if (showDetailView || properties) {
+    detailViewProps = timeSeriesObj && timeSeriesObj.data &&
+        timeSeriesObj.data.length && timeSeriesObj.data.find(d => {
+      return (d.properties||d)[layerObj.source.join[1]] === (properties || detailView.properties)[layerObj.source.join[0]]
+      });
+    }
+  } 
+  return detailViewProps;
+}

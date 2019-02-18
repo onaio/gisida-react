@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
-import { detectIE, buildLayersObj } from '../../utils';
+import { detectIE, buildLayersObj, detailViewData } from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -671,29 +671,10 @@ class Map extends Component {
 
   render() {
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
-    const { detailView, layerObj, timeSeriesObj } = this.props;
-    let detailViewProps;
+    const { detailView, layerObj, timeSeriesObj, showDetailView } = this.props;
+    let detailViewProps = detailViewData(detailView, null, layerObj, timeSeriesObj, showDetailView);
 
-    if (layerObj && layerObj['detail-view'] && layerObj['detail-view'].join && this.props.showDetailView) {
-      detailViewProps = timeSeriesObj.data.find(d =>
-         (d.properties || d)[layerObj['detail-view'].join[0]] === detailView.properties[layerObj['detail-view'].join[1]]);
-    }
-    if(detailViewProps === undefined) {
-    if (Array.isArray(layerObj && layerObj.source && layerObj.source.join && layerObj.source.join[1])&&
-      this.props.showDetailView) {
-      detailViewProps =  detailView.properties[layerObj.source.join[1][0]] ? 
-        timeSeriesObj.data.find(d => 
-          (d.properties || d)[layerObj.source.join[1][0]] === detailView.properties[layerObj.source.join[2]])
-           : timeSeriesObj.data.find(d => 
-          (d.properties || d)[layerObj.source.join[1][1]] === detailView.properties[layerObj.source.join[2]]);
-      } else {
-          detailViewProps = this.props.showDetailView && timeSeriesObj && timeSeriesObj.data &&
-          timeSeriesObj.data.length && timeSeriesObj.data.find(d => {
-        return (d.properties||d)[layerObj.source.join[1]] === detailView.properties[layerObj.source.join[0]]
-        });
-      }
-    } 
-    const showDetailView = timeSeriesObj ? detailViewProps && typeof detailViewProps !== undefined : this.props.showDetailView;
+    const showDetailViewBool = timeSeriesObj ? detailViewProps && typeof detailViewProps !== undefined : showDetailView;
     let mapWidth = '100%';
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
@@ -701,7 +682,7 @@ class Map extends Component {
     if (this.props.showFilterPanel) {
       mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 250px)` : '48%';
     }
-    if (showDetailView) {
+    if (showDetailViewBool) {
       mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 345px)` : '48%';
     }
     return (
