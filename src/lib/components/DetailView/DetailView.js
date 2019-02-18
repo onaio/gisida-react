@@ -58,11 +58,27 @@ class DetailView extends Component {
     if (!layerObj || !spec || !properties || !detailView) {
       this.setState({ UID: null });
     } else if (nextProps.timeSeriesObj && detailView) {
-      const { timeSeriesObj, layerObj, spec } = nextProps;
+      const { timeSeriesObj, layerObj, spec, } = nextProps;
       const { UID, title, subTitle, basicInfo } = detailView;
       const newParsedBasicInfo = [];
       let parsedDet;
-      const newProps = timeSeriesObj.data.find(d => (d.properties||d)[layerObj.source.join[1]] === properties[layerObj.source.join[0]]);
+      let newProps;
+      if (layerObj && layerObj['detail-view'] && layerObj['detail-view'].join) {
+        newProps = timeSeriesObj.data.find(d =>
+           (d.properties || d)[layerObj['detail-view'].join[0]] === nextProps.properties[layerObj['detail-view'].join[1]])
+      }
+      if(newProps === undefined) {
+      if (Array.isArray(layerObj.source.join[1]) && newProps === undefined) {
+        newProps =  properties[nextProps.layerObj.source.join[1][0]] ? 
+        timeSeriesObj.data.find(d => 
+          (d.properties || d)[layerObj.source.join[1][0]] === nextProps.properties[layerObj.source.join[2]])
+           : timeSeriesObj.data.find(d => 
+          (d.properties || d)[layerObj.source.join[1][1]] === nextProps.properties[layerObj.source.join[2]]);
+      } else {
+        newProps = timeSeriesObj.data.find(d =>
+         (d.properties||d)[layerObj.source.join[1]] === nextProps.properties[layerObj.source.join[0]]);
+        } 
+      }
       if (!newProps) {
         this.setState({
           UID: null,
@@ -82,7 +98,8 @@ class DetailView extends Component {
         layerObj,
         parsedBasicInfo: newParsedBasicInfo,
       });
-    } else {
+    } 
+    else {
       const { UID, title, subTitle, basicInfo, parsedBasicInfo } = detailView;
       this.setState({
         UID,

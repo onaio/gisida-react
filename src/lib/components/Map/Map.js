@@ -672,9 +672,27 @@ class Map extends Component {
   render() {
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
     const { detailView, layerObj, timeSeriesObj } = this.props;
-    const detailViewProps = this.props.showDetailView && timeSeriesObj && timeSeriesObj.data && timeSeriesObj.data.length && timeSeriesObj.data.find(d => {
-      return (d.properties||d)[layerObj.source.join[1]] === detailView.properties[layerObj.source.join[0]]
-    });
+    let detailViewProps;
+
+    if (layerObj && layerObj['detail-view'] && layerObj['detail-view'].join && this.props.showDetailView) {
+      detailViewProps = timeSeriesObj.data.find(d =>
+         (d.properties || d)[layerObj['detail-view'].join[0]] === detailView.properties[layerObj['detail-view'].join[1]]);
+    }
+    if(detailViewProps === undefined) {
+    if (Array.isArray(layerObj && layerObj.source && layerObj.source.join && layerObj.source.join[1])&&
+      this.props.showDetailView) {
+      detailViewProps =  detailView.properties[layerObj.source.join[1][0]] ? 
+        timeSeriesObj.data.find(d => 
+          (d.properties || d)[layerObj.source.join[1][0]] === detailView.properties[layerObj.source.join[2]])
+           : timeSeriesObj.data.find(d => 
+          (d.properties || d)[layerObj.source.join[1][1]] === detailView.properties[layerObj.source.join[2]]);
+      } else {
+          detailViewProps = this.props.showDetailView && timeSeriesObj && timeSeriesObj.data &&
+          timeSeriesObj.data.length && timeSeriesObj.data.find(d => {
+        return (d.properties||d)[layerObj.source.join[1]] === detailView.properties[layerObj.source.join[0]]
+        });
+      }
+    } 
     const showDetailView = timeSeriesObj ? detailViewProps && typeof detailViewProps !== undefined : this.props.showDetailView;
     let mapWidth = '100%';
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
