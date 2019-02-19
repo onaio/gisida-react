@@ -189,7 +189,7 @@ class Map extends Component {
     }
 
     // Move the selected primary layer to the top of the map layers
-    if (!nextLayerObj.layers && this.map.getLayer(nextLayerId)) {
+    if (!nextLayerObj.layers && nextLayerId !== "pd-details-form" && this.map.getLayer(nextLayerId)) {
       this.map.moveLayer(nextLayerId);
     }
     let layerObj;
@@ -199,7 +199,7 @@ class Map extends Component {
       // If 'layerObj' is not a fill OR the selected primary layer
       if (layerObj.type !== 'fill' && layerObj.id !== nextLayerId && !layerObj.layers && !layerObj.parent) {
         // If 'layerObj' is not the same type as the selected
-        if (layerObj.type !== nextLayerObj.type) {
+        if (layerObj.type !== nextLayerObj.type && nextLayerId !== "pd-details-form") {
           // Move 'layerObj' to the top of the map layers
           if (this.map.getLayer(layerObj.id)) {
             this.map.moveLayer(layerObj.id);
@@ -240,7 +240,7 @@ class Map extends Component {
     const currentStyle = nextProps.MAP.currentStyle;
     const currentRegion = nextProps.MAP.currentRegion;
     const reloadLayers = nextProps.MAP.reloadLayers;
-    const activelayersData = this.state.layersObj;
+    const activelayersData = nextProps.layersObj;
     const activelayerObj = nextProps.layerObj;
     const primaryLayer = nextProps.MAP.primaryLayer;
     const activeLayerId = nextProps.MAP.activeLayerId;

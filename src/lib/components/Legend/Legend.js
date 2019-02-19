@@ -332,7 +332,7 @@ componentWillReceiveProps(nextProps) {
         }
         continue;
       }
-      if (circleLayerType) {
+      if (circleLayerType && !fillLayerNoBreaks) {
         legendItems.unshift((
           <div
             id={`legend-${layer.id}-${mapId}`}
