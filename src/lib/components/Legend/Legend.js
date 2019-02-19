@@ -134,7 +134,7 @@ componentWillReceiveProps(nextProps) {
             ));
           });
         }
-      } else if (circleLayerType && layer.breaks && layer.stopsData && layer.styleSpec && layer.styleSpec.paint) {
+      } else if (circleLayerType && layer.breaks && layer.stopsData && layer.styleSpec && layer.styleSpec.paint && layer.categories.breaks !== 'no') {
         const stopVals = [];
         layer.stopsData.forEach((s) => {
           stopVals.push(s[1]);
@@ -169,7 +169,7 @@ componentWillReceiveProps(nextProps) {
       }
 
       if (lastLayerSelected && lastLayerSelected.id === layer.id) {
-        if (circleLayerType) {
+        if (circleLayerType && layer.categories.breaks !== 'no') {
           primaryLegend = (
             <div
               id={`legend-${layer.id}-${mapId}`}
@@ -332,7 +332,7 @@ componentWillReceiveProps(nextProps) {
         }
         continue;
       }
-      if (circleLayerType) {
+      if (circleLayerType && layer.categories.breaks !== 'no') {
         legendItems.unshift((
           <div
             id={`legend-${layer.id}-${mapId}`}

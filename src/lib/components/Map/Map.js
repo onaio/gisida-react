@@ -48,12 +48,6 @@ const isIE = detectIE();
 window.maps = [];
 
 class Map extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      layersObj: this.props.layersObj,
-    }
-  }
   initMap(accessToken, mapConfig, mapId) {
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;
@@ -193,28 +187,24 @@ class Map extends Component {
       this.map.moveLayer(nextLayerId);
     }
     let layerObj;
-    // Loop throught all active map layers
-    for (let i = activeLayersData.length - 1; i >= 0; i -= 1) {
-      layerObj = activeLayersData[i];
-      // If 'layerObj' is not a fill OR the selected primary layer
-      if (layerObj.type !== 'fill' && layerObj.id !== nextLayerId && !layerObj.layers && !layerObj.parent) {
-        // If 'layerObj' is not the same type as the selected
-        if (layerObj.type !== nextLayerObj.type) {
-          // Move 'layerObj' to the top of the map layers
-          if (this.map.getLayer(layerObj.id)) {
-            this.map.moveLayer(layerObj.id);
+    // if nextLayerObj has detail view let the layer be always at
+    // the top of the active map layers
+    if (!nextLayerObj['detail-view']) {
+      // Loop throught all active map layers
+      for (let i = activeLayersData.length - 1; i >= 0; i -= 1) {
+        layerObj = activeLayersData[i];
+        // If 'layerObj' is not a fill OR the selected primary layer
+        if (layerObj.type !== 'fill' && layerObj.id !== nextLayerId && !layerObj.layers && !layerObj.parent && !nextLayerObj['detail-view']) {
+          // If 'layerObj' is not the same type as the selected
+          if (layerObj.type !== nextLayerObj.type) {
+            // Move 'layerObj' to the top of the map layers
+            if (this.map.getLayer(layerObj.id)) {
+              this.map.moveLayer(layerObj.id);
+            }
           }
         }
       }
     }
-
-    // Re-order this.state.layersObj array
-    const nextlayersObj = activeLayersData.filter(lo => lo.id !== nextLayerId);
-    nextlayersObj.push(nextLayerObj);
-
-    this.setState({
-      layersObj: nextlayersObj,
-    });
 
     return true;
   }
@@ -240,7 +230,7 @@ class Map extends Component {
     const currentStyle = nextProps.MAP.currentStyle;
     const currentRegion = nextProps.MAP.currentRegion;
     const reloadLayers = nextProps.MAP.reloadLayers;
-    const activelayersData = this.state.layersObj;
+    const activelayersData = nextProps.layersObj;
     const activelayerObj = nextProps.layerObj;
     const primaryLayer = nextProps.MAP.primaryLayer;
     const activeLayerId = nextProps.MAP.activeLayerId;
