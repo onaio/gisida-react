@@ -672,7 +672,13 @@ class Map extends Component {
   render() {
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
     const { detailView, layerObj, timeSeriesObj, showDetailView } = this.props;
-    let detailViewProps = detailViewData(detailView, null, layerObj, timeSeriesObj, showDetailView);
+    const join = layerObj && ((layerObj['detail-view'] &&
+      layerObj['detail-view'].join) || layerObj.source.join);
+    let detailViewProps = showDetailView &&
+      timeSeriesObj &&
+      timeSeriesObj.data &&
+      timeSeriesObj.data.length &&
+      timeSeriesObj.data.find(d => (d.properties || d)[join[1]] === detailView.properties[join[0]]);
 
     const showDetailViewBool = timeSeriesObj ? detailViewProps && typeof detailViewProps !== undefined : showDetailView;
     let mapWidth = '100%';
