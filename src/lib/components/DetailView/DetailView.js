@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { buildDetailView, buildParsedBasicDetailItem } from 'gisida';
 import { connect } from 'react-redux';
 import Parser from 'html-react-parser';
-import { buildLayersObj } from '../../utils';
+import { buildLayersObj, detailViewData } from '../../utils';
 import './DetailView.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -58,11 +58,13 @@ class DetailView extends Component {
     if (!layerObj || !spec || !properties || !detailView) {
       this.setState({ UID: null });
     } else if (nextProps.timeSeriesObj && detailView) {
-      const { timeSeriesObj, layerObj, spec } = nextProps;
+      const { timeSeriesObj, layerObj, spec, properties } = nextProps;
       const { UID, title, subTitle, basicInfo } = detailView;
       const newParsedBasicInfo = [];
       let parsedDet;
-      const newProps = timeSeriesObj.data.find(d => (d.properties||d)[layerObj.source.join[1]] === properties[layerObj.source.join[0]]);
+      const join = layerObj['detail-view'].join || layerObj.source.join;
+      const newProps = timeSeriesObj.data.find(d => (d.properties || d)[join[1]] === properties[join[0]]);
+      
       if (!newProps) {
         this.setState({
           UID: null,
@@ -82,7 +84,8 @@ class DetailView extends Component {
         layerObj,
         parsedBasicInfo: newParsedBasicInfo,
       });
-    } else {
+    } 
+    else {
       const { UID, title, subTitle, basicInfo, parsedBasicInfo } = detailView;
       this.setState({
         UID,
