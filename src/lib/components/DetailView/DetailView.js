@@ -62,7 +62,8 @@ class DetailView extends Component {
       const { UID, title, subTitle, basicInfo } = detailView;
       const newParsedBasicInfo = [];
       let parsedDet;
-      let newProps = detailViewData(null, properties, layerObj, timeSeriesObj,null);
+      const join = layerObj['detail-view'].join || layerObj.source.join;
+      const newProps = timeSeriesObj.data.find(d => (d.properties || d)[join[1]] === properties[join[0]]);
       
       if (!newProps) {
         this.setState({
