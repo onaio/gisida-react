@@ -136,9 +136,9 @@ componentWillReceiveProps(nextProps) {
         }
       } else if (circleLayerType && layer.breaks && layer.stopsData && layer.styleSpec && layer.styleSpec.paint) {
         const breaks = [...new Set(layer.breaks)];
-        const colors = [... new Set(layer.colorStops.map(d => d[1]))]
+        const colors = [...new Set(layer.colorStops.map(d => d[1]))]
 
-        uniqueStops = [... new Set(layer.stopsData.map(d => d[1]))];
+        uniqueStops = [...new Set(layer.stopsData.map(d => d[1]))];
 
         uniqueStops.forEach((s, i) => {
           quantiles.push((
