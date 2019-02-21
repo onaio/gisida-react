@@ -159,8 +159,10 @@ export function buildLayersObj(layers) {
 
 export const parseColValue = (datum, col) => {
   let val;
-  if (Number.isNaN(Number(datum[col]))) {
+  if (datum[col] && Number.isNaN(Number(datum[col]))) {
     val = Number(datum[col].split(',').join(''));
+  } else if (typeof datum[col] === 'undefined') {
+    val = 0;
   } else {
     val = Number(datum[col]);
   }

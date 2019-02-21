@@ -135,16 +135,10 @@ componentWillReceiveProps(nextProps) {
           });
         }
       } else if (circleLayerType && layer.breaks && layer.stopsData && layer.styleSpec && layer.styleSpec.paint) {
-        const stopVals = [];
-        layer.stopsData.forEach((s) => {
-          stopVals.push(s[1]);
-        });
+        const breaks = [...new Set(layer.breaks)];
+        const colors = [...new Set(layer.colorStops.map(d => d[1]))]
 
-        layer.styleSpec.paint['circle-radius'].stops.forEach((s) => {
-          stopVals.push(s[1]);
-        });
-
-        uniqueStops = [...new Set(stopVals)].sort((a, b) => a - b);
+        uniqueStops = [...new Set(layer.stopsData.map(d => d[1]))];
 
         uniqueStops.forEach((s, i) => {
           quantiles.push((
@@ -155,14 +149,14 @@ componentWillReceiveProps(nextProps) {
                 style={
                   {
                     background: Array.isArray(layer.categories.color) ? layer.categories.color[i]
-                      : layer.stops[4][i],
+                      : colors[i],
                     width: `${s * 2}px`,
                     height: `${s * 2}px`,
                     margin: `0px ${i + 2}px`
                   }
                 }
               ></span>
-              <p>{layer.breaks[i]}</p>
+              <p>{breaks[i]}</p>
             </span>
           ));
         });

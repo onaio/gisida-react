@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
-import { detectIE, buildLayersObj } from '../../utils';
+import { detectIE, buildLayersObj, detailViewData } from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -712,15 +712,16 @@ class Map extends Component {
 
   render() {
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
-    const { detailView, layerObj, timeSeriesObj } = this.props;
-    const detailViewProps = this.props.showDetailView && timeSeriesObj &&
-      timeSeriesObj.data && timeSeriesObj.data.length &&
-       timeSeriesObj.data.find(d => {
-      return (d.properties||d)[layerObj.source &&
-         layerObj.source.join[1]] === detailView.properties[layerObj.source && 
-          layerObj.source.join[0]]
-    });
-    const showDetailView = timeSeriesObj && timeSeriesObj.layerId === this.props.primaryLayer ? detailViewProps && typeof detailViewProps !== undefined : this.props.showDetailView;
+    const { detailView, layerObj, timeSeriesObj, showDetailView } = this.props;
+    const join = layerObj && ((layerObj['detail-view'] &&
+      layerObj['detail-view'].join) || (layerObj.source && layerObj.source.join));
+    let detailViewProps = join && showDetailView &&
+      timeSeriesObj &&
+      timeSeriesObj.data &&
+      timeSeriesObj.data.length &&
+      timeSeriesObj.data.find(d => (d.properties || d)[join[1]] === detailView.properties[join[0]]);
+
+    const showDetailViewBool = timeSeriesObj ? detailViewProps && typeof detailViewProps !== undefined : showDetailView;
     let mapWidth = '100%';
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
@@ -728,7 +729,7 @@ class Map extends Component {
     if (this.props.showFilterPanel) {
       mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 250px)` : '48%';
     }
-    if (showDetailView) {
+    if (showDetailViewBool) {
       mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 345px)` : '48%';
     }
     return (
