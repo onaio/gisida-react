@@ -189,25 +189,56 @@ class Map extends Component {
     }
 
     // Move the selected primary layer to the top of the map layers
-    if (!nextLayerObj.layers && !nextLayerObj['detail-view'] && this.map.getLayer(nextLayerId)) {
-      this.map.moveLayer(nextLayerId);
+    if (!nextLayerObj.layers && this.map.getLayer(nextLayerId)) {
+      this.map.moveLayer(nextLayerId); 
+      //move icon with detail view to top of the map layers wip
+      if (activeLayersData.find(d => d['detail-view']) && this.map.getLayer(activeLayersData.find(d => d['detail-view']).id)) {
+        this.map.moveLayer(activeLayersData.find(d => d['detail-view']).id);
+      } 
     }
     let layerObj;
-    // Loop throught all active map layers
+    //Loop throught all active map layers
     for (let i = activeLayersData.length - 1; i >= 0; i -= 1) {
       layerObj = activeLayersData[i];
       // If 'layerObj' is not a fill OR the selected primary layer
       if (layerObj.type !== 'fill' && layerObj.id !== nextLayerId && !layerObj.layers && !layerObj.parent) {
         // If 'layerObj' is not the same type as the selected
-        if (layerObj.type !== nextLayerObj.type && !nextLayerObj['detail-view']) {
+        if (layerObj.type !== nextLayerObj.type) {
           // Move 'layerObj' to the top of the map layers
           if (this.map.getLayer(layerObj.id)) {
             this.map.moveLayer(layerObj.id);
           }
+
         }
       }
     }
-
+    /* Move layer in the : circle, symbol and detailview  based on what shoul move above others wip*/
+    if (activeLayersData) {
+      Object.keys(activeLayersData).forEach((key) => {
+        layerObj = activeLayersData[key];
+        if (layerObj.type === 'circle' && !layerObj.layers && !layerObj.parent) {
+          if (this.map.getLayer(layerObj.id)) {
+            this.map.moveLayer(layerObj.id);
+          }
+        }
+      });
+      Object.keys(activeLayersData).forEach((key)=> {
+        layerObj = activeLayersData[key];
+        if (layerObj.type === 'symbol' && !layerObj.layers && !layerObj.parent) {
+          if(this.map.getLayer(layerObj.id)) {
+            this.map.moveLayer(layerObj.id);
+          }
+        }
+      });
+      Object.keys(activeLayersData).forEach((key) => {
+        layerObj = activeLayersData[key];
+        if(layerObj && layerObj['detail-view'] && !layerObj.layers && !layerObj.parent) {
+          if(this.map.getLayer(layerObj.id)) {
+            this.map.moveLayer(layerObj.id);
+          }
+        }
+      });
+    }
     // Re-order this.state.layersObj array
     const nextlayersObj = activeLayersData.filter(lo => lo.id !== nextLayerId);
     nextlayersObj.push(nextLayerObj);
@@ -215,7 +246,7 @@ class Map extends Component {
     this.setState({
       layersObj: nextlayersObj,
     });
-
+    
     return true;
   }
   
@@ -682,10 +713,14 @@ class Map extends Component {
   render() {
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
     const { detailView, layerObj, timeSeriesObj } = this.props;
-    const detailViewProps = this.props.showDetailView && timeSeriesObj && timeSeriesObj.data && timeSeriesObj.data.length && timeSeriesObj.data.find(d => {
-      return (d.properties||d)[layerObj.source.join[1]] === detailView.properties[layerObj.source.join[0]]
+    const detailViewProps = this.props.showDetailView && timeSeriesObj &&
+      timeSeriesObj.data && timeSeriesObj.data.length &&
+       timeSeriesObj.data.find(d => {
+      return (d.properties||d)[layerObj.source &&
+         layerObj.source.join[1]] === detailView.properties[layerObj.source && 
+          layerObj.source.join[0]]
     });
-    const showDetailView = timeSeriesObj ? detailViewProps && typeof detailViewProps !== undefined : this.props.showDetailView;
+    const showDetailView = timeSeriesObj && timeSeriesObj.layerId === this.props.primaryLayer ? detailViewProps && typeof detailViewProps !== undefined : this.props.showDetailView;
     let mapWidth = '100%';
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
