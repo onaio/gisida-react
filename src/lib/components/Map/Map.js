@@ -721,7 +721,9 @@ class Map extends Component {
       timeSeriesObj.data.length &&
       timeSeriesObj.data.find(d => (d.properties || d)[join[1]] === detailView.properties[join[0]]);
 
-    const showDetailViewBool = timeSeriesObj ? detailViewProps && typeof detailViewProps !== undefined : showDetailView;
+    const showDetailViewBool = timeSeriesObj &&
+     timeSeriesObj.layerId === this.props.primaryLayer ?
+      detailViewProps && typeof detailViewProps !== undefined : this.props.showDetailView;
     let mapWidth = '100%';
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
