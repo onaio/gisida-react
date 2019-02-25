@@ -20,6 +20,7 @@ const mapStateToProps = (state, ownProps) => {
     layersData: buildLayersObj(MAP.layers),
     MAP,
     mapId,
+    activeLayerIds: MAP.activeLayerIds,
     layers : MAP.layers,
     primaryLayer: MAP.primaryLayer,
     showFilterPanel: MAP.showFilterPanel,
@@ -32,6 +33,7 @@ export class Legend extends React.Component {
     super(props);
     this.state = {
       setPrimary: false,
+      primaryLayer: this.props.primaryLayer,
       timeSeriesObj: undefined,
     };
   }
@@ -75,6 +77,14 @@ componentWillReceiveProps(nextProps) {
      }
    }
  }
+
+ componentDidUpdate(prevProps, prevState) {
+   if (this.props.primaryLayer !== prevProps.primaryLayer && this.props.layers[this.props.primaryLayer].credit) {
+     this.setState({
+       primaryLayer: prevProps.primaryLayer
+     });
+   }
+ }
   onUpdatePrimaryLayer(e) {
     e.preventDefault();
     const { dispatch, mapId } = this.props;
@@ -84,7 +94,7 @@ componentWillReceiveProps(nextProps) {
   }
  
   render() {
-    const { layerObj, mapId, lastLayerSelected, timeSeriesObj, layers, primaryLayer, primarySubLayer } = this.props;
+    const { layerObj, mapId, lastLayerSelected, timeSeriesObj, layers, primaryLayer, primarySubLayer, activeLayerIds } = this.props;
     if (!layerObj) {
       return false;
     }
@@ -99,7 +109,20 @@ componentWillReceiveProps(nextProps) {
       const symbolLayer = (layer && layer.credit && layer.categories && layer.categories.shape && layer.type !== 'circle');
       const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
       const fillLayerWithBreaks = (layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle' && layer.categories && layer.categories.breaks === 'yes');
-      const activeLayerSelected = this.props.primaryLayer === layer.id ? 'primary' : '';
+      let activeLegendLayer;
+      let a = activeLayerIds.length;
+      while(a --) {
+        if (layers[activeLayerIds[a]] && layers[activeLayerIds[a]].credit) {
+          activeLegendLayer = activeLayerIds[a];
+          break;
+        }
+      }
+
+      if (this.state.primaryLayer !== primaryLayer && layers[primaryLayer].credit) {
+        activeLegendLayer = primaryLayer;
+      }
+
+      const activeLayerSelected = activeLegendLayer === layer.id  ? 'primary' : '';
 
       let background = [];
 
