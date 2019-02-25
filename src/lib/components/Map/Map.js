@@ -180,6 +180,10 @@ class Map extends Component {
               this.map.moveLayer(sublayers[s]);
             }
           }
+          if (activeLayersData.find(d => d['detail-view']) &&
+           this.map.getLayer(activeLayersData.find(d => d['detail-view']).id)) {
+            this.map.moveLayer(activeLayersData.find(d => d['detail-view']).id);
+          } 
         }
       }
     }
@@ -189,6 +193,7 @@ class Map extends Component {
     }
 
     // Move the selected primary layer to the top of the map layers
+    let layerObj;
     if (!nextLayerObj.layers && this.map.getLayer(nextLayerId)) {
       this.map.moveLayer(nextLayerId); 
       //move icon with detail view to top of the map layers wip
@@ -196,50 +201,25 @@ class Map extends Component {
         this.map.moveLayer(activeLayersData.find(d => d['detail-view']).id);
       } 
     }
-    let layerObj;
-    //Loop throught all active map layers
+    // Loop throught all active map layers
     for (let i = activeLayersData.length - 1; i >= 0; i -= 1) {
       layerObj = activeLayersData[i];
       // If 'layerObj' is not a fill OR the selected primary layer
-      if (layerObj.type !== 'fill' && layerObj.id !== nextLayerId && !layerObj.layers && !layerObj.parent) {
+      if (layerObj.type !== 'fill' && layerObj.id === nextLayerId && !layerObj.layers && !layerObj.parent) {
         // If 'layerObj' is not the same type as the selected
         if (layerObj.type !== nextLayerObj.type) {
           // Move 'layerObj' to the top of the map layers
           if (this.map.getLayer(layerObj.id)) {
             this.map.moveLayer(layerObj.id);
           }
+          if (activeLayersData.find(d => d['detail-view'])
+           && this.map.getLayer(activeLayersData.find(d => d['detail-view']).id)) {
+            this.map.moveLayer(activeLayersData.find(d => d['detail-view']).id);
+          } 
 
         }
       }
     }
-    /* Move layer in the : circle, symbol and detailview  based on what shoul move above others wip*/
-    if (activeLayersData) {
-      Object.keys(activeLayersData).forEach((key) => {
-        layerObj = activeLayersData[key];
-        if (layerObj.type === 'circle' && !layerObj.layers && !layerObj.parent) {
-          if (this.map.getLayer(layerObj.id)) {
-            this.map.moveLayer(layerObj.id);
-          }
-        }
-      });
-      Object.keys(activeLayersData).forEach((key)=> {
-        layerObj = activeLayersData[key];
-        if (layerObj.type === 'symbol' && !layerObj.layers && !layerObj.parent) {
-          if(this.map.getLayer(layerObj.id)) {
-            this.map.moveLayer(layerObj.id);
-          }
-        }
-      });
-      Object.keys(activeLayersData).forEach((key) => {
-        layerObj = activeLayersData[key];
-        if(layerObj && layerObj['detail-view'] && !layerObj.layers && !layerObj.parent) {
-          if(this.map.getLayer(layerObj.id)) {
-            this.map.moveLayer(layerObj.id);
-          }
-        }
-      });
-    }
-    // Re-order this.state.layersObj array
     const nextlayersObj = activeLayersData.filter(lo => lo.id !== nextLayerId);
     nextlayersObj.push(nextLayerObj);
 
