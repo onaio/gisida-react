@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
-import { detectIE, buildLayersObj, detailViewData } from '../../utils';
+import { detectIE, buildLayersObj, detailViewData, orderLayers } from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -170,6 +170,7 @@ class Map extends Component {
         if (nextLayerObj) break;
       }
     }
+    let map = this.map;
     if (nextLayerObj && nextLayerId) {
       const parentLayer = layers[nextLayerId];
       if (parentLayer.layers) {
@@ -180,10 +181,7 @@ class Map extends Component {
               this.map.moveLayer(sublayers[s]);
             }
           }
-          if (activeLayersData.find(d => d['detail-view']) &&
-           this.map.getLayer(activeLayersData.find(d => d['detail-view']).id)) {
-            this.map.moveLayer(activeLayersData.find(d => d['detail-view']).id);
-          } 
+          orderLayers(activeLayersData, map, nextLayerId);
         }
       }
     }
@@ -202,24 +200,27 @@ class Map extends Component {
       } 
     }
     // Loop throught all active map layers
-    for (let i = activeLayersData.length - 1; i >= 0; i -= 1) {
-      layerObj = activeLayersData[i];
-      // If 'layerObj' is not a fill OR the selected primary layer
-      if (layerObj.type !== 'fill' && layerObj.id === nextLayerId && !layerObj.layers && !layerObj.parent) {
-        // If 'layerObj' is not the same type as the selected
-        if (layerObj.type !== nextLayerObj.type) {
-          // Move 'layerObj' to the top of the map layers
-          if (this.map.getLayer(layerObj.id)) {
-            this.map.moveLayer(layerObj.id);
-          }
-          if (activeLayersData.find(d => d['detail-view'])
-           && this.map.getLayer(activeLayersData.find(d => d['detail-view']).id)) {
-            this.map.moveLayer(activeLayersData.find(d => d['detail-view']).id);
-          } 
+    // for (let i = activeLayersData.length - 1; i >= 0; i -= 1) {
+    //   layerObj = activeLayersData[i];
+      
+    //   // If 'layerObj' is not a fill OR the selected primary layer
+    //   if (layerObj.type !== 'fill' && layerObj.id === nextLayerId && !layerObj.layers && !layerObj.parent) {
+    //     // If 'layerObj' is not the same type as the selected
+    //     if (layerObj.type !== nextLayerObj.type) {
+    //       // Move 'layerObj' to the top of the map layers
+    //       if (this.map.getLayer(layerObj.id)) {
+    //         this.map.moveLayer(layerObj.id);
+    //       }
+    //       if (activeLayersData.find(d => d['detail-view'])
+    //        && this.map.getLayer(activeLayersData.find(d => d['detail-view']).id)) {
+    //         this.map.moveLayer(activeLayersData.find(d => d['detail-view']).id);
+    //       } 
 
-        }
-      }
-    }
+    //     }
+    //   }
+    // }
+    // Order active layers
+    orderLayers(activeLayersData, map, nextLayerId);
     const nextlayersObj = activeLayersData.filter(lo => lo.id !== nextLayerId);
     nextlayersObj.push(nextLayerObj);
 

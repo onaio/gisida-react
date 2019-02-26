@@ -172,3 +172,40 @@ export const parseColValue = (datum, col) => {
 export function deepCopy(x) {
   return JSON.parse(JSON.stringify(x));
 };
+
+export function orderLayers(activeLayersData, map, nextLayerId) {
+  let circles = activeLayersData.filter(d => d['type'] === 'circle'
+     && !d['detail-view']);
+     if (circles.length) {
+       Object.keys(circles).forEach((key) => {
+         if (map.getLayer(circles[key].id)) {
+           map.moveLayer(circles[key].id);
+         }
+       });
+       if (circles.find(c => c.id === nextLayerId) && map.getLayer(nextLayerId)) {
+          map.moveLayer(nextLayerId);
+       }
+     }
+    let symbols = activeLayersData.filter(d => d['type'] === 'symbol' && !d['detail-view']);
+    if (symbols.length) {
+      Object.keys(symbols).forEach((key) => {
+        if (map.getLayer(symbols[key].id)) {
+          map.moveLayer(symbols[key].id)
+        }
+      });
+      if (symbols.find(s => s.id === nextLayerId) && map.getLayer(nextLayerId)) {
+        map.moveLayer(nextLayerId);
+      }
+    }
+    let detailViewActive = activeLayersData.filter(d => d['detail-view']);
+    if (detailViewActive.length) {
+      Object.keys(detailViewActive).forEach((key) => {
+        if (map.getLayer(detailViewActive[key].id)) {
+          map.moveLayer(detailViewActive[key].id);
+        }
+      });
+      if (detailViewActive.find(d => d.id === nextLayerId) && map.getLayer(nextLayerId)) {
+        map.moveLayer(nextLayerId);
+      }
+    }
+}
