@@ -79,8 +79,10 @@ componentWillReceiveProps(nextProps) {
  }
 
  componentDidUpdate(prevProps, prevState) {
-   if (this.props.primaryLayer !== prevProps.primaryLayer && this.props.layers[this.props.primaryLayer].credit) {
-     this.setState({
+   if (this.props.primaryLayer !== prevProps.primaryLayer && this.props.layers &&
+    this.props.layers[this.props.primaryLayer] &&
+     this.props.layers[this.props.primaryLayer].credit) {
+      this.setState({
        primaryLayer: prevProps.primaryLayer
      });
    }
