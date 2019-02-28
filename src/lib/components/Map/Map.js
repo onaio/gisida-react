@@ -191,7 +191,7 @@ class Map extends Component {
     }
 
     // Move the selected primary layer to the top of the map layers
-    let layerObj;
+    // let layerObj;
     if (!nextLayerObj.layers && this.map.getLayer(nextLayerId)) {
       this.map.moveLayer(nextLayerId); 
       //move icon with detail view to top of the map layers wip
@@ -220,6 +220,7 @@ class Map extends Component {
     //   }
     // }
     // Order active layers
+
     orderLayers(activeLayersData, map, nextLayerId);
     const nextlayersObj = activeLayersData.filter(lo => lo.id !== nextLayerId);
     nextlayersObj.push(nextLayerObj);
@@ -346,7 +347,7 @@ class Map extends Component {
              $(`.marker-chart-${layer.id}-${mapId}`).remove();
           }
         });
-        sortLayers(this.map, layers);
+        sortLayers(this.map, layers, (primaryLayer || activeLayerId));
       }
 
       if (this.props.MAP.primaryLayer !== primaryLayer) {
