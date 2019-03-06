@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Actions, SupAuth, history } from 'gisida';
+import { Actions, SupAuth, history, SUPERSET } from 'gisida';
 
 const { defaultUnSupAuthZ:deAuthZ } = SupAuth;
 
@@ -20,6 +20,9 @@ class Callback extends Component {
         APP: { ...nextProps.global.APP },
        }, () => {
         this.authorizeUser(this.state.APP);
+        if (this.state.APP.supersetAuth) {
+          this.authorizeSupersetUser(this.state.APP);
+        }
       });
     }
   }
@@ -37,6 +40,23 @@ class Callback extends Component {
     const user = await SupAuth.getUser(accessToken, dispatch);
     dispatch(Actions.receiveLogin(user));
     return this.history.push('/');
+  }
+
+  async authorizeSupersetUser(APP) {
+    const { dispatch } = this.props;
+    const accessToken = this.getAccessToken();
+
+    return SUPERSET.authZ({
+      token: accessToken,
+      base: APP.supersetBase || 'http://localhost:8088/'
+    }, (res) => {
+      // todo - update AUTH store with superset authZ status
+      if (res.status === 200) {
+        // console.log('SUPERSET AUTHd!!!')
+      } else {
+        // console.warn('SUPERSET NOT AUTHd!!!')
+      }
+    });
   }
 
   getParameterByName(name) {
