@@ -1,14 +1,15 @@
 import React from 'react';
 import {
+  Switch as RSwitch,
   Router as RRouter,
   Redirect as RRedirect,
-  Link as RLink
+  Link as RLink,
+  withRouter,
 } from 'react-router-dom';
 import { history } from 'gisida';
 import PrivateRoute from './privateRoute';
 import PublicRoute from './publicRoute';
 
-// Router Builder Functions
 const Redirect = (to) => <RRedirect to={to || '/'} />;
 const Link = (to) => <RLink to={to || '/'} />;
 const Wrapper = (history) => {
@@ -42,6 +43,8 @@ class Router {
     this.PublicRoute = PublicRoute;
     this.Redirect = Redirect;
     this.Link = Link;
+    this.Switch = RSwitch;
+    this.withRouter = withRouter;
 
     // Define this as Singleton Instance
     this.instance = this;
