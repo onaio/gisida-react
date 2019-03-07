@@ -52,9 +52,9 @@ class Callback extends Component {
     }, (res) => {
       // todo - update AUTH store with superset authZ status
       if (res.status === 200) {
-        // console.log('SUPERSET AUTHd!!!')
+        console.log('SUPERSET AUTHd!!!')
       } else {
-        // console.warn('SUPERSET NOT AUTHd!!!')
+        console.warn('SUPERSET NOT AUTHd!!!', res)
       }
     });
   }
