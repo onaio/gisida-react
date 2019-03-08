@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
-import { detectIE, buildLayersObj, detailViewData } from '../../utils';
+import { detectIE, buildLayersObj, detailViewData, orderLayers } from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -48,6 +48,12 @@ const isIE = detectIE();
 window.maps = [];
 
 class Map extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      layersObj: this.props.layersObj,
+    }
+  }
   initMap(accessToken, mapConfig, mapId) {
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;
@@ -164,6 +170,7 @@ class Map extends Component {
         if (nextLayerObj) break;
       }
     }
+    let map = this.map;
     if (nextLayerObj && nextLayerId) {
       const parentLayer = layers[nextLayerId];
       if (parentLayer.layers) {
@@ -174,6 +181,7 @@ class Map extends Component {
               this.map.moveLayer(sublayers[s]);
             }
           }
+          orderLayers(activeLayersData, map, nextLayerId);
         }
       }
     }
@@ -183,29 +191,44 @@ class Map extends Component {
     }
 
     // Move the selected primary layer to the top of the map layers
+    // let layerObj;
     if (!nextLayerObj.layers && this.map.getLayer(nextLayerId)) {
-      this.map.moveLayer(nextLayerId);
+      this.map.moveLayer(nextLayerId); 
+      //move icon with detail view to top of the map layers wip
+      if (activeLayersData.find(d => d['detail-view']) && this.map.getLayer(activeLayersData.find(d => d['detail-view']).id)) {
+        this.map.moveLayer(activeLayersData.find(d => d['detail-view']).id);
+      } 
     }
-    let layerObj;
     // Loop throught all active map layers
-    for (let i = activeLayersData.length - 1; i >= 0; i -= 1) {
-      layerObj = activeLayersData[i];
-      // If 'layerObj' is not a fill OR the selected primary layer
-      if (layerObj.type !== 'fill' && layerObj.id !== nextLayerId && !layerObj.layers && !layerObj.parent) {
-        // If 'layerObj' is not the same type as the selected
-        if (layerObj.type !== nextLayerObj.type) {
-          // Move 'layerObj' to the top of the map layers
-          if (this.map.getLayer(layerObj.id)) {
-            this.map.moveLayer(layerObj.id);
-          }
-        }
-      }
-    }
+    // for (let i = activeLayersData.length - 1; i >= 0; i -= 1) {
+    //   layerObj = activeLayersData[i];
+      
+    //   // If 'layerObj' is not a fill OR the selected primary layer
+    //   if (layerObj.type !== 'fill' && layerObj.id === nextLayerId && !layerObj.layers && !layerObj.parent) {
+    //     // If 'layerObj' is not the same type as the selected
+    //     if (layerObj.type !== nextLayerObj.type) {
+    //       // Move 'layerObj' to the top of the map layers
+    //       if (this.map.getLayer(layerObj.id)) {
+    //         this.map.moveLayer(layerObj.id);
+    //       }
+    //       if (activeLayersData.find(d => d['detail-view'])
+    //        && this.map.getLayer(activeLayersData.find(d => d['detail-view']).id)) {
+    //         this.map.moveLayer(activeLayersData.find(d => d['detail-view']).id);
+    //       } 
 
-    // Re-order this.state.layersObj array
+    //     }
+    //   }
+    // }
+    // Order active layers
+
+    orderLayers(activeLayersData, map, nextLayerId);
     const nextlayersObj = activeLayersData.filter(lo => lo.id !== nextLayerId);
     nextlayersObj.push(nextLayerObj);
 
+    this.setState({
+      layersObj: nextlayersObj,
+    });
+    
     return true;
   }
   
@@ -324,7 +347,7 @@ class Map extends Component {
              $(`.marker-chart-${layer.id}-${mapId}`).remove();
           }
         });
-        sortLayers(this.map, layers);
+        sortLayers(this.map, layers, (primaryLayer || activeLayerId));
       }
 
       if (this.props.MAP.primaryLayer !== primaryLayer) {
@@ -673,14 +696,16 @@ class Map extends Component {
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
     const { detailView, layerObj, timeSeriesObj, showDetailView } = this.props;
     const join = layerObj && ((layerObj['detail-view'] &&
-      layerObj['detail-view'].join) || layerObj.source.join);
-    let detailViewProps = showDetailView &&
+      layerObj['detail-view'].join) || (layerObj.source && layerObj.source.join));
+    let detailViewProps = join && showDetailView &&
       timeSeriesObj &&
       timeSeriesObj.data &&
       timeSeriesObj.data.length &&
       timeSeriesObj.data.find(d => (d.properties || d)[join[1]] === detailView.properties[join[0]]);
 
-    const showDetailViewBool = timeSeriesObj ? detailViewProps && typeof detailViewProps !== undefined : showDetailView;
+    const showDetailViewBool = timeSeriesObj &&
+     timeSeriesObj.layerId === this.props.primaryLayer ?
+      detailViewProps && typeof detailViewProps !== undefined : this.props.showDetailView;
     let mapWidth = '100%';
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';

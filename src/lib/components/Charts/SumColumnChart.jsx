@@ -21,9 +21,9 @@ class SumColumnChart extends React.Component {
     // deifine which break each datum falls into
     let dataBreaks;
     if (breaks) {
-      dataBreaks = layerData.map((d) => {
+      dataBreaks = (layerData.features || layerData).map((d) => {
         for (let b = 0; b < breaks.length; b += 1) {
-          parsedVal = parseColValue(d, column);
+          parsedVal = parseColValue((d.properties || d), column);
           if (parsedVal <= Number(breaks[b])) return b;
         }
         return breaks.length - 1;
@@ -33,8 +33,9 @@ class SumColumnChart extends React.Component {
     // Push the data into categorical buckets
     catCol = chartSpec.level;
     if (catCol === 'district_id' && locations && Object.keys(locations).length) mapCol = true;
-    for (i; i < layerData.length; i += 1) {
-      datum = layerData[i];
+    const activeData = layerData.features || layerData;
+    for (i; i < activeData.length; i += 1) {
+      datum = (activeData[i].properties || activeData[i]);
       if (!dataMap[datum[catCol]]) {
         dataMap[datum[catCol]] = {
           sum: 0,

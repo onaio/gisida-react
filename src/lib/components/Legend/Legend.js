@@ -20,6 +20,7 @@ const mapStateToProps = (state, ownProps) => {
     layersData: buildLayersObj(MAP.layers),
     MAP,
     mapId,
+    activeLayerIds: MAP.activeLayerIds,
     layers : MAP.layers,
     primaryLayer: MAP.primaryLayer,
     showFilterPanel: MAP.showFilterPanel,
@@ -32,6 +33,7 @@ export class Legend extends React.Component {
     super(props);
     this.state = {
       setPrimary: false,
+      primaryLayer: this.props.primaryLayer,
       timeSeriesObj: undefined,
     };
   }
@@ -75,6 +77,16 @@ componentWillReceiveProps(nextProps) {
      }
    }
  }
+
+ componentDidUpdate(prevProps, prevState) {
+   if (this.props.primaryLayer !== prevProps.primaryLayer && this.props.layers &&
+    this.props.layers[this.props.primaryLayer] &&
+     this.props.layers[this.props.primaryLayer].credit) {
+      this.setState({
+       primaryLayer: prevProps.primaryLayer
+     });
+   }
+ }
   onUpdatePrimaryLayer(e) {
     e.preventDefault();
     const { dispatch, mapId } = this.props;
@@ -84,7 +96,7 @@ componentWillReceiveProps(nextProps) {
   }
  
   render() {
-    const { layerObj, mapId, lastLayerSelected, timeSeriesObj, layers, primaryLayer, primarySubLayer } = this.props;
+    const { layerObj, mapId, lastLayerSelected, timeSeriesObj, layers, primaryLayer, primarySubLayer, activeLayerIds } = this.props;
     if (!layerObj) {
       return false;
     }
@@ -99,7 +111,20 @@ componentWillReceiveProps(nextProps) {
       const symbolLayer = (layer && layer.credit && layer.categories && layer.categories.shape && layer.type !== 'circle');
       const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
       const fillLayerWithBreaks = (layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle' && layer.categories && layer.categories.breaks === 'yes');
-      const activeLayerSelected = this.props.primaryLayer === layer.id ? 'primary' : '';
+      let activeLegendLayer;
+      let a = activeLayerIds.length;
+      while(a --) {
+        if (layers[activeLayerIds[a]] && layers[activeLayerIds[a]].credit) {
+          activeLegendLayer = activeLayerIds[a];
+          break;
+        }
+      }
+
+      if (this.state.primaryLayer !== primaryLayer && layers[primaryLayer].credit) {
+        activeLegendLayer = primaryLayer;
+      }
+
+      const activeLayerSelected = activeLegendLayer === layer.id  ? 'primary' : '';
 
       let background = [];
 
@@ -135,16 +160,10 @@ componentWillReceiveProps(nextProps) {
           });
         }
       } else if (circleLayerType && layer.breaks && layer.stopsData && layer.styleSpec && layer.styleSpec.paint) {
-        const stopVals = [];
-        layer.stopsData.forEach((s) => {
-          stopVals.push(s[1]);
-        });
+        const breaks = [...new Set(layer.breaks)];
+        const colors = [...new Set(layer.colorStops.map(d => d[1]))]
 
-        layer.styleSpec.paint['circle-radius'].stops.forEach((s) => {
-          stopVals.push(s[1]);
-        });
-
-        uniqueStops = [...new Set(stopVals)].sort((a, b) => a - b);
+        uniqueStops = [...new Set(layer.stopsData.map(d => d[1]))];
 
         uniqueStops.forEach((s, i) => {
           quantiles.push((
@@ -155,14 +174,14 @@ componentWillReceiveProps(nextProps) {
                 style={
                   {
                     background: Array.isArray(layer.categories.color) ? layer.categories.color[i]
-                      : layer.stops[4][i],
+                      : colors[i],
                     width: `${s * 2}px`,
                     height: `${s * 2}px`,
                     margin: `0px ${i + 2}px`
                   }
                 }
               ></span>
-              <p>{layer.breaks[i]}</p>
+              <p>{breaks[i]}</p>
             </span>
           ));
         });
@@ -257,7 +276,7 @@ componentWillReceiveProps(nextProps) {
            [...new Set(timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(d => d[1]))] :
            layerObj && layerObj.stops && layerObj.stops[0][0] ?
             [...new Set(layerObj.stops[0][0].map(d => d[1]))] :
-            layer.categories.color;
+            [...new Set(layer.colorStops.map(d => d[1]))];
 
           activeColors.forEach((color, index, activeColors) => {
             const stopsIndex = layerStops ? layerStops.indexOf(color) : -1;
@@ -332,7 +351,7 @@ componentWillReceiveProps(nextProps) {
         }
         continue;
       }
-      if (circleLayerType) {
+      if (circleLayerType && !fillLayerNoBreaks) {
         legendItems.unshift((
           <div
             id={`legend-${layer.id}-${mapId}`}
@@ -433,45 +452,61 @@ componentWillReceiveProps(nextProps) {
         ));
       } else if (fillLayerWithBreaks && layer.stops && !layer.parent) {
         const { stopsData, breaks} = layer;
-        const colorLegend = [...new Set(stopsData.map(stop => stop[1]))];
-        const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
-        const activeColors =(timeSeriesObj && timeSeriesObj.newColors &&
-          layerObj.aggregate && layerObj.aggregate.timeseries) || (layers 
-            && layers[primaryLayer] && layers[primaryLayer].layers) ? 
-            (timeSeriesObj && timeSeriesObj.newColors) || (layerObj && layerObj.categories 
-            && layerObj.categories.color) : this.state && this.state.timeSeriesObj &&
-             layerObj && layerObj.aggregate && layerObj.aggregate.timeseries ? 
-              this.state.timeSeriesObj.newColors : (layerObj && layerObj.stops) ?
-               [...new Set(layerObj.stops[0][0].map(d => d[1]))]
+          const colorLegend = layer && layer.stopsData && [...new Set(stopsData.map(stop => stop[1]))];
+          const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
+
+          const activeColors =(timeSeriesObj && timeSeriesObj.newColors &&
+             layerObj.aggregate && layerObj.aggregate.timeseries) ? 
+              timeSeriesObj.newColors : this.state && this.state.timeSeriesObj &&
+                layerObj && layerObj.aggregate && layerObj.aggregate.timeseries ? 
+                this.state.timeSeriesObj.newColors : (layerObj && layerObj.stops &&
+                   layerObj.stops[0] && layerObj.stops[0][0]) ?
+                [...new Set(layerObj.stops[0][0].map(d => d[1]))]
                 : layer.colors;
-          if (colorLegend && colorLegend.includes('transparent') &&
-          !(activeColors).includes('transparent')) {
+           
+          if (colorLegend && colorLegend.includes('transparent') && !(activeColors).includes('transparent')) {
             activeColors.splice(0, 0, 'transparent');
             breaks.splice(1, 0, breaks[0]);
           }
+          let lastVal;
+          const stopsBreak = (timeSeriesObj && timeSeriesObj.newBreaks && layerObj.aggregate &&
+            layerObj.aggregate.timeseries) ? 
+              timeSeriesObj.newBreaks : (layers[primaryLayer].layers) ?
+              (layerObj && layerObj.categories && layerObj.categories.breaks) :
+               layer.breaks;
+          
+          const lastBreaks = Math.max(...stopsBreak);
+          const layerStops = (timeSeriesObj && timeSeriesObj.stops && 
+            layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) ? 
+           [...new Set(timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(d => d[1]))] :
+           layerObj && layerObj.stops && layerObj.stops[0][0] ?
+            [...new Set(layerObj.stops[0][0].map(d => d[1]))] :
+            [...new Set(layer.colorStops.map(d => d[1]))];
 
-        let lastVal;
-        const stopsBreak = (timeSeriesObj && timeSeriesObj.newBreaks && layerObj.aggregate &&
-          layerObj.aggregate.timeseries)
-          ? timeSeriesObj.newBreaks : layerObj && layerObj.stops 
-          && layerObj.stops[3] ? layerObj.stops[3] : layer.color ;
-        activeColors.forEach((color, index) => {
-          const stopsIndex = layerObj.stops ? layerObj.stops[4].indexOf(color) : -1;
+          activeColors.forEach((color, index, activeColors) => {
+            const stopsIndex = layerStops ? layerStops.indexOf(color) : -1;
+            if (stopsIndex !== -1) {
+              const firstVal = stopsIndex ? stopsBreak[stopsIndex - 1] : 0;
+            
+              if (Object.is(activeColors.length - 1, index)) {
+                // execute last item logic
+                lastVal = lastBreaks;
 
-          if (stopsIndex !== -1) {
-            const firstVal = stopsIndex ? stopsBreak[stopsIndex - 1] : 0;
-            lastVal = stopsBreak[stopsIndex];
-            background.push((
-              <li
-                key={index}
-                className={`background-block-${layer.id}-${mapId}`}
-                data-tooltip={`${typeof formatNum(firstVal, 1) === 'undefined' ? 0 : formatNum(firstVal, 1)}-${typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)}${legendSuffix}`}
-                style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / activeColors.length) + '%' }}
-              >
-              </li>
-            ));
-          }
-        });
+
+              } else {
+              lastVal = stopsBreak[stopsIndex];
+              }
+              background.push((
+                <li
+                  key={index}
+                  className={`background-block-${layer.id}-${mapId}`}
+                  data-tooltip={`${(typeof formatNum(firstVal, 1) === 'undefined' ? 0 : formatNum(firstVal, 1))}-${(typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1))}${legendSuffix}`}
+                  style={{ background: hexToRgbA(color, 0.9).toString(), width: (100 / activeColors.length) + '%' }}
+                >
+                </li>
+              ));
+            }
+          });
 
         legendItems.unshift((
           <div
