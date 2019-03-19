@@ -40,6 +40,7 @@ const mapStateToProps = (state, ownProps) => {
     showDetailView: (detailView && detailView.model && detailView.model.UID),
     showFilterPanel: !!MAP.showFilterPanel,
     activeLayers,
+    handlers: ownProps.handlers,
   }
 }
 
@@ -97,11 +98,25 @@ class Map extends Component {
       this.map.on('zoom', this.handleLabelsOnMapZoom.bind(this))
 
       // Dispach map rendered to indicate map was rendered
-      this.props.dispatch(Actions.mapRendered(mapId));
+      this.props.dispatch(Actions.mapRendered(mapId, true));
     }
   }
 
   addMouseEvents(mapId) {
+    const { handlers } = this.props;
+    if (handlers) {
+      let handler;
+      Object.keys(handlers).forEach(event => {
+        if (Array.isArray(handlers[event])) {
+          for (let c = 0; c < handlers[event].length; c += 1) {
+            handler = handlers[event][c]
+            this.map.on(event, handler.method);
+          }
+        } else {
+          // handle other events
+        }
+      })
+    }
     addPopUp(mapId, this.map, this.props.dispatch);
     // this.addMapClickEvents()
     // this.addMouseMoveEvents()
@@ -279,7 +294,7 @@ class Map extends Component {
       });
 
       // Zoom to current region (center and zoom)
-      regions.forEach((region) => {
+      regions && regions.forEach((region) => {
         if (region.current && this.props.MAP.currentRegion !== currentRegion) {
           this.map.easeTo({
             center: region.center,
@@ -421,6 +436,14 @@ class Map extends Component {
         this.buildFilters();
       }
     }
+  }
+
+  componentWillUnmount() {
+    const { dispatch, mapId } = this.props;
+    const index = window.maps.map(m => m['_container'].id).indexOf(mapId);
+    window.maps.splice(index, 1);
+    dispatch(Actions.mapRendered(mapId, false));
+    dispatch(Actions.mapLoaded(mapId, false));
   }
   
 
