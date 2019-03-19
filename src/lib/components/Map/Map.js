@@ -338,7 +338,9 @@ class Map extends Component {
             this.map.removeSource(layer.id);
             // 2) dispatch action to set reloadLayerId to null
             this.props.dispatch(Actions.layerReloaded(mapId));
-            const originalLayer = nextProps.FILTER[layer.id].isClear ? nextProps.MAP.oldLayerObjs[layer.id] : layer;
+            const originalLayer = nextProps.FILTER &&
+              nextProps.FILTER[layer.id] &&
+              nextProps.FILTER[layer.id].isClear ? nextProps.MAP.oldLayerObjs[layer.id] : layer;
             prepareLayer(mapId, originalLayer, this.props.dispatch, filterOptions, doUpdateTsLayer);
           }
           // Change visibility if layer is already on map
