@@ -104,25 +104,23 @@ class Map extends Component {
 
   addMouseEvents(mapId) {
     const { handlers } = this.props;
-    if (handlers) {
-      let handler;
-      Object.keys(handlers).forEach(event => {
-        if (Array.isArray(handlers[event])) {
-          for (let c = 0; c < handlers[event].length; c += 1) {
-            handler = handlers[event][c]
-            this.map.on(event, handler.method);
-          }
-        } else {
-          // handle other events
-        }
-      })
+    if (handlers && Array.isArray(handlers)) {
+      // let handler;
+
+      for (let c = 0; c < handlers.length; c += 1) {
+        this.map.on(handlers[c].type, handlers[c].method);
+      }
     }
+
     addPopUp(mapId, this.map, this.props.dispatch);
     // this.addMapClickEvents()
     // this.addMouseMoveEvents()
     // etc
     this.map.on('mousemove', (e) => {
       const { activeLayers, layerObj } = this.props;
+      if (!layerObj) {
+        return false;
+      }
       const features = this.map.queryRenderedFeatures(e.point, {
         layers: activeLayers.filter(i => this.map.getLayer(i) !== undefined)
       });
