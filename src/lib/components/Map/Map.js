@@ -103,7 +103,7 @@ class Map extends Component {
   }
 
   addMouseEvents(mapId) {
-    const { handlers } = this.props;
+    const { handlers, APP } = this.props;
     if (handlers && Array.isArray(handlers)) {
       // let handler;
 
@@ -112,27 +112,38 @@ class Map extends Component {
       }
     }
 
-    addPopUp(mapId, this.map, this.props.dispatch);
-    // this.addMapClickEvents()
-    // this.addMouseMoveEvents()
-    // etc
-    this.map.on('mousemove', (e) => {
-      const { activeLayers, layerObj } = this.props;
-      if (!layerObj) {
-        return false;
-      }
-      const features = this.map.queryRenderedFeatures(e.point, {
-        layers: activeLayers.filter(i => this.map.getLayer(i) !== undefined)
+    if (APP.disableDefaultMapListeners) {
+      return false
+    }
+
+
+
+    if (!APP.disableTooltip) {
+      addPopUp(mapId, this.map, this.props.dispatch);
+      // this.addMapClickEvents()
+      // this.addMouseMoveEvents()
+      // etc
+      this.map.on('mousemove', (e) => {
+        const { activeLayers, layerObj } = this.props;
+        if (!layerObj) {
+          return false;
+        }
+        const features = this.map.queryRenderedFeatures(e.point, {
+          layers: activeLayers.filter(i => this.map.getLayer(i) !== undefined)
+        });
+        const feature = features.find(f => f.layer.id === layerObj.id);
+        if (!feature) {
+          return false;
+        }
+        this.map.getCanvas().style.cursor = layerObj['detail-view']
+          ? 'pointer' : '';
+        return true;
       });
-      const feature = features.find(f => f.layer.id === layerObj.id);
-      if (!feature) {
-        return false;
-      }
-      this.map.getCanvas().style.cursor = layerObj['detail-view']
-        ? 'pointer' : '';
-      return true;
-    });
-    this.map.on('click', this.onFeatureClick.bind(this));
+    }
+
+    if (!APP.disableDefaultFeatureClick) {
+      this.map.on('click', this.onFeatureClick.bind(this));
+    }
   }
 
   componentWillUpdate (nextProps, nextState) {
