@@ -6,7 +6,7 @@
   "bugs": {
     "url": "https://github.com/onaio/gisida-react/issues"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "Ona Systems Inc.",
   "main": "build/gisida_react.js",
   "repository": {
