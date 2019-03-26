@@ -105,10 +105,23 @@ class Map extends Component {
   addMouseEvents(mapId) {
     const { handlers, APP } = this.props;
     if (handlers && Array.isArray(handlers)) {
-      // let handler;
-
+      let handler;
+      let sublayer;
       for (let c = 0; c < handlers.length; c += 1) {
-        this.map.on(handlers[c].type, handlers[c].method);
+        handler = handlers[c];
+        if (handler.layer) {
+          if (handler.layer.layers) {
+            // If it is a grouped layer loop through the layer.layers array
+            for (let l = 0; l < handler.layer.layers.length; l += 1) {
+              sublayer = handler.layer.layers[l];
+              this.map.on(handler.type, sublayer, handler.method);
+            }
+          } else {
+            this.map.on(handler.type, handler.layer, handler.method);
+          }
+        } else {
+          this.map.on(handler.type, handler.method);
+        }
       }
     }
 
