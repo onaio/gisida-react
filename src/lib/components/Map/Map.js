@@ -388,28 +388,17 @@ class Map extends Component {
         this.updateTimeseriesLayers();
       }
 
-      // Update Labels
-      this.removeLabels();
-      const subLayerWithLabels = layersObj && layersObj.find((l) => {
-        if (layerObj && layerObj.layers) {
-          return l.parent === primaryLayer && l.labels && l.labels.labels
-        }
-        return null;
-      });
-      const activeObj = subLayerWithLabels || layerObj;
-      if (activeObj &&
-        ((layerObj.id === primaryLayer) || (subLayerWithLabels && (subLayerWithLabels.parent === primaryLayer))) &&
-        activeObj.labels &&
-        activeObj.labels.labels) {
-        this.addLabels(activeObj, this.props.timeseries);
-        const minZoom = activeObj.labels.minZoom || activeObj.labels.minzoom || 0;
-        const maxZoom = activeObj.labels.maxZoom || activeObj.labels.maxzoom || 22;
-        const currentZoom = this.map.getZoom();
-        if (currentZoom < minZoom || currentZoom > maxZoom) {
-          this.removeLabels(`label-${activeObj.id}`);
-        }
+      // Update Labels and handle labels visibility at different
+      // zoom levels
+      if (layerObj && (layerObj.labels
+        || (this.props.MAP
+          && this.props.MAP.defaultLayers.length
+          && this.props.MAP.defaultLayers.indexOf(layerObj.id) > -1))) {
+        this.removeLabels();
+        this.handleLabelsOnMapZoom();
       }
     }
+
     // Update Layer Filters
     if (this.map && this.props.layerObj && this.map.getLayer(this.props.layerObj.id)) {
       const { FILTER, primaryLayer } = this.props;
@@ -675,16 +664,17 @@ class Map extends Component {
     let maxZoom;
     let zoom = this.map.getZoom();
     let isRendered;
+    let activeId;
     if (this.props && this.props.layersObj) {
       this.props.layersObj.forEach(layerObj => {
         if (layerObj.labels) {
           minZoom = layerObj.labels.minZoom || layerObj.labels.minzoom || 0;
           maxZoom = layerObj.labels.maxZoom || layerObj.labels.maxzoom || 22;
           isRendered = (document.getElementsByClassName(`label-${layerObj.id}`)).length;
-
-          if (zoom < minZoom || zoom > maxZoom) {
+          activeId = layerObj.parent || layerObj.id;
+          if ((zoom < minZoom || zoom > maxZoom)) {
             this.removeLabels(`label-${layerObj.id}`);
-          } else if (!isRendered && (layerObj.id === this.props.primaryLayer)) {
+          } else if (!isRendered && (activeId === this.props.primaryLayer)) {
             this.addLabels(layerObj);
           }
         }
