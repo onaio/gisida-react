@@ -117,7 +117,7 @@ class Map extends Component {
               this.map.on(handler.type, sublayer, handler.method);
             }
           } else {
-            this.map.on(handler.type, handler.layer, handler.method);
+            this.map.on(handler.type, handler.layer.id, handler.method);
           }
         } else {
           this.map.on(handler.type, handler.method);
