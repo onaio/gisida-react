@@ -391,6 +391,7 @@ class Map extends Component {
       // Update Labels and handle labels visibility at different
       // zoom levels
       if (layerObj && (layerObj.labels
+        || layerObj.layers
         || (this.props.MAP
           && this.props.MAP.defaultLayers.length
           && this.props.MAP.defaultLayers.indexOf(layerObj.id) > -1))) {
