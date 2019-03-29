@@ -29,7 +29,7 @@ export class Layer extends Component {
     }
     this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
     const {center, zoom } = lngLat(LOC, APP);
-    if (layer.visible) {
+    if (layer.zoomOnToggle && layer.visible) {
         window.maps.forEach((e) => {
           e.easeTo({
             center,
