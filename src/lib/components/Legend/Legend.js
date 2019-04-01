@@ -174,7 +174,7 @@ componentWillReceiveProps(nextProps) {
                 style={
                   {
                     background: Array.isArray(layer.categories.color) ? layer.categories.color[i]
-                      : colors[i],
+                      : (colors[i] || colors[0]),
                     width: `${s * 2}px`,
                     height: `${s * 2}px`,
                     margin: `0px ${i + 2}px`
