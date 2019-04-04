@@ -126,7 +126,7 @@ class TimeSeriesSlider extends React.Component {
   }
 
   render() {
-    return this.props.timeSeriesObj ? (
+    return ((this.props.timeSeriesObj) && (this.state && this.state.periods.length > 1)) ? (
       <div
         className="series"
         style={{ right: '50px'}}>
