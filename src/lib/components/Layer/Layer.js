@@ -50,7 +50,7 @@ export class Layer extends Component {
       return null;
     }
     return (
-      <li className="layer" title={layer.credit ? `Credit: ${layer.credit}` : ''}>
+      <li className="layer" title={layer['menu-credit'] ? `Credit: ${layer['menu-credit']}` : ''}>
         <input
           id={`${layer.id}-${mapId}`}
           type="checkbox"
