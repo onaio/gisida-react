@@ -88,7 +88,9 @@ componentWillReceiveProps(nextProps) {
    }
  }
   onUpdatePrimaryLayer(e) {
-    e.preventDefault();
+    if (e.target.getAttribute('data-credit') !== 'credit') {
+      e.preventDefault();
+    }
     const { dispatch, mapId } = this.props;
     const targetLayer = e.currentTarget.getAttribute('data-layer');
     // dispatch primary layer id
@@ -203,7 +205,7 @@ componentWillReceiveProps(nextProps) {
               <div className="legend-symbols">
                 {quantiles}
               </div>
-              <span>{layer.credit}</span>
+              <span>{Parser(layer.credit)}</span>
             </div>);
         }
         if (fillLayerNoBreaks && !layer.parent) {
@@ -366,7 +368,7 @@ componentWillReceiveProps(nextProps) {
             <div className="legend-symbols">
               {quantiles}
             </div>
-            <span>{layer.credit}</span>
+            <span>{Parser(layer.credit)}</span>
           </div>
         ));
       } else if (symbolLayer) {

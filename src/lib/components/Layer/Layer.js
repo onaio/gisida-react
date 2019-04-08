@@ -58,7 +58,7 @@ export class Layer extends Component {
           onChange={e => this.onLayerToggle(layer)}
           checked={!!layer.visible}
         />
-        <label htmlFor={`${layer.id}-${mapId}`} title={layer.credit ? `Credit: ${layer.credit}` : ''}>{layer.label}</label>
+        <label htmlFor={`${layer.id}-${mapId}`}>{layer.label}</label>
       </li>
     );
   }
