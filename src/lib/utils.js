@@ -187,8 +187,7 @@ export function orderLayers(activeLayersData, map, nextLayerId) {
        }
      }
 
-  let circles = activeLayersData.filter(d => d['type'] === 'circle'
-     && !d['detail-view']);
+  let circles = activeLayersData.filter(d => d['type'] === 'circle');
      if (circles.length) {
        Object.keys(circles).forEach((key) => {
          if (map.getLayer(circles[key].id)) {
@@ -200,7 +199,7 @@ export function orderLayers(activeLayersData, map, nextLayerId) {
        }
      }
 
-    let symbols = activeLayersData.filter(d => d['type'] === 'symbol' && !d['detail-view']);
+    let symbols = activeLayersData.filter(d => d['type'] === 'symbol');
     if (symbols.length) {
       Object.keys(symbols).forEach((key) => {
         if (map.getLayer(symbols[key].id)) {
@@ -212,8 +211,7 @@ export function orderLayers(activeLayersData, map, nextLayerId) {
       }
     }
 
-    let line = activeLayersData.filter(d => d['type'] === 'line'
-     && !d['detail-view']);
+    let line = activeLayersData.filter(d => d['type'] === 'line');
      if (line.length) {
        Object.keys(line).forEach((key) => {
          if (map.getLayer(line[key].id)) {
