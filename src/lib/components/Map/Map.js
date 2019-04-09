@@ -122,12 +122,12 @@ class Map extends Component {
     this.map.on('click', this.onFeatureClick.bind(this));
   }
 
-  componentWillUpdate (nextProps, nextState) {
-    if((this.props && this.props.primaryLayer) !== 
-        (nextProps && nextProps.primaryLayer)) {
-      this.updateTimeseriesLayers(nextProps);
-    }
-  }
+  // componentWillUpdate (nextProps, nextState) {
+  //   if((this.props && this.props.primaryLayer) !== 
+  //       (nextProps && nextProps.primaryLayer)) {
+  //     this.updateTimeseriesLayers(nextProps);
+  //   }
+  // }
   onFeatureClick(e) {
     const activeLayers = this.props.layersObj.map(l => l.id)
     const { mapId } = this.props;

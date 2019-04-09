@@ -236,5 +236,17 @@ export function orderLayers(activeLayersData, map, nextLayerId) {
         map.moveLayer(nextLayerId);
       }
     }
+    let isLabelActive = activeLayersData.filter(d => d.isLabel);
+
+    if (isLabelActive.length) {
+      Object.keys(isLabelActive).forEach((key) => {
+        if (map.getLayer(isLabelActive[key].id)) {
+          map.moveLayer(isLabelActive[key].id);
+        }
+      });
+      if (isLabelActive.find(d => d.id === nextLayerId) && map.getLayer(nextLayerId)) {
+        map.moveLayer(nextLayerId);
+      }
+    }
 
 }
