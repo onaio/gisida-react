@@ -107,15 +107,9 @@ componentWillReceiveProps(nextProps) {
 
     let primaryLegend;
     let layer;
-    for (let l = 0; l < this.props.layersData.length; l += 1) {
-      layer = this.props.layersData[l];
-      const circleLayerType = (layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible);
-      const symbolLayer = (layer && layer.credit && layer.categories && layer.categories.shape && layer.type !== 'circle');
-      const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
-      const fillLayerWithBreaks = (layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle' && layer.categories && layer.categories.breaks === 'yes');
-      let activeLegendLayer;
-      let a = activeLayerIds.length;
-      while(a --) {
+
+    let activeLegendLayer;
+      for (let a = activeLayerIds.length - 1; a >= 0; a -= 1) {
         if (layers[activeLayerIds[a]] && layers[activeLayerIds[a]].credit) {
           activeLegendLayer = activeLayerIds[a];
           break;
@@ -125,6 +119,13 @@ componentWillReceiveProps(nextProps) {
       if (this.state.primaryLayer !== primaryLayer && layers[primaryLayer].credit) {
         activeLegendLayer = primaryLayer;
       }
+
+    for (let l = 0; l < this.props.layersData.length; l += 1) {
+      layer = this.props.layersData[l];
+      const circleLayerType = (layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible);
+      const symbolLayer = (layer && layer.credit && layer.categories && layer.categories.shape && layer.type !== 'circle');
+      const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
+      const fillLayerWithBreaks = (layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle' && layer.categories && layer.categories.breaks === 'yes');
 
       const activeLayerSelected = activeLegendLayer === layer.id  ? 'primary' : '';
 
