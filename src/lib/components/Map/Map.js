@@ -166,7 +166,7 @@ class Map extends Component {
     const sortedLayers = [];
     activeLayerIds.forEach(id => {
       activeLayersData.forEach(l => {
-        if (id === l.id) {
+        if (id === l.id || id === l.parent) {
           sortedLayers.push(l);
         }
       });
@@ -361,9 +361,8 @@ class Map extends Component {
         });
         const intelLayers = []
         activeLayerIds.forEach(id => {
-          const layerArray = Object.keys(layers).map(l => layers[l]);
-          layerArray.forEach(l => {
-            if (id === l.id) {
+          activeLayerIds.forEach(l => {
+            if (id === l.id | id === l.parent) {
               intelLayers.push(l);
             }
           });
