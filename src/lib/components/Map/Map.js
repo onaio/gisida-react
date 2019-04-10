@@ -359,7 +359,16 @@ class Map extends Component {
              $(`.marker-chart-${layer.id}-${mapId}`).remove();
           }
         });
-        // sortLayers(this.map, layers, (primaryLayer || activeLayerId));
+        const intelLayers = []
+        activeLayerIds.forEach(id => {
+          const layerArray = Object.keys(layers).map(l => layers[l]);
+          layerArray.forEach(l => {
+            if (id === l.id) {
+              intelLayers.push(l);
+            }
+          });
+        });
+        sortLayers(this.map, (intelLayers || layers), (primaryLayer || activeLayerId));
       }
 
       if (this.props.MAP.primaryLayer !== primaryLayer) {
