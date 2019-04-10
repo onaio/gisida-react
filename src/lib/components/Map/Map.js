@@ -192,7 +192,7 @@ class Map extends Component {
               this.map.moveLayer(sublayers[s]);
             }
           }
-          // orderLayers(sortedLayers, map, nextLayerId);
+          orderLayers(sortedLayers, map, nextLayerId);
           return false
         }
       }
