@@ -682,28 +682,47 @@ class Map extends Component {
     let id;
     let hasLabel;
     let layerObj;
+    let slId;
+    const sortedLayers = [];
     if (this.props && this.props.layersObj) {
       for (let a = this.props.activeLayerIds.length - 1; a >= 0; a -= 1) {
         id = this.props.activeLayerIds[a];
-        if (this.props.layers[id] && this.props.layers[id].labels) {
+        if (this.props.layers[id].layers) {
+          for (let sl = 0; sl < this.props.layers[id].layers.length; sl += 1) {
+            slId = this.props.layers[id].layers[sl];
+            if (this.props.layers[slId].labels) {
+              hasLabel = slId;
+              break;
+            }
+          }
+          break;
+        } else if (!this.props.layers[id].layers && this.props.layers[id] && this.props.layers[id].labels) {
           hasLabel = id;
           break;
         }
       }
-       for (let l = 0; l < this.props.layersObj.length; l += 1) {
-         layerObj = this.props.layersObj[l];
+
+      this.props.activeLayerIds.forEach(id => {
+        this.props.layersObj
+          .filter(d => !d.layers)
+          .forEach((l) => {
+            if (id === l.id || id === l.parent) {
+              sortedLayers.push(l);
+            }
+          });
+      });
+
+       for (let l = 0; l < sortedLayers.length; l += 1) {
+         layerObj = sortedLayers[l];
          if (layerObj.labels) {
            minZoom = layerObj.labels.minZoom || layerObj.labels.minzoom || 0;
            maxZoom = layerObj.labels.maxZoom || layerObj.labels.maxzoom || 22;
            isRendered = (document.getElementsByClassName(`label-${layerObj.id}`)).length;
-           activeId = layerObj.parent || layerObj.id;
+           activeId = layerObj.id || layerObj.parent;
            if ((zoom < minZoom || zoom > maxZoom)) {
              this.removeLabels(`label-${layerObj.id}`);
            } else if (!isRendered && (activeId === this.props.primaryLayer || activeId === hasLabel)) {
              this.addLabels(layerObj);
-             if (layerObj.parent) {
-               break;
-             }
            }
          }
       }
