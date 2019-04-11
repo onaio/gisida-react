@@ -193,7 +193,6 @@ class Map extends Component {
             }
           }
           orderLayers(sortedLayers, map, nextLayerId);
-          return false
         }
       }
     }
@@ -361,7 +360,7 @@ class Map extends Component {
         });
         const intelLayers = []
         activeLayerIds.forEach(id => {
-          activeLayerIds.forEach(l => {
+          activelayersData.forEach(l => {
             if (id === l.id | id === l.parent) {
               intelLayers.push(l);
             }
