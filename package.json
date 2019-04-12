@@ -68,6 +68,7 @@
     ]
   },
   "dependencies": {
+    "@onaio/superset-connector": "^0.0.7",
     "ansi-regex": "^3.0.0",
     "camelcase": "^4.1.0",
     "colorbrewer": "^1.1.0",
