@@ -104,9 +104,12 @@ componentWillReceiveProps(nextProps) {
       return false;
     }
     let latestTimestamp;
-    if (layerObj['timestamp'] && Array.isArray(layerObj.source.data) && layerObj.source.data.length > 1) {
-       latestTimestamp = (layerObj && layerObj.source && layerObj.source.data && layerObj.source.data.length > 1) &&
-       (layerObj.source.data.map(d => d[layerObj['timestamp']]).sort().reverse()[0]);
+    if (layerObj['timestamp'] && 
+      Array.isArray(layerObj.source.data.features || layerObj.source.data) &&
+       (layerObj.source.data.features || layerObj.source.data).length > 1) {
+          latestTimestamp = (layerObj.source.data.features || layerObj.source.data)
+            .map(d => ((d.properties && d.properties[layerObj['timestamp']])
+             || (d[layerObj['timestamp']]))).sort().reverse()[0];
        }
     const legendItems = [];
     latestTimestamp = latestTimestamp ? <span>Timestamp: {latestTimestamp}</span> : null;
