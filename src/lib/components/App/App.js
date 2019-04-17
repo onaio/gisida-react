@@ -1,8 +1,15 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import superset from '@onaio/superset-connector';
 import './App.scss';
 
 const { authZ, deAuthZ } = superset;
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    appConfig: state.APP
+  }
+}
 
 const getParameterByName = (name) => {
   var match = RegExp('[#&]' + name + '=([^&]*)').exec(window.location.hash);
@@ -25,18 +32,23 @@ class App extends Component {
       accessToken,
     };
   }
-  componentWillMount() {
+
+  componentWillReceiveProps(nextProps) {
     const { accessToken } = this.state;
-    authZ({
-      token: accessToken,
-      base: 'https://discover.ona.io/'
-    }, (res) => {
-      if (!res.ok) {
-        localStorage.removeItem('access_token');
-        window.location.reload();
-      }
-    })
+    const { appConfig } = nextProps;
+    if (appConfig && appConfig.supersetBase) {
+      authZ({
+        token: accessToken,
+        base: appConfig.supersetBase
+      }, (res) => {
+        if (!res.ok) {
+          localStorage.removeItem('access_token');
+          window.location.reload();
+        }
+      })
+    }
   }
+
   render() {
     return (
       <div className="app">
@@ -46,4 +58,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default connect(mapStateToProps)(App);
