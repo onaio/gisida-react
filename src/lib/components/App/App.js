@@ -19,8 +19,8 @@ class App extends Component {
     const accessToken = localStorage.getItem('access_token') || getAccessToken();
     if (!localStorage.getItem('access_token') && accessToken) {
       localStorage.setItem('access_token', accessToken);
-      window.history.replaceState('asdf', 'Superset', '/');
     }
+    window.history.replaceState('asdf', 'Superset', '/');
     this.state = {
       accessToken,
     };
@@ -30,7 +30,12 @@ class App extends Component {
     authZ({
       token: accessToken,
       base: 'https://discover.ona.io/'
-    }, (res) => console.log(res.status))
+    }, (res) => {
+      if (!res.ok) {
+        localStorage.removeItem('access_token');
+        window.location.reload();
+      }
+    })
   }
   render() {
     return (
