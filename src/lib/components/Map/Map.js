@@ -64,11 +64,11 @@ class Map extends Component {
       window.maps.push(this.map);
       this.map.controls = new mapboxgl.NavigationControl();
       this.map.addControl(this.map.controls);
-      this.map.scaleControls = new mapboxgl.ScaleControl({
+      this.map.scale_controls = new mapboxgl.ScaleControl({
         maxWidth: 80,
         unit: 'imperial'
     });
-    this.map.addControl(this.map.controls2);
+    this.map.addControl(this.map.scale_controls);
   
       // Handle Map Load Event
       this.map.on('load', () => {
