@@ -60,7 +60,7 @@ class DetailView extends Component {
     } else if ((nextProps.timeSeriesObj && detailView) && 
         (nextProps.timeSeriesObj.layerId === layerObj.id)) {
       const { timeSeriesObj, layerObj, spec, properties } = nextProps;
-      const { UID, title, subTitle, basicInfo } = detailView;
+      const { UID, title, subTitle, basicInfo, 'image-url': imageURL } = detailView;
       const newParsedBasicInfo = [];
       let parsedDet;
       const join = layerObj['detail-view'].join || layerObj.source.join;
@@ -83,15 +83,24 @@ class DetailView extends Component {
         spec,
         subTitle,
         layerObj,
+        imageURL,
         parsedBasicInfo: newParsedBasicInfo,
       });
     } 
     else {
-      const { UID, title, subTitle, basicInfo, parsedBasicInfo } = detailView;
+      const {
+        UID,
+        title,
+        subTitle,
+        basicInfo,
+        parsedBasicInfo,
+        'image-url': imageURL
+      } = detailView;
       this.setState({
         UID,
         title,
         subTitle,
+        imageURL,
         parsedBasicInfo,
         spec,
         properties,
@@ -114,7 +123,7 @@ class DetailView extends Component {
   }
 
   render() {
-    const { UID, spec, title, subTitle, parsedBasicInfo } = this.state;
+    const { UID, spec, title, subTitle, parsedBasicInfo, imageURL } = this.state;
     const { mapId, isSplitScreen } = this.props;
     if (this.props.MAP.showFilterPanel || !UID || !spec) {
       return null
@@ -169,11 +178,12 @@ class DetailView extends Component {
           <div className="detail-header">
             <h4>{title}</h4>
             {!!subTitle ? (<h6>{subTitle}</h6>) : ''}
-            <img
-              id="facilityImg"
-              alt={`${title}`}
-              onClick={(e) => this.onFacilityImageClick(e)}
-              src="/assets/img/no-facility-img.jpg" />
+            {imageURL ?
+              <img
+                id="facilityImg"
+                alt={`${title}`}
+                onClick={(e) => this.onFacilityImageClick(e)}
+                src="/assets/img/no-facility-img.jpg" /> : null}
           </div>
           <div className="detail-list">
             <ul>{detailList}</ul>
