@@ -43,6 +43,7 @@ const mapStateToProps = (state, ownProps) => {
     showDetailView: (detailView && detailView.model && detailView.model.UID),
     showFilterPanel: !!MAP.showFilterPanel,
     activeLayers,
+    handlers: ownProps.handlers,
   }
 }
 
@@ -105,29 +106,65 @@ class Map extends Component {
       this.map.on('zoom', this.handleLabelsOnMapZoom.bind(this))
 
       // Dispach map rendered to indicate map was rendered
-      this.props.dispatch(Actions.mapRendered(mapId));
+      this.props.dispatch(Actions.mapRendered(mapId, true));
     }
   }
 
   addMouseEvents(mapId) {
-    addPopUp(mapId, this.map, this.props.dispatch);
-    // this.addMapClickEvents()
-    // this.addMouseMoveEvents()
-    // etc
-    this.map.on('mousemove', (e) => {
-      const { activeLayers, layerObj } = this.props;
-      const features = this.map.queryRenderedFeatures(e.point, {
-        layers: activeLayers.filter(i => this.map.getLayer(i) !== undefined)
-      });
-      const feature = features.find(f => f.layer.id === layerObj.id);
-      if (!feature) {
-        return false;
+    const { handlers, APP } = this.props;
+    if (handlers && Array.isArray(handlers)) {
+      let handler;
+      let sublayer;
+      for (let c = 0; c < handlers.length; c += 1) {
+        handler = handlers[c];
+        if (handler.layer) {
+          if (handler.layer.layers) {
+            // If it is a grouped layer loop through the layer.layers array
+            for (let l = 0; l < handler.layer.layers.length; l += 1) {
+              sublayer = handler.layer.layers[l];
+              this.map.on(handler.type, sublayer, handler.method);
+            }
+          } else {
+            this.map.on(handler.type, handler.layer.id, handler.method);
+          }
+        } else {
+          this.map.on(handler.type, handler.method);
+        }
       }
-      this.map.getCanvas().style.cursor = layerObj['detail-view']
-        ? 'pointer' : '';
-      return true;
-    });
-    this.map.on('click', this.onFeatureClick.bind(this));
+    }
+
+    if (APP.disableDefaultMapListeners) {
+      return false
+    }
+
+
+
+    if (!APP.disableTooltip) {
+      addPopUp(mapId, this.map, this.props.dispatch);
+      // this.addMapClickEvents()
+      // this.addMouseMoveEvents()
+      // etc
+      this.map.on('mousemove', (e) => {
+        const { activeLayers, layerObj } = this.props;
+        if (!layerObj) {
+          return false;
+        }
+        const features = this.map.queryRenderedFeatures(e.point, {
+          layers: activeLayers.filter(i => this.map.getLayer(i) !== undefined)
+        });
+        const feature = features.find(f => f.layer.id === layerObj.id);
+        if (!feature) {
+          return false;
+        }
+        this.map.getCanvas().style.cursor = layerObj['detail-view']
+          ? 'pointer' : '';
+        return true;
+      });
+    }
+
+    if (!APP.disableDefaultFeatureClick) {
+      this.map.on('click', this.onFeatureClick.bind(this));
+    }
   }
 
   // componentWillUpdate (nextProps, nextState) {
@@ -275,7 +312,7 @@ class Map extends Component {
     const activeLayerId = nextProps.MAP.activeLayerId;
 
     const layers = nextProps.MAP.layers;
-    const styles = nextProps.STYLES;
+    const styles = nextProps.STYLES || [];
     const regions = nextProps.REGIONS;
     const mapId = nextProps.mapId;
     mapConfig.container = mapId
@@ -295,7 +332,7 @@ class Map extends Component {
       });
 
       // Zoom to current region (center and zoom)
-      regions.forEach((region) => {
+      regions && regions.forEach((region) => {
         if (region.current && this.props.MAP.currentRegion !== currentRegion) {
           this.map.easeTo({
             center: region.center,
@@ -339,7 +376,9 @@ class Map extends Component {
             this.map.removeSource(layer.id);
             // 2) dispatch action to set reloadLayerId to null
             this.props.dispatch(Actions.layerReloaded(mapId));
-            const originalLayer = nextProps.FILTER[layer.id].isClear ? nextProps.MAP.oldLayerObjs[layer.id] : layer;
+            const originalLayer = nextProps.FILTER &&
+              nextProps.FILTER[layer.id] &&
+              nextProps.FILTER[layer.id].isClear ? nextProps.MAP.oldLayerObjs[layer.id] : layer;
             prepareLayer(mapId, originalLayer, this.props.dispatch, filterOptions, doUpdateTsLayer);
           }
           // Change visibility if layer is already on map
@@ -429,6 +468,14 @@ class Map extends Component {
         this.buildFilters();
       }
     }
+  }
+
+  componentWillUnmount() {
+    const { dispatch, mapId } = this.props;
+    const index = window.maps.map(m => m['_container'].id).indexOf(mapId);
+    window.maps.splice(index, 1);
+    dispatch(Actions.mapRendered(mapId, false));
+    dispatch(Actions.mapLoaded(mapId, false));
   }
   
 
