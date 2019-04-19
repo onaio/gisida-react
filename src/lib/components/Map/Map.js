@@ -312,7 +312,7 @@ class Map extends Component {
     const activeLayerId = nextProps.MAP.activeLayerId;
 
     const layers = nextProps.MAP.layers;
-    const styles = nextProps.STYLES;
+    const styles = nextProps.STYLES || [];
     const regions = nextProps.REGIONS;
     const mapId = nextProps.mapId;
     mapConfig.container = mapId
