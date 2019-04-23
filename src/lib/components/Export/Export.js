@@ -85,6 +85,7 @@ export class Export extends Component {
     this.onOptionsChange = this.onOptionsChange.bind(this);
     this.resetMapAfterExport = this.resetMapAfterExport.bind(this);
   }
+  
 
   componentWillReceiveProps(nextProps) {
     if (nextProps && nextProps.map) {
@@ -124,7 +125,7 @@ export class Export extends Component {
     const {  mapId } = this.props;
     const { map, config } = this.state;
     const self = this;
-
+   
     // save the previous position of the map
     const prevMapState = {
       zoom: map.getZoom(),
@@ -133,8 +134,8 @@ export class Export extends Component {
 
     // resize map container / map
     $(`#${mapId}.mapboxgl-map`).innerWidth(dimWidth / resValue).innerHeight(dimHeight / resValue);
-    map.removeControl(map.controls);
-    map.resize();
+    // map.removeControl(map.controls);
+    // map.resize();
 
     if (config.mapBounds && doFitMap) {
       // fit to bounds as described in the app config
@@ -171,6 +172,9 @@ export class Export extends Component {
       let selectorsToQuery = config.exportIncludes || [];
       selectorsToQuery = selectorsToQuery.concat([
         `.legend.${mapId}`,
+        `.mapboxgl-control-container`,
+        `.mapboxgl-ctrl mapboxgl-ctrl-scale`,
+        '.brand img',
         '.series',
       ]);
 
@@ -214,8 +218,8 @@ export class Export extends Component {
       }
 
       // scale the scalling containers
-      $('.topLeft, .topRight, .bottomLeft, .bottomRight', exportEl)
-        .css('transform', `scale(${scale})`);
+      $('.topLeft, .topRight, .bottomLeft, .bottomRight', exportEl).css('transform');
+        // .css('transform', `scale(${scale})`);
       // insert the export container element in the DOM
       $('body').append(exportEl);
       // move (not copy) the map into the export container
