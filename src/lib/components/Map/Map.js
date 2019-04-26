@@ -66,7 +66,7 @@ class Map extends Component {
       this.map.addControl(this.map.controls);
       this.map.scale_controls = new mapboxgl.ScaleControl({
         maxWidth: 80,
-        unit: 'imperial'
+        unit: 'metric'
     });
     this.map.addControl(this.map.scale_controls);
   
