@@ -447,6 +447,7 @@ export class Filter extends Component {
       return false;
     }
 
+    const { data, join } = layerObj.source;
     const filterKeys = Object.keys(filters);
     const nextFilters = [isOr ? 'any' : 'all'];
 
@@ -456,8 +457,37 @@ export class Filter extends Component {
     let regenStops = false;
     // loop through all filters
     for (let f = 0; f < filterKeys.length; f += 1) {
-      // chec if the filter is actually filtered
-      if (filters[filterKeys[f]].isFiltered && filterOptions[filterKeys[f]].type !== 'stops') {
+      // check if filter should be a vector boolean
+      if (filterOptions[filterKeys[f]].type === 'vBool') {
+        const _data = [...(data.features || data)];
+        let _datum;
+        let passes = [];
+        options = filters[filterKeys[f]].options;
+        optionKeys = Object.keys(options);
+
+        for (let b = 0; b < _data.length; b += 1) { // loop through the data data
+          _datum = {...(_data[b].properties || _data[b])}
+          for (let o = 0; o < optionKeys.length; o += 1) { // loop through option keys
+            // check if option is enabled && if optionKey is in select_multiple value
+            if (options[optionKeys[o]].enabled && _datum[filterKeys[f]].indexOf(optionKeys[o]) !== -1) {
+              passes.push(_datum[join[1]]); // push district code
+              break;
+            }
+          }
+        }
+
+        passes = [...new Set(passes)];
+        newFilters = ['any'];
+        for (let p = 0; p < passes.length; p += 1) {
+          newFilters.push(['==', join[0], passes[p]])
+        }
+        
+        // push this filter to the combind filter
+        if (newFilters.length > 1) {
+          nextFilters.push(newFilters);
+        }
+      } // check if the filter is actually filtered
+      else if (filters[filterKeys[f]].isFiltered && filterOptions[filterKeys[f]].type !== 'stops') {
         newFilters = ['any'];
         if (filters[filterKeys[f]].dataType === 'ordinal') {
           // define the options and option keys for this filter
