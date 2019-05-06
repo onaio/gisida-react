@@ -134,8 +134,10 @@ export class Export extends Component {
 
     // resize map container / map
     $(`#${mapId}.mapboxgl-map`).innerWidth(dimWidth / resValue).innerHeight(dimHeight / resValue);
-    // map.removeControl(map.controls);
-    // map.resize();
+    if (!config.includeNavControls) {
+      map.removeControl(map.controls);
+      map.resize();
+    }
 
     if (config.mapBounds && doFitMap) {
       // fit to bounds as described in the app config
@@ -172,9 +174,6 @@ export class Export extends Component {
       let selectorsToQuery = config.exportIncludes || [];
       selectorsToQuery = selectorsToQuery.concat([
         `.legend.${mapId}`,
-        `.mapboxgl-control-container`,
-        `.mapboxgl-ctrl mapboxgl-ctrl-scale`,
-        '.brand img',
         '.series',
       ]);
 

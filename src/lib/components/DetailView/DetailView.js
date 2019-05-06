@@ -175,9 +175,9 @@ class DetailView extends Component {
         </a>
 
         <div className="detail-basic-details">
-          <div className="detail-header">
+          <div className="detail-header" style={!imageURL ? {minHeight: "auto" }: {} }>
             <h4>{title}</h4>
-            {!!subTitle ? (<h6>{subTitle}</h6>) : ''}
+            {!!subTitle && (subTitle !== title) ? (<h6>{subTitle}</h6>) : ''}
             {imageURL ?
               <img
                 id="facilityImg"
