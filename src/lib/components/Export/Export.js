@@ -136,8 +136,9 @@ export class Export extends Component {
     $(`#${mapId}.mapboxgl-map`).innerWidth(dimWidth / resValue).innerHeight(dimHeight / resValue);
     if (!config.includeNavControls) {
       map.removeControl(map.controls);
-      map.resize();
+      
     }
+      map.resize();
 
     if (config.mapBounds && doFitMap) {
       // fit to bounds as described in the app config
