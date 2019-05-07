@@ -203,4 +203,22 @@
     position: absolute;
     z-index: 10001;
   }
-  
+  .mapboxgl-ctrl-icon.mapboxgl-ctrl-compass > .mapboxgl-ctrl-compass-arrow {
+    width: 20px;
+    height: 20px;
+    margin: 5px;
+    background-image: url("../../../../public/assets/img/compas.png") !important;
+  }
+  .mapboxgl-ctrl-icon.mapboxgl-ctrl-zoom-in {
+    background-image: url("../../../../public/assets/img/zoomin\ .png") !important;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    position: relative;
+    
+  }
+  .mapboxgl-ctrl-icon.mapboxgl-ctrl-zoom-out {
+    background-image: url("../../../../public/assets/img/zoom-out\ \(1\).png") !important;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    position: relative;
+  }
