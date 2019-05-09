@@ -158,7 +158,7 @@ class DetailView extends Component {
         <div className="detail-basic-details">
           <div className="detail-header">
             <h4>{title}</h4>
-            {!!subTitle ? (<h6>{subTitle}</h6>) : ''}
+            {!!subTitle && (subTitle !== title) ? (<h6>{subTitle}</h6>) : ''}
             <img
               id="facilityImg"
               alt={`${title}`}
