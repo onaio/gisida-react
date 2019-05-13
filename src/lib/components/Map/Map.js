@@ -378,7 +378,7 @@ class Map extends Component {
             const originalLayer = nextProps.FILTER &&
               nextProps.FILTER[layer.id] &&
               nextProps.FILTER[layer.id].isClear ? nextProps.MAP.oldLayerObjs[layer.id] : layer;
-            prepareLayer(mapId, originalLayer, this.props.dispatch, filterOptions, doUpdateTsLayer);
+            prepareLayer(mapId, originalLayer, this.props.dispatch, filterOptions, doUpdateTslayer);
           }
           // Change visibility if layer is already on map
           this.changeVisibility(layer.id, layer.visible);
@@ -773,7 +773,7 @@ class Map extends Component {
            if ((zoom < minZoom || zoom > maxZoom)) {
              this.removeLabels(`label-${layerObj.id}`);
            } else if (!isRendered && (activeId === this.props.primaryLayer || activeId === hasLabel)) {
-             this.addLabels(layerObj);
+             this.addLabels(layerObj, this.props.timeseries);
            }
          }
       }
@@ -781,7 +781,6 @@ class Map extends Component {
   }
 
   render() {
-    const { layerObj } = this.props;
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
     const { detailView, layerObj, timeSeriesObj, showDetailView } = this.props;
     const join = layerObj && ((layerObj['detail-view'] &&

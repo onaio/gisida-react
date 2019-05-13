@@ -985,7 +985,9 @@ export class Filter extends Component {
     }
     
     const doClear = isFilterable || this.isMapFiltered()|| isClearable;
-    let sidebarOffset = this.props.showFilterPanel
+    let sidebarOffset = this.props.showFilterPanel &&
+      !(layerObj.aggregate &&
+        layerObj.aggregate.filterIsPrev)
       ? '260px'
       : !!this.props.detailView
       ? '355px'
