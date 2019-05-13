@@ -39,8 +39,8 @@ export class Legend extends React.Component {
   }
 
 componentWillReceiveProps(nextProps) {
-
-  if(nextProps.timeSeriesObj && (this.props.timeSeriesObj !== nextProps.timeSeriesObj)) {
+  const { layerObj } = nextProps;
+  if(nextProps.timeSeriesObj && (this.props.timeSeriesObj !== nextProps.timeSeriesObj) && layerObj.type !== 'chart') {
     const { timeSeriesObj, dispatch } = nextProps;
 
     const stops = generateStops(timeSeriesObj,
@@ -58,7 +58,8 @@ componentWillReceiveProps(nextProps) {
       }
   }
  componentWillUpdate(nextProps, nextState) {
-   if (this.props.primaryLayer !== nextProps.primaryLayer ) {
+   const { layerObj } = nextProps;
+   if (this.props.primaryLayer !== nextProps.primaryLayer && layerObj.type !== 'chart') {
      const { timeSeriesObj } = nextProps;
      
      if(timeSeriesObj && timeSeriesObj.layerObj && 

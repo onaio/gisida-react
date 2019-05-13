@@ -398,11 +398,12 @@ class Map extends Component {
 
           if (layer.visible && layer.type === 'chart' && (typeof layer.source.data !== 'string')) {
             const timefield = (layer.aggregate && layer.aggregate.timeseries) ? layer.aggregate.timeseries.field : '';
+            const tsObj = nextProps.timeSeriesObj;
             let { data } = layer.source;
             if (timefield) {
               const period = [...new Set(layer.source.data.map(p => p[timefield]))];
               // newStops = { id: layer.id, period, timefield };
-              data = layer.source.data.filter(d => d[timefield] === period[period.length - 1]);
+              data = layer.source.data.filter(d => d[timefield] === period[tsObj.temporalIndex]);
             }
             addChart(layer, data, this.map, mapId);
           } else {
