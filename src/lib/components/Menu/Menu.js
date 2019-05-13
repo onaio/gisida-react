@@ -108,22 +108,23 @@ class Menu extends Component {
   render() {
     const mapId = this.props.mapId;
     const categories = this.props.categories;
-    let sortedCategories;
-    if (categories && categories.length > 0) {
-      sortedCategories = categories.sort((a, b) =>
-        a.category.localeCompare(b.category)
-      );
-    }
-    const regions = this.props.regions;
-    const currentRegion = this.props.currentRegion;
-    const preparedLayers = this.props.preparedLayers;
+
+    const {disableDefault } = this.props;
+    if (disableDefault) return this.props.children || null;
+
+    const children = React.Children.map(this.props.children, child => {
+      return React.cloneElement(child, { mapId });
+    })
+
+    const { regions, currentRegion, preparedLayers, childrenPosition } = this.props;
+    const childrenPositionClass = childrenPosition || 'top';
+
     return (
       <div>
-        {this.props.children ? this.props.children :
           <div>
             {this.props.loaded ?
               // Menu Wrapper
-              <div id={`${mapId}-menu-wrapper`} className="menu-wrapper">
+              <div id={`${mapId}-menu-wrapper`} className={`menu-wrapper ${childrenPositionClass}`}>
                 {/* Open button menu */}
                 <a onClick={e => this.onToggleMenu(e)} className="open-btn"
                   style={{ display: this.props.menuIsOpen ? 'none' : 'block' }}>
@@ -136,6 +137,10 @@ class Menu extends Component {
                   <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
                     <span className="glyphicon glyphicon-remove"></span>
                   </a>
+
+                  {/* Children Elements (top) */}
+                  {(children && childrenPosition !== 'bottom') ? children : ''}
+
                   {/* Menu List*/}
                   <ul className="sectors">
                     {regions && regions.length ?
@@ -163,7 +168,7 @@ class Menu extends Component {
                         </ul>
                       </li> : <li />}
                     {(categories && categories.length) > 0 ?
-                      sortedCategories.map((category, i) =>
+                      categories.map((category, i) =>
                         (<li className="sector" key={i}>
                           <a onClick={e => this.onCategoryClick(e, category.category)}>{category.category}
                             <span
@@ -185,10 +190,12 @@ class Menu extends Component {
                       <li></li>
                     }
                   </ul>
+                  
+                  {/* Children Elements (top) */}
+                  {(children && childrenPosition === 'bottom') ? children : ''}
                 </div>
               </div> : ''}
           </div>
-        }
       </div>
     );
   }

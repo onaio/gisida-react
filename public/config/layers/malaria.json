@@ -12,6 +12,7 @@
   },
   "property": "malaria",
   "aggregate": {
+      "joinKey": ["Adm1Name"],
       "filter": ["County"],
       "sub-filter": [""],
       "accepted-filter-values": ["all"],
