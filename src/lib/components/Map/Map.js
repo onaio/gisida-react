@@ -58,18 +58,20 @@ class Map extends Component {
       layersObj: this.props.layersObj,
     }
   }
-  initMap(accessToken, mapConfig, mapId) {
+  initMap(accessToken, mapConfig, mapId, app) {
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;
       this.map = new mapboxgl.Map(mapConfig);
       window.maps.push(this.map);
       this.map.controls = new mapboxgl.NavigationControl();
       this.map.addControl(this.map.controls);
-      this.map.scale_controls = new mapboxgl.ScaleControl({
-        maxWidth: 80,
-        unit: 'metric'
-    });
-    this.map.addControl(this.map.scale_controls);
+      if (app && !app.removeMapScale) {
+        this.map.scale_controls = new mapboxgl.ScaleControl({
+          maxWidth: 80,
+          unit: 'metric'
+        });
+        this.map.addControl(this.map.scale_controls);
+      }
   
       // Handle Map Load Event
       this.map.on('load', () => {
@@ -320,7 +322,7 @@ class Map extends Component {
 
     // Check if map is initialized.
     if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
-      this.initMap(accessToken, mapConfig, mapId);
+      this.initMap(accessToken, mapConfig, mapId, nextProps.APP);
     }
     // Check if rendererd map has finished loading
     if (isLoaded) {
