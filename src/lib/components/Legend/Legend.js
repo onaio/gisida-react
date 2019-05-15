@@ -40,7 +40,7 @@ export class Legend extends React.Component {
 
 componentWillReceiveProps(nextProps) {
   const { layerObj } = nextProps;
-  if(nextProps.timeSeriesObj && (this.props.timeSeriesObj !== nextProps.timeSeriesObj) && layerObj.type !== 'chart') {
+  if(nextProps.timeSeriesObj && (this.props.timeSeriesObj !== nextProps.timeSeriesObj) && layerObj.type !== 'chart' && layerObj.property) {
     const { timeSeriesObj, dispatch } = nextProps;
 
     const stops = generateStops(timeSeriesObj,
@@ -59,7 +59,7 @@ componentWillReceiveProps(nextProps) {
   }
  componentWillUpdate(nextProps, nextState) {
    const { layerObj } = nextProps;
-   if (this.props.primaryLayer !== nextProps.primaryLayer && layerObj.type !== 'chart') {
+   if (this.props.primaryLayer !== nextProps.primaryLayer && layerObj.type !== 'chart' && layerObj.property) {
      const { timeSeriesObj } = nextProps;
      
      if(timeSeriesObj && timeSeriesObj.layerObj && 
@@ -159,7 +159,7 @@ componentWillReceiveProps(nextProps) {
                 <span
                   style={
                     {
-                      background: `${currentColorStops[i]}`,
+                      background: `${(currentColorStops[i] || currentColorStops[0])}`,
                       width: `${s * 2}px`,
                       height: `${s * 2}px`,
                       margin: `0px ${currentRadiusStops[i] / 2}px`
@@ -186,7 +186,7 @@ componentWillReceiveProps(nextProps) {
                 style={
                   {
                     background: Array.isArray(layer.categories.color) ? layer.categories.color[i]
-                      : (colors[i] || colors[0]),
+                      : (colors[i] || colors[0] || colors),
                     width: `${s * 2}px`,
                     height: `${s * 2}px`,
                     margin: `0px ${i + 2}px`
