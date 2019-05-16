@@ -109,8 +109,20 @@ class TimeSeriesSlider extends React.Component {
   componentWillReceiveProps(nextProps) {
     
     if (nextProps.timeSeriesObj && nextProps.timeSeriesObj.periodData) {
+      const annualPeriods = [];
+      let matches;
       const { period, temporalIndex } = nextProps.timeSeriesObj;
+      period.forEach((p) => {
+        const yearRxp = /\b(19|20)\d{2}\b/g;
+        if (p && p.match(yearRxp) && p.match(yearRxp).length) {
+          matches = p.match(yearRxp)[0];
+          if (!annualPeriods.includes(matches)) {
+            annualPeriods.push(matches);
+          }
+        }
+      });
       this.setState({
+        annualPeriods,
         periods: period,
         index: temporalIndex,
         period: period[temporalIndex],
@@ -126,7 +138,33 @@ class TimeSeriesSlider extends React.Component {
     }
   }
 
+  onAnnualSelectorChange(e) {
+    e.preventDefault();
+    const currentYear = e.currentTarget.value;
+    const { period } = this.props.timeSeriesObj;
+    let currentPeriods = period;
+    if (currentYear !== 'All') {
+      currentPeriods = period.filter(p => p.includes(currentYear));
+    }
+    this.setState({
+      currentYear,
+      periods: currentPeriods,
+      period: currentPeriods[currentPeriods.length - 1]
+    });
+  }
+
   render() {
+    let yearSelectorComponent = null;
+
+    if (!this.props.timeSeriesObj) {
+      return null;
+    }
+
+    const { annualPeriods } = this.state;
+
+    if (annualPeriods.length) {
+      yearSelectorComponent = annualPeriods.map((d) => (<option>{d}</option>))
+    }
     return ((this.props.timeSeriesObj) && (this.state && this.state.periods.length > 1)) ? (
       <div
         className="series"
@@ -136,6 +174,13 @@ class TimeSeriesSlider extends React.Component {
           className="label"
           htmlFor="slider"
         >{this.state.period}</label>
+        <select
+          className="annual-selector"
+          onChange={(e) => this.onAnnualSelectorChange(e)}
+        >
+          <option>All</option>
+          {yearSelectorComponent}
+        </select>
         {this.state.periods.length > 1 ?
           <input
             id={`${this.props.mapId}-slider`}
