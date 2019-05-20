@@ -41,43 +41,44 @@ export class Legend extends React.Component {
 componentWillReceiveProps(nextProps) {
   const { layerObj } = nextProps;
   if(nextProps.timeSeriesObj && (this.props.timeSeriesObj !== nextProps.timeSeriesObj) && layerObj.type !== 'chart' && layerObj.property) {
-    const { timeSeriesObj, dispatch } = nextProps;
-
+    const { timeSeriesObj } = nextProps;
+    const index = timeSeriesObj.allPeriods.indexOf(timeSeriesObj.period[timeSeriesObj.temporalIndex]);
     const stops = generateStops(timeSeriesObj,
        timeSeriesObj.layerObj.aggregate.timeseries.field,
-       dispatch);
+       this.props.dispatch, index);
        if(timeSeriesObj && timeSeriesObj.layerObj && 
         timeSeriesObj.layerObj.aggregate &&
           timeSeriesObj.layerObj.aggregate.timeseries) {
        timeSeriesObj.newBreaks = stops[3];
-       timeSeriesObj.newColors = [...new Set(timeSeriesObj.colorStops[timeSeriesObj.temporalIndex].map(d => d[1]))];
+       timeSeriesObj.newColors = [...new Set(timeSeriesObj.colorStops[index].map(d => d[1]))];
        this.setState({
          timeSeriesObj: timeSeriesObj
         })
        }
       }
   }
- componentWillUpdate(nextProps, nextState) {
-   const { layerObj } = nextProps;
-   if (this.props.primaryLayer !== nextProps.primaryLayer && layerObj.type !== 'chart' && layerObj.property) {
-     const { timeSeriesObj } = nextProps;
+//  componentWillUpdate(nextProps, nextState) {
+//    const { layerObj } = nextProps;
+//    if (this.props.primaryLayer !== nextProps.primaryLayer && layerObj.type !== 'chart' && layerObj.property) {
+//      const { timeSeriesObj } = nextProps;
      
-     if(timeSeriesObj && timeSeriesObj.layerObj && 
-        timeSeriesObj.layerObj.aggregate &&
-          timeSeriesObj.layerObj.aggregate.timeseries) {
-            const stops = generateStops(timeSeriesObj, 
-            timeSeriesObj.layerObj.aggregate.timeseries.field, 
-            this.props.dispatch);
+//      if(timeSeriesObj && timeSeriesObj.layerObj && 
+//         timeSeriesObj.layerObj.aggregate &&
+//           timeSeriesObj.layerObj.aggregate.timeseries) {
+//             debugger;
+//             const stops = generateStops(timeSeriesObj, 
+//             timeSeriesObj.layerObj.aggregate.timeseries.field, 
+//             this.props.dispatch);
 
-            timeSeriesObj.newBreaks = stops[3];
-            timeSeriesObj.newColors = [...new Set(timeSeriesObj.colorStops[timeSeriesObj.temporalIndex].map(d => d[1]))];
+//             timeSeriesObj.newBreaks = stops[3];
+//             timeSeriesObj.newColors = [...new Set(timeSeriesObj.colorStops[timeSeriesObj.temporalIndex].map(d => d[1]))];
             
-            this.setState({
-              timeSeriesObj: nextProps.timeSeriesObj
-            });
-     }
-   }
- }
+//             this.setState({
+//               timeSeriesObj: nextProps.timeSeriesObj
+//             });
+//      }
+//    }
+//  }
 
  componentDidUpdate(prevProps, prevState) {
    if (this.props.primaryLayer !== prevProps.primaryLayer && this.props.layers &&
@@ -146,10 +147,11 @@ componentWillReceiveProps(nextProps) {
 
       if (timeSeriesObj) {
         const { temporalIndex } = timeSeriesObj;
-        if (circleLayerType && layer.breaks && layer.stops && layer.stops[0][temporalIndex]) {
-          const currentColorStops = [...new Set(layer.stops[0][temporalIndex].map(d => d[1]))];
-          const currentRadiusStops = [...new Set(layer.stops[1][temporalIndex].map(d => d[1]))];
-          const currentBreakStops = [...new Set(layer.stops[6][temporalIndex])];
+        const index = timeSeriesObj.allPeriods.indexOf(timeSeriesObj.period[temporalIndex])
+        if (circleLayerType && layer.breaks && layer.stops && layer.stops[0][index]) {
+          const currentColorStops = [...new Set(layer.stops[0][index].map(d => d[1]))];
+          const currentRadiusStops = [...new Set(layer.stops[1][index].map(d => d[1]))];
+          const currentBreakStops = [...new Set(layer.stops[6][index])];
 
           currentRadiusStops.forEach((s, i) => {
             quantiles.push((
@@ -285,9 +287,10 @@ componentWillReceiveProps(nextProps) {
                layer.breaks;
           
           const lastBreaks = Math.max(...stopsBreak);
+          const index = timeSeriesObj.allPeriods.indexOf(timeSeriesObj.period[timeSeriesObj.temporalIndex]);
           const layerStops = (timeSeriesObj && timeSeriesObj.stops && 
             layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) ? 
-           [...new Set(timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(d => d[1]))] :
+           [...new Set(timeSeriesObj.stops[index].map(d => d[1]))] :
            layerObj && layerObj.stops && layerObj.stops[0][0] ?
             [...new Set(layerObj.stops[0][0].map(d => d[1]))] :
             [...new Set(layer.colorStops.map(d => d[1]))];
@@ -494,9 +497,10 @@ componentWillReceiveProps(nextProps) {
                layer.breaks;
           
           const lastBreaks = Math.max(...stopsBreak);
+          const index = timeSeriesObj.allPeriods.indexOf(timeSeriesObj.period[timeSeriesObj.temporalIndex]);
           const layerStops = (timeSeriesObj && timeSeriesObj.stops && 
             layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) ? 
-           [...new Set(timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(d => d[1]))] :
+           [...new Set(timeSeriesObj.stops[index].map(d => d[1]))] :
            layerObj && layerObj.stops && layerObj.stops[0][0] ?
             [...new Set(layerObj.stops[0][0].map(d => d[1]))] :
             [...new Set(layer.colorStops.map(d => d[1]))];

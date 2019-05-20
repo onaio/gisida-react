@@ -556,7 +556,12 @@ class Map extends Component {
     for (let i = 0; i < tsKeys.length; i += 1) {
       layer = tsKeys[i];
       // if temporalIndecies don't match, then definitely update the timeseries
-      if (timeseries[layer].temporalIndex !== prevProps.timeseries[layer].temporalIndex) {
+      if ((timeseries[layer].temporalIndex !== prevProps.timeseries[layer].temporalIndex) || timeseries[layer].updateTs) {
+        if (timeseries[layer].updateTs) {
+          const nextTimeseries = timeseries;
+          nextTimeseries[layer].updateTs = !nextTimeseries[layer].updateTs;
+          this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, layer));
+        }
         return true;
       }
     }
@@ -597,6 +602,7 @@ class Map extends Component {
 
       if (timeSeriesLayers.includes(id)) {
         tsObj = timeseries[id];
+        tsObj.temporalIndex = timeSeriesObj.allPeriods.indexOf(currPeriod);
 
         const {
           temporalIndex, stops, strokeWidthStops,
@@ -612,9 +618,8 @@ class Map extends Component {
         // } else if (this.map.getLayer(id) && layer && layer.visible) {
 
           // look through the layer periods for a match
-          pIndex = timeseries[id].period.indexOf(currPeriod);
+          pIndex = timeseries[id].allPeriods.indexOf(currPeriod);
           hasData = pIndex !== -1 ? ((FILTER && FILTER[id] && FILTER[id].isClear) || timeseries[id].periodData[currPeriod].hasData) : false;
-
           // if the layer is in the map and has no period match, hide it
           if (!hasData || pIndex === -1) {
 
