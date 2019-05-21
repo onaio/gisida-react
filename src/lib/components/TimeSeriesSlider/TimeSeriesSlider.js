@@ -196,7 +196,9 @@ class TimeSeriesSlider extends React.Component {
     if (annualPeriods.length) {
       yearSelectorComponent = annualPeriods.map((d) => (<option>{d}</option>))
     }
-    return ((this.props.timeSeriesObj) && (this.state && this.state.periods.length > 1)) ? (
+    return ((this.props.timeSeriesObj)
+      && (this.state && ((this.state.periods.length > 1)
+        || (this.state.annualPeriods && this.state.annualPeriods.length > 1)))) ? (
       <div
         className="series"
         style={{ right: '50px'}}>

@@ -575,8 +575,9 @@ class Map extends Component {
     const timeSeriesLayers = Object.keys(timeseries);
 
     // determine what the currently timeperiod to see if layers should be hidden
+    const currIndex = timeSeriesObj.allPeriods.indexOf(timeSeriesObj.period[timeSeriesObj.temporalIndex]);
     const currPeriod = timeSeriesObj && timeSeriesObj.period &&
-       timeSeriesObj.period[timeSeriesObj.temporalIndex];
+       timeSeriesObj.allPeriods[currIndex];
 
     let tsObj;
     let layerObj;
@@ -709,7 +710,7 @@ class Map extends Component {
 
     if (timeseries && typeof timeseries[layerObj.id] !== 'undefined') {
       const tsObj = timeseries[layerObj.id];
-      const period = tsObj.period[tsObj.temporalIndex] || tsObj.allPeriods[tsObj.temporalIndex];
+      const period = tsObj.allPeriods[tsObj.temporalIndex];
       labels = layerObj.labels.labels[period];
     } else {
       labels = layerObj.labels.labels;

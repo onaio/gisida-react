@@ -290,7 +290,7 @@ componentWillReceiveProps(nextProps) {
           const index = timeSeriesObj.allPeriods.indexOf(timeSeriesObj.period[timeSeriesObj.temporalIndex]);
           const layerStops = (timeSeriesObj && timeSeriesObj.stops && 
             layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) ? 
-           [...new Set(timeSeriesObj.stops[index].map(d => d[1]))] :
+           [...new Set(timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(d => d[1]))] :
            layerObj && layerObj.stops && layerObj.stops[0][0] ?
             [...new Set(layerObj.stops[0][0].map(d => d[1]))] :
             [...new Set(layer.colorStops.map(d => d[1]))];
@@ -500,7 +500,7 @@ componentWillReceiveProps(nextProps) {
           const index = timeSeriesObj.allPeriods.indexOf(timeSeriesObj.period[timeSeriesObj.temporalIndex]);
           const layerStops = (timeSeriesObj && timeSeriesObj.stops && 
             layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) ? 
-           [...new Set(timeSeriesObj.stops[index].map(d => d[1]))] :
+           [...new Set(timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(d => d[1]))] :
            layerObj && layerObj.stops && layerObj.stops[0][0] ?
             [...new Set(layerObj.stops[0][0].map(d => d[1]))] :
             [...new Set(layer.colorStops.map(d => d[1]))];
