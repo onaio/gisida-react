@@ -705,9 +705,15 @@ class Map extends Component {
   addLabels(layerObj, timeseries) {
     let el;
     const { id } = layerObj;
-    const labels = timeseries && typeof timeseries[layerObj.id] !== 'undefined'
-      ? layerObj.labels.labels[timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]]
-      : layerObj.labels.labels;
+    let labels;
+
+    if (timeseries && typeof timeseries[layerObj.id] !== 'undefined') {
+      const tsObj = timeseries[layerObj.id];
+      const period = tsObj.period[tsObj.temporalIndex] || tsObj.allPeriods[tsObj.temporalIndex];
+      labels = layerObj.labels.labels[period];
+    } else {
+      labels = layerObj.labels.labels;
+    }
 
     if (!labels) {
       return false;

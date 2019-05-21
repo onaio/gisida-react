@@ -76,7 +76,6 @@ class TimeSeriesSlider extends React.Component {
 
         nextTimeseriesLayer.period = period;
         sliderLayerObj.period = period;
-
         if (layerId === sliderLayerObj.layerId) {
           temporalIndex = nextIndex;
         } else {
@@ -180,8 +179,9 @@ class TimeSeriesSlider extends React.Component {
       currentYear,
       periods: currentPeriods,
       period: currentPeriods[currentPeriods.length - 1]
+    }, () => {
+      this.updateTimeseriesState(currentPeriods.length - 1, this.props.timeSeriesObj, currentYear)
     });
-    this.updateTimeseriesState(currentPeriods.length - 1, this.props.timeSeriesObj, currentYear)
   }
 
   render() {
