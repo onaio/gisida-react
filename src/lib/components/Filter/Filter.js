@@ -521,7 +521,7 @@ export class Filter extends Component {
     // Update FILTER store state
     const { FILTER } = this.props;
     if (FILTER[layerId] && !FILTER[layerId].originalLayerObj) {
-      this.buildOriginalObj(this.props, this.state);
+      this.buildOriginalObj(this.props, this.state, regenStops);
     }
 
     const newFilterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, regenStops, isOr);
@@ -539,10 +539,10 @@ export class Filter extends Component {
     return true;
   }
 
-  buildOriginalObj(props, state) {
+  buildOriginalObj(props, state, regenStops) {
     const { layerObj, mapId, dispatch } = props;
     const { filters, isOr, filterOptions } = state;
-    const filterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, true, isOr);
+    const filterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, regenStops, isOr);
     const { originalLayerObj } = filterState;
     dispatch(Actions.resetFilteredLayer(mapId, originalLayerObj));
     
