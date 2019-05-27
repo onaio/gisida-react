@@ -160,6 +160,7 @@ class TimeSeriesSlider extends React.Component {
   }
 
   handleMouseUp(e) {
+    debugger;
     const nextIndex = parseInt(e.target.value, 10);
     const { index, currentYear } = this.state;
     if (nextIndex !== index) {

@@ -40,7 +40,10 @@ export class Legend extends React.Component {
 
 componentWillReceiveProps(nextProps) {
   const { layerObj } = nextProps;
-  if(nextProps.timeSeriesObj && (this.props.timeSeriesObj !== nextProps.timeSeriesObj) && layerObj.type !== 'chart' && layerObj.property) {
+  if (nextProps.timeSeriesObj &&
+    (this.props.timeSeriesObj !== nextProps.timeSeriesObj) &&
+    layerObj.type !== 'chart' &&
+    layerObj.property && !(layerObj.categories && layerObj.categories.label)) {
     const { timeSeriesObj } = nextProps;
     const index = timeSeriesObj.allPeriods.indexOf(timeSeriesObj.period[timeSeriesObj.temporalIndex]);
     const stops = generateStops(timeSeriesObj,
@@ -148,22 +151,22 @@ componentWillReceiveProps(nextProps) {
       if (timeSeriesObj) {
         const { temporalIndex } = timeSeriesObj;
         const index = timeSeriesObj.allPeriods.indexOf(timeSeriesObj.period[temporalIndex])
-        if (circleLayerType && layer.breaks && layer.stops && layer.stops[0][index]) {
-          const currentColorStops = [...new Set(layer.stops[0][index].map(d => d[1]))];
-          const currentRadiusStops = [...new Set(layer.stops[1][index].map(d => d[1]))];
-          const currentBreakStops = [...new Set(layer.stops[6][index])];
-
+        if (circleLayerType && layer.breaks && layer.stops && layer.stops[0][temporalIndex]) {
+          const currentColorStops = timeSeriesObj.newColors;
+          const currentRadiusStops = [...new Set(timeSeriesObj.stops[temporalIndex].map(d => d[1]))];
+          const currentBreakStops = timeSeriesObj.newBreaks;
           currentRadiusStops.forEach((s, i) => {
+            let rs = s;
             quantiles.push((
               <span
                 className="circle-container"
-                key={s}>
+                key={rs}>
                 <span
                   style={
                     {
                       background: `${(currentColorStops[i] || currentColorStops[0])}`,
-                      width: `${s * 2}px`,
-                      height: `${s * 2}px`,
+                      width: `${rs * 2}px`,
+                      height: `${rs * 2}px`,
                       margin: `0px ${currentRadiusStops[i] / 2}px`
                     }
                   }
@@ -261,7 +264,7 @@ componentWillReceiveProps(nextProps) {
               {latestTimestamp}
             </div>
           );
-        } if (fillLayerWithBreaks && layer.stops && !layer.parent) {
+        } if (fillLayerWithBreaks && layer.stops && !layer.parent && !circleLayerType) {
           const { stopsData, breaks} = layer;
           const colorLegend = layer && layer.stopsData && [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
@@ -471,7 +474,7 @@ componentWillReceiveProps(nextProps) {
             {latestTimestamp}
           </div>
         ));
-      } else if (fillLayerWithBreaks && layer.stops && !layer.parent) {
+      } else if (fillLayerWithBreaks && layer.stops && !layer.parent && !circleLayerType) {
         const { stopsData, breaks} = layer;
           const colorLegend = layer && layer.stopsData && [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
