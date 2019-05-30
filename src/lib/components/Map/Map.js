@@ -415,6 +415,9 @@ class Map extends Component {
 
       if (this.props.MAP.primaryLayer !== primaryLayer) {
         this.setPrimaryLayer(primaryLayer, activeLayerId, layers, activelayersData, activeLayerIds);
+        if (layers[primaryLayer] && layers[primaryLayer].location) {
+          this.map.easeTo(layers[primaryLayer].location);
+        }
       }
     }
     // Assign global variable for debugging purposes.
