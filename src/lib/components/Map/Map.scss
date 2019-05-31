@@ -42,4 +42,32 @@
   top: 0;
   right: 0;
   border-left: 4px solid #fff;
+
+  &.splitScreenClass {
+  width: 34% !important;
+  right: 250px
+  }
+
 }
+
+.mapboxgl-map
+.mapboxgl-control-container
+.mapboxgl-ctrl-bottom-left {
+  right: 0;
+  position: relative;
+  top: 250px;
+.mapboxgl-ctrl {
+  float: right;
+}
+.mapboxgl-ctrl-scale {
+    background-color: rgba(255,255,255,0.75);
+    padding: 2px 5px;
+    right: 0;
+    top: 235px;
+    width: 45px !important;
+    border: 2px solid #cdcdcd ;
+    color: #333;
+    margin: 7px;
+  
+    }
+  }

@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import SumPieChart from './SumPieChart';
 import SumColumnChart from './SumColumnChart';
 import SumChartMinimize from './SumChartMinimize';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 
 require('./SummaryChart.scss');
 
 
 const mapStateToProps = (state, ownProps) => {
-  const MAP = state[ownProps.mapId] || { layers: {}};
+  const MAP = state[ownProps.mapId] || { layers: {} };
   const layers = MAP.layers;
   let layerObj
   let layersObj = []
@@ -21,11 +21,10 @@ const mapStateToProps = (state, ownProps) => {
   Object.keys(layers).forEach((key) => {
     const layer = layers[key];
     if (layer.charts && layer.visible) {
-      layerObj = layer;
-      layersObj.push(layerObj);
-    } 
+      layersObj.push(layer);
+    }
   });
-
+  layerObj = MAP.layers[MAP.primaryLayer || MAP.activeLayerId]
   // Set layer to undefined of layer is from diffrent region
   currentRegion = state.REGIONS.filter(region => region.current)[0];
   if (currentRegion) {
@@ -40,7 +39,6 @@ const mapStateToProps = (state, ownProps) => {
       : MAP.timeseries[layerObj.id]
       ? MAP.timeseries[layerObj.id]
       : null;
-
     if (typeof layerObj.isChartMin === 'undefined') {
       isChartMin = true;
       legendBottom = 40;
@@ -59,6 +57,7 @@ const mapStateToProps = (state, ownProps) => {
       legendBottom: legendBottom,
       locations: {},
       showMinimize: true,
+      primaryLayer: MAP.primaryLayer,
       menuIsOpen: MAP.menuIsOpen,
     }
   } else return { showMinimize: false}
@@ -126,14 +125,19 @@ class SummaryChart extends React.Component {
     const newLayersObj = [];
     let doUpdateLayersObj = false;
 
+    if (!this.props.primaryLayer) {
+      return false;
+    }
+
     if (layerObj.id === layerId && layerObj.isChartMin !== isChartMin) {
       layerObj.isChartMin = isChartMin;
       layerObj.legendBottom = legendBottom;
-      layersObj[layersObj.length - 1].isChartMin = isChartMin;
-      layersObj[layersObj.length - 1].legendBottom = legendBottom;
+      const activeObj = layersObj.find(d => d.id === this.props.primaryLayer);
+      activeObj.isChartMin = isChartMin;
+      activeObj.legendBottom = legendBottom;
 
       this.setState({
-        layerObj,
+        layerObj: activeObj,
         layersObj,
       });
     } else {
@@ -214,6 +218,8 @@ class SummaryChart extends React.Component {
         doShowModal: layerId === this.state && this.state.layerId ? this.state.doShowModal : false,
         chartWidth: primaryChartPosition.chartWidth,
         isFullBleed: primaryChartPosition.isFullBleed,
+      }, () => {
+        this.moveMapLedgend();
       });
     }
   }
@@ -233,10 +239,17 @@ class SummaryChart extends React.Component {
   }
 
   moveMapLedgend(chartHeight) {
-    const { isChartMin, layerId } = this.state;
+    const { layerId } = this.state;
     const { mapId, menuIsOpen } = this.props;
     const { chartWidth, isFullBleed } = SummaryChart.calcChartWidth(mapId, menuIsOpen);
     const legendPosition = SummaryChart.calcLegendPosition(mapId);
+    let isChartMin;
+    if (this.props.layersObj &&
+      typeof this.state.isChartMin === 'undefined') {
+      isChartMin = this.props.layersObj.find(l => l.id === layerId).isChartMin;
+    } else {
+      isChartMin = this.state.isChartMin;
+    }
     const legendBottom = isChartMin
       ? 40
       : isFullBleed
@@ -254,7 +267,7 @@ class SummaryChart extends React.Component {
       chartWidth: chartWidth,
       isFullBleed: isFullBleed,
     }, () => {
-      this.saveChartState(layerId, this.state.isChartMin, legendBottom);
+      this.saveChartState(layerId, isChartMin, legendBottom);
     });
   }
 

@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux'
-import { Actions, getSliderLayers } from 'gisida';
+import { Actions, getSliderLayers, generateStops } from 'gisida';
 import { buildLayersObj } from '../../utils';
+
+
 
 require('./TimeSeriesSlider.scss');
 
@@ -21,7 +23,9 @@ const mapStateToProps = (state, ownProps) => {
     timeSeriesObj: MAP.timeseries[timeSubLayer || timeLayer],
     timeseries: MAP.timeseries,
     layers: MAP.layers,
+    primaryLayer: MAP.primaryLayer,
     showFilterPanel: MAP.showFilterPanel,
+    timeLayer,
   }
 }
 
@@ -39,7 +43,7 @@ class TimeSeriesSlider extends React.Component {
     const nextTimeseries = Object.assign({}, this.props.timeseries);
 
     const timeSeriesLayers = getSliderLayers(this.props.layers);
-    
+
     const activeLayers = [];
     const layers = [];
     const loadedlayers = this.props.layers;
@@ -54,7 +58,10 @@ class TimeSeriesSlider extends React.Component {
       layerId = timeSeriesLayers[i];
       if (activeLayers.includes(layerId) && nextTimeseries[layerId]) {
         nextTimeseriesLayer = nextTimeseries[layerId];
-        const { periodData } = nextTimeseriesLayer;
+        const {
+          periodData
+        } = nextTimeseriesLayer;
+
         period = nextTimeseriesLayer.period;
 
         if (layerId === sliderLayerObj.layerId) {
@@ -64,23 +71,43 @@ class TimeSeriesSlider extends React.Component {
         }
 
         if (temporalIndex !== -1) {
-          nextTimeseries[layerId] = Object.assign(
-            {},
-            nextTimeseriesLayer,
-            {
+          nextTimeseries[layerId] = Object.assign({},
+            nextTimeseriesLayer, {
               temporalIndex,
               data: periodData[period[temporalIndex]].data,
+              adminFilter: periodData[period[temporalIndex]].adminFilter && [...periodData[period[temporalIndex]].adminFilter],
             },
           );
         }
       }
     }
+    const {
+      field
+    } = sliderLayerObj.layerObj.aggregate.timeseries;
+    sliderLayerObj.data = sliderLayerObj.periodData[sliderLayerObj.period[nextIndex]].data;
+    const activeStops = generateStops(sliderLayerObj, field, this.props.dispatch, nextIndex);
 
-    this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries))
+    const {
+      primaryLayer
+    } = this.props;
+    if (this.props.layers[primaryLayer].layers) {
+      this.props.layers[primaryLayer].layers.map(i =>
+        nextTimeseries[i].newBreaks = activeStops[3]);
+      this.props.layers[primaryLayer].layers.map(i =>
+        nextTimeseries[i].newColors = [...new Set(sliderLayerObj.colorStops[nextIndex].map(d =>
+          d[1]))]);
+
+      this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, this.props.timeLayer));
+    } else {
+      nextTimeseries[sliderLayerObj.layerId].newBreaks = activeStops[3];
+      nextTimeseries[sliderLayerObj.layerId].newColors = [...new Set(sliderLayerObj.colorStops[nextIndex].map(d => d[1]))];
+      this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, this.props.timeLayer));
+    }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.timeSeriesObj) {
+    
+    if (nextProps.timeSeriesObj && nextProps.timeSeriesObj.periodData) {
       const { period, temporalIndex } = nextProps.timeSeriesObj;
       this.setState({
         periods: period,
@@ -99,7 +126,7 @@ class TimeSeriesSlider extends React.Component {
   }
 
   render() {
-    return this.props.timeSeriesObj ? (
+    return ((this.props.timeSeriesObj) && (this.state && this.state.periods.length > 1)) ? (
       <div
         className="series"
         style={{ right: '50px'}}>

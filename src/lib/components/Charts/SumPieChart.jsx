@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import PieChart from './PieChart';
-import { hexToRgbA } from '../../utils';
+import { hexToRgbA, parseColValue } from '../../utils';
 
 class SumPieChart extends React.Component {
   static tooltipFormatter() {
@@ -35,19 +35,20 @@ class SumPieChart extends React.Component {
 
     let dataBreaks;
     if (breaks) {
-      dataBreaks = layerData.map((d) => {
+      dataBreaks = (layerData.features || layerData).map((d) => {
         for (let b = 0; b < breaks.length; b += 1) {
-          if (d[column] <= breaks[b]) return b;
+          if (parseColValue((d.properties || d), column) <= breaks[b]) return b;
         }
         return breaks.length - 1;
       });
     }
 
     // Aggregate data
+    const activeData = layerData.features || layerData;
     if (chartSpec.type === 'status') {
       // loop through dataset
-      for (i; i < layerData.length; i += 1) {
-        datum = layerData[i];
+      for (i; i < activeData.length; i += 1) {
+        datum = activeData[i].properties || activeData[i];
         // check for status category in dataMap
         if (!dataMap[datum[column]]) {
           // create it if it doesn't exist
@@ -61,8 +62,8 @@ class SumPieChart extends React.Component {
         dataMap[datum[column]].count += 1;
       }
     } else if (chartSpec.type === 'breaks') {
-      for (i; i < layerData.length; i += 1) {
-        datum = layerData[i];
+      for (i; i < activeData.length; i += 1) {
+        datum = activeData[i].properties || activeData[i];
         dBreak = dataBreaks[i];
         if (!dataMap[dBreak]) {
           dataMap[dBreak] = {
@@ -81,7 +82,7 @@ class SumPieChart extends React.Component {
     return Object.keys(dataMap).map(category => ({
       name: dataMap[category].label,
       y: dataMap[category].count,
-      x: chartSpec.level,
+      x: dataMap[category].count > 1 ? `${chartSpec.level}s` : chartSpec.level,
       color: hexToRgbA(dataMap[category].color, 0.8),
     }));
   }
