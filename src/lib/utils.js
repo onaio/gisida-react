@@ -174,8 +174,20 @@ export function deepCopy(x) {
 };
 
 export function orderLayers(activeLayersData, map, nextLayerId) {
-  let circles = activeLayersData.filter(d => d['type'] === 'circle'
+  let fill = activeLayersData.filter(d => d['type'] === 'fill'
      && !d['detail-view']);
+     if (fill.length) {
+       Object.keys(fill).forEach((key) => {
+         if (map.getLayer(fill[key].id)) {
+           map.moveLayer(fill[key].id);
+         }
+       });
+       if (fill.find(c => c.id === nextLayerId) && map.getLayer(nextLayerId)) {
+          map.moveLayer(nextLayerId);
+       }
+     }
+
+  let circles = activeLayersData.filter(d => d['type'] === 'circle');
      if (circles.length) {
        Object.keys(circles).forEach((key) => {
          if (map.getLayer(circles[key].id)) {
@@ -186,7 +198,8 @@ export function orderLayers(activeLayersData, map, nextLayerId) {
           map.moveLayer(nextLayerId);
        }
      }
-    let symbols = activeLayersData.filter(d => d['type'] === 'symbol' && !d['detail-view']);
+
+    let symbols = activeLayersData.filter(d => d['type'] === 'symbol');
     if (symbols.length) {
       Object.keys(symbols).forEach((key) => {
         if (map.getLayer(symbols[key].id)) {
@@ -197,6 +210,19 @@ export function orderLayers(activeLayersData, map, nextLayerId) {
         map.moveLayer(nextLayerId);
       }
     }
+
+    let line = activeLayersData.filter(d => d['type'] === 'line');
+     if (line.length) {
+       Object.keys(line).forEach((key) => {
+         if (map.getLayer(line[key].id)) {
+           map.moveLayer(line[key].id);
+         }
+       });
+       if (line.find(c => c.id === nextLayerId) && map.getLayer(nextLayerId)) {
+          map.moveLayer(nextLayerId);
+       }
+     }
+
     let detailViewActive = activeLayersData.filter(d => d['detail-view']);
     if (detailViewActive.length) {
       Object.keys(detailViewActive).forEach((key) => {
@@ -208,4 +234,17 @@ export function orderLayers(activeLayersData, map, nextLayerId) {
         map.moveLayer(nextLayerId);
       }
     }
+    let isLabelActive = activeLayersData.filter(d => d.isLabel);
+
+    if (isLabelActive.length) {
+      Object.keys(isLabelActive).forEach((key) => {
+        if (map.getLayer(isLabelActive[key].id)) {
+          map.moveLayer(isLabelActive[key].id);
+        }
+      });
+      if (isLabelActive.find(d => d.id === nextLayerId) && map.getLayer(nextLayerId)) {
+        map.moveLayer(nextLayerId);
+      }
+    }
+
 }

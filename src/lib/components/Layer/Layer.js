@@ -29,7 +29,7 @@ export class Layer extends Component {
     }
     this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
     const {center, zoom } = lngLat(LOC, APP);
-    if (layer.visible) {
+    if (layer.zoomOnToggle && layer.visible) {
         window.maps.forEach((e) => {
           e.easeTo({
             center,
@@ -50,7 +50,7 @@ export class Layer extends Component {
       return null;
     }
     return (
-      <li className="layer">
+      <li className="layer" title={layer['menu-credit'] ? `Credit: ${layer['menu-credit']}` : ''}>
         <input
           id={`${layer.id}-${mapId}`}
           type="checkbox"
@@ -58,7 +58,7 @@ export class Layer extends Component {
           onChange={e => this.onLayerToggle(layer)}
           checked={!!layer.visible}
         />
-        <label htmlFor={`${layer.id}-${mapId}`} >{layer.label}</label>
+        <label htmlFor={`${layer.id}-${mapId}`}>{layer.label}</label>
       </li>
     );
   }

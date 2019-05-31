@@ -30,16 +30,20 @@ const mapStateToProps = (state, ownProps) => {
     LOC,
     VIEW,
     FILTER,
+    layers: MAP.layers,
+    primarySubLayer: MAP.primarySubLayer,
+    activeLayerIds: MAP.activeLayerIds,
     detailView: MAP.detailView,
     timeSeriesObj: MAP.timeseries ? MAP.timeseries[MAP.primarySubLayer || MAP.activeLayerId]: null,
     timeseries:  MAP.timeseries,
     layersObj: MAP.layers ? buildLayersObj(MAP.layers) : {},
-    layerObj: MAP.layers ? MAP.layers[MAP.activeLayerId]: null,
+    layerObj: MAP.layers ? MAP.layers[MAP.primaryLayer || MAP.activeLayerId]: null,
     primaryLayer: MAP.primaryLayer,
     oldLayerObj: MAP.oldLayerObjs ? MAP.oldLayerObjs[MAP.primaryLayer] : {},
     showDetailView: (detailView && detailView.model && detailView.model.UID),
     showFilterPanel: !!MAP.showFilterPanel,
     activeLayers,
+    handlers: ownProps.handlers,
   }
 }
 
@@ -61,6 +65,11 @@ class Map extends Component {
       window.maps.push(this.map);
       this.map.controls = new mapboxgl.NavigationControl();
       this.map.addControl(this.map.controls);
+      this.map.scale_controls = new mapboxgl.ScaleControl({
+        maxWidth: 80,
+        unit: 'metric'
+    });
+    this.map.addControl(this.map.scale_controls);
   
       // Handle Map Load Event
       this.map.on('load', () => {
@@ -97,37 +106,73 @@ class Map extends Component {
       this.map.on('zoom', this.handleLabelsOnMapZoom.bind(this))
 
       // Dispach map rendered to indicate map was rendered
-      this.props.dispatch(Actions.mapRendered(mapId));
+      this.props.dispatch(Actions.mapRendered(mapId, true));
     }
   }
 
   addMouseEvents(mapId) {
-    addPopUp(mapId, this.map, this.props.dispatch);
-    // this.addMapClickEvents()
-    // this.addMouseMoveEvents()
-    // etc
-    this.map.on('mousemove', (e) => {
-      const { activeLayers, layerObj } = this.props;
-      const features = this.map.queryRenderedFeatures(e.point, {
-        layers: activeLayers.filter(i => this.map.getLayer(i) !== undefined)
-      });
-      const feature = features.find(f => f.layer.id === layerObj.id);
-      if (!feature) {
-        return false;
+    const { handlers, APP } = this.props;
+    if (handlers && Array.isArray(handlers)) {
+      let handler;
+      let sublayer;
+      for (let c = 0; c < handlers.length; c += 1) {
+        handler = handlers[c];
+        if (handler.layer) {
+          if (handler.layer.layers) {
+            // If it is a grouped layer loop through the layer.layers array
+            for (let l = 0; l < handler.layer.layers.length; l += 1) {
+              sublayer = handler.layer.layers[l];
+              this.map.on(handler.type, sublayer, handler.method);
+            }
+          } else {
+            this.map.on(handler.type, handler.layer.id, handler.method);
+          }
+        } else {
+          this.map.on(handler.type, handler.method);
+        }
       }
-      this.map.getCanvas().style.cursor = layerObj['detail-view']
-        ? 'pointer' : '';
-      return true;
-    });
-    this.map.on('click', this.onFeatureClick.bind(this));
-  }
+    }
 
-  componentWillUpdate (nextProps, nextState) {
-    if((this.props && this.props.primaryLayer) !== 
-        (nextProps && nextProps.primaryLayer)) {
-      this.updateTimeseriesLayers(nextProps);
+    if (APP.disableDefaultMapListeners) {
+      return false
+    }
+
+
+
+    if (!APP.disableTooltip) {
+      addPopUp(mapId, this.map, this.props.dispatch);
+      // this.addMapClickEvents()
+      // this.addMouseMoveEvents()
+      // etc
+      this.map.on('mousemove', (e) => {
+        const { activeLayers, layerObj } = this.props;
+        if (!layerObj) {
+          return false;
+        }
+        const features = this.map.queryRenderedFeatures(e.point, {
+          layers: activeLayers.filter(i => this.map.getLayer(i) !== undefined)
+        });
+        const feature = features.find(f => f.layer.id === layerObj.id);
+        if (!feature) {
+          return false;
+        }
+        this.map.getCanvas().style.cursor = layerObj['detail-view']
+          ? 'pointer' : '';
+        return true;
+      });
+    }
+
+    if (!APP.disableDefaultFeatureClick) {
+      this.map.on('click', this.onFeatureClick.bind(this));
     }
   }
+
+  // componentWillUpdate (nextProps, nextState) {
+  //   if((this.props && this.props.primaryLayer) !== 
+  //       (nextProps && nextProps.primaryLayer)) {
+  //     this.updateTimeseriesLayers(nextProps);
+  //   }
+  // }
   onFeatureClick(e) {
     const activeLayers = this.props.layersObj.map(l => l.id)
     const { mapId } = this.props;
@@ -159,7 +204,15 @@ class Map extends Component {
     return activelayersData.find(lo => lo.id === nextLayer);
   }
 
-  setPrimaryLayer(primaryLayer, activeLayerId, layers, activeLayersData, activelayerObj) {
+  setPrimaryLayer(primaryLayer, activeLayerId, layers, activeLayersData, activeLayerIds) {
+    const sortedLayers = [];
+    activeLayerIds.forEach(id => {
+      activeLayersData.forEach(l => {
+        if (id === l.id || id === l.parent) {
+          sortedLayers.push(l);
+        }
+      });
+    });
     const nextLayerId =  primaryLayer || activeLayerId;
     let nextLayerObj = activeLayersData.find(lo => lo.id === nextLayerId);
     if (nextLayerId && !nextLayerObj && layers[nextLayerId].layers) {
@@ -181,7 +234,7 @@ class Map extends Component {
               this.map.moveLayer(sublayers[s]);
             }
           }
-          orderLayers(activeLayersData, map, nextLayerId);
+          orderLayers(sortedLayers, map, nextLayerId);
         }
       }
     }
@@ -221,7 +274,7 @@ class Map extends Component {
     // }
     // Order active layers
 
-    orderLayers(activeLayersData, map, nextLayerId);
+    orderLayers(sortedLayers, map, nextLayerId);
     const nextlayersObj = activeLayersData.filter(lo => lo.id !== nextLayerId);
     nextlayersObj.push(nextLayerObj);
 
@@ -254,12 +307,12 @@ class Map extends Component {
     const currentRegion = nextProps.MAP.currentRegion;
     const reloadLayers = nextProps.MAP.reloadLayers;
     const activelayersData = nextProps.layersObj;
-    const activelayerObj = nextProps.layerObj;
+    const activeLayerIds = nextProps.activeLayerIds;
     const primaryLayer = nextProps.MAP.primaryLayer;
     const activeLayerId = nextProps.MAP.activeLayerId;
 
     const layers = nextProps.MAP.layers;
-    const styles = nextProps.STYLES;
+    const styles = nextProps.STYLES || [];
     const regions = nextProps.REGIONS;
     const mapId = nextProps.mapId;
     mapConfig.container = mapId
@@ -279,7 +332,7 @@ class Map extends Component {
       });
 
       // Zoom to current region (center and zoom)
-      regions.forEach((region) => {
+      regions && regions.forEach((region) => {
         if (region.current && this.props.MAP.currentRegion !== currentRegion) {
           this.map.easeTo({
             center: region.center,
@@ -323,7 +376,9 @@ class Map extends Component {
             this.map.removeSource(layer.id);
             // 2) dispatch action to set reloadLayerId to null
             this.props.dispatch(Actions.layerReloaded(mapId));
-            const originalLayer = nextProps.FILTER[layer.id].isClear ? nextProps.MAP.oldLayerObjs[layer.id] : layer;
+            const originalLayer = nextProps.FILTER &&
+              nextProps.FILTER[layer.id] &&
+              nextProps.FILTER[layer.id].isClear ? nextProps.MAP.oldLayerObjs[layer.id] : layer;
             prepareLayer(mapId, originalLayer, this.props.dispatch, filterOptions, doUpdateTsLayer);
           }
           // Change visibility if layer is already on map
@@ -347,11 +402,37 @@ class Map extends Component {
              $(`.marker-chart-${layer.id}-${mapId}`).remove();
           }
         });
-        sortLayers(this.map, layers, (primaryLayer || activeLayerId));
+        const intelLayers = []
+        activeLayerIds.forEach(id => {
+          activelayersData.forEach(l => {
+            if (id === l.id | id === l.parent) {
+              intelLayers.push(l);
+            }
+          });
+        });
+        sortLayers(this.map, (intelLayers || layers), (primaryLayer || activeLayerId));
       }
 
       if (this.props.MAP.primaryLayer !== primaryLayer) {
-        this.setPrimaryLayer(primaryLayer, activeLayerId, layers, activelayersData, activelayerObj);
+        this.setPrimaryLayer(primaryLayer, activeLayerId, layers, activelayersData, activeLayerIds);
+        if (layers[primaryLayer] && layers[primaryLayer].location) {
+          this.map.easeTo(layers[primaryLayer].location);
+        } else {
+          if (!Array.isArray(mapConfig.center)) {
+            this.map.easeTo({
+              center: mapConfig.center,
+              zoom: mapConfig.zoom
+            });
+          } else {
+            this.map.easeTo({
+              center: {
+                "lng": mapConfig.center[0],
+                "lat": mapConfig.center[1]
+              },
+              zoom: mapConfig.zoom
+            });
+          }
+        }
       }
     }
     // Assign global variable for debugging purposes.
@@ -388,28 +469,12 @@ class Map extends Component {
         this.updateTimeseriesLayers();
       }
 
-      // Update Labels
+      // Update Labels and handle labels visibility at different
+      // zoom levels
       this.removeLabels();
-      const subLayerWithLabels = layersObj && layersObj.find((l) => {
-        if (layerObj && layerObj.layers) {
-          return l.parent === primaryLayer && l.labels && l.labels.labels
-        }
-        return null;
-      });
-      const activeObj = subLayerWithLabels || layerObj;
-      if (activeObj &&
-        ((layerObj.id === primaryLayer) || (subLayerWithLabels && (subLayerWithLabels.parent === primaryLayer))) &&
-        activeObj.labels &&
-        activeObj.labels.labels) {
-        this.addLabels(activeObj, this.props.timeseries);
-        const minZoom = activeObj.labels.minZoom || activeObj.labels.minzoom || 0;
-        const maxZoom = activeObj.labels.maxZoom || activeObj.labels.maxzoom || 22;
-        const currentZoom = this.map.getZoom();
-        if (currentZoom < minZoom || currentZoom > maxZoom) {
-          this.removeLabels(`label-${activeObj.id}`);
-        }
-      }
+      this.handleLabelsOnMapZoom();
     }
+
     // Update Layer Filters
     if (this.map && this.props.layerObj && this.map.getLayer(this.props.layerObj.id)) {
       const { FILTER, primaryLayer } = this.props;
@@ -421,6 +486,14 @@ class Map extends Component {
         this.buildFilters();
       }
     }
+  }
+
+  componentWillUnmount() {
+    const { dispatch, mapId } = this.props;
+    const index = window.maps.map(m => m['_container'].id).indexOf(mapId);
+    window.maps.splice(index, 1);
+    dispatch(Actions.mapRendered(mapId, false));
+    dispatch(Actions.mapLoaded(mapId, false));
   }
   
 
@@ -675,20 +748,54 @@ class Map extends Component {
     let maxZoom;
     let zoom = this.map.getZoom();
     let isRendered;
+    let activeId;
+    let id;
+    let hasLabel;
+    let layerObj;
+    let slId;
+    const sortedLayers = [];
     if (this.props && this.props.layersObj) {
-      this.props.layersObj.forEach(layerObj => {
-        if (layerObj.labels) {
-          minZoom = layerObj.labels.minZoom || layerObj.labels.minzoom || 0;
-          maxZoom = layerObj.labels.maxZoom || layerObj.labels.maxzoom || 22;
-          isRendered = (document.getElementsByClassName(`label-${layerObj.id}`)).length;
-
-          if (zoom < minZoom || zoom > maxZoom) {
-            this.removeLabels(`label-${layerObj.id}`);
-          } else if (!isRendered && (layerObj.id === this.props.primaryLayer)) {
-            this.addLabels(layerObj);
+      for (let a = this.props.activeLayerIds.length - 1; a >= 0; a -= 1) {
+        id = this.props.activeLayerIds[a];
+        if (this.props.layers[id].layers) {
+          for (let sl = 0; sl < this.props.layers[id].layers.length; sl += 1) {
+            slId = this.props.layers[id].layers[sl];
+            if (this.props.layers[slId].labels) {
+              hasLabel = slId;
+              break;
+            }
           }
+          break;
+        } else if (!this.props.layers[id].layers && this.props.layers[id] && this.props.layers[id].labels) {
+          hasLabel = id;
+          break;
         }
+      }
+
+      this.props.activeLayerIds.forEach(id => {
+        this.props.layersObj
+          .filter(d => !d.layers)
+          .forEach((l) => {
+            if (id === l.id || id === l.parent) {
+              sortedLayers.push(l);
+            }
+          });
       });
+
+       for (let l = 0; l < sortedLayers.length; l += 1) {
+         layerObj = sortedLayers[l];
+         if (layerObj.labels) {
+           minZoom = layerObj.labels.minZoom || layerObj.labels.minzoom || 0;
+           maxZoom = layerObj.labels.maxZoom || layerObj.labels.maxzoom || 22;
+           isRendered = (document.getElementsByClassName(`label-${layerObj.id}`)).length;
+           activeId = layerObj.id || layerObj.parent;
+           if ((zoom < minZoom || zoom > maxZoom)) {
+             this.removeLabels(`label-${layerObj.id}`);
+           } else if (!isRendered && (activeId === this.props.primaryLayer || activeId === hasLabel)) {
+             this.addLabels(layerObj, this.props.timeseries);
+           }
+         }
+      }
     }
   }
 

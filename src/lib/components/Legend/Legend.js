@@ -88,7 +88,9 @@ componentWillReceiveProps(nextProps) {
    }
  }
   onUpdatePrimaryLayer(e) {
-    e.preventDefault();
+    if (e.target.getAttribute('data-credit') !== 'credit') {
+      e.preventDefault();
+    }
     const { dispatch, mapId } = this.props;
     const targetLayer = e.currentTarget.getAttribute('data-layer');
     // dispatch primary layer id
@@ -96,33 +98,43 @@ componentWillReceiveProps(nextProps) {
   }
  
   render() {
+
     const { layerObj, mapId, lastLayerSelected, timeSeriesObj, layers, primaryLayer, primarySubLayer, activeLayerIds } = this.props;
     if (!layerObj) {
       return false;
     }
-
+    let latestTimestamp;
+    if (layerObj['timestamp'] && 
+      Array.isArray(layerObj.source.data.features || layerObj.source.data) &&
+       (layerObj.source.data.features || layerObj.source.data).length > 1) {
+          latestTimestamp = (layerObj.source.data.features || layerObj.source.data)
+            .map(d => ((d.properties && d.properties[layerObj['timestamp']])
+             || (d[layerObj['timestamp']]))).sort().reverse()[0];
+       }
     const legendItems = [];
-
+    latestTimestamp = latestTimestamp ? <span>Timestamp: {latestTimestamp}</span> : null;
     let primaryLegend;
     let layer;
-    for (let l = 0; l < this.props.layersData.length; l += 1) {
-      layer = this.props.layersData[l];
-      const circleLayerType = (layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible);
-      const symbolLayer = (layer && layer.credit && layer.categories && layer.categories.shape && layer.type !== 'circle');
-      const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
-      const fillLayerWithBreaks = (layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle' && layer.categories && layer.categories.breaks === 'yes');
-      let activeLegendLayer;
-      let a = activeLayerIds.length;
-      while(a --) {
+
+    let activeLegendLayer;
+      for (let a = activeLayerIds.length - 1; a >= 0; a -= 1) {
         if (layers[activeLayerIds[a]] && layers[activeLayerIds[a]].credit) {
           activeLegendLayer = activeLayerIds[a];
           break;
         }
       }
 
-      if (this.state.primaryLayer !== primaryLayer && layers[primaryLayer].credit) {
+      if (this.state.primaryLayer !== primaryLayer &&
+        (layers[primaryLayer] && layers[primaryLayer].credit)) {
         activeLegendLayer = primaryLayer;
       }
+
+    for (let l = 0; l < this.props.layersData.length; l += 1) {
+      layer = this.props.layersData[l];
+      const circleLayerType = (layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible);
+      const symbolLayer = (layer && layer.credit && layer.categories && layer.categories.shape && layer.type !== 'circle');
+      const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
+      const fillLayerWithBreaks = (layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle' && layer.categories && layer.categories.breaks === 'yes');
 
       const activeLayerSelected = activeLegendLayer === layer.id  ? 'primary' : '';
 
@@ -174,7 +186,7 @@ componentWillReceiveProps(nextProps) {
                 style={
                   {
                     background: Array.isArray(layer.categories.color) ? layer.categories.color[i]
-                      : colors[i],
+                      : (colors[i] || colors[0]),
                     width: `${s * 2}px`,
                     height: `${s * 2}px`,
                     margin: `0px ${i + 2}px`
@@ -203,7 +215,8 @@ componentWillReceiveProps(nextProps) {
               <div className="legend-symbols">
                 {quantiles}
               </div>
-              <span>{layer.credit}</span>
+              <span>{Parser(layer.credit)}</span>
+              {latestTimestamp}
             </div>);
         }
         if (fillLayerNoBreaks && !layer.parent) {
@@ -243,6 +256,7 @@ componentWillReceiveProps(nextProps) {
               <span>
                 {Parser(layer.credit)}
               </span>
+              {latestTimestamp}
             </div>
           );
         } if (fillLayerWithBreaks && layer.stops && !layer.parent) {
@@ -345,6 +359,7 @@ componentWillReceiveProps(nextProps) {
                 </ul>
               </div>
               <span>{Parser(layer.credit)}</span>
+              {latestTimestamp}
             </div>
           );
 
@@ -366,7 +381,8 @@ componentWillReceiveProps(nextProps) {
             <div className="legend-symbols">
               {quantiles}
             </div>
-            <span>{layer.credit}</span>
+            <span>{Parser(layer.credit)}</span>
+            {latestTimestamp}
           </div>
         ));
       } else if (symbolLayer) {
@@ -408,6 +424,7 @@ componentWillReceiveProps(nextProps) {
             <span>
               {Parser(layer.credit)}
             </span>
+            {latestTimestamp}
           </div>
         ));
 
@@ -448,6 +465,7 @@ componentWillReceiveProps(nextProps) {
             <span>
               {Parser(layer.credit)}
             </span>
+            {latestTimestamp}
           </div>
         ));
       } else if (fillLayerWithBreaks && layer.stops && !layer.parent) {
@@ -550,6 +568,7 @@ componentWillReceiveProps(nextProps) {
               </ul>
             </div>
             <span>{Parser(layer.credit)}</span>
+            {latestTimestamp}
           </div>
         ));
       }
