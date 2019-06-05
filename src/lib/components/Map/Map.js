@@ -54,10 +54,12 @@ window.maps = [];
 class Map extends Component {
   constructor(props) {
     super(props);
+    this._isMounted = false;
     this.state = {
       layersObj: this.props.layersObj,
     }
   }
+
   initMap(accessToken, mapConfig, mapId) {
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;
@@ -73,10 +75,12 @@ class Map extends Component {
   
       // Handle Map Load Event
       this.map.on('load', () => {
-        const mapLoaded = true;
-        this.addMouseEvents(mapId);
-        this.setState({ mapLoaded });
-        this.props.dispatch(Actions.mapLoaded(mapId, true));
+        if (this._isMounted) {
+          const mapLoaded = true;
+          this.addMouseEvents(mapId);
+          this.setState({ mapLoaded });
+          this.props.dispatch(Actions.mapLoaded(mapId, true));
+        }
       });
 
       // Handle Style Change Event
@@ -295,6 +299,10 @@ class Map extends Component {
     }
   }
 
+  componentDidMount() {
+    this._isMounted = true;
+  }
+
   componentWillReceiveProps(nextProps) {
     if (this.map) {
       this.map.resize();
@@ -489,6 +497,7 @@ class Map extends Component {
   }
 
   componentWillUnmount() {
+    this._isMounted = false;
     const { dispatch, mapId } = this.props;
     const index = window.maps.map(m => m['_container'].id).indexOf(mapId);
     window.maps.splice(index, 1);
