@@ -272,12 +272,16 @@ export class Filter extends Component {
   }
 
   handleFilterClick() {
-    const { dispatch, mapId, layerId, APP, LOC } = this.props;
-    const availableMaps = ['map-1', 'map-2'];
+    const { dispatch, mapId, layerId, APP, LOC, layerObj } = this.props;
+    // const availableMaps = ['map-1', 'map-2'];
     const { center, zoom } = lngLat(LOC, APP);
-    window.maps[availableMaps.indexOf(mapId)].easeTo({
-      center,
-      zoom,
+    window.maps.forEach((e) => {
+      if (layerObj && !layerObj.location) {
+        e.easeTo({
+          center,
+          zoom,
+        });
+      }
     });
     dispatch(Actions.toggleFilter(mapId, layerId));
   }
@@ -308,24 +312,23 @@ export class Filter extends Component {
 
 
     // determine whether to update the compnent state
-    const doUpdate = (layerId !== this.state.layerId
-      && (filterOptions && Object.keys(filterOptions).length > 0))
-      || (filterState && filterState.doUpdate);
+    const doUpdate = ((layerId !== this.state.layerId &&
+        (filterOptions && Object.keys(filterOptions).length > 0)) ||
+      (filterState && filterState.doUpdate) || (timeseriesObj &&
+        (timeseriesObj.temporalIndex !== this.props.timeseriesObj.temporalIndex)));
     if (doUpdate) {
-    this.setState({
-      filters,
-      filterOptions,
-      timeseriesObj: nextProps.timeseriesObj,
-      oldLayerObj,
-      layerId: doUpdate ? layerId : null,
-      doShowProfile: false,
-    }, () => {
-      
+      this.setState({
+        filters,
+        filterOptions,
+        timeseriesObj: nextProps.timeseriesObj,
+        oldLayerObj,
+        layerId: doUpdate ? layerId : null,
+        doShowProfile: false,
+      }, () => {
         this.props.dispatch(Actions.filtersUpdated(nextProps.mapId, layerId));
-      
-    });
-  }  
- } 
+      });
+    }
+ }
   onCloseClick = (e) => {
     e.preventDefault();
     //TODO dispach close action
