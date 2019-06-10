@@ -150,7 +150,6 @@ componentWillReceiveProps(nextProps) {
 
       if (timeSeriesObj) {
         const { temporalIndex } = timeSeriesObj;
-        const index = timeSeriesObj.allPeriods.indexOf(timeSeriesObj.period[temporalIndex])
         if (circleLayerType && layer.breaks && layer.stops && layer.stops[0][temporalIndex]) {
           const currentColorStops = timeSeriesObj.newColors;
           const currentRadiusStops = [...new Set(timeSeriesObj.stops[temporalIndex].map(d => d[1]))];
@@ -290,7 +289,6 @@ componentWillReceiveProps(nextProps) {
                layer.breaks;
           
           const lastBreaks = Math.max(...stopsBreak);
-          const index = timeSeriesObj.allPeriods.indexOf(timeSeriesObj.period[timeSeriesObj.temporalIndex]);
           const layerStops = (timeSeriesObj && timeSeriesObj.stops && 
             layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) ? 
            [...new Set(timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(d => d[1]))] :
@@ -500,7 +498,6 @@ componentWillReceiveProps(nextProps) {
                layer.breaks;
           
           const lastBreaks = Math.max(...stopsBreak);
-          const index = timeSeriesObj.allPeriods.indexOf(timeSeriesObj.period[timeSeriesObj.temporalIndex]);
           const layerStops = (timeSeriesObj && timeSeriesObj.stops && 
             layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) ? 
            [...new Set(timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(d => d[1]))] :

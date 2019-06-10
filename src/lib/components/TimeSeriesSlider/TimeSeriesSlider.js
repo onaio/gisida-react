@@ -39,7 +39,7 @@ class TimeSeriesSlider extends React.Component {
   }
 
   filteredPeriods(allPeriods, currentYear) {
-    return allPeriods.filter(p => p.includes(currentYear))
+    return allPeriods.filter(p => p.toString().includes(currentYear))
   }
 
   updateTimeseriesState(nextIndex, sliderLayerObj, currentYear) {
@@ -129,8 +129,9 @@ class TimeSeriesSlider extends React.Component {
       if (allPeriods.length) {
         allPeriods.forEach((p) => {
           const yearRxp = /\b(19|20)\d{2}\b/g;
-          if (p && p.match(yearRxp) && p.match(yearRxp).length) {
-            matches = p.match(yearRxp)[0];
+          const _period = p.toString();
+          if (_period && _period.match(yearRxp) && _period.match(yearRxp).length) {
+            matches = _period.match(yearRxp)[0];
             if (!annualPeriods.includes(matches)) {
               annualPeriods.push(matches);
             }
@@ -160,7 +161,6 @@ class TimeSeriesSlider extends React.Component {
   }
 
   handleMouseUp(e) {
-    debugger;
     const nextIndex = parseInt(e.target.value, 10);
     const { index, currentYear } = this.state;
     if (nextIndex !== index) {
@@ -174,7 +174,7 @@ class TimeSeriesSlider extends React.Component {
     const { period, allPeriods } = this.props.timeSeriesObj;
     let currentPeriods = allPeriods;
     if (currentYear !== 'All') {
-      currentPeriods = allPeriods.filter(p => p.includes(currentYear));
+      currentPeriods = allPeriods.filter(p => p.toString().includes(currentYear));
     }
     this.setState({
       currentYear,
