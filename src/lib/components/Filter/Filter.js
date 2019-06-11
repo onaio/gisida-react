@@ -315,7 +315,8 @@ export class Filter extends Component {
     const doUpdate = ((layerId !== this.state.layerId &&
         (filterOptions && Object.keys(filterOptions).length > 0)) ||
       (filterState && filterState.doUpdate) || (timeseriesObj &&
-        (timeseriesObj.temporalIndex !== this.props.timeseriesObj.temporalIndex)));
+        (timeseriesObj.temporalIndex !== (this.props.timeseriesObj &&
+          this.props.timeseriesObj.temporalIndex))));
     if (doUpdate) {
       this.setState({
         filters,
