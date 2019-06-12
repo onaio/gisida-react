@@ -301,15 +301,28 @@ export class Filter extends Component {
     // Build new component state or retrieve it from FILTER store
     const filterState = nextProps.FILTER[layerId];
     const layerFilters = this.getLayerFilter(layerId); // this may be deprecated
-    const filterOptions = filterState && filterState.filterOptions
-      ? filterState.filterOptions
-      : (nextProps.timeseriesObj && layerObj.aggregate && layerObj.aggregate.timeseries)
-        ? generateFilterOptions(timeseriesObj) : (layerObj.filterOptions || {});
 
-    const filters = (filterState && filterState.filters)
-      || (this.state.isFiltered && this.state.prevFilters)
-      || this.buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters);
+    let filterOptions;
+    if (nextProps.timeseriesObj && layerObj.aggregate && layerObj.aggregate.timeseries) {
+      filterOptions = generateFilterOptions(timeseriesObj);
+    } else if (!timeseriesObj && (filterState && filterState.filterOptions)) {
+      filterOptions = filterState.filterOptions;
+    } else {
+      filterOptions = (layerObj.filterOptions || {})
+    }
 
+    let filters;
+
+    if (timeseriesObj &&
+      (timeseriesObj.temporalIndex !== (this.props.timeseriesObj &&
+        this.props.timeseriesObj.temporalIndex)) && !layerFilters &&
+      !(filterState && filterState.doUpdate)) {
+      filters = this.buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters)
+    } else {
+      filters = (filterState && filterState.filters) ||
+        (this.state.isFiltered && this.state.prevFilters) ||
+        this.buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters)
+    }
 
     // determine whether to update the compnent state
     const doUpdate = ((layerId !== this.state.layerId &&
