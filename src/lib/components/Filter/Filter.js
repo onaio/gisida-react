@@ -9,7 +9,7 @@ import {
   clearFilterState,
   lngLat,
 } from 'gisida';
-import { buildLayersObj} from '../../utils';
+import { buildLayersObj, handleDetailviewPanel } from '../../utils';
 import FilterSelector from './FilterSelector';
 import FilterSelectorPrev from './FilterSelectorPrev';
 import './Filter.scss';
@@ -18,6 +18,7 @@ import 'rc-slider/assets/index.css';
 const mapStateToProps = (state, ownProps) => {
   const { mapId } = ownProps;
   const MAP = state[mapId] || { layers: {}, filter: {}, timeseries: {} };
+  const { detailView } = MAP;
   let timeLayer;
   buildLayersObj(MAP.layers).forEach((layer) => {
     if (layer && layer.visible && layer.aggregate && layer.aggregate.timeseries) {
@@ -37,9 +38,11 @@ const mapStateToProps = (state, ownProps) => {
     doShowProfile: MAP.showProfile,
     showFilterPanel: MAP.showFilterPanel && MAP.primaryLayer === MAP.filter.layerId,
     layersObj: buildLayersObj(MAP.layers),
+    showDetailView: (detailView && detailView.model && detailView.model.UID),
     showFilterBtn: MAP.filter.layerId && MAP.primaryLayer === MAP.filter.layerId,
     layerData: MAP.layers,
     detailView: MAP.detailView,
+    primaryLayer: MAP.primaryLayer,
   }
 }
 
@@ -1019,7 +1022,7 @@ export class Filter extends Component {
       !(layerObj.aggregate &&
         layerObj.aggregate.filterIsPrev)
       ? '260px'
-      : !!this.props.detailView
+      : handleDetailviewPanel(this.props)
       ? '355px'
       : '10px';
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
-import { detectIE, buildLayersObj, detailViewData, orderLayers } from '../../utils';
+import { detectIE, buildLayersObj, orderLayers, handleDetailviewPanel } from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -797,19 +797,9 @@ class Map extends Component {
 
   render() {
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
-    const { detailView, layerObj, timeSeriesObj, showDetailView } = this.props;
-    const join = layerObj && ((layerObj['detail-view'] &&
-      layerObj['detail-view'].join) || (layerObj.source && layerObj.source.join));
-    let detailViewProps = join && showDetailView &&
-      timeSeriesObj &&
-      timeSeriesObj.data &&
-      timeSeriesObj.data.length &&
-      timeSeriesObj.data.find(d => (d.properties || d)[join[1]] === detailView.properties[join[0]]);
-
-    const showDetailViewBool = timeSeriesObj &&
-     timeSeriesObj.layerId === this.props.primaryLayer ?
-      detailViewProps && typeof detailViewProps !== undefined : this.props.showDetailView;
+    const { layerObj } = this.props;
     let mapWidth = '100%';
+    const showDetailViewBool = handleDetailviewPanel(this.props);
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
     }
