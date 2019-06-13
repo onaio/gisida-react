@@ -137,7 +137,7 @@ componentWillReceiveProps(nextProps) {
       layer = this.props.layersData[l];
       const circleLayerType = (layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible);
       const symbolLayer = (layer && layer.credit && layer.categories && layer.categories.shape && layer.type !== 'circle' && layer.categories.breaks === 'no');
-      const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no' && !layer.categories.shape);
+      const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
       const fillLayerWithBreaks = (layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle' && layer.categories && layer.categories.breaks === 'yes');
 
       const activeLayerSelected = activeLegendLayer === layer.id  ? 'primary' : '';
@@ -151,9 +151,9 @@ componentWillReceiveProps(nextProps) {
       if (timeSeriesObj) {
         const { temporalIndex } = timeSeriesObj;
         if (circleLayerType && layer.breaks && layer.stops && layer.stops[0][temporalIndex]) {
-          const currentColorStops = timeSeriesObj.newColors;
+          const currentColorStops = timeSeriesObj.newColors || timeSeriesObj.colors;
           const currentRadiusStops = [...new Set(timeSeriesObj.stops[temporalIndex].map(d => d[1]))];
-          const currentBreakStops = timeSeriesObj.newBreaks;
+          const currentBreakStops = timeSeriesObj.newBreaks || timeSeriesObj.breaks;
           currentRadiusStops.forEach((s, i) => {
             let rs = s;
             quantiles.push((
