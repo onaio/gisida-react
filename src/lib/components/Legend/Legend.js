@@ -136,8 +136,8 @@ componentWillReceiveProps(nextProps) {
     for (let l = 0; l < this.props.layersData.length; l += 1) {
       layer = this.props.layersData[l];
       const circleLayerType = (layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible);
-      const symbolLayer = (layer && layer.credit && layer.categories && layer.categories.shape && layer.type !== 'circle');
-      const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
+      const symbolLayer = (layer && layer.credit && layer.categories && layer.categories.shape && layer.type !== 'circle' && layer.categories.breaks === 'no');
+      const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no' && !layer.categories.shape);
       const fillLayerWithBreaks = (layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle' && layer.categories && layer.categories.breaks === 'yes');
 
       const activeLayerSelected = activeLegendLayer === layer.id  ? 'primary' : '';
@@ -222,6 +222,51 @@ componentWillReceiveProps(nextProps) {
               <span>{Parser(layer.credit)}</span>
               {latestTimestamp}
             </div>);
+        }
+        if (symbolLayer) {
+          layer.categories.color.forEach((color, index) => {
+            const style = layer.categories.shape[index] === 'triangle-stroked-11' ||
+              layer.categories.shape[index] === 'triangle-15' ?
+              'borderBottomColor' : 'background';
+            const styleString = {
+              [style]: color
+            };
+            background.push((
+              <li
+                className="layer-symbols"
+                key={index}
+              >
+                <span
+                  className={`${layer.categories.shape[index]}`}
+                  style={ styleString }
+                />
+                {layer.categories.label[index]}
+              </li>
+            ));
+          });
+
+          primaryLegend = (
+            <div
+              id={`legend-${layer.id}-${mapId}`}
+              className={`legend-row ${activeLayerSelected}`}
+              data-layer={`${layer.id}`}
+              onClick={(e) => this.onUpdatePrimaryLayer(e)}
+              key={l}
+            >
+              <b>
+                {layer.label}
+              </b>
+              <div className="legend-shapes">
+                <ul style={{ left: '0' }}>
+                  {background}
+                </ul>
+              </div>
+              <span>
+                {Parser(layer.credit)}
+              </span>
+              {latestTimestamp}
+            </div>
+          );
         }
         if (fillLayerNoBreaks && !layer.parent) {
           const fillWidth = (100 / layer.categories.color.filter(c =>
@@ -393,20 +438,22 @@ componentWillReceiveProps(nextProps) {
         layer.categories.color.forEach((color, index) => {
           const style = layer.categories.shape[index] === 'triangle-stroked-11' ||
             layer.categories.shape[index] === 'triangle-15' ?
-            'border-bottom-color:' : 'background:';
-          const styleString = `${style}: ${color}`;
-          background += (
+            'borderBottomColor' : 'background';
+          const styleString = {
+            [style]: color
+          };
+          background.push((
             <li
               className="layer-symbols"
               key={index}
             >
               <span
                 className={`${layer.categories.shape[index]}`}
-                style={{ styleString }}
+                style={ styleString }
               />
               {layer.categories.label[index]}
             </li>
-          );
+          ));
         });
 
         legendItems.unshift((
