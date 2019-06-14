@@ -114,18 +114,11 @@ class Map extends Component {
     const { handlers, APP } = this.props;
     if (handlers && Array.isArray(handlers)) {
       let handler;
-      let sublayer;
       for (let c = 0; c < handlers.length; c += 1) {
         handler = handlers[c];
-        if (handler.layer) {
-          if (handler.layer.layers) {
-            // If it is a grouped layer loop through the layer.layers array
-            for (let l = 0; l < handler.layer.layers.length; l += 1) {
-              sublayer = handler.layer.layers[l];
-              this.map.on(handler.type, sublayer, handler.method);
-            }
-          } else {
-            this.map.on(handler.type, handler.layer.id, handler.method);
+        if (Array.isArray(handler.layer)) {
+          for (let l = 0; l < handler.layer.length; l += 1) {
+            this.map.on(handler.type, handler.layer[l], handler.method)
           }
         } else {
           this.map.on(handler.type, handler.method);
