@@ -4,9 +4,7 @@ import { connect } from 'react-redux';
 import QuantColumnChart from './../Charts/QuantColumnChart';
 
 import 'rc-slider/assets/index.css';
-import Slider from 'rc-slider';
-const createSliderWithTooltip = Slider.createSliderWithTooltip;
-const Range = createSliderWithTooltip(Slider.Range);
+import Slider, { Range } from 'rc-slider';
 
 const mapStateToProps = (state, ownProps) => {
   return {
@@ -43,7 +41,9 @@ export class AdvancedFilter extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.queries) {
-      this.setState({ queries: nextProps.queries });
+      this.setState({
+        queries: nextProps.queries,
+      });
     }
   }
 
@@ -183,7 +183,7 @@ export class AdvancedFilter extends React.Component {
       } else {
         nextQueries.push(query);
       }
-      nextQueries[i].matches = this.getQueryMatches(nextQueries, i);
+      nextQueries[i].matches = nextQueries[i].val.length ? this.getQueryMatches(nextQueries, i) : [];
     }
 
     const queriedOptionKeys = this.reduceQueryMatches(nextQueries);
@@ -209,7 +209,7 @@ export class AdvancedFilter extends React.Component {
       } else {
         nextQueries.push(query);
       }
-      nextQueries[i].matches = this.getQueryMatches(nextQueries, i);
+      nextQueries[i].matches = nextQueries[i].val.length ? this.getQueryMatches(nextQueries, i) : [];
     }
 
     const queriedOptionKeys = this.reduceQueryMatches(nextQueries);
@@ -296,17 +296,28 @@ export class AdvancedFilter extends React.Component {
           <Range
             min={min}
             max={max}
+            marks={
+              {
+                [val.min]: val.min.toString(),
+                [val.max]: val.max.toString()
+              }
+            }
             defaultValue={[val.min, val.max]}
             onChange={(e) => {
               this.onInputChange(e, q);
             }}
-            tipFormatter={value => `${value}`}
           />
         ) : (
           <Slider
             min={min}
             max={max}
             defaultValue={control === 'less than' ? val.max : val.min}
+            marks={
+              {
+                [val.min]: val.min.toString(),
+                [val.max]: val.max.toString()
+              }
+            }
             onChange={(e) => {
               this.onInputChange(control === 'less than' ? [val.min, e] : [e, val.max], q);
             }}
@@ -376,9 +387,9 @@ export class AdvancedFilter extends React.Component {
           type="text"
           className="advanced-search"
           data-type="advanced-filter"
-          // ref={(el) => { this[`searchEl`] = el; }}
           value={query.val}
-          onChange={(e) => { this.onInputChange(e, q); }}
+          // ref={(el) => { this[`searchEl`] = el; }}
+          onChange={(e) => this.onInputChange(e, q)}
         />
       ) : this.buildQuantInputEl(query, q);
 
