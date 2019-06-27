@@ -295,7 +295,18 @@ class Map extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidMount() {
+    const { MAP, APP, mapId } = this.props;
+    if (APP && MAP && mapId) {
+      const { isRendered, accessToken, mapConfig } = APP;
+      // Check if map is initialized, use mapId as container value
+      if (!isRendered && (!isIE || mapboxgl.supported()) && !MAP.blockLoad) {
+        this.initMap(accessToken, { ...mapConfig, container: mapId }, mapId);
+      }
+    }
+  }
+
+  componentWillReceiveProps(nextProps){
     if (this.map) {
       this.map.resize();
     }
