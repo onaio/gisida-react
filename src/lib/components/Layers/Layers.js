@@ -27,7 +27,7 @@ export class Layers extends Component {
   }
 
   render() {
-    const { mapId, layers, currentRegion, preparedLayers } = this.props;
+    const { mapId, layers, currentRegion, preparedLayers, auth } = this.props;
 
     let layerKeys;
     let layerObj;
@@ -54,12 +54,32 @@ export class Layers extends Component {
         || (layer.region
           && layer.region === currentRegion))
         && !subLayerIds.includes(layer.id)) {
-        if (layer.id) {
+        if (layer.id && !auth) {
           layerItem.push((<Layer
             key={layer.id}
             mapId={mapId}
             layer={layer}
           />))
+        } else if (layer.id && auth) {
+          const { authConfigs, userInfo } = auth;
+          let activeId = layer.id;
+          let users;
+          if (activeId.indexOf('.json') !== -1) {
+            // layer ids from github shared repo have .json suffix
+            // split to remove .json part
+            activeId = activeId.split('.')[0];
+          }
+
+          users = authConfigs.LAYERS[activeId]; // list of users with access to the layer
+          // check if logged in user exists in the list of users
+          // who have access to the layer
+          if (users && userInfo && users.includes(userInfo.username)) {
+            layerItem.push((<Layer
+              key={layer.id}
+              mapId={mapId}
+              layer={layer}
+            />))
+          }
         } else {
           Object.keys(layer).forEach((d, i) => {
             layerItem = layerItem.concat([
@@ -82,6 +102,7 @@ export class Layers extends Component {
                     layers={layer[d].layers}
                     currentRegion={currentRegion}
                     preparedLayers={preparedLayers}
+                    auth={this.props.auth}
                   />
               : null)
             ]);

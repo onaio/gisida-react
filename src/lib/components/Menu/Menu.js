@@ -7,7 +7,7 @@ import './Menu.scss';
 
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {} };
-  const { LAYERS } = state;
+  const { LAYERS, AUTH } = state;
   let categories;
   // let layers;
 
@@ -68,6 +68,7 @@ const mapStateToProps = (state, ownProps) => {
     categories,
     // layers, // todo - support layers without categories
     LAYERS,
+    AUTH,
     menuId: 'sector-menu-1',
     mapTargetId: '',
     regions: state.REGIONS,
@@ -184,6 +185,7 @@ class Menu extends Component {
                                 layers={category.layers}
                                 currentRegion={currentRegion}
                                 preparedLayers={preparedLayers}
+                                auth={this.props.AUTH}
                               />
                               : <ul />}
                         </li>)) :
