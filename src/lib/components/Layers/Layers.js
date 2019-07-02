@@ -73,7 +73,12 @@ export class Layers extends Component {
           users = authConfigs.LAYERS[activeId]; // list of users with access to the layer
           // check if logged in user exists in the list of users
           // who have access to the layer
-          if (users && userInfo && users.includes(userInfo.username)) {
+          if ((users
+            && userInfo
+            && users.includes(userInfo.username))
+            || (authConfigs.LAYERS
+              && authConfigs.LAYERS.ALL
+              && authConfigs.LAYERS.ALL.includes(userInfo.username))) {
             layerItem.push((<Layer
               key={layer.id}
               mapId={mapId}
