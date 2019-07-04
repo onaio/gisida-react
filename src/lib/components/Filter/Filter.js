@@ -277,12 +277,16 @@ export class Filter extends Component {
   }
 
   handleFilterClick() {
-    const { dispatch, mapId, layerId, APP, LOC } = this.props;
-    const availableMaps = ['map-1', 'map-2'];
+    const { dispatch, mapId, layerId, APP, LOC, layerObj } = this.props;
+    // const availableMaps = ['map-1', 'map-2'];
     const { center, zoom } = lngLat(LOC, APP);
-    window.maps[availableMaps.indexOf(mapId)].easeTo({
-      center,
-      zoom,
+    window.maps.forEach((e) => {
+      if (layerObj && !layerObj.location) {
+        e.easeTo({
+          center,
+          zoom,
+        });
+      }
     });
     dispatch(Actions.toggleFilter(mapId, layerId));
   }
@@ -302,35 +306,48 @@ export class Filter extends Component {
     // Build new component state or retrieve it from FILTER store
     const filterState = nextProps.FILTER[layerId];
     const layerFilters = this.getLayerFilter(layerId); // this may be deprecated
-    const filterOptions = filterState && filterState.filterOptions
-      ? filterState.filterOptions
-      : (nextProps.timeseriesObj && layerObj.aggregate && layerObj.aggregate.timeseries)
-        ? generateFilterOptions(timeseriesObj) : (layerObj.filterOptions || {});
 
-    const filters = (filterState && filterState.filters)
-      || (this.state.isFiltered && this.state.prevFilters)
-      || this.buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters);
+    let filterOptions;
+    if (nextProps.timeseriesObj && layerObj.aggregate && layerObj.aggregate.timeseries) {
+      filterOptions = generateFilterOptions(timeseriesObj);
+    } else if (!timeseriesObj && (filterState && filterState.filterOptions)) {
+      filterOptions = filterState.filterOptions;
+    } else {
+      filterOptions = (layerObj.filterOptions || {})
+    }
 
+    let filters;
+
+    if (timeseriesObj &&
+      (timeseriesObj.temporalIndex !== (this.props.timeseriesObj &&
+        this.props.timeseriesObj.temporalIndex)) && !layerFilters &&
+      !(filterState && filterState.doUpdate)) {
+      filters = this.buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters)
+    } else {
+      filters = (filterState && filterState.filters) ||
+        (this.state.isFiltered && this.state.prevFilters) ||
+        this.buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters)
+    }
 
     // determine whether to update the compnent state
-    const doUpdate = (layerId !== this.state.layerId
-      && (filterOptions && Object.keys(filterOptions).length > 0))
-      || (filterState && filterState.doUpdate);
+    const doUpdate = ((layerId !== this.state.layerId &&
+        (filterOptions && Object.keys(filterOptions).length > 0)) ||
+      (filterState && filterState.doUpdate) || (timeseriesObj &&
+        (timeseriesObj.temporalIndex !== (this.props.timeseriesObj &&
+          this.props.timeseriesObj.temporalIndex))));
     if (doUpdate) {
-    this.setState({
-      filters,
-      filterOptions,
-      timeseriesObj: nextProps.timeseriesObj,
-      oldLayerObj,
-      layerId: doUpdate ? layerId : null,
-      doShowProfile: false,
-    }, () => {
-      
+      this.setState({
+        filters,
+        filterOptions,
+        timeseriesObj: nextProps.timeseriesObj,
+        oldLayerObj,
+        layerId: doUpdate ? layerId : null,
+        doShowProfile: false,
+      }, () => {
         this.props.dispatch(Actions.filtersUpdated(nextProps.mapId, layerId));
-      
-    });
-  }  
- } 
+      });
+    }
+ }
   onCloseClick = (e) => {
     e.preventDefault();
     //TODO dispach close action

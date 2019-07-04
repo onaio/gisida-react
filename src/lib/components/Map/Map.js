@@ -417,6 +417,24 @@ class Map extends Component {
 
       if (this.props.MAP.primaryLayer !== primaryLayer) {
         this.setPrimaryLayer(primaryLayer, activeLayerId, layers, activelayersData, activeLayerIds);
+        if (layers[primaryLayer] && layers[primaryLayer].location) {
+          this.map.easeTo(layers[primaryLayer].location);
+        } else {
+          if (!Array.isArray(mapConfig.center)) {
+            this.map.easeTo({
+              center: mapConfig.center,
+              zoom: mapConfig.zoom
+            });
+          } else {
+            this.map.easeTo({
+              center: {
+                "lng": mapConfig.center[0],
+                "lat": mapConfig.center[1]
+              },
+              zoom: mapConfig.zoom
+            });
+          }
+        }
       }
     }
     // Assign global variable for debugging purposes.

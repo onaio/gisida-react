@@ -129,7 +129,8 @@ componentWillReceiveProps(nextProps) {
         }
       }
 
-      if (this.state.primaryLayer !== primaryLayer && layers[primaryLayer].credit) {
+      if (this.state.primaryLayer !== primaryLayer &&
+        (layers[primaryLayer] && layers[primaryLayer].credit)) {
         activeLegendLayer = primaryLayer;
       }
 
