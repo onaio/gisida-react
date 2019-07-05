@@ -372,7 +372,8 @@ class Map extends Component {
             }
           } else if (this.map.getLayer(layer.id) && nextProps.MAP.reloadLayerId === layer.id) {
             let doUpdateTslayer = true;
-            let filterOptions = nextProps.MAP.filter.filterOptionsPrev || false;
+            let filterOptions = Object.keys(nextProps.MAP.filter.filterOptionsPrev).length !== 0
+              ? nextProps.MAP.filter.filterOptionsPrev : false;
             this.map.removeLayer(layer.id);
             this.map.removeSource(layer.id);
 
