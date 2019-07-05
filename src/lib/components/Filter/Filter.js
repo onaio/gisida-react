@@ -424,14 +424,18 @@ export class Filter extends Component {
     if (!isFilterable) {
       return false;
     }
-    const { layerId, filterOptions, oldLayerObj } = this.state;
-    const { mapId, dispatch } = this.props;
+    const { layerId, oldLayerObj } = this.state;
+    const { mapId, dispatch, FILTER } = this.props;
+    const filterState = FILTER[layerId];
+
     // Clear layerFilter from mapbox layer
     dispatch(Actions.setLayerFilter(mapId, layerId, null));
 
     // Update FILTER state
 
-    const filterState = {
+    const filterOptions = filterState && filterState.filterOptions;
+
+    const clearedFilterState = {
       filterOptions,
       filters: this.buildFiltersMap(filterOptions),
       aggregate: {
@@ -443,7 +447,7 @@ export class Filter extends Component {
 
     const hasStops = Object.keys(filterOptions).map(f => filterOptions[f].type).includes('stops');
     
-    clearFilterState(mapId, filterState, layerId, dispatch, true);
+    clearFilterState(mapId, clearedFilterState, layerId, dispatch, true);
 
     // Reload layer if necessary to re-aggregate / restore layer stops
     if (this.props.FILTER[layerId]
@@ -547,7 +551,7 @@ export class Filter extends Component {
     }
 
     const newFilterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, regenStops, isOr);
-    dispatch(Actions.saveFilterState(mapId, layerId, newFilterState));
+    dispatch(Actions.saveFilterState(mapId, layerId, newFilterState, false));
 
     if (regenStops) {
       const { fauxLayerObj } = newFilterState;
