@@ -23,6 +23,7 @@ const mapStateToProps = (state, ownProps) => {
     timeSeriesObj: MAP.timeseries[timeSubLayer || timeLayer],
     timeseries: MAP.timeseries,
     layers: MAP.layers,
+    FILTER: state.FILTER,
     primaryLayer: MAP.primaryLayer,
     showFilterPanel: MAP.showFilterPanel,
     timeLayer,
@@ -121,10 +122,10 @@ class TimeSeriesSlider extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    
     if (nextProps.timeSeriesObj && nextProps.timeSeriesObj.periodData) {
       const annualPeriods = [];
       let matches;
+
       const { period, allPeriods, temporalIndex } = nextProps.timeSeriesObj;
       if (allPeriods.length) {
         allPeriods.forEach((p) => {
@@ -138,11 +139,15 @@ class TimeSeriesSlider extends React.Component {
           }
         });
       }
+      const isFilterCleared = nextProps.FILTER
+        && nextProps.FILTER[nextProps.primaryLayer]
+        && nextProps.FILTER[nextProps.primaryLayer].isClear
       this.setState({
+        currentYear: isFilterCleared ? 'All' : this.state.currentYear,
         annualPeriods,
         periods: this.state.currentYear === 'All' ? allPeriods : period,
-        index: temporalIndex,
-        period: period[temporalIndex],
+        index: typeof period[temporalIndex] === 'undefined' ? this.state.index : temporalIndex,
+        period: period[temporalIndex] || allPeriods[temporalIndex],
       }); 
     }
   }
@@ -161,10 +166,17 @@ class TimeSeriesSlider extends React.Component {
   }
 
   handleMouseUp(e) {
+    e.persist();
     const nextIndex = parseInt(e.target.value, 10);
     const { index, currentYear } = this.state;
+    const self = this;
+    self.e = e;
     if (nextIndex !== index) {
-      this.updateTimeseriesState(e.target.value, this.props.timeSeriesObj, currentYear);
+      this.setState({
+        index: nextIndex,
+      }, () => {
+        this.updateTimeseriesState(self.e.target.value, this.props.timeSeriesObj, currentYear);
+      });
     }
   }
 
@@ -209,6 +221,7 @@ class TimeSeriesSlider extends React.Component {
           htmlFor="slider"
         >{this.state.period}</label>
         <select
+          value={this.state.currentYear}
           className="annual-selector"
           onChange={(e) => this.onAnnualSelectorChange(e)}
         >

@@ -344,6 +344,13 @@ export class Filter extends Component {
         layerId: doUpdate ? layerId : null,
         doShowProfile: false,
       }, () => {
+        if (nextProps.FILTER && nextProps.FILTER[layerId] && nextProps.FILTER[layerId].isClear) {
+          const newFilterState = {
+            ...filterState,
+            isClear: false,
+          }
+          this.props.dispatch(Actions.saveFilterState(this.props.mapId, layerId, newFilterState))
+        }
         this.props.dispatch(Actions.filtersUpdated(nextProps.mapId, layerId));
       });
     }
@@ -456,6 +463,7 @@ export class Filter extends Component {
       && hasStops) {
       // Reload layer to re-aggregate and re-add layer
       this.props.dispatch(Actions.addLayer(mapId, oldLayerObj));
+
     }
     return true;
   }
