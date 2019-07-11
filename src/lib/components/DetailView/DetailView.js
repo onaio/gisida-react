@@ -183,7 +183,7 @@ class DetailView extends Component {
                 id="facilityImg"
                 alt={`${title}`}
                 onClick={(e) => this.onFacilityImageClick(e)}
-                src="/assets/img/no-facility-img.jpg" /> : null}
+                src={imageURL} /> : null}
           </div>
           <div className="detail-list">
             <ul>{detailList}</ul>
@@ -210,7 +210,7 @@ class DetailView extends Component {
             >&times;</span>
             <img
               alt={`${title}`}
-              src="/assets/img/no-facility-img.jpg"
+              src={imageURL}
               className="modal-content"
               id="facility-image" />
             <div id="caption">
