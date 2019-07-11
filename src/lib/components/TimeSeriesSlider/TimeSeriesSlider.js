@@ -169,13 +169,11 @@ class TimeSeriesSlider extends React.Component {
     e.persist();
     const nextIndex = parseInt(e.target.value, 10);
     const { index, currentYear } = this.state;
-    const self = this;
-    self.e = e;
     if (nextIndex !== index) {
       this.setState({
         index: nextIndex,
       }, () => {
-        this.updateTimeseriesState(self.e.target.value, this.props.timeSeriesObj, currentYear);
+        this.updateTimeseriesState(e.target.value, this.props.timeSeriesObj, currentYear);
       });
     }
   }
