@@ -475,7 +475,7 @@ export class Filter extends Component {
     }
     const { filters, layerId, filterOptions, isOr } = this.state;
 
-    const { layerObj, mapId, dispatch } = this.props;
+    const { layerObj, mapId, dispatch, timeseriesObj } = this.props;
 
     if (!layerObj) {
       return false;
@@ -554,11 +554,20 @@ export class Filter extends Component {
 
     // Update FILTER store state
     const { FILTER } = this.props;
-    if (FILTER[layerId] && !FILTER[layerId].originalLayerObj) {
-      this.buildOriginalObj(this.props, this.state, regenStops);
+    let newLayerObj = { ...layerObj };
+    let currPeriodData;
+    if (layerObj.aggregate && layerObj.aggregate.timeseries && regenStops) {
+      const { periodData, allPeriods, temporalIndex } = timeseriesObj;
+      currPeriodData = periodData[allPeriods[temporalIndex]].data;
+      newLayerObj = {
+        ...layerObj,
+        Data: currPeriodData,
+      };
     }
-
-    const newFilterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, regenStops, isOr);
+    if (FILTER[layerId] && !FILTER[layerId].originalLayerObj) {
+      this.buildOriginalObj(this.props, this.state, regenStops, newLayerObj);
+    }
+    const newFilterState = buildFilterState(mapId, filterOptions, filters, newLayerObj, dispatch, regenStops, isOr);
     dispatch(Actions.saveFilterState(mapId, layerId, newFilterState, false));
 
     if (regenStops) {
@@ -573,10 +582,10 @@ export class Filter extends Component {
     return true;
   }
 
-  buildOriginalObj(props, state, regenStops) {
-    const { layerObj, mapId, dispatch } = props;
+  buildOriginalObj(props, state, regenStops, layer) {
+    const {  mapId, dispatch } = props;
     const { filters, isOr, filterOptions } = state;
-    const filterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, regenStops, isOr);
+    const filterState = buildFilterState(mapId, filterOptions, filters, layer, dispatch, regenStops, isOr);
     const { originalLayerObj } = filterState;
     dispatch(Actions.resetFilteredLayer(mapId, originalLayerObj));
     
