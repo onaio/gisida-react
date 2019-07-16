@@ -51,6 +51,17 @@ const isIE = detectIE();
 
 window.maps = [];
 
+const imgArr = [{
+  imageUrl: 'https://raw.githubusercontent.com/onaio/reveal-frontend/add-icons/src/assets/images/case-confirmation.png',
+  id: 'case-confirmation'
+}, {
+  imageUrl: 'https://raw.githubusercontent.com/onaio/reveal-frontend/add-icons/src/assets/images/larval.png',
+  id: 'larval'
+}, {
+  imageUrl: 'https://raw.githubusercontent.com/onaio/reveal-frontend/add-icons/src/assets/images/mosquito.png',
+  id: 'mosquito'
+}];
+
 class Map extends Component {
   constructor(props) {
     super(props);
@@ -73,6 +84,12 @@ class Map extends Component {
   
       // Handle Map Load Event
       this.map.on('load', () => {
+        /** Add icons from external source to map since they aren't available on the basemap */
+        imgArr.forEach((element) => {
+          this.map.loadImage(element.imageUrl, (error, res) => {
+              this.map.addImage(element.id, res);
+          });
+      });
         const mapLoaded = true;
         this.addMouseEvents(mapId);
         this.setState({ mapLoaded });
