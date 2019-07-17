@@ -51,16 +51,6 @@ const isIE = detectIE();
 
 window.maps = [];
 
-const imgArr = [{
-  imageUrl: 'https://raw.githubusercontent.com/onaio/reveal-frontend/add-icons/src/assets/images/case-confirmation.png',
-  id: 'case-confirmation'
-}, {
-  imageUrl: 'https://raw.githubusercontent.com/onaio/reveal-frontend/add-icons/src/assets/images/larval.png',
-  id: 'larval'
-}, {
-  imageUrl: 'https://raw.githubusercontent.com/onaio/reveal-frontend/add-icons/src/assets/images/mosquito.png',
-  id: 'mosquito'
-}];
 
 class Map extends Component {
   constructor(props) {
@@ -69,7 +59,7 @@ class Map extends Component {
       layersObj: this.props.layersObj,
     }
   }
-  initMap(accessToken, mapConfig, mapId) {
+  initMap(accessToken, mapConfig, mapId, mapIcon) {
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;
       this.map = new mapboxgl.Map(mapConfig);
@@ -85,11 +75,13 @@ class Map extends Component {
       // Handle Map Load Event
       this.map.on('load', () => {
         /** Add icons from external source to map since they aren't available on the basemap */
-        imgArr.forEach((element) => {
+        if (mapIcon) {
+        mapIcon.forEach((element) => {
           this.map.loadImage(element.imageUrl, (error, res) => {
               this.map.addImage(element.id, res);
           });
       });
+    }
         const mapLoaded = true;
         this.addMouseEvents(mapId);
         this.setState({ mapLoaded });
@@ -311,6 +303,7 @@ class Map extends Component {
     }
     const accessToken = nextProps.APP.accessToken;
     let mapConfig = nextProps.APP.mapConfig;
+    const mapIcon = nextProps.APP.mapIcon;
     const isRendered = nextProps.MAP.isRendered;
     const isLoaded = nextProps.MAP.isLoaded;
     const currentStyle = nextProps.MAP.currentStyle;
@@ -330,7 +323,7 @@ class Map extends Component {
 
     // Check if map is initialized.
     if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
-      this.initMap(accessToken, mapConfig, mapId);
+      this.initMap(accessToken, mapConfig, mapId, mapIcon);
     }
     // Check if rendererd map has finished loading
     if (isLoaded) {
