@@ -76,12 +76,12 @@ class Map extends Component {
       this.map.on('load', () => {
         /** Add icons from external source to map since they aren't available on the basemap */
         if (mapIcons) {
-        mapIcons.forEach((element) => {
-          this.map.loadImage(element.imageUrl, (error, res) => {
-              this.map.addImage(element.id, res);
+          mapIcons.forEach((element) => {
+            this.map.loadImage(element.imageUrl, (error, res) => {
+                this.map.addImage(element.id, res);
+              });
           });
-      });
-    }
+        }
         const mapLoaded = true;
         this.addMouseEvents(mapId);
         this.setState({ mapLoaded });
