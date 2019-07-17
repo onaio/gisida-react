@@ -20,7 +20,6 @@ class ColumnChart extends React.Component {
       yAxis,
       yAxisLabel,
       pointFormatterFunc,
-      isPercent,
     } = this.props;
 
     this.state = {

@@ -373,7 +373,7 @@ export class Export extends Component {
       <div>
         <a
           className={`export-modal-btn export-btn-${this.props.mapId}`}
-          href="#"
+          href=""
           onClick={(e) => { this.onOpenCloseClick(e); }}
           style={{
             right: '10px'

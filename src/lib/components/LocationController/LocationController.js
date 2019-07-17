@@ -18,10 +18,6 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 class LocationController extends React.Component {
-  constructor(props){
-    super(props);
-  }
-
   onLocationClick(e) {
     const { dispatch } = this.props;
     e.preventDefault();

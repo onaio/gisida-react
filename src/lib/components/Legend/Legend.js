@@ -99,7 +99,7 @@ componentWillReceiveProps(nextProps) {
  
   render() {
 
-    const { layerObj, mapId, lastLayerSelected, timeSeriesObj, layers, primaryLayer, primarySubLayer, activeLayerIds } = this.props;
+    const { layerObj, mapId, lastLayerSelected, timeSeriesObj, layers, primaryLayer, activeLayerIds } = this.props;
     if (!layerObj) {
       return false;
     }

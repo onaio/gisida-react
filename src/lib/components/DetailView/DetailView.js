@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { buildDetailView, buildParsedBasicDetailItem } from 'gisida';
 import { connect } from 'react-redux';
 import Parser from 'html-react-parser';
-import { buildLayersObj, detailViewData } from '../../utils';
+import { buildLayersObj } from '../../utils';
 import './DetailView.scss';
 
 const mapStateToProps = (state, ownProps) => {
