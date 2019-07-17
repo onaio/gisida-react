@@ -59,7 +59,7 @@ class Map extends Component {
       layersObj: this.props.layersObj,
     }
   }
-  initMap(accessToken, mapConfig, mapId, mapIcon) {
+  initMap(accessToken, mapConfig, mapId, mapIcons) {
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;
       this.map = new mapboxgl.Map(mapConfig);
@@ -75,8 +75,8 @@ class Map extends Component {
       // Handle Map Load Event
       this.map.on('load', () => {
         /** Add icons from external source to map since they aren't available on the basemap */
-        if (mapIcon) {
-        mapIcon.forEach((element) => {
+        if (mapIcons) {
+        mapIcons.forEach((element) => {
           this.map.loadImage(element.imageUrl, (error, res) => {
               this.map.addImage(element.id, res);
           });
@@ -303,7 +303,7 @@ class Map extends Component {
     }
     const accessToken = nextProps.APP.accessToken;
     let mapConfig = nextProps.APP.mapConfig;
-    const mapIcon = nextProps.APP.mapIcon;
+    const mapIcons = nextProps.APP.mapIcons;
     const isRendered = nextProps.MAP.isRendered;
     const isLoaded = nextProps.MAP.isLoaded;
     const currentStyle = nextProps.MAP.currentStyle;
@@ -323,7 +323,7 @@ class Map extends Component {
 
     // Check if map is initialized.
     if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
-      this.initMap(accessToken, mapConfig, mapId, mapIcon);
+      this.initMap(accessToken, mapConfig, mapId, mapIcons);
     }
     // Check if rendererd map has finished loading
     if (isLoaded) {
