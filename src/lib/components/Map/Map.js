@@ -299,7 +299,11 @@ class Map extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.map) {
-      this.map.resize();
+      try {
+        this.map.resize();
+      } catch (e) {
+        console.warn('resize error', e)
+      }
     }
     const accessToken = nextProps.APP.accessToken;
     let mapConfig = nextProps.APP.mapConfig;
@@ -420,7 +424,7 @@ class Map extends Component {
         this.setPrimaryLayer(primaryLayer, activeLayerId, layers, activelayersData, activeLayerIds);
         if (layers[primaryLayer] && layers[primaryLayer].location) {
           this.map.easeTo(layers[primaryLayer].location);
-        } else {
+        } else if (mapConfig.center) {
           if (!Array.isArray(mapConfig.center)) {
             this.map.easeTo({
               center: mapConfig.center,
@@ -444,7 +448,12 @@ class Map extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (this.map) {
-      this.map.resize();
+      try {
+        this.map.resize();
+      } catch (e) {
+        console.warn('resize error',e)
+      }
+      
       const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj } = this.props;
       if (LOC && LOC.doUpdateMap === mapId && LOC.location &&
          ((prevProps.LOC.active !== LOC.active) || (prevProps.layersObj.length !== layersObj.length) ||
