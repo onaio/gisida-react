@@ -29,15 +29,12 @@ class Callback extends Component {
     const { AUTH } = this.props.global;
     const accessToken = this.getAccessToken();
     dispatch(Actions.receiveToken(accessToken));
-    const { isAuth:userIsAuthorized,  authConfig } = await SupAuth.authorizeUser(APP, AUTH, accessToken);
-    if (authConfig) {
-      dispatch(Actions.getAuthConfigs(authConfig));
-    }
-    if (!userIsAuthorized || !accessToken) {
+    const { isAuth:userIsAuthorized,  authConfig, user } = await SupAuth.authorizeUser(APP, AUTH, accessToken);
+    if (!accessToken) {
       deAuthZ();
       return this.history.push('/login');
     }
-    const user = await SupAuth.getUser(accessToken, dispatch);
+    // const user = await SupAuth.getUser(accessToken, dispatch);
     dispatch(Actions.receiveLogin(user));
     return this.history.push('/');
   }
