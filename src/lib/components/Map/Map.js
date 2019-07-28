@@ -419,7 +419,16 @@ class Map extends Component {
         });
         sortLayers(this.map, (intelLayers || layers), (primaryLayer || activeLayerId));
       }
-
+      /** Move symbol layer on top when we have no primary layer */
+      if (!this.props.MAP.primaryLayer && nextProps.activeLayers.length) {
+        nextProps.activeLayers.forEach((layer) => {
+          if(layer.includes('symbol')) {
+            this.map.getLayer(layer);
+            this.map.moveLayer(layer);
+            
+          }
+        })
+      }
       if (this.props.MAP.primaryLayer !== primaryLayer) {
         this.setPrimaryLayer(primaryLayer, activeLayerId, layers, activelayersData, activeLayerIds);
         if (layers[primaryLayer] && layers[primaryLayer].location) {
