@@ -422,8 +422,7 @@ class Map extends Component {
       /** Move symbol layer on top when we have no primary layer */
       if (!this.props.MAP.primaryLayer && nextProps.activeLayers.length) {
         nextProps.layersObj.forEach((layer) => {
-          if (layer.type === "symbol") {
-            this.map.getLayer(layer.id);
+          if (layer.type === "symbol" && this.map.getLayer(layer.id)) {
             this.map.moveLayer(layer.id);
           }
         });
