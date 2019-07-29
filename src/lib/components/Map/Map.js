@@ -421,13 +421,12 @@ class Map extends Component {
       }
       /** Move symbol layer on top when we have no primary layer */
       if (!this.props.MAP.primaryLayer && nextProps.activeLayers.length) {
-        nextProps.activeLayers.forEach((layer) => {
-          if(layer.includes('symbol')) {
-            this.map.getLayer(layer);
-            this.map.moveLayer(layer);
-            
+        nextProps.layersObj.forEach((layer) => {
+          if (layer.type === "symbol") {
+            this.map.getLayer(layer.id);
+            this.map.moveLayer(layer.id);
           }
-        })
+        });
       }
       if (this.props.MAP.primaryLayer !== primaryLayer) {
         this.setPrimaryLayer(primaryLayer, activeLayerId, layers, activelayersData, activeLayerIds);
