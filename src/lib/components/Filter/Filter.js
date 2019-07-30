@@ -33,7 +33,7 @@ const mapStateToProps = (state, ownProps) => {
     oldLayerObj: MAP.oldLayerObjs ? MAP.oldLayerObjs[MAP.primaryLayer] : {},
     isSplitScreen: state.VIEW && state.VIEW.splitScreen,
     FILTER: state.FILTER,
-    layerObj: MAP.layers[MAP.filter.layerId],
+    layerObj: MAP.layers[MAP.primaryLayer],
     timeseriesObj: MAP.timeseries[timeLayer],
     doShowProfile: MAP.showProfile,
     showFilterPanel: MAP.showFilterPanel && MAP.primaryLayer === MAP.filter.layerId,
@@ -308,7 +308,7 @@ export class Filter extends Component {
     const layerFilters = this.getLayerFilter(layerId); // this may be deprecated
 
     let filterOptions;
-    if (nextProps.timeseriesObj && layerObj.aggregate && layerObj.aggregate.timeseries) {
+    if (nextProps.timeseriesObj && layerObj.aggregate && layerObj.aggregate.filter) {
       filterOptions = generateFilterOptions(timeseriesObj);
     } else if (!timeseriesObj && (filterState && filterState.filterOptions)) {
       filterOptions = filterState.filterOptions;
