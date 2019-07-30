@@ -686,7 +686,11 @@ class Map extends Component {
                 this.map.setPaintProperty(id, 'circle-stroke-width', newStrokeStops);
               }
 
-              this.map.setPaintProperty(id, paintProperty, newStops);
+              if (layerObj['radius-prop']) {
+                this.map.setPaintProperty(id, paintProperty, layerObj.paint['circle-radius']);
+              } else {
+                this.map.setPaintProperty(id, paintProperty, newStops);
+              }
 
               // TODO : update legend?
               // this.removeLegend(layerObj);
