@@ -20,6 +20,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     APP: state.APP,
     MAP: MAP,
+    LOC: state.LOC,
     mapId: ownProps.mapId,
     timeSeriesObj: MAP.timeseries[timeLayer],
     isSplitScreen: state.VIEW && state.VIEW.splitScreen,
@@ -113,11 +114,12 @@ class DetailView extends Component {
 
   onCloseClick(e) {
     e.preventDefault();
-    const center = Array.isArray(this.props.APP.mapConfig.center) ?
-    { lng: this.props.APP.mapConfig.center[0], lat: this.props.APP.mapConfig.center[1] } : { ...this.props.APP.mapConfig.center }
+    const center = this.props.LOC ? this.props.LOC.center :  Array.isArray(this.props.APP.mapConfig.center) ?
+    { lng: this.props.APP.mapConfig.center[0], lat: this.props.APP.mapConfig.center[1] } : { ...this.props.APP.mapConfig.center };
+    const zoom = this.props.LOC ? this.props.LOC.location.zoom : this.props.APP.mapConfig.zoom;
     window.maps[0].easeTo({
       center,
-      zoom: this.props.APP.mapConfig.zoom,
+      zoom: zoom,
     });
     buildDetailView(this.props.mapId, null, null, this.props.dispatch);
   }
