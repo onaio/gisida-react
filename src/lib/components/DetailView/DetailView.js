@@ -114,9 +114,26 @@ class DetailView extends Component {
 
   onCloseClick(e) {
     e.preventDefault();
-    const center = this.props.LOC ? this.props.LOC.center :  Array.isArray(this.props.APP.mapConfig.center) ?
-    { lng: this.props.APP.mapConfig.center[0], lat: this.props.APP.mapConfig.center[1] } : { ...this.props.APP.mapConfig.center };
-    const zoom = this.props.LOC ? this.props.LOC.location.zoom : this.props.APP.mapConfig.zoom;
+    let center, zoom;
+    /**
+     * Datermining center and zoom when closing detailview 
+     * on Close Click Ease to layer location 
+     * if layer has no location ease to active LOC
+     * else ease into mapconfig levels*/
+    if (this.props.MAP.layers[this.props.MAP.primaryLayer].location) {
+      center = this.props.MAP.layers[this.props.MAP.primaryLayer].location.center;
+      zoom = this.props.MAP.layers[this.props.MAP.primaryLayer].location.zoom;
+    } else if (this.props.LOC) {
+      center = Array.isArray(this.props.LOC.location.center) ? 
+      {lng: this.props.LOC.location.center[0], lat: this.props.LOC.location.center[1] } 
+       : {...this.props.LOC.location.center};
+      zoom = this.props.LOC.location.zoom;
+    } else {
+      center = Array.isArray(this.props.APP.mapConfig.center) ?
+      { lng: this.props.APP.mapConfig.center[0], lat: this.props.APP.mapConfig.center[1] } 
+        : { ...this.props.APP.mapConfig.center };
+      zoom = this.props.LOC ? this.props.LOC.location.zoom : this.props.APP.mapConfig.zoom;
+    }
     window.maps[0].easeTo({
       center,
       zoom: zoom,
