@@ -183,7 +183,7 @@ export class AdvancedFilter extends React.Component {
       } else {
         nextQueries.push(query);
       }
-      nextQueries[i].matches = nextQueries[i].val.length ? this.getQueryMatches(nextQueries, i) : [];
+      nextQueries[i].matches = this.getQueryMatches(nextQueries, i);
     }
 
     const queriedOptionKeys = this.reduceQueryMatches(nextQueries);
@@ -209,7 +209,7 @@ export class AdvancedFilter extends React.Component {
       } else {
         nextQueries.push(query);
       }
-      nextQueries[i].matches = nextQueries[i].val.length ? this.getQueryMatches(nextQueries, i) : [];
+      nextQueries[i].matches = this.getQueryMatches(nextQueries, i);
     }
 
     const queriedOptionKeys = this.reduceQueryMatches(nextQueries);

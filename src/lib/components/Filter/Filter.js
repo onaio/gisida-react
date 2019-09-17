@@ -594,35 +594,7 @@ export class Filter extends Component {
   setFilterQueries = (filterKey, nextQueries, queriedOptionKeys) => {
     const { layerObj, mapId, dispatch, FILTER } = this.props;
     const { isOr, filterOptions } = this.state;
-    if (FILTER[this.state.layerId] && !FILTER[this.state.layerId].originalLayerObj) {
-      this.buildOriginalObj(this.props, this.state);
-    }
     let prevFilters = Object.assign({}, this.state.filters);
-    const nextQuery = queriedOptionKeys
-      && queriedOptionKeys.length
-      && nextQueries.find(d => d.matches.length === queriedOptionKeys.length);
-    const compareQueries = this.state.filters[filterKey].queries.length
-      && nextQueries.length > this.state.filters[filterKey].queries.length;
-    if (compareQueries) {
-      prevFilters[filterKey].toggleAllOn = true;
-      prevFilters = {
-        ...this.buildFauxOptions(this.state.filters, prevFilters, filterKey, false)
-      };
-    } else {
-      prevFilters[filterKey].toggleAllOn = (nextQuery
-        && nextQueries.indexOf(nextQuery) !== 0
-        && nextQuery.isOR)
-        || (!!!queriedOptionKeys && prevFilters[filterKey].doAdvFiltering);
-      prevFilters = {
-        ...this.buildFauxOptions(
-          this.state.filters,
-          prevFilters,
-          filterKey,
-          null,
-          nextQueries,
-          queriedOptionKeys),
-      };
-    }
     prevFilters[filterKey].queries = nextQueries;
     prevFilters[filterKey].queriedOptionKeys = [...new Set(queriedOptionKeys)];
     const {
