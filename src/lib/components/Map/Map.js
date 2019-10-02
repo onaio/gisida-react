@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
-import { detectIE, buildLayersObj, detailViewData, orderLayers } from '../../utils';
+import { detectIE, buildLayersObj, orderLayers } from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
-  const { APP, STYLES, REGIONS, VIEW, FILTER, LOC } = state;
+  const { APP, STYLES, REGIONS, VIEW, FILTER, LOC, LOCLIB } = state;
   const mapId = ownProps.mapId || 'map-1';
   const MAP = state[mapId] || { blockLoad: true, layers: {}};
   const { detailView } = MAP;
@@ -28,6 +28,7 @@ const mapStateToProps = (state, ownProps) => {
     REGIONS,
     MAP,
     LOC,
+    LOCLIB,
     VIEW,
     FILTER,
     layers: MAP.layers,
@@ -317,7 +318,7 @@ class Map extends Component {
     const activeLayerIds = nextProps.activeLayerIds;
     const primaryLayer = nextProps.MAP.primaryLayer;
     const activeLayerId = nextProps.MAP.activeLayerId;
-
+    const locLib = nextProps.LOCLIB;
     const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES || [];
     const regions = nextProps.REGIONS;
@@ -325,10 +326,22 @@ class Map extends Component {
     mapConfig.container = mapId
   
 
-    // Check if map is initialized.
-    if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
+    /** Check that map is not rendered or not IE and mapboxgl is supported
+     * Check 
+     */
+      if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad && 
+      ((mapConfig.country && locLib && Object.keys(locLib).length) || (!mapConfig.country) ) ) {
+        mapConfig = (mapConfig.country && mapConfig.locFormId &&
+           locLib && Object.keys(locLib).length) ? {
+          ...mapConfig,
+          center: {
+            lng: locLib._geolocation[1],
+            lat: locLib._geolocation[0]
+          },
+          zoom: locLib.zoom_level
+        } : mapConfig;
       this.initMap(accessToken, mapConfig, mapId, mapIcons);
-    }
+     }
     // Check if rendererd map has finished loading
     if (isLoaded) {
       // Set current style (basemap)
