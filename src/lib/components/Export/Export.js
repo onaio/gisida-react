@@ -238,7 +238,15 @@ export class Export extends Component {
           // delete the export container and it's child clones
           $('#exportEl').remove();
         }, 'image/jpg');
-      }, () => {
+        /**
+         * Hide export modal once map is exported
+         */
+          if (this.props.config["closeExportModal"]){
+            this.setState({
+              isOpen: !this.state.isOpen
+            })
+          }
+        }, () => {
         // if the promise is rejected, restore the map to it's previous state
         self.resetMapAfterExport(prevMapState);
         // delete the export container and it's child clones
