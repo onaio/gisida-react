@@ -427,6 +427,17 @@ class Map extends Component {
           }
         });
       }
+      /** Ease to layer location for default layers (on render)
+       * This expects location prop to be on a single layer for default layers.
+       * We ensure we don't have two layers with location data with visible set to true since we can flyTo/
+       * easeTo two locations at the same time
+      */
+      const location = nextProps.layersObj.find(layer => layer.location) &&
+       nextProps.layersObj.find(layer => layer.location).location;
+      if (location) {
+        this.map.easeTo(location);
+      }
+      /** Set primary layer and EaseTo location if location property is provided */
       if (this.props.MAP.primaryLayer !== primaryLayer) {
         this.setPrimaryLayer(primaryLayer, activeLayerId, layers, activelayersData, activeLayerIds);
         if (layers[primaryLayer] && layers[primaryLayer].location) {
