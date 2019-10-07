@@ -34,7 +34,7 @@ const mapStateToProps = (state, ownProps) => {
     primarySubLayer: MAP.primarySubLayer,
     activeLayerIds: MAP.activeLayerIds,
     detailView: MAP.detailView,
-    timeSeriesObj: MAP.timeseries ? MAP.timeseries[MAP.primarySubLayer || MAP.activeLayerId]: null,
+    timeSeriesObj: MAP.timeseries ? MAP.timeseries[MAP.primarySubLayer || MAP.primaryLayer || MAP.activeLayerId]: null,
     timeseries:  MAP.timeseries,
     layersObj: MAP.layers ? buildLayersObj(MAP.layers) : {},
     layerObj: MAP.layers ? MAP.layers[MAP.primaryLayer || MAP.activeLayerId]: null,
