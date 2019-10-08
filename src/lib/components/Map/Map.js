@@ -1,35 +1,23 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import {
-  Actions,
-  addPopUp,
-  sortLayers,
-  addChart,
-  buildDetailView,
-  prepareLayer
-} from "gisida";
-import {
-  detectIE,
-  buildLayersObj,
-  detailViewData,
-  orderLayers
-} from "../../utils";
-import "./Map.scss";
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
+import { detectIE, buildLayersObj, detailViewData, orderLayers } from '../../utils';
+import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
   const { APP, STYLES, REGIONS, VIEW, FILTER, LOC } = state;
-  const mapId = ownProps.mapId || "map-1";
+  const mapId = ownProps.mapId || 'map-1';
   const MAP = state[mapId] || { blockLoad: true, layers: {} };
   const { detailView } = MAP;
   const activeLayers = [];
-  Object.keys(MAP.layers).forEach(key => {
+  Object.keys(MAP.layers).forEach((key) => {
     const layer = MAP.layers[key];
-    if (layer.visible && layer.type !== "chart") {
+    if (layer.visible && layer.type !== 'chart') {
       activeLayers.push(key);
     }
   });
 
-  MAP.blockLoad = mapId === "map-1" ? false : !VIEW || !VIEW.splitScreen;
+  MAP.blockLoad = mapId === 'map-1' ? false : !VIEW || !VIEW.splitScreen;
 
   return {
     mapId,
@@ -45,21 +33,17 @@ const mapStateToProps = (state, ownProps) => {
     activeLayerIds: MAP.activeLayerIds,
     detailView: MAP.detailView,
     timeSeriesObj: MAP.timeseries
-      ? MAP.timeseries[
-          MAP.primarySubLayer || MAP.primaryLayer || MAP.activeLayerId
-        ]
+      ? MAP.timeseries[MAP.primarySubLayer || MAP.primaryLayer || MAP.activeLayerId]
       : null,
     timeseries: MAP.timeseries,
     layersObj: MAP.layers ? buildLayersObj(MAP.layers) : {},
-    layerObj: MAP.layers
-      ? MAP.layers[MAP.primaryLayer || MAP.activeLayerId]
-      : null,
+    layerObj: MAP.layers ? MAP.layers[MAP.primaryLayer || MAP.activeLayerId] : null,
     primaryLayer: MAP.primaryLayer,
     oldLayerObj: MAP.oldLayerObjs ? MAP.oldLayerObjs[MAP.primaryLayer] : {},
     showDetailView: detailView && detailView.model && detailView.model.UID,
     showFilterPanel: !!MAP.showFilterPanel,
     activeLayers,
-    handlers: ownProps.handlers
+    handlers: ownProps.handlers,
   };
 };
 
@@ -71,7 +55,7 @@ class Map extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      layersObj: this.props.layersObj
+      layersObj: this.props.layersObj,
     };
   }
   initMap(accessToken, mapConfig, mapId, mapIcons) {
@@ -83,15 +67,15 @@ class Map extends Component {
       this.map.addControl(this.map.controls);
       this.map.scale_controls = new mapboxgl.ScaleControl({
         maxWidth: 80,
-        unit: "metric"
+        unit: 'metric',
       });
       this.map.addControl(this.map.scale_controls);
 
       // Handle Map Load Event
-      this.map.on("load", () => {
+      this.map.on('load', () => {
         /** Add icons from external source to map since they aren't available on the basemap */
         if (mapIcons) {
-          mapIcons.forEach(element => {
+          mapIcons.forEach((element) => {
             this.map.loadImage(element.imageUrl, (error, res) => {
               this.map.addImage(element.id, res);
             });
@@ -104,34 +88,30 @@ class Map extends Component {
       });
 
       // Handle Style Change Event
-      this.map.on("style.load", e => {
+      this.map.on('style.load', (e) => {
         let mapLoad = false;
         // Define on map on render listener for current stlye loads
-        const onStyleLoad = e => {
+        const onStyleLoad = (e) => {
           // check if map is loaded before reloading layers
-          if (
-            e.target.loaded() &&
-            mapLoad !== e.target.loaded() &&
-            this.props.MAP.isLoaded
-          ) {
+          if (e.target.loaded() && mapLoad !== e.target.loaded() && this.props.MAP.isLoaded) {
             mapLoad = true;
             this.props.dispatch(Actions.reloadLayers(mapId, Math.random()));
           }
         };
         // remove render listener for previous style.load event
-        e.target.off("render", onStyleLoad);
+        e.target.off('render', onStyleLoad);
         // add render listener for current style.load event
-        e.target.on("render", onStyleLoad);
+        e.target.on('render', onStyleLoad);
       });
 
-      this.map.on("data", data => {
+      this.map.on('data', (data) => {
         if (data.isSourceLoaded) {
           this.props.dispatch(Actions.triggerSpinner(this.props.mapId));
         }
       });
 
       // Handle adding/removing labels when zooming
-      this.map.on("zoom", this.handleLabelsOnMapZoom.bind(this));
+      this.map.on('zoom', this.handleLabelsOnMapZoom.bind(this));
 
       // Dispach map rendered to indicate map was rendered
       this.props.dispatch(Actions.mapRendered(mapId, true));
@@ -163,27 +143,25 @@ class Map extends Component {
       // this.addMapClickEvents()
       // this.addMouseMoveEvents()
       // etc
-      this.map.on("mousemove", e => {
+      this.map.on('mousemove', (e) => {
         const { activeLayers, layerObj } = this.props;
         if (!layerObj) {
           return false;
         }
         const features = this.map.queryRenderedFeatures(e.point, {
-          layers: activeLayers.filter(i => this.map.getLayer(i) !== undefined)
+          layers: activeLayers.filter((i) => this.map.getLayer(i) !== undefined),
         });
-        const feature = features.find(f => f.layer.id === layerObj.id);
+        const feature = features.find((f) => f.layer.id === layerObj.id);
         if (!feature) {
           return false;
         }
-        this.map.getCanvas().style.cursor = layerObj["detail-view"]
-          ? "pointer"
-          : "";
+        this.map.getCanvas().style.cursor = layerObj['detail-view'] ? 'pointer' : '';
         return true;
       });
     }
 
     if (!APP.disableDefaultFeatureClick) {
-      this.map.on("click", this.onFeatureClick.bind(this));
+      this.map.on('click', this.onFeatureClick.bind(this));
     }
   }
 
@@ -194,22 +172,20 @@ class Map extends Component {
   //   }
   // }
   onFeatureClick(e) {
-    const activeLayers = this.props.layersObj.map(l => l.id);
+    const activeLayers = this.props.layersObj.map((l) => l.id);
     const { mapId } = this.props;
     const features = this.map.queryRenderedFeatures(e.point, {
-      layers: activeLayers.filter(l => this.map.getLayer(l) !== undefined)
+      layers: activeLayers.filter((l) => this.map.getLayer(l) !== undefined),
     });
     const feature = features[0];
     if (!feature) return false;
-    const activeLayerObj = this.props.layersObj.find(
-      l => l.id === feature.layer.id
-    );
+    const activeLayerObj = this.props.layersObj.find((l) => l.id === feature.layer.id);
 
-    if (feature && activeLayerObj["detail-view"]) {
+    if (feature && activeLayerObj['detail-view']) {
       const newZoom = this.map.getZoom() < 7.5 ? 7.5 : this.map.getZoom();
       this.map.easeTo({
         center: e.lngLat,
-        zoom: newZoom
+        zoom: newZoom,
       });
       buildDetailView(
         mapId,
@@ -223,26 +199,20 @@ class Map extends Component {
   }
 
   findNextLayer(activelayersData, nextLayer) {
-    return activelayersData.find(lo => lo.id === nextLayer);
+    return activelayersData.find((lo) => lo.id === nextLayer);
   }
 
-  setPrimaryLayer(
-    primaryLayer,
-    activeLayerId,
-    layers,
-    activeLayersData,
-    activeLayerIds
-  ) {
+  setPrimaryLayer(primaryLayer, activeLayerId, layers, activeLayersData, activeLayerIds) {
     const sortedLayers = [];
-    activeLayerIds.forEach(id => {
-      activeLayersData.forEach(l => {
+    activeLayerIds.forEach((id) => {
+      activeLayersData.forEach((l) => {
         if (id === l.id || id === l.parent) {
           sortedLayers.push(l);
         }
       });
     });
     const nextLayerId = primaryLayer || activeLayerId;
-    let nextLayerObj = activeLayersData.find(lo => lo.id === nextLayerId);
+    let nextLayerObj = activeLayersData.find((lo) => lo.id === nextLayerId);
     if (nextLayerId && !nextLayerObj && layers[nextLayerId].layers) {
       let nextLayer;
       for (let l = 0; l < layers[nextLayerId].layers.length; l += 1) {
@@ -277,10 +247,10 @@ class Map extends Component {
       this.map.moveLayer(nextLayerId);
       //move icon with detail view to top of the map layers wip
       if (
-        activeLayersData.find(d => d["detail-view"]) &&
-        this.map.getLayer(activeLayersData.find(d => d["detail-view"]).id)
+        activeLayersData.find((d) => d['detail-view']) &&
+        this.map.getLayer(activeLayersData.find((d) => d['detail-view']).id)
       ) {
-        this.map.moveLayer(activeLayersData.find(d => d["detail-view"]).id);
+        this.map.moveLayer(activeLayersData.find((d) => d['detail-view']).id);
       }
     }
     // Loop throught all active map layers
@@ -306,11 +276,11 @@ class Map extends Component {
     // Order active layers
 
     orderLayers(sortedLayers, map, nextLayerId);
-    const nextlayersObj = activeLayersData.filter(lo => lo.id !== nextLayerId);
+    const nextlayersObj = activeLayersData.filter((lo) => lo.id !== nextLayerId);
     nextlayersObj.push(nextLayerObj);
 
     this.setState({
-      layersObj: nextlayersObj
+      layersObj: nextlayersObj,
     });
 
     return true;
@@ -318,17 +288,13 @@ class Map extends Component {
 
   changeVisibility(layerId, visibility) {
     if (this.map.getLayer(layerId)) {
-      this.map.setLayoutProperty(
-        layerId,
-        "visibility",
-        visibility ? "visible" : "none"
-      );
+      this.map.setLayoutProperty(layerId, 'visibility', visibility ? 'visible' : 'none');
       // if layer has a highlight layer, update its visibility too
       if (this.map.getLayer(`${layerId}-highlight`)) {
         this.map.setLayoutProperty(
           `${layerId}-highlight`,
-          "visibility",
-          visibility ? "visible" : "none"
+          'visibility',
+          visibility ? 'visible' : 'none'
         );
       }
     }
@@ -339,7 +305,7 @@ class Map extends Component {
       try {
         this.map.resize();
       } catch (e) {
-        console.warn("resize error", e);
+        console.warn('resize error', e);
       }
     }
     const accessToken = nextProps.APP.accessToken;
@@ -362,51 +328,36 @@ class Map extends Component {
     mapConfig.container = mapId;
 
     // Check if map is initialized.
-    if (
-      !isRendered &&
-      (!isIE || mapboxgl.supported()) &&
-      !nextProps.MAP.blockLoad
-    ) {
+    if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
       this.initMap(accessToken, mapConfig, mapId, mapIcons);
     }
     // Check if rendererd map has finished loading
     if (isLoaded) {
       // Set current style (basemap)
-      styles.forEach(style => {
-        if (
-          style[mapId] &&
-          style[mapId].current &&
-          this.props.MAP.currentStyle !== currentStyle
-        ) {
+      styles.forEach((style) => {
+        if (style[mapId] && style[mapId].current && this.props.MAP.currentStyle !== currentStyle) {
           this.map.setStyle(style.url);
         }
       });
 
       // Zoom to current region (center and zoom)
       regions &&
-        regions.forEach(region => {
-          if (
-            region.current &&
-            this.props.MAP.currentRegion !== currentRegion
-          ) {
+        regions.forEach((region) => {
+          if (region.current && this.props.MAP.currentRegion !== currentRegion) {
             this.map.easeTo({
               center: region.center,
               zoom: region.zoom,
-              duration: 1200
+              duration: 1200,
             });
           }
         });
 
       // Add current layers to map
       if (this.props.MAP.reloadLayers !== reloadLayers) {
-        Object.keys(layers).forEach(key => {
+        Object.keys(layers).forEach((key) => {
           const layer = layers[key];
           // Add layer to map if visible
-          if (
-            !this.map.getLayer(layer.id) &&
-            layer.visible &&
-            layer.styleSpec
-          ) {
+          if (!this.map.getLayer(layer.id) && layer.visible && layer.styleSpec) {
             this.map.addLayer({ ...layer.styleSpec });
 
             // if layer has a highlight layer
@@ -414,31 +365,28 @@ class Map extends Component {
               // create a copy of the layer
               const highlightLayer = Object.assign({}, layer.styleSpec);
               // apply layout and paint properties to the highlight layer
-              if (layer["highlight-layout"]) {
+              if (layer['highlight-layout']) {
                 highlightLayer.layout = Object.assign(
                   {},
                   highlightLayer.layout,
-                  layer["highlight-layout"]
+                  layer['highlight-layout']
                 );
               }
-              if (layer["highlight-paint"]) {
+              if (layer['highlight-paint']) {
                 highlightLayer.paint = Object.assign(
                   {},
                   highlightLayer.paint,
-                  layer["highlight-paint"]
+                  layer['highlight-paint']
                 );
               }
               // append suffix to highlight layer id
-              highlightLayer.id += "-highlight";
+              highlightLayer.id += '-highlight';
               // add the highlight layer to the map
               if (!this.map.getLayer(highlightLayer.id)) {
                 this.map.addLayer(highlightLayer);
               }
             }
-          } else if (
-            this.map.getLayer(layer.id) &&
-            nextProps.MAP.reloadLayerId === layer.id
-          ) {
+          } else if (this.map.getLayer(layer.id) && nextProps.MAP.reloadLayerId === layer.id) {
             // 1) remove layer and source
             let doUpdateTsLayer = true;
             let filterOptions = false;
@@ -447,45 +395,27 @@ class Map extends Component {
             // 2) dispatch action to set reloadLayerId to null
             this.props.dispatch(Actions.layerReloaded(mapId));
             const originalLayer =
-              nextProps.FILTER &&
-              nextProps.FILTER[layer.id] &&
-              nextProps.FILTER[layer.id].isClear
+              nextProps.FILTER && nextProps.FILTER[layer.id] && nextProps.FILTER[layer.id].isClear
                 ? nextProps.MAP.oldLayerObjs[layer.id]
                 : layer;
-            prepareLayer(
-              mapId,
-              originalLayer,
-              this.props.dispatch,
-              filterOptions,
-              doUpdateTsLayer
-            );
+            prepareLayer(mapId, originalLayer, this.props.dispatch, filterOptions, doUpdateTsLayer);
           }
           // Change visibility if layer is already on map
           this.changeVisibility(layer.id, layer.visible);
           if (layer.layers) {
-            layer.layers.forEach(subLayer => {
+            layer.layers.forEach((subLayer) => {
               this.changeVisibility(subLayer, layer.visible);
             });
           }
 
-          if (
-            layer.visible &&
-            layer.type === "chart" &&
-            typeof layer.source.data !== "string"
-          ) {
+          if (layer.visible && layer.type === 'chart' && typeof layer.source.data !== 'string') {
             const timefield =
-              layer.aggregate && layer.aggregate.timeseries
-                ? layer.aggregate.timeseries.field
-                : "";
+              layer.aggregate && layer.aggregate.timeseries ? layer.aggregate.timeseries.field : '';
             let { data } = layer.source;
             if (timefield) {
-              const period = [
-                ...new Set(layer.source.data.map(p => p[timefield]))
-              ];
+              const period = [...new Set(layer.source.data.map((p) => p[timefield]))];
               // newStops = { id: layer.id, period, timefield };
-              data = layer.source.data.filter(
-                d => d[timefield] === period[period.length - 1]
-              );
+              data = layer.source.data.filter((d) => d[timefield] === period[period.length - 1]);
             }
             addChart(layer, data, this.map, mapId);
           } else {
@@ -493,23 +423,19 @@ class Map extends Component {
           }
         });
         const intelLayers = [];
-        activeLayerIds.forEach(id => {
-          activelayersData.forEach(l => {
+        activeLayerIds.forEach((id) => {
+          activelayersData.forEach((l) => {
             if ((id === l.id) | (id === l.parent)) {
               intelLayers.push(l);
             }
           });
         });
-        sortLayers(
-          this.map,
-          intelLayers || layers,
-          primaryLayer || activeLayerId
-        );
+        sortLayers(this.map, intelLayers || layers, primaryLayer || activeLayerId);
       }
       /** Move symbol layer on top when we have no primary layer */
       if (!this.props.MAP.primaryLayer && nextProps.activeLayers.length) {
-        nextProps.layersObj.forEach(layer => {
-          if (layer.type === "symbol" && this.map.getLayer(layer.id)) {
+        nextProps.layersObj.forEach((layer) => {
+          if (layer.type === 'symbol' && this.map.getLayer(layer.id)) {
             this.map.moveLayer(layer.id);
           }
         });
@@ -517,28 +443,22 @@ class Map extends Component {
 
       /** Set primary layer and EaseTo location if location property is provided */
       if (this.props.MAP.primaryLayer !== primaryLayer) {
-        this.setPrimaryLayer(
-          primaryLayer,
-          activeLayerId,
-          layers,
-          activelayersData,
-          activeLayerIds
-        );
+        this.setPrimaryLayer(primaryLayer, activeLayerId, layers, activelayersData, activeLayerIds);
         if (layers[primaryLayer] && layers[primaryLayer].location) {
           this.map.easeTo(layers[primaryLayer].location);
         } else if (mapConfig.center) {
           if (!Array.isArray(mapConfig.center)) {
             this.map.easeTo({
               center: mapConfig.center,
-              zoom: mapConfig.zoom
+              zoom: mapConfig.zoom,
             });
           } else {
             this.map.easeTo({
               center: {
                 lng: mapConfig.center[0],
-                lat: mapConfig.center[1]
+                lat: mapConfig.center[1],
               },
-              zoom: mapConfig.zoom
+              zoom: mapConfig.zoom,
             });
           }
         }
@@ -553,32 +473,23 @@ class Map extends Component {
       try {
         this.map.resize();
       } catch (e) {
-        console.warn("resize error", e);
+        console.warn('resize error', e);
       }
 
-      const {
-        layersObj,
-        layerObj,
-        primaryLayer,
-        FILTER,
-        LOC,
-        mapId,
-        timeSeriesObj
-      } = this.props;
+      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj } = this.props;
       if (
         LOC &&
         LOC.doUpdateMap === mapId &&
         LOC.location &&
         (prevProps.LOC.active !== LOC.active ||
           prevProps.layersObj.length !== layersObj.length ||
-          (this.map.getZoom() !== LOC.location.zoom &&
-            LOC.location.doUpdateLOC))
+          (this.map.getZoom() !== LOC.location.zoom && LOC.location.doUpdateLOC))
       ) {
         const { bounds, boundsPadding, center, zoom } = LOC.location;
         if (bounds) {
           this.map.fitBounds(bounds, {
             padding: boundsPadding || 0,
-            linear: true
+            linear: true,
           });
         } else {
           this.map.easeTo({ center, zoom });
@@ -592,10 +503,8 @@ class Map extends Component {
       // Update Timeseries
       const doUpdateTSlayers = this.doUpdateTSlayers(prevProps);
       if (
-        ((layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) ||
-          timeSeriesObj) &&
-        (doUpdateTSlayers ||
-          (FILTER && FILTER[primaryLayer] && FILTER[primaryLayer].isClear))
+        ((layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) || timeSeriesObj) &&
+        (doUpdateTSlayers || (FILTER && FILTER[primaryLayer] && FILTER[primaryLayer].isClear))
       ) {
         this.updateTimeseriesLayers();
       }
@@ -607,11 +516,7 @@ class Map extends Component {
     }
 
     // Update Layer Filters
-    if (
-      this.map &&
-      this.props.layerObj &&
-      this.map.getLayer(this.props.layerObj.id)
-    ) {
+    if (this.map && this.props.layerObj && this.map.getLayer(this.props.layerObj.id)) {
       const { FILTER, primaryLayer } = this.props;
       if (
         this.props.MAP.doApplyFilters ||
@@ -625,13 +530,10 @@ class Map extends Component {
       }
     }
 
-    if (
-      !prevProps.layersObj.length &&
-      this.props.layersObj !== prevProps.layersObj
-    ) {
+    if (!prevProps.layersObj.length && this.props.layersObj !== prevProps.layersObj) {
       const location =
-        this.props.layersObj.find(layer => layer.location) &&
-        this.props.layersObj.find(layer => layer.location).location;
+        this.props.layersObj.find((layer) => layer.location) &&
+        this.props.layersObj.find((layer) => layer.location).location;
       if (location) {
         this.map.easeTo(location);
       }
@@ -640,7 +542,7 @@ class Map extends Component {
 
   componentWillUnmount() {
     const { dispatch, mapId } = this.props;
-    const index = window.maps.map(m => m["_container"].id).indexOf(mapId);
+    const index = window.maps.map((m) => m['_container'].id).indexOf(mapId);
     window.maps.splice(index, 1);
     dispatch(Actions.mapRendered(mapId, false));
     dispatch(Actions.mapLoaded(mapId, false));
@@ -657,13 +559,13 @@ class Map extends Component {
 
     const filterKeys = Object.keys(layerObj.filters);
     let filter;
-    const combinedFilters = ["all"];
+    const combinedFilters = ['all'];
 
     // loop through filters object
     for (let f = 0; f < filterKeys.length; f += 1) {
       filter = layerObj.filters[filterKeys[f]];
 
-      if (filterKeys[f] === "highlight") {
+      if (filterKeys[f] === 'highlight') {
         // handle highlight filter seperately
         this.applyFilters(`${layerId}-highlight`, filter);
       } else if (filter) {
@@ -678,7 +580,7 @@ class Map extends Component {
     } else if (combinedFilters.length === 2) {
       // if there is only one filter, apply the only one
       this.applyFilters(layerId, combinedFilters[1]);
-    } else if (combinedFilters.length === 1 && combinedFilters[0] === "all") {
+    } else if (combinedFilters.length === 1 && combinedFilters[0] === 'all') {
       // if nothing was added to the combined filter array, removal all filters
       this.applyFilters(layerId, null);
     }
@@ -701,8 +603,7 @@ class Map extends Component {
     // if timeseries objects' keys don't match, update the timeseries
     if (
       prevProps.timeseries &&
-      Object.keys(prevProps.timeseries).length !==
-        Object.keys(timeseries).length
+      Object.keys(prevProps.timeseries).length !== Object.keys(timeseries).length
     ) {
       return true;
     }
@@ -714,7 +615,7 @@ class Map extends Component {
       if (
         layerObj &&
         this.map.getLayer(layerObj.id) &&
-        this.map.getLayoutProperty(layerObj.id, "visibility") === "none"
+        this.map.getLayoutProperty(layerObj.id, 'visibility') === 'none'
       ) {
         return true;
       }
@@ -727,10 +628,7 @@ class Map extends Component {
     for (let i = 0; i < tsKeys.length; i += 1) {
       layer = tsKeys[i];
       // if temporalIndecies don't match, then definitely update the timeseries
-      if (
-        timeseries[layer].temporalIndex !==
-        prevProps.timeseries[layer].temporalIndex
-      ) {
+      if (timeseries[layer].temporalIndex !== prevProps.timeseries[layer].temporalIndex) {
         return true;
       }
     }
@@ -739,16 +637,12 @@ class Map extends Component {
   }
 
   updateTimeseriesLayers(nextProps) {
-    const { timeSeriesObj, timeseries, layersObj, FILTER } = nextProps
-      ? nextProps
-      : this.props;
+    const { timeSeriesObj, timeseries, layersObj, FILTER } = nextProps ? nextProps : this.props;
     const timeSeriesLayers = Object.keys(timeseries);
 
     // determine what the currently timeperiod to see if layers should be hidden
     const currPeriod =
-      timeSeriesObj &&
-      timeSeriesObj.period &&
-      timeSeriesObj.period[timeSeriesObj.temporalIndex];
+      timeSeriesObj && timeSeriesObj.period && timeSeriesObj.period[timeSeriesObj.temporalIndex];
 
     let tsObj;
     let layerObj;
@@ -796,71 +690,50 @@ class Map extends Component {
 
         // if the layer is in the map and has no period match, hide it
         if (!hasData || pIndex === -1) {
-          this.map.setLayoutProperty(layerObj.id, "visibility", "none");
+          this.map.setLayoutProperty(layerObj.id, 'visibility', 'none');
           // if layer has a highlight layer, update its visibility too
           if (this.map.getLayer(`${layerObj.id}-highlight`)) {
-            this.map.setLayoutProperty(
-              `${layerObj.id}-highlight`,
-              "visibility",
-              "none"
-            );
+            this.map.setLayoutProperty(`${layerObj.id}-highlight`, 'visibility', 'none');
           }
 
           // if the layer is not in the map and does have a match, handle it
         } else if (this.map.getLayer(id) && hasData && pIndex !== -1) {
           // if layer is hidden, reveal it
-          if (this.map.getLayoutProperty(id, "visibility") === "none") {
-            this.map.setLayoutProperty(layerObj.id, "visibility", "visible");
+          if (this.map.getLayoutProperty(id, 'visibility') === 'none') {
+            this.map.setLayoutProperty(layerObj.id, 'visibility', 'visible');
             // if layer has a highlight layer, update its visibility too
             if (this.map.getLayer(`${layerObj.id}-highlight`)) {
-              this.map.setLayoutProperty(
-                `${layerObj.id}-highlight`,
-                "visibility",
-                "visible"
-              );
+              this.map.setLayoutProperty(`${layerObj.id}-highlight`, 'visibility', 'visible');
             }
           }
 
           // if layer has stops, update them
-          if (
-            stops &&
-            stops[index] !== undefined &&
-            stops[index][0][0] !== undefined
-          ) {
-            defaultValue = layerObj.type === "circle" ? 0 : "rgba(0,0,0,0)";
-            paintProperty =
-              layerObj.type === "circle" ? "circle-radius" : "fill-color";
+          if (stops && stops[index] !== undefined && stops[index][0][0] !== undefined) {
+            defaultValue = layerObj.type === 'circle' ? 0 : 'rgba(0,0,0,0)';
+            paintProperty = layerObj.type === 'circle' ? 'circle-radius' : 'fill-color';
             newStops = {
-              property:
-                layerObj.categories["vector-prop"] || layerObj.source.join[0],
+              property: layerObj.categories['vector-prop'] || layerObj.source.join[0],
               stops: stops[index],
-              type: "categorical",
-              default: defaultValue
+              type: 'categorical',
+              default: defaultValue,
             };
 
             if (
-              layerObj.type === "circle" &&
-              (layerObj.categories.color instanceof Array ||
-                layerObj.colorStops)
+              layerObj.type === 'circle' &&
+              (layerObj.categories.color instanceof Array || layerObj.colorStops)
             ) {
               newColorStops = {
-                property:
-                  layerObj.categories["vector-prop"] || layerObj.source.join[0],
+                property: layerObj.categories['vector-prop'] || layerObj.source.join[0],
                 stops: layerObj.stops[0][index],
-                type: "categorical"
+                type: 'categorical',
               };
               newStrokeStops = {
-                property:
-                  layerObj.categories["vector-prop"] || layerObj.source.join[0],
+                property: layerObj.categories['vector-prop'] || layerObj.source.join[0],
                 stops: strokeWidthStops[index],
-                type: "categorical"
+                type: 'categorical',
               };
-              this.map.setPaintProperty(id, "circle-color", newColorStops);
-              this.map.setPaintProperty(
-                id,
-                "circle-stroke-width",
-                newStrokeStops
-              );
+              this.map.setPaintProperty(id, 'circle-color', newColorStops);
+              this.map.setPaintProperty(id, 'circle-stroke-width', newStrokeStops);
             }
 
             this.map.setPaintProperty(id, paintProperty, newStops);
@@ -903,11 +776,9 @@ class Map extends Component {
     let el;
     const { id } = layerObj;
     const labels =
-      timeseries && typeof timeseries[layerObj.id] !== "undefined"
+      timeseries && typeof timeseries[layerObj.id] !== 'undefined'
         ? layerObj.labels.labels[
-            timeseries[layerObj.id].period[
-              timeseries[layerObj.id].temporalIndex
-            ]
+            timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]
           ]
         : layerObj.labels.labels;
 
@@ -916,11 +787,11 @@ class Map extends Component {
     }
 
     for (let l = 0; l < labels.length; l += 1) {
-      el = document.createElement("div");
+      el = document.createElement('div');
       el.className = `map-label label-${id}`;
       el.innerHTML = labels[l].label;
       new mapboxgl.Marker(el, {
-        offset: labels[l].offset
+        offset: labels[l].offset,
       })
         .setLngLat(labels[l].coordinates)
         .addTo(this.map);
@@ -928,9 +799,7 @@ class Map extends Component {
   }
 
   removeLabels(labelClass) {
-    const classItems = document.getElementsByClassName(
-      labelClass || "map-label"
-    );
+    const classItems = document.getElementsByClassName(labelClass || 'map-label');
     while (classItems[0]) {
       classItems[0].parentNode.removeChild(classItems[0]);
     }
@@ -969,10 +838,10 @@ class Map extends Component {
         }
       }
 
-      this.props.activeLayerIds.forEach(id => {
+      this.props.activeLayerIds.forEach((id) => {
         this.props.layersObj
-          .filter(d => !d.layers)
-          .forEach(l => {
+          .filter((d) => !d.layers)
+          .forEach((l) => {
             if (id === l.id || id === l.parent) {
               sortedLayers.push(l);
             }
@@ -984,8 +853,7 @@ class Map extends Component {
         if (layerObj.labels) {
           minZoom = layerObj.labels.minZoom || layerObj.labels.minzoom || 0;
           maxZoom = layerObj.labels.maxZoom || layerObj.labels.maxzoom || 22;
-          isRendered = document.getElementsByClassName(`label-${layerObj.id}`)
-            .length;
+          isRendered = document.getElementsByClassName(`label-${layerObj.id}`).length;
           activeId = layerObj.id || layerObj.parent;
           if (zoom < minZoom || zoom > maxZoom) {
             this.removeLabels(`label-${layerObj.id}`);
@@ -1005,7 +873,7 @@ class Map extends Component {
     const { detailView, layerObj, timeSeriesObj, showDetailView } = this.props;
     const join =
       layerObj &&
-      ((layerObj["detail-view"] && layerObj["detail-view"].join) ||
+      ((layerObj['detail-view'] && layerObj['detail-view'].join) ||
         (layerObj.source && layerObj.source.join));
     let detailViewProps =
       join &&
@@ -1014,54 +882,48 @@ class Map extends Component {
       timeSeriesObj.data &&
       timeSeriesObj.data.length &&
       timeSeriesObj.data.find(
-        d => (d.properties || d)[join[1]] === detailView.properties[join[0]]
+        (d) => (d.properties || d)[join[1]] === detailView.properties[join[0]]
       );
 
     const showDetailViewBool =
       timeSeriesObj && timeSeriesObj.layerId === this.props.primaryLayer
         ? detailViewProps && typeof detailViewProps !== undefined
         : this.props.showDetailView;
-    let mapWidth = "100%";
+    let mapWidth = '100%';
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
-      mapWidth = this.props.mapId === "map-1" ? "52%" : "48%";
+      mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
     }
     if (this.props.showFilterPanel) {
-      mapWidth =
-        this.props.mapId === "map-1" ? `calc(${mapWidth} - 250px)` : "48%";
+      mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 250px)` : '48%';
     }
     if (showDetailViewBool) {
-      mapWidth =
-        this.props.mapId === "map-1" ? `calc(${mapWidth} - 345px)` : "48%";
+      mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 345px)` : '48%';
     }
     return (
       <div>
         {isIE || !mapboxgl.supported() ? (
           <div className="alert alert-info">
-            Your browser is not supported. Please open link in another browser
-            e.g Chrome or Firefox
+            Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
           </div>
         ) : (
           <div
             id={this.props.mapId}
             className={`${
-              this.props.mapId === "map-2" && this.props.showFilterPanel
-                ? "splitScreenClass"
-                : ""
+              this.props.mapId === 'map-2' && this.props.showFilterPanel ? 'splitScreenClass' : ''
             }`}
             style={{
               width: mapWidth,
               display:
-                this.props.MAP.blockLoad ||
-                (this.props.VIEW && !this.props.VIEW.showMap)
-                  ? "none"
-                  : "inline"
+                this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
+                  ? 'none'
+                  : 'inline',
             }}
           >
             <div className="widgets">
               {/* Render Children elemets with mapId prop added to each child  */}
-              {React.Children.map(this.props.children, child => {
+              {React.Children.map(this.props.children, (child) => {
                 return React.cloneElement(child, {
-                  mapId: this.props.mapId
+                  mapId: this.props.mapId,
                 });
               })}
             </div>
