@@ -133,7 +133,7 @@ componentWillReceiveProps(nextProps) {
       layer = this.props.layersData[l];
       const circleLayerType = (layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible);
       const symbolLayer = (layer && layer.credit && layer.categories && layer.categories.shape && layer.type !== 'circle');
-      const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
+      const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no' && layer.type !== 'circle');
       const fillLayerWithBreaks = (layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle' && layer.categories && layer.categories.breaks === 'yes');
 
       const activeLayerSelected = activeLegendLayer === layer.id  ? 'primary' : '';
@@ -150,7 +150,6 @@ componentWillReceiveProps(nextProps) {
           const currentColorStops = [...new Set(layer.stops[0][temporalIndex].map(d => d[1]))];
           const currentRadiusStops = [...new Set(layer.stops[1][temporalIndex].map(d => d[1]))];
           const currentBreakStops = [...new Set(layer.stops[6][temporalIndex])];
-
           currentRadiusStops.forEach((s, i) => {
             quantiles.push((
               <span
@@ -176,7 +175,6 @@ componentWillReceiveProps(nextProps) {
         const colors = [...new Set(layer.colorStops.map(d => d[1]))]
 
         uniqueStops = [...new Set(layer.stopsData.map(d => d[1]))];
-
         uniqueStops.forEach((s, i) => {
           quantiles.push((
             <span

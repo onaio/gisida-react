@@ -529,8 +529,7 @@ class Map extends Component {
         this.buildFilters();
       }
     }
-
-    if (!prevProps.layersObj.length && this.props.layersObj !== prevProps.layersObj) {
+    if (this.props.layersObj.length !== prevProps.layersObj.length) {
       const location =
         this.props.layersObj.find((layer) => layer.location) &&
         this.props.layersObj.find((layer) => layer.location).location;
