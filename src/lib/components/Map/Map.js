@@ -530,9 +530,11 @@ class Map extends Component {
       }
     }
     if (this.props.layersObj.length !== prevProps.layersObj.length) {
-      const location =
-        this.props.layersObj.find((layer) => layer.location) &&
-        this.props.layersObj.find((layer) => layer.location).location;
+      const { primaryLayer, layersObj, layers } = this.props;
+      const location = layers && layers[primaryLayer] && layers[primaryLayer].location ? 
+        layers[primaryLayer].location :
+        (layersObj && layersObj.find((layer) => layer.location) &&
+        layersObj.find((layer) => layer.location).location);
       if (location) {
         this.map.easeTo(location);
       }
