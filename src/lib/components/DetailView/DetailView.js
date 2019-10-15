@@ -123,7 +123,7 @@ class DetailView extends Component {
     if (this.props.MAP.layers[this.props.MAP.primaryLayer].location) {
       center = this.props.MAP.layers[this.props.MAP.primaryLayer].location.center;
       zoom = this.props.MAP.layers[this.props.MAP.primaryLayer].location.zoom;
-    } else if (this.props.LOC) {
+    } else if (this.props.LOC && this.props.LOC.location) {
       center = Array.isArray(this.props.LOC.location.center) ? 
       {lng: this.props.LOC.location.center[0], lat: this.props.LOC.location.center[1] } 
        : {...this.props.LOC.location.center};
@@ -132,7 +132,7 @@ class DetailView extends Component {
       center = Array.isArray(this.props.APP.mapConfig.center) ?
       { lng: this.props.APP.mapConfig.center[0], lat: this.props.APP.mapConfig.center[1] } 
         : { ...this.props.APP.mapConfig.center };
-      zoom = this.props.LOC ? this.props.LOC.location.zoom : this.props.APP.mapConfig.zoom;
+      zoom = this.props.LOC.location ? this.props.LOC.location.zoom : this.props.APP.mapConfig.zoom;
     }
     window.maps[0].easeTo({
       center,
