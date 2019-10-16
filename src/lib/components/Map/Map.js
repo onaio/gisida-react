@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
-import { detectIE, buildLayersObj, detailViewData, orderLayers } from '../../utils';
+import { detectIE, buildLayersObj, orderLayers, handleDetailviewPanel } from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -372,7 +372,8 @@ class Map extends Component {
             }
           } else if (this.map.getLayer(layer.id) && nextProps.MAP.reloadLayerId === layer.id) {
             let doUpdateTslayer = true;
-            let filterOptions = nextProps.MAP.filter.filterOptionsPrev || false;
+            let filterOptions = Object.keys(nextProps.MAP.filter.filterOptionsPrev).length !== 0
+              ? nextProps.MAP.filter.filterOptionsPrev : false;
             this.map.removeLayer(layer.id);
             this.map.removeSource(layer.id);
 
@@ -417,6 +418,24 @@ class Map extends Component {
 
       if (this.props.MAP.primaryLayer !== primaryLayer) {
         this.setPrimaryLayer(primaryLayer, activeLayerId, layers, activelayersData, activeLayerIds);
+        if (layers[primaryLayer] && layers[primaryLayer].location) {
+          this.map.easeTo(layers[primaryLayer].location);
+        } else {
+          if (!Array.isArray(mapConfig.center)) {
+            this.map.easeTo({
+              center: mapConfig.center,
+              zoom: mapConfig.zoom
+            });
+          } else {
+            this.map.easeTo({
+              center: {
+                "lng": mapConfig.center[0],
+                "lat": mapConfig.center[1]
+              },
+              zoom: mapConfig.zoom
+            });
+          }
+        }
       }
     }
     // Assign global variable for debugging purposes.
@@ -556,7 +575,12 @@ class Map extends Component {
     for (let i = 0; i < tsKeys.length; i += 1) {
       layer = tsKeys[i];
       // if temporalIndecies don't match, then definitely update the timeseries
-      if (timeseries[layer].temporalIndex !== prevProps.timeseries[layer].temporalIndex) {
+      if ((timeseries[layer].temporalIndex !== prevProps.timeseries[layer].temporalIndex) || timeseries[layer].updateTs) {
+        if (timeseries[layer].updateTs) {
+          const nextTimeseries = timeseries;
+          nextTimeseries[layer].updateTs = !nextTimeseries[layer].updateTs;
+          this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, layer));
+        }
         return true;
       }
     }
@@ -570,8 +594,9 @@ class Map extends Component {
     const timeSeriesLayers = Object.keys(timeseries);
 
     // determine what the currently timeperiod to see if layers should be hidden
+    const currIndex = timeSeriesObj.allPeriods.indexOf(timeSeriesObj.period[timeSeriesObj.temporalIndex]);
     const currPeriod = timeSeriesObj && timeSeriesObj.period &&
-       timeSeriesObj.period[timeSeriesObj.temporalIndex];
+       timeSeriesObj.allPeriods[currIndex];
 
     let tsObj;
     let layerObj;
@@ -597,6 +622,7 @@ class Map extends Component {
 
       if (timeSeriesLayers.includes(id)) {
         tsObj = timeseries[id];
+        tsObj.temporalIndex = timeSeriesObj.allPeriods.indexOf(currPeriod);
 
         const {
           temporalIndex, stops, strokeWidthStops,
@@ -612,9 +638,8 @@ class Map extends Component {
         // } else if (this.map.getLayer(id) && layer && layer.visible) {
 
           // look through the layer periods for a match
-          pIndex = timeseries[id].period.indexOf(currPeriod);
+          pIndex = timeseries[id].allPeriods.indexOf(currPeriod);
           hasData = pIndex !== -1 ? ((FILTER && FILTER[id] && FILTER[id].isClear) || timeseries[id].periodData[currPeriod].hasData) : false;
-
           // if the layer is in the map and has no period match, hide it
           if (!hasData || pIndex === -1) {
 
@@ -661,7 +686,11 @@ class Map extends Component {
                 this.map.setPaintProperty(id, 'circle-stroke-width', newStrokeStops);
               }
 
-              this.map.setPaintProperty(id, paintProperty, newStops);
+              if (layerObj['radius-prop']) {
+                this.map.setPaintProperty(id, paintProperty, layerObj.paint['circle-radius']);
+              } else {
+                this.map.setPaintProperty(id, paintProperty, newStops);
+              }
 
               // TODO : update legend?
               // this.removeLegend(layerObj);
@@ -700,9 +729,15 @@ class Map extends Component {
   addLabels(layerObj, timeseries) {
     let el;
     const { id } = layerObj;
-    const labels = timeseries && typeof timeseries[layerObj.id] !== 'undefined'
-      ? layerObj.labels.labels[timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]]
-      : layerObj.labels.labels;
+    let labels;
+
+    if (timeseries && typeof timeseries[layerObj.id] !== 'undefined') {
+      const tsObj = timeseries[layerObj.id];
+      const period = tsObj.allPeriods[tsObj.temporalIndex];
+      labels = layerObj.labels.labels[period];
+    } else {
+      labels = layerObj.labels.labels;
+    }
 
     if (!labels) {
       return false;
@@ -785,19 +820,9 @@ class Map extends Component {
 
   render() {
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
-    const { detailView, layerObj, timeSeriesObj, showDetailView } = this.props;
-    const join = layerObj && ((layerObj['detail-view'] &&
-      layerObj['detail-view'].join) || (layerObj.source && layerObj.source.join));
-    let detailViewProps = join && showDetailView &&
-      timeSeriesObj &&
-      timeSeriesObj.data &&
-      timeSeriesObj.data.length &&
-      timeSeriesObj.data.find(d => (d.properties || d)[join[1]] === detailView.properties[join[0]]);
-
-    const showDetailViewBool = timeSeriesObj &&
-     timeSeriesObj.layerId === this.props.primaryLayer ?
-      detailViewProps && typeof detailViewProps !== undefined : this.props.showDetailView;
+    const { layerObj } = this.props;
     let mapWidth = '100%';
+    const showDetailViewBool = handleDetailviewPanel(this.props);
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
     }

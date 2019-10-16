@@ -3,6 +3,7 @@
 exports[`Layer component renderes correctly 1`] = `
 <li
   className="layer"
+  title=""
 >
   <input
     checked={true}

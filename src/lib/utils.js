@@ -248,3 +248,29 @@ export function orderLayers(activeLayersData, map, nextLayerId) {
     }
 
 }
+
+export function handleDetailviewPanel(props) {
+  const {
+    primaryLayer,
+    layerObj,
+    detailView,
+    showDetailView
+  } = props;
+
+  const timeseriesObj = props.timeseriesObj || props.timeSeriesObj
+
+  const join = layerObj && ((layerObj['detail-view'] &&
+    layerObj['detail-view'].join) || (layerObj.source && layerObj.source.join));
+
+  const detailViewProps = join && (detailView && detailView.model && detailView.model.UID) &&
+    timeseriesObj &&
+    timeseriesObj.data &&
+    timeseriesObj.data.length &&
+    timeseriesObj.data.find(d => (d.properties || d)[join[1]] === detailView.properties[join[0]]);
+
+  const showDetView = timeseriesObj &&
+    timeseriesObj.layerId === primaryLayer ?
+    detailViewProps && typeof detailViewProps !== undefined : showDetailView;
+
+  return showDetView;
+}

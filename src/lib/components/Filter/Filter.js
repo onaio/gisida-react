@@ -9,7 +9,7 @@ import {
   clearFilterState,
   lngLat,
 } from 'gisida';
-import { buildLayersObj} from '../../utils';
+import { buildLayersObj, handleDetailviewPanel } from '../../utils';
 import FilterSelector from './FilterSelector';
 import FilterSelectorPrev from './FilterSelectorPrev';
 import './Filter.scss';
@@ -18,6 +18,7 @@ import 'rc-slider/assets/index.css';
 const mapStateToProps = (state, ownProps) => {
   const { mapId } = ownProps;
   const MAP = state[mapId] || { layers: {}, filter: {}, timeseries: {} };
+  const { detailView } = MAP;
   let timeLayer;
   buildLayersObj(MAP.layers).forEach((layer) => {
     if (layer && layer.visible && layer.aggregate && layer.aggregate.timeseries) {
@@ -32,14 +33,16 @@ const mapStateToProps = (state, ownProps) => {
     oldLayerObj: MAP.oldLayerObjs ? MAP.oldLayerObjs[MAP.primaryLayer] : {},
     isSplitScreen: state.VIEW && state.VIEW.splitScreen,
     FILTER: state.FILTER,
-    layerObj: MAP.layers[MAP.filter.layerId],
+    layerObj: MAP.layers[MAP.primaryLayer],
     timeseriesObj: MAP.timeseries[timeLayer],
     doShowProfile: MAP.showProfile,
     showFilterPanel: MAP.showFilterPanel && MAP.primaryLayer === MAP.filter.layerId,
     layersObj: buildLayersObj(MAP.layers),
+    showDetailView: (detailView && detailView.model && detailView.model.UID),
     showFilterBtn: MAP.filter.layerId && MAP.primaryLayer === MAP.filter.layerId,
     layerData: MAP.layers,
     detailView: MAP.detailView,
+    primaryLayer: MAP.primaryLayer,
   }
 }
 
@@ -274,12 +277,16 @@ export class Filter extends Component {
   }
 
   handleFilterClick() {
-    const { dispatch, mapId, layerId, APP, LOC } = this.props;
-    const availableMaps = ['map-1', 'map-2'];
+    const { dispatch, mapId, layerId, APP, LOC, layerObj } = this.props;
+    // const availableMaps = ['map-1', 'map-2'];
     const { center, zoom } = lngLat(LOC, APP);
-    window.maps[availableMaps.indexOf(mapId)].easeTo({
-      center,
-      zoom,
+    window.maps.forEach((e) => {
+      if (layerObj && !layerObj.location) {
+        e.easeTo({
+          center,
+          zoom,
+        });
+      }
     });
     dispatch(Actions.toggleFilter(mapId, layerId));
   }
@@ -299,35 +306,55 @@ export class Filter extends Component {
     // Build new component state or retrieve it from FILTER store
     const filterState = nextProps.FILTER[layerId];
     const layerFilters = this.getLayerFilter(layerId); // this may be deprecated
-    const filterOptions = filterState && filterState.filterOptions
-      ? filterState.filterOptions
-      : (nextProps.timeseriesObj && layerObj.aggregate && layerObj.aggregate.timeseries)
-        ? generateFilterOptions(timeseriesObj) : (layerObj.filterOptions || {});
 
-    const filters = (filterState && filterState.filters)
-      || (this.state.isFiltered && this.state.prevFilters)
-      || this.buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters);
+    let filterOptions;
+    if (nextProps.timeseriesObj && layerObj.aggregate && layerObj.aggregate.filter) {
+      filterOptions = generateFilterOptions(timeseriesObj);
+    } else if (!timeseriesObj && (filterState && filterState.filterOptions)) {
+      filterOptions = filterState.filterOptions;
+    } else {
+      filterOptions = (layerObj.filterOptions || {})
+    }
 
+    let filters;
+
+    if (timeseriesObj &&
+      (timeseriesObj.temporalIndex !== (this.props.timeseriesObj &&
+        this.props.timeseriesObj.temporalIndex)) && !layerFilters &&
+      !(filterState && filterState.doUpdate)) {
+      filters = this.buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters)
+    } else {
+      filters = (filterState && filterState.filters) ||
+        (this.state.isFiltered && this.state.prevFilters) ||
+        this.buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters)
+    }
 
     // determine whether to update the compnent state
-    const doUpdate = (layerId !== this.state.layerId
-      && (filterOptions && Object.keys(filterOptions).length > 0))
-      || (filterState && filterState.doUpdate);
+    const doUpdate = ((layerId !== this.state.layerId &&
+        (filterOptions && Object.keys(filterOptions).length > 0)) ||
+      (filterState && filterState.doUpdate) || (timeseriesObj &&
+        (timeseriesObj.temporalIndex !== (this.props.timeseriesObj &&
+          this.props.timeseriesObj.temporalIndex))));
     if (doUpdate) {
-    this.setState({
-      filters,
-      filterOptions,
-      timeseriesObj: nextProps.timeseriesObj,
-      oldLayerObj,
-      layerId: doUpdate ? layerId : null,
-      doShowProfile: false,
-    }, () => {
-      
+      this.setState({
+        filters,
+        filterOptions,
+        timeseriesObj: nextProps.timeseriesObj,
+        oldLayerObj,
+        layerId: doUpdate ? layerId : null,
+        doShowProfile: false,
+      }, () => {
+        if (nextProps.FILTER && nextProps.FILTER[layerId] && nextProps.FILTER[layerId].isClear) {
+          const newFilterState = {
+            ...filterState,
+            isClear: false,
+          }
+          this.props.dispatch(Actions.saveFilterState(this.props.mapId, layerId, newFilterState))
+        }
         this.props.dispatch(Actions.filtersUpdated(nextProps.mapId, layerId));
-      
-    });
-  }  
- } 
+      });
+    }
+ }
   onCloseClick = (e) => {
     e.preventDefault();
     //TODO dispach close action
@@ -404,14 +431,18 @@ export class Filter extends Component {
     if (!isFilterable) {
       return false;
     }
-    const { layerId, filterOptions, oldLayerObj } = this.state;
-    const { mapId, dispatch } = this.props;
+    const { layerId, oldLayerObj } = this.state;
+    const { mapId, dispatch, FILTER } = this.props;
+    const filterState = FILTER[layerId];
+
     // Clear layerFilter from mapbox layer
     dispatch(Actions.setLayerFilter(mapId, layerId, null));
 
     // Update FILTER state
 
-    const filterState = {
+    const filterOptions = filterState && filterState.filterOptions;
+
+    const clearedFilterState = {
       filterOptions,
       filters: this.buildFiltersMap(filterOptions),
       aggregate: {
@@ -423,7 +454,7 @@ export class Filter extends Component {
 
     const hasStops = Object.keys(filterOptions).map(f => filterOptions[f].type).includes('stops');
     
-    clearFilterState(mapId, filterState, layerId, dispatch, true);
+    clearFilterState(mapId, clearedFilterState, layerId, dispatch, true);
 
     // Reload layer if necessary to re-aggregate / restore layer stops
     if (this.props.FILTER[layerId]
@@ -432,6 +463,7 @@ export class Filter extends Component {
       && hasStops) {
       // Reload layer to re-aggregate and re-add layer
       this.props.dispatch(Actions.addLayer(mapId, oldLayerObj));
+
     }
     return true;
   }
@@ -443,7 +475,7 @@ export class Filter extends Component {
     }
     const { filters, layerId, filterOptions, isOr } = this.state;
 
-    const { layerObj, mapId, dispatch } = this.props;
+    const { layerObj, mapId, dispatch, timeseriesObj } = this.props;
 
     if (!layerObj) {
       return false;
@@ -522,12 +554,21 @@ export class Filter extends Component {
 
     // Update FILTER store state
     const { FILTER } = this.props;
-    if (FILTER[layerId] && !FILTER[layerId].originalLayerObj) {
-      this.buildOriginalObj(this.props, this.state);
+    let newLayerObj = { ...layerObj };
+    let currPeriodData;
+    if (layerObj.aggregate && layerObj.aggregate.timeseries && regenStops) {
+      const { periodData, allPeriods, temporalIndex } = timeseriesObj;
+      currPeriodData = periodData[allPeriods[temporalIndex]].data;
+      newLayerObj = {
+        ...layerObj,
+        Data: currPeriodData,
+      };
     }
-
-    const newFilterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, regenStops, isOr);
-    dispatch(Actions.saveFilterState(mapId, layerId, newFilterState));
+    if (FILTER[layerId] && !FILTER[layerId].originalLayerObj) {
+      this.buildOriginalObj(this.props, this.state, regenStops, newLayerObj);
+    }
+    const newFilterState = buildFilterState(mapId, filterOptions, filters, newLayerObj, dispatch, regenStops, isOr);
+    dispatch(Actions.saveFilterState(mapId, layerId, newFilterState, false));
 
     if (regenStops) {
       const { fauxLayerObj } = newFilterState;
@@ -541,10 +582,10 @@ export class Filter extends Component {
     return true;
   }
 
-  buildOriginalObj(props, state) {
-    const { layerObj, mapId, dispatch } = props;
+  buildOriginalObj(props, state, regenStops, layer) {
+    const {  mapId, dispatch } = props;
     const { filters, isOr, filterOptions } = state;
-    const filterState = buildFilterState(mapId, filterOptions, filters, layerObj, dispatch, true, isOr);
+    const filterState = buildFilterState(mapId, filterOptions, filters, layer, dispatch, regenStops, isOr);
     const { originalLayerObj } = filterState;
     dispatch(Actions.resetFilteredLayer(mapId, originalLayerObj));
     
@@ -1019,7 +1060,7 @@ export class Filter extends Component {
       !(layerObj.aggregate &&
         layerObj.aggregate.filterIsPrev)
       ? '260px'
-      : !!this.props.detailView
+      : handleDetailviewPanel(this.props)
       ? '355px'
       : '10px';
 

@@ -40,44 +40,48 @@ export class Legend extends React.Component {
 
 componentWillReceiveProps(nextProps) {
   const { layerObj } = nextProps;
-  if(nextProps.timeSeriesObj && (this.props.timeSeriesObj !== nextProps.timeSeriesObj) && layerObj.type !== 'chart' && layerObj.property) {
-    const { timeSeriesObj, dispatch } = nextProps;
-
+  if (nextProps.timeSeriesObj &&
+    (this.props.timeSeriesObj !== nextProps.timeSeriesObj) &&
+    layerObj.type !== 'chart' &&
+    layerObj.property && !(layerObj.categories && layerObj.categories.label)) {
+    const { timeSeriesObj } = nextProps;
+    const index = timeSeriesObj.allPeriods.indexOf(timeSeriesObj.period[timeSeriesObj.temporalIndex]);
     const stops = generateStops(timeSeriesObj,
        timeSeriesObj.layerObj.aggregate.timeseries.field,
-       dispatch);
+       this.props.dispatch, index);
        if(timeSeriesObj && timeSeriesObj.layerObj && 
         timeSeriesObj.layerObj.aggregate &&
           timeSeriesObj.layerObj.aggregate.timeseries) {
        timeSeriesObj.newBreaks = stops[3];
-       timeSeriesObj.newColors = [...new Set(timeSeriesObj.colorStops[timeSeriesObj.temporalIndex].map(d => d[1]))];
+       timeSeriesObj.newColors = [...new Set(timeSeriesObj.colorStops[index].map(d => d[1]))];
        this.setState({
          timeSeriesObj: timeSeriesObj
         })
        }
       }
   }
- componentWillUpdate(nextProps, nextState) {
-   const { layerObj } = nextProps;
-   if (this.props.primaryLayer !== nextProps.primaryLayer && layerObj.type !== 'chart' && layerObj.property) {
-     const { timeSeriesObj } = nextProps;
+//  componentWillUpdate(nextProps, nextState) {
+//    const { layerObj } = nextProps;
+//    if (this.props.primaryLayer !== nextProps.primaryLayer && layerObj.type !== 'chart' && layerObj.property) {
+//      const { timeSeriesObj } = nextProps;
      
-     if(timeSeriesObj && timeSeriesObj.layerObj && 
-        timeSeriesObj.layerObj.aggregate &&
-          timeSeriesObj.layerObj.aggregate.timeseries) {
-            const stops = generateStops(timeSeriesObj, 
-            timeSeriesObj.layerObj.aggregate.timeseries.field, 
-            this.props.dispatch);
+//      if(timeSeriesObj && timeSeriesObj.layerObj && 
+//         timeSeriesObj.layerObj.aggregate &&
+//           timeSeriesObj.layerObj.aggregate.timeseries) {
+//             debugger;
+//             const stops = generateStops(timeSeriesObj, 
+//             timeSeriesObj.layerObj.aggregate.timeseries.field, 
+//             this.props.dispatch);
 
-            timeSeriesObj.newBreaks = stops[3];
-            timeSeriesObj.newColors = [...new Set(timeSeriesObj.colorStops[timeSeriesObj.temporalIndex].map(d => d[1]))];
+//             timeSeriesObj.newBreaks = stops[3];
+//             timeSeriesObj.newColors = [...new Set(timeSeriesObj.colorStops[timeSeriesObj.temporalIndex].map(d => d[1]))];
             
-            this.setState({
-              timeSeriesObj: nextProps.timeSeriesObj
-            });
-     }
-   }
- }
+//             this.setState({
+//               timeSeriesObj: nextProps.timeSeriesObj
+//             });
+//      }
+//    }
+//  }
 
  componentDidUpdate(prevProps, prevState) {
    if (this.props.primaryLayer !== prevProps.primaryLayer && this.props.layers &&
@@ -125,16 +129,22 @@ componentWillReceiveProps(nextProps) {
         }
       }
 
-      if (this.state.primaryLayer !== primaryLayer && layers[primaryLayer].credit) {
+      if (this.state.primaryLayer !== primaryLayer &&
+        (layers[primaryLayer] && layers[primaryLayer].credit)) {
         activeLegendLayer = primaryLayer;
       }
 
     for (let l = 0; l < this.props.layersData.length; l += 1) {
       layer = this.props.layersData[l];
       const circleLayerType = (layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible);
-      const symbolLayer = (layer && layer.credit && layer.categories && layer.categories.shape && layer.type !== 'circle');
-      const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
-      const fillLayerWithBreaks = (layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle' && layer.categories && layer.categories.breaks === 'yes');
+      const symbolLayer = (layer && layer.credit && layer.categories &&
+        typeof layer.categories.shape === 'object' && Array.isArray(layer.categories.shape) &&
+        layer.type !== 'circle' && layer.categories.breaks === 'no');
+      const fillLayerNoBreaks = (layer && layer.credit && layer.categories && layer.categories.breaks === 'no' &&
+        (!layer.categories.shape || !(typeof layer.categories.shape === 'object' &&
+          Array.isArray(layer.categories.shape))));
+      const fillLayerWithBreaks = (layer && layer.credit && layer.type !== 'chart' && layer.type !== 'circle' &&
+        layer.categories && layer.categories.breaks === 'yes');
 
       const activeLayerSelected = activeLegendLayer === layer.id  ? 'primary' : '';
 
@@ -147,21 +157,21 @@ componentWillReceiveProps(nextProps) {
       if (timeSeriesObj) {
         const { temporalIndex } = timeSeriesObj;
         if (circleLayerType && layer.breaks && layer.stops && layer.stops[0][temporalIndex]) {
-          const currentColorStops = [...new Set(layer.stops[0][temporalIndex].map(d => d[1]))];
-          const currentRadiusStops = [...new Set(layer.stops[1][temporalIndex].map(d => d[1]))];
-          const currentBreakStops = [...new Set(layer.stops[6][temporalIndex])];
-
+          const currentColorStops = timeSeriesObj.newColors || timeSeriesObj.colors;
+          const currentRadiusStops = [...new Set(timeSeriesObj.stops[temporalIndex].map(d => d[1]))];
+          const currentBreakStops = timeSeriesObj.newBreaks || timeSeriesObj.breaks;
           currentRadiusStops.forEach((s, i) => {
+            let rs = s;
             quantiles.push((
               <span
                 className="circle-container"
-                key={s}>
+                key={rs}>
                 <span
                   style={
                     {
                       background: `${(currentColorStops[i] || currentColorStops[0])}`,
-                      width: `${s * 2}px`,
-                      height: `${s * 2}px`,
+                      width: `${rs * 2}px`,
+                      height: `${rs * 2}px`,
                       margin: `0px ${currentRadiusStops[i] / 2}px`
                     }
                   }
@@ -219,6 +229,51 @@ componentWillReceiveProps(nextProps) {
               {latestTimestamp}
             </div>);
         }
+        if (symbolLayer) {
+          layer.categories.color.forEach((color, index) => {
+            const style = layer.categories.shape[index] === 'triangle-stroked-11' ||
+              layer.categories.shape[index] === 'triangle-15' ?
+              'borderBottomColor' : 'background';
+            const styleString = {
+              [style]: color
+            };
+            background.push((
+              <li
+                className="layer-symbols"
+                key={index}
+              >
+                <span
+                  className={`${layer.categories.shape[index]}`}
+                  style={ styleString }
+                />
+                {layer.categories.label[index]}
+              </li>
+            ));
+          });
+
+          primaryLegend = (
+            <div
+              id={`legend-${layer.id}-${mapId}`}
+              className={`legend-row ${activeLayerSelected}`}
+              data-layer={`${layer.id}`}
+              onClick={(e) => this.onUpdatePrimaryLayer(e)}
+              key={l}
+            >
+              <b>
+                {layer.label}
+              </b>
+              <div className="legend-shapes">
+                <ul style={{ left: '0' }}>
+                  {background}
+                </ul>
+              </div>
+              <span>
+                {Parser(layer.credit)}
+              </span>
+              {latestTimestamp}
+            </div>
+          );
+        }
         if (fillLayerNoBreaks && !layer.parent) {
           const fillWidth = (100 / layer.categories.color.filter(c =>
             c !== "transparent").length).toString();
@@ -259,7 +314,7 @@ componentWillReceiveProps(nextProps) {
               {latestTimestamp}
             </div>
           );
-        } if (fillLayerWithBreaks && layer.stops && !layer.parent) {
+        } if (fillLayerWithBreaks && layer.stops && !layer.parent && !circleLayerType) {
           const { stopsData, breaks} = layer;
           const colorLegend = layer && layer.stopsData && [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
@@ -389,20 +444,22 @@ componentWillReceiveProps(nextProps) {
         layer.categories.color.forEach((color, index) => {
           const style = layer.categories.shape[index] === 'triangle-stroked-11' ||
             layer.categories.shape[index] === 'triangle-15' ?
-            'border-bottom-color:' : 'background:';
-          const styleString = `${style}: ${color}`;
-          background += (
+            'borderBottomColor' : 'background';
+          const styleString = {
+            [style]: color
+          };
+          background.push((
             <li
               className="layer-symbols"
               key={index}
             >
               <span
                 className={`${layer.categories.shape[index]}`}
-                style={{ styleString }}
+                style={ styleString }
               />
               {layer.categories.label[index]}
             </li>
-          );
+          ));
         });
 
         legendItems.unshift((
@@ -468,7 +525,7 @@ componentWillReceiveProps(nextProps) {
             {latestTimestamp}
           </div>
         ));
-      } else if (fillLayerWithBreaks && layer.stops && !layer.parent) {
+      } else if (fillLayerWithBreaks && layer.stops && !layer.parent && !circleLayerType) {
         const { stopsData, breaks} = layer;
           const colorLegend = layer && layer.stopsData && [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';

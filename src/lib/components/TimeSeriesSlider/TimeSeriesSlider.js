@@ -23,6 +23,7 @@ const mapStateToProps = (state, ownProps) => {
     timeSeriesObj: MAP.timeseries[timeSubLayer || timeLayer],
     timeseries: MAP.timeseries,
     layers: MAP.layers,
+    FILTER: state.FILTER,
     primaryLayer: MAP.primaryLayer,
     showFilterPanel: MAP.showFilterPanel,
     timeLayer,
@@ -32,10 +33,17 @@ const mapStateToProps = (state, ownProps) => {
 class TimeSeriesSlider extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      currentYear: 'All'
+    };
     this.handleMouseUp = this.handleMouseUp.bind(this);
   }
 
-  updateTimeseriesState(nextIndex, sliderLayerObj) {
+  filteredPeriods(allPeriods, currentYear) {
+    return allPeriods.filter(p => p.toString().includes(currentYear))
+  }
+
+  updateTimeseriesState(nextIndex, sliderLayerObj, currentYear) {
     let nextTimeseriesLayer;
     let layerId;
     let temporalIndex;
@@ -62,8 +70,13 @@ class TimeSeriesSlider extends React.Component {
           periodData
         } = nextTimeseriesLayer;
 
-        period = nextTimeseriesLayer.period;
+        nextTimeseriesLayer.allPeriods = nextTimeseriesLayer.allPeriods || nextTimeseriesLayer.period;
 
+        const filteredPeriods = this.filteredPeriods(nextTimeseriesLayer.allPeriods, currentYear);
+        period = currentYear === 'All' ? nextTimeseriesLayer.allPeriods : filteredPeriods;
+
+        nextTimeseriesLayer.period = period;
+        sliderLayerObj.period = period;
         if (layerId === sliderLayerObj.layerId) {
           temporalIndex = nextIndex;
         } else {
@@ -74,6 +87,7 @@ class TimeSeriesSlider extends React.Component {
           nextTimeseries[layerId] = Object.assign({},
             nextTimeseriesLayer, {
               temporalIndex,
+              updateTs: currentYear !== this.state.currentYear,
               data: periodData[period[temporalIndex]].data,
               adminFilter: periodData[period[temporalIndex]].adminFilter && [...periodData[period[temporalIndex]].adminFilter],
               tsFilter: periodData[period[temporalIndex]].tsFilter && [...periodData[period[temporalIndex]].tsFilter],
@@ -87,8 +101,9 @@ class TimeSeriesSlider extends React.Component {
     } = sliderLayerObj.layerObj.aggregate.timeseries;
     sliderLayerObj.data = sliderLayerObj.periodData[sliderLayerObj.period[nextIndex]].data;
     const { layerObj } = sliderLayerObj;
+    const index = sliderLayerObj.allPeriods.indexOf(sliderLayerObj.period[nextIndex])
     if (layerObj.type !== 'chart' && layerObj.property) {
-      const activeStops = generateStops(sliderLayerObj, field, this.props.dispatch, nextIndex);
+      const activeStops = generateStops(sliderLayerObj, field, this.props.dispatch, index);
 
       const { primaryLayer } = this.props;
 
@@ -96,38 +111,103 @@ class TimeSeriesSlider extends React.Component {
         this.props.layers[primaryLayer].layers.map(i =>
           nextTimeseries[i].newBreaks = activeStops[3]);
         this.props.layers[primaryLayer].layers.map(i =>
-          nextTimeseries[i].newColors = [...new Set(sliderLayerObj.colorStops[nextIndex].map(d =>
+          nextTimeseries[i].newColors = [...new Set(sliderLayerObj.colorStops[index].map(d =>
             d[1]))]);
       } else {
         nextTimeseries[sliderLayerObj.layerId].newBreaks = activeStops[3];
-        nextTimeseries[sliderLayerObj.layerId].newColors = [...new Set(sliderLayerObj.colorStops[nextIndex].map(d => d[1]))];
+        nextTimeseries[sliderLayerObj.layerId].newColors = [...new Set(sliderLayerObj.colorStops[index].map(d => d[1]))];
       }
     }
     this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, this.props.timeLayer));
   }
 
   componentWillReceiveProps(nextProps) {
-    
     if (nextProps.timeSeriesObj && nextProps.timeSeriesObj.periodData) {
-      const { period, temporalIndex } = nextProps.timeSeriesObj;
+      const annualPeriods = [];
+      let matches;
+
+      const { period, allPeriods, temporalIndex } = nextProps.timeSeriesObj;
+      if (allPeriods.length) {
+        allPeriods.forEach((p) => {
+          const yearRxp = /\b(19|20)\d{2}\b/g;
+          const _period = p.toString();
+          if (_period && _period.match(yearRxp) && _period.match(yearRxp).length) {
+            matches = _period.match(yearRxp)[0];
+            if (!annualPeriods.includes(matches)) {
+              annualPeriods.push(matches);
+            }
+          }
+        });
+      }
+      const isFilterCleared = nextProps.FILTER
+        && nextProps.FILTER[nextProps.primaryLayer]
+        && nextProps.FILTER[nextProps.primaryLayer].isClear
       this.setState({
-        periods: period,
-        index: temporalIndex,
-        period: period[temporalIndex],
+        currentYear: isFilterCleared ? 'All' : this.state.currentYear,
+        annualPeriods,
+        periods: this.state.currentYear === 'All' ? allPeriods : period,
+        index: typeof period[temporalIndex] === 'undefined' ? this.state.index : temporalIndex,
+        period: period[temporalIndex] || allPeriods[temporalIndex],
       }); 
     }
   }
 
-  handleMouseUp(e) {
-    const nextIndex = parseInt(e.target.value, 10);
-    const { index } = this.state;
-    if (nextIndex !== index) {
-      this.updateTimeseriesState(e.target.value, this.props.timeSeriesObj);
+  componentWillUpdate(nextProps, nextState) {
+    if (nextProps.timeSeriesObj) {
+      const { allPeriods, period } = nextProps.timeSeriesObj;
+      const { currentYear } = nextState;
+      if (currentYear !== this.state.currentYear) {
+        this.setState({
+          currentYear,
+          periods: currentYear === 'All' ? allPeriods : period,
+        });
+      }
     }
   }
 
+  handleMouseUp(e) {
+    e.persist();
+    const nextIndex = parseInt(e.target.value, 10);
+    const { index, currentYear } = this.state;
+    if (nextIndex !== index) {
+      this.setState({
+        index: nextIndex,
+      }, () => {
+        this.updateTimeseriesState(e.target.value, this.props.timeSeriesObj, currentYear);
+      });
+    }
+  }
+
+  onAnnualSelectorChange(e) {
+    e.preventDefault();
+    const currentYear = e.currentTarget.value;
+    const { period, allPeriods } = this.props.timeSeriesObj;
+    let currentPeriods = allPeriods;
+    if (currentYear !== 'All') {
+      currentPeriods = allPeriods.filter(p => p.toString().includes(currentYear));
+    }
+    this.setState({
+      currentYear,
+      periods: currentPeriods,
+      period: currentPeriods[currentPeriods.length - 1]
+    }, () => {
+      this.updateTimeseriesState(currentPeriods.length - 1, this.props.timeSeriesObj, currentYear)
+    });
+  }
+
   render() {
-    return ((this.props.timeSeriesObj) && (this.state && this.state.periods.length > 1)) ? (
+    let yearSelectorComponent = null;
+
+    if (!this.props.timeSeriesObj) {
+      return null;
+    }
+
+    const { annualPeriods } = this.state;
+
+    if (annualPeriods.length) {
+      yearSelectorComponent = annualPeriods.map((d) => (<option>{d}</option>))
+    }
+    return (this.props.timeSeriesObj) ? (
       <div
         className="series"
         style={{ right: '50px'}}>
@@ -136,6 +216,14 @@ class TimeSeriesSlider extends React.Component {
           className="label"
           htmlFor="slider"
         >{this.state.period}</label>
+        <select
+          value={this.state.currentYear}
+          className="annual-selector"
+          onChange={(e) => this.onAnnualSelectorChange(e)}
+        >
+          <option>All</option>
+          {yearSelectorComponent}
+        </select>
         {this.state.periods.length > 1 ?
           <input
             id={`${this.props.mapId}-slider`}
