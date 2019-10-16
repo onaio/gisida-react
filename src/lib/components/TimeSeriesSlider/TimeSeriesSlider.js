@@ -23,6 +23,7 @@ const mapStateToProps = (state, ownProps) => {
     timeSeriesObj: MAP.timeseries[timeSubLayer || timeLayer],
     timeseries: MAP.timeseries,
     layers: MAP.layers,
+    FILTER: state.FILTER,
     primaryLayer: MAP.primaryLayer,
     showFilterPanel: MAP.showFilterPanel,
     timeLayer,
@@ -121,10 +122,10 @@ class TimeSeriesSlider extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    
     if (nextProps.timeSeriesObj && nextProps.timeSeriesObj.periodData) {
       const annualPeriods = [];
       let matches;
+
       const { period, allPeriods, temporalIndex } = nextProps.timeSeriesObj;
       if (allPeriods.length) {
         allPeriods.forEach((p) => {
@@ -138,11 +139,15 @@ class TimeSeriesSlider extends React.Component {
           }
         });
       }
+      const isFilterCleared = nextProps.FILTER
+        && nextProps.FILTER[nextProps.primaryLayer]
+        && nextProps.FILTER[nextProps.primaryLayer].isClear
       this.setState({
+        currentYear: isFilterCleared ? 'All' : this.state.currentYear,
         annualPeriods,
         periods: this.state.currentYear === 'All' ? allPeriods : period,
-        index: temporalIndex,
-        period: period[temporalIndex],
+        index: typeof period[temporalIndex] === 'undefined' ? this.state.index : temporalIndex,
+        period: period[temporalIndex] || allPeriods[temporalIndex],
       }); 
     }
   }
@@ -161,10 +166,15 @@ class TimeSeriesSlider extends React.Component {
   }
 
   handleMouseUp(e) {
+    e.persist();
     const nextIndex = parseInt(e.target.value, 10);
     const { index, currentYear } = this.state;
     if (nextIndex !== index) {
-      this.updateTimeseriesState(e.target.value, this.props.timeSeriesObj, currentYear);
+      this.setState({
+        index: nextIndex,
+      }, () => {
+        this.updateTimeseriesState(e.target.value, this.props.timeSeriesObj, currentYear);
+      });
     }
   }
 
@@ -197,9 +207,7 @@ class TimeSeriesSlider extends React.Component {
     if (annualPeriods.length) {
       yearSelectorComponent = annualPeriods.map((d) => (<option>{d}</option>))
     }
-    return ((this.props.timeSeriesObj)
-      && (this.state && ((this.state.periods.length > 1)
-        || (this.state.annualPeriods && this.state.annualPeriods.length > 1)))) ? (
+    return (this.props.timeSeriesObj) ? (
       <div
         className="series"
         style={{ right: '50px'}}>
@@ -209,6 +217,7 @@ class TimeSeriesSlider extends React.Component {
           htmlFor="slider"
         >{this.state.period}</label>
         <select
+          value={this.state.currentYear}
           className="annual-selector"
           onChange={(e) => this.onAnnualSelectorChange(e)}
         >
