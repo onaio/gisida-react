@@ -1,0 +1,37 @@
+{
+  "env": {
+    "browser": true,
+    "node": true,
+    "jest": true
+  },
+  "extends": ["airbnb", "prettier", "prettier/react"],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true,
+      "jsx": true
+    },
+    "sourceType": "module"
+  },
+  "plugins": ["react", "prettier"],
+  "rules": {
+    "jsx-a11y/anchor-has-content": 0,
+    "jsx-a11y/href-no-hash": 0,
+    "jsx-a11y/no-autofocus": 0,
+    "no-mixed-operators": 0,
+    "no-nested-ternary": 0,
+    "react/no-array-index-key": 0,
+    "react/react-in-jsx-scope": 0,
+    "no-param-reassign": [
+      2,
+      {
+        "props": true,
+        "ignorePropertyModificationsFor": ["layer", "layerData", "layerProp", "row", "obj", "data"]
+      }
+    ],
+    "prettier/prettier": ["error"]
+  },
+  "parser": "babel-eslint",
+  "globals": {
+    "$": true
+  }
+}
