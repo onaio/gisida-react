@@ -28,11 +28,16 @@ export class Layers extends Component {
 
   render() {
     const { mapId, layers, currentRegion, preparedLayers, auth } = this.props;
-
     let layerKeys;
     let layerObj;
     let layerItem = [];
     const subLayerIds = [];
+
+    const ifPermissionDenied = () => {
+      return layers.length > 0 ? 
+      (<p>You don't have permision to view this category</p>) :
+       (<p>No layers available</p>);
+    }
 
     if (!preparedLayers) {
       return false;
@@ -119,7 +124,7 @@ export class Layers extends Component {
 
     return (
       <ul className="layers">
-        {layerItem}
+        { layerItem.length > 0 ? layerItem :  ifPermissionDenied() }
       </ul>
     );
   }
