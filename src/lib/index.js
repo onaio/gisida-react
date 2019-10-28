@@ -16,6 +16,7 @@ import ThemeSwitcher from './components/ThemeSwitcher/ThemeSwitcher';
 import Export from './components/Export/Export';
 import HorizontalBarChart from './components/Charts/HorizontalBarChart';
 import ColumnChart from './components/Charts/ColumnChart';
+import DoughnutChart from './components/Charts/doughnutChart'
 
 import Callback from './components/Callback/Callback';
 
@@ -42,4 +43,5 @@ export {
   Export,
   Router,
   Callback,
+  DoughnutChart
 }
