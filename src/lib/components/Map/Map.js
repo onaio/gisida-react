@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
 import { detectIE, buildLayersObj, orderLayers, handleDetailviewPanel } from '../../utils';
+import DrawDoughnutChart from '../Charts/drawDoughnutChart'
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -54,8 +55,11 @@ window.maps = [];
 class Map extends Component {
   constructor(props) {
     super(props);
+    this.doughnutChartBuilder = null;
+    this.chartsIds = [];
     this.state = {
       layersObj: this.props.layersObj,
+      chartActive: false
     }
   }
   initMap(accessToken, mapConfig, mapId, app) {
@@ -318,8 +322,7 @@ class Map extends Component {
     const regions = nextProps.REGIONS;
     const mapId = nextProps.mapId;
     mapConfig.container = mapId
-  
-
+    
     // Check if map is initialized.
     if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
       this.initMap(accessToken, mapConfig, mapId, nextProps.APP);
@@ -390,7 +393,6 @@ class Map extends Component {
               this.changeVisibility(subLayer, layer.visible);
             });
           }
-
           if (layer.visible && layer.type === 'chart' && (typeof layer.source.data !== 'string')) {
             const timefield = (layer.aggregate && layer.aggregate.timeseries) ? layer.aggregate.timeseries.field : '';
             const tsObj = nextProps.timeSeriesObj;
@@ -400,7 +402,10 @@ class Map extends Component {
               // newStops = { id: layer.id, period, timefield };
               data = layer.source.data.filter(d => d[timefield] === period[tsObj.temporalIndex]);
             }
-            addChart(layer, data, this.map, mapId);
+            // addChart(layer, data, this.map, mapId);
+            this.chartsIds.includes(layer.id) ? '' : this.chartsIds.push(layer.id)
+            this.doughnutChartBuilder = {layer, data, map:this.map, mapId}
+            
           } else {
              $(`.marker-chart-${layer.id}-${mapId}`).remove();
           }
@@ -440,6 +445,16 @@ class Map extends Component {
     }
     // Assign global variable for debugging purposes.
     // window.GisidaMap = this.map;
+    const currentLayer = nextProps.primaryLayer
+    if (this.chartsIds.includes(currentLayer)) {
+      this.setState({
+        chartActive: true
+      })
+    } else {
+      this.setState({
+        chartActive: false
+      })
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -575,7 +590,7 @@ class Map extends Component {
     for (let i = 0; i < tsKeys.length; i += 1) {
       layer = tsKeys[i];
       // if temporalIndecies don't match, then definitely update the timeseries
-      if ((timeseries[layer].temporalIndex !== prevProps.timeseries[layer].temporalIndex) || timeseries[layer].updateTs) {
+      if (timeseries[layer] && (timeseries[layer].temporalIndex !== prevProps.timeseries[layer].temporalIndex) || timeseries[layer].updateTs) {
         if (timeseries[layer].updateTs) {
           const nextTimeseries = timeseries;
           nextTimeseries[layer].updateTs = !nextTimeseries[layer].updateTs;
@@ -834,6 +849,13 @@ class Map extends Component {
     }
     return (
       <div>
+        {this.doughnutChartBuilder && this.state.chartActive ? 
+        (<DrawDoughnutChart
+          layer={this.doughnutChartBuilder.layer}
+          data={this.doughnutChartBuilder.data}
+          map={this.doughnutChartBuilder.map}
+          mapId={this.doughnutChartBuilder.mapId}
+        />) : ''}
         {isIE || !mapboxgl.supported() 
           ?
           (

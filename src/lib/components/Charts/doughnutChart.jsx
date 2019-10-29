@@ -5,7 +5,7 @@ import Highcharts from 'highcharts';
 class DoughnutChart extends React.Component {
     constructor(props) {
         super(props);
-        const {data, dimension, innerSize, title} = this.props
+        const {data, dimension, innerSize, title, container} = this.props
         this.state = {
             chart: {
                 type: 'pie',
@@ -16,6 +16,9 @@ class DoughnutChart extends React.Component {
             },
             title: {
               text: title ? title : ''
+            },
+            credits: {
+              enabled: false,
             },
             tooltip: {
                 enabled: true,
@@ -50,8 +53,6 @@ class DoughnutChart extends React.Component {
                     crop: true,
                     overflow: 'none',
                     formatter() {
-
-                    console.log(this.point)
                       if (this.point.scoreLabel !== undefined) {
                         return `<b>${this.point.label}</b>`;
                       }
@@ -69,15 +70,15 @@ class DoughnutChart extends React.Component {
         }
     }
 
-    componentDidMount() {
-        const self = this;
-        setTimeout(() => {
-          self.chart = Highcharts.chart(self.chartEl, self.state);
-        }, 300);
-      }
+    // componentDidMount() {
+    //     const self = this;
+    //     self.chart = Highcharts.chart(this.props.container, self.state);
+    //   }
 
     componentWillReceiveProps(nextProps) {
-    this.chart.destroy();
+      if (this.chart) {
+        this.chart.destroy();
+    }
     const {data, dimension, title} = nextProps
     this.setState({
         series: data,
@@ -89,7 +90,7 @@ class DoughnutChart extends React.Component {
           text: title ? title : ''
         }
     }, () => {
-      this.chart = Highcharts.chart(this.chartEl, this.state);
+      this.chart = Highcharts.chart(this.props.container, this.state);
     });
     }
 
