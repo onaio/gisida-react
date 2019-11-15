@@ -10,7 +10,7 @@ const mapStateToProps = (state, ownProps) => {
   const MAP = state[mapId] || { blockLoad: true, layers: {} };
   const { detailView } = MAP;
   const activeLayers = [];
-  Object.keys(MAP.layers).forEach((key) => {
+  Object.keys(MAP.layers).forEach(key => {
     const layer = MAP.layers[key];
     if (layer.visible && layer.type !== 'chart') {
       activeLayers.push(key);
@@ -75,7 +75,7 @@ class Map extends Component {
       this.map.on('load', () => {
         /** Add icons from external source to map since they aren't available on the basemap */
         if (mapIcons) {
-          mapIcons.forEach((element) => {
+          mapIcons.forEach(element => {
             this.map.loadImage(element.imageUrl, (error, res) => {
               this.map.addImage(element.id, res);
             });
@@ -88,10 +88,10 @@ class Map extends Component {
       });
 
       // Handle Style Change Event
-      this.map.on('style.load', (e) => {
+      this.map.on('style.load', e => {
         let mapLoad = false;
         // Define on map on render listener for current stlye loads
-        const onStyleLoad = (e) => {
+        const onStyleLoad = e => {
           // check if map is loaded before reloading layers
           if (e.target.loaded() && mapLoad !== e.target.loaded() && this.props.MAP.isLoaded) {
             mapLoad = true;
@@ -104,7 +104,7 @@ class Map extends Component {
         e.target.on('render', onStyleLoad);
       });
 
-      this.map.on('data', (data) => {
+      this.map.on('data', data => {
         if (data.isSourceLoaded) {
           this.props.dispatch(Actions.triggerSpinner(this.props.mapId));
         }
@@ -143,19 +143,24 @@ class Map extends Component {
       // this.addMapClickEvents()
       // this.addMouseMoveEvents()
       // etc
-      this.map.on('mousemove', (e) => {
-        const { activeLayers, layerObj } = this.props;
+      this.map.on('mousemove', e => {
+        const { activeLayers, layerObj, layers } = this.props;
         if (!layerObj) {
           return false;
         }
         const features = this.map.queryRenderedFeatures(e.point, {
-          layers: activeLayers.filter((i) => this.map.getLayer(i) !== undefined),
+          layers: activeLayers.filter(i => this.map.getLayer(i) !== undefined),
         });
-        const feature = features.find((f) => f.layer.id === layerObj.id);
+        const feature = features.find(
+          f => f.layer.id === layerObj.id || layerObj.layers.includes(f.layer.id)
+        );
         if (!feature) {
           return false;
         }
-        this.map.getCanvas().style.cursor = layerObj['detail-view'] ? 'pointer' : '';
+        this.map.getCanvas().style.cursor =
+          layerObj['detail-view'] || layers[feature && feature.layer.id]['detail-view']
+            ? 'pointer'
+            : '';
         return true;
       });
     }
@@ -172,14 +177,15 @@ class Map extends Component {
   //   }
   // }
   onFeatureClick(e) {
-    const activeLayers = this.props.layersObj.map((l) => l.id);
-    const { mapId } = this.props;
+    const { layerObj, mapId, layersObj, layers } = this.props;
+    const activeLayers = layersObj.map(l => l.id);
     const features = this.map.queryRenderedFeatures(e.point, {
-      layers: activeLayers.filter((l) => this.map.getLayer(l) !== undefined),
+      layers: activeLayers.filter(l => this.map.getLayer(l) !== undefined),
     });
+    /** Inestigate why fill layer picks one feature object which is not what we desire */
     const feature = features[0];
     if (!feature) return false;
-    const activeLayerObj = this.props.layersObj.find((l) => l.id === feature.layer.id);
+    const activeLayerObj = layersObj.find(l => l.id === feature.layer.id);
 
     if (feature && activeLayerObj['detail-view']) {
       const newZoom = this.map.getZoom() < 7.5 ? 7.5 : this.map.getZoom();
@@ -187,10 +193,27 @@ class Map extends Component {
         center: e.lngLat,
         zoom: newZoom,
       });
+      /** Build properties for fill layer the existing one's are not desirable
+       * We get them from the Map component onFeatureClick method
+       * The implementation below is hacky and may need some r&d to be standard
+       */
+      let { properties } = feature;
+      if (
+        properties &&
+        properties.OBJECTID &&
+        properties.Shape_Area &&
+        properties.Shape_Area &&
+        properties.Shape_Leng &&
+        properties.PD_Name
+      ) {
+        properties = layers[feature.layer.id].source.data.find(
+          d => d.PD_Name === properties.PD_Name
+        );
+      }
       buildDetailView(
         mapId,
         activeLayerObj,
-        feature.properties,
+        properties || feature.properties,
         this.props.dispatch,
         this.props.timeSeriesObj
       );
@@ -199,20 +222,20 @@ class Map extends Component {
   }
 
   findNextLayer(activelayersData, nextLayer) {
-    return activelayersData.find((lo) => lo.id === nextLayer);
+    return activelayersData.find(lo => lo.id === nextLayer);
   }
 
   setPrimaryLayer(primaryLayer, activeLayerId, layers, activeLayersData, activeLayerIds) {
     const sortedLayers = [];
-    activeLayerIds.forEach((id) => {
-      activeLayersData.forEach((l) => {
+    activeLayerIds.forEach(id => {
+      activeLayersData.forEach(l => {
         if (id === l.id || id === l.parent) {
           sortedLayers.push(l);
         }
       });
     });
     const nextLayerId = primaryLayer || activeLayerId;
-    let nextLayerObj = activeLayersData.find((lo) => lo.id === nextLayerId);
+    let nextLayerObj = activeLayersData.find(lo => lo.id === nextLayerId);
     if (nextLayerId && !nextLayerObj && layers[nextLayerId].layers) {
       let nextLayer;
       for (let l = 0; l < layers[nextLayerId].layers.length; l += 1) {
@@ -247,10 +270,10 @@ class Map extends Component {
       this.map.moveLayer(nextLayerId);
       //move icon with detail view to top of the map layers wip
       if (
-        activeLayersData.find((d) => d['detail-view']) &&
-        this.map.getLayer(activeLayersData.find((d) => d['detail-view']).id)
+        activeLayersData.find(d => d['detail-view']) &&
+        this.map.getLayer(activeLayersData.find(d => d['detail-view']).id)
       ) {
-        this.map.moveLayer(activeLayersData.find((d) => d['detail-view']).id);
+        this.map.moveLayer(activeLayersData.find(d => d['detail-view']).id);
       }
     }
     // Loop throught all active map layers
@@ -276,7 +299,7 @@ class Map extends Component {
     // Order active layers
 
     orderLayers(sortedLayers, map, nextLayerId);
-    const nextlayersObj = activeLayersData.filter((lo) => lo.id !== nextLayerId);
+    const nextlayersObj = activeLayersData.filter(lo => lo.id !== nextLayerId);
     nextlayersObj.push(nextLayerObj);
 
     this.setState({
@@ -334,7 +357,7 @@ class Map extends Component {
     // Check if rendererd map has finished loading
     if (isLoaded) {
       // Set current style (basemap)
-      styles.forEach((style) => {
+      styles.forEach(style => {
         if (style[mapId] && style[mapId].current && this.props.MAP.currentStyle !== currentStyle) {
           this.map.setStyle(style.url);
         }
@@ -342,7 +365,7 @@ class Map extends Component {
 
       // Zoom to current region (center and zoom)
       regions &&
-        regions.forEach((region) => {
+        regions.forEach(region => {
           if (region.current && this.props.MAP.currentRegion !== currentRegion) {
             this.map.easeTo({
               center: region.center,
@@ -354,7 +377,7 @@ class Map extends Component {
 
       // Add current layers to map
       if (this.props.MAP.reloadLayers !== reloadLayers) {
-        Object.keys(layers).forEach((key) => {
+        Object.keys(layers).forEach(key => {
           const layer = layers[key];
           // Add layer to map if visible
           if (!this.map.getLayer(layer.id) && layer.visible && layer.styleSpec) {
@@ -403,7 +426,7 @@ class Map extends Component {
           // Change visibility if layer is already on map
           this.changeVisibility(layer.id, layer.visible);
           if (layer.layers) {
-            layer.layers.forEach((subLayer) => {
+            layer.layers.forEach(subLayer => {
               this.changeVisibility(subLayer, layer.visible);
             });
           }
@@ -413,9 +436,9 @@ class Map extends Component {
               layer.aggregate && layer.aggregate.timeseries ? layer.aggregate.timeseries.field : '';
             let { data } = layer.source;
             if (timefield) {
-              const period = [...new Set(layer.source.data.map((p) => p[timefield]))];
+              const period = [...new Set(layer.source.data.map(p => p[timefield]))];
               // newStops = { id: layer.id, period, timefield };
-              data = layer.source.data.filter((d) => d[timefield] === period[period.length - 1]);
+              data = layer.source.data.filter(d => d[timefield] === period[period.length - 1]);
             }
             addChart(layer, data, this.map, mapId);
           } else {
@@ -423,8 +446,8 @@ class Map extends Component {
           }
         });
         const intelLayers = [];
-        activeLayerIds.forEach((id) => {
-          activelayersData.forEach((l) => {
+        activeLayerIds.forEach(id => {
+          activelayersData.forEach(l => {
             if ((id === l.id) | (id === l.parent)) {
               intelLayers.push(l);
             }
@@ -434,7 +457,7 @@ class Map extends Component {
       }
       /** Move symbol layer on top when we have no primary layer */
       if (!this.props.MAP.primaryLayer && nextProps.activeLayers.length) {
-        nextProps.layersObj.forEach((layer) => {
+        nextProps.layersObj.forEach(layer => {
           if (layer.type === 'symbol' && this.map.getLayer(layer.id)) {
             this.map.moveLayer(layer.id);
           }
@@ -531,10 +554,12 @@ class Map extends Component {
     }
     if (this.props.layersObj.length !== prevProps.layersObj.length) {
       const { primaryLayer, layersObj, layers } = this.props;
-      const location = layers && layers[primaryLayer] && layers[primaryLayer].location ? 
-        layers[primaryLayer].location :
-        (layersObj && layersObj.find((layer) => layer.location) &&
-        layersObj.find((layer) => layer.location).location);
+      const location =
+        layers && layers[primaryLayer] && layers[primaryLayer].location
+          ? layers[primaryLayer].location
+          : layersObj &&
+            layersObj.find(layer => layer.location) &&
+            layersObj.find(layer => layer.location).location;
       if (location) {
         this.map.easeTo(location);
       }
@@ -543,7 +568,7 @@ class Map extends Component {
 
   componentWillUnmount() {
     const { dispatch, mapId } = this.props;
-    const index = window.maps.map((m) => m['_container'].id).indexOf(mapId);
+    const index = window.maps.map(m => m['_container'].id).indexOf(mapId);
     window.maps.splice(index, 1);
     dispatch(Actions.mapRendered(mapId, false));
     dispatch(Actions.mapLoaded(mapId, false));
@@ -839,10 +864,10 @@ class Map extends Component {
         }
       }
 
-      this.props.activeLayerIds.forEach((id) => {
+      this.props.activeLayerIds.forEach(id => {
         this.props.layersObj
-          .filter((d) => !d.layers)
-          .forEach((l) => {
+          .filter(d => !d.layers)
+          .forEach(l => {
             if (id === l.id || id === l.parent) {
               sortedLayers.push(l);
             }
@@ -882,9 +907,7 @@ class Map extends Component {
       timeSeriesObj &&
       timeSeriesObj.data &&
       timeSeriesObj.data.length &&
-      timeSeriesObj.data.find(
-        (d) => (d.properties || d)[join[1]] === detailView.properties[join[0]]
-      );
+      timeSeriesObj.data.find(d => (d.properties || d)[join[1]] === detailView.properties[join[0]]);
 
     const showDetailViewBool =
       timeSeriesObj && timeSeriesObj.layerId === this.props.primaryLayer
@@ -922,7 +945,7 @@ class Map extends Component {
           >
             <div className="widgets">
               {/* Render Children elemets with mapId prop added to each child  */}
-              {React.Children.map(this.props.children, (child) => {
+              {React.Children.map(this.props.children, child => {
                 return React.cloneElement(child, {
                   mapId: this.props.mapId,
                 });
