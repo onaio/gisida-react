@@ -7,6 +7,8 @@ import {
   buildFilterState,
   clearFilterState,
   lngLat,
+  mergeFilters,
+  buildFiltersMap
 } from 'gisida';
 import { buildLayersObj} from '../../utils';
 import FilterSelector from './FilterSelector';
@@ -68,7 +70,7 @@ export class Filter extends Component {
     this.onClearClick(null, true);
     this.setState({ isOr: !this.state.isOr });
   }
-  buildFiltersMap(filters, layerFilters, prevFilters) {
+  buildFiltersMapToremove(filters, layerFilters, prevFilters) {
     const filterMap = {};
     const filterKeys = Object.keys(filters);
     let filterKey;
@@ -317,11 +319,11 @@ export class Filter extends Component {
       (timeseriesObj.temporalIndex !== (this.props.timeseriesObj &&
         this.props.timeseriesObj.temporalIndex)) && !layerFilters &&
       !(filterState && filterState.doUpdate)) {
-      filters = this.buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters)
+      filters = buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters)
     } else {
       filters = (filterState && filterState.filters) ||
         (this.state.isFiltered && this.state.prevFilters) ||
-        this.buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters)
+        buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters)
     }
 
     // determine whether to update the compnent state
@@ -428,7 +430,7 @@ export class Filter extends Component {
 
     const filterState = {
       filterOptions,
-      filters: this.buildFiltersMap(filterOptions),
+      filters: buildFiltersMap(filterOptions),
       aggregate: {
         ...(oldLayerObj && oldLayerObj.aggregate)
       },
@@ -824,8 +826,8 @@ export class Filter extends Component {
       'data-parse': layerObj['data-parse'],
     };
     const newLayerOptions = generateFilterOptions(newLayerObj);
-    const filteredFilters = this.buildFiltersMap(newLayerOptions);
-    return this.mergeFilters(filters, filteredFilters, clickedFilterKey);
+    const filteredFilters = buildFiltersMap(newLayerOptions);
+    return mergeFilters(filters, filteredFilters, clickedFilterKey);
   }
 
   isMapFiltered = () => {
@@ -916,7 +918,7 @@ export class Filter extends Component {
       nextFilters = this.state.isOr ? nextFilters : this.buildFilteredFilters(filterKey, nextFilters);
     } else if (isResetable) {
       const layerFilters = this.getLayerFilter(this.props.layerObj.id);
-      nextFilters = this.buildFiltersMap(filterOptions, layerFilters, nextFilters);
+      nextFilters = buildFiltersMap(filterOptions, layerFilters, nextFilters);
     }
   
     return { isFiltered, nextFilters };
