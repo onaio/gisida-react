@@ -119,6 +119,7 @@ export class Legend extends React.Component {
   }
 
   render() {
+    console.log('<==>', this.props)
     const {
       layerObj,
       mapId,

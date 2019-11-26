@@ -11,6 +11,7 @@ exports[`SumChartMinimize SumChartMinimize component renders correctly 1`] = `
     Object {
       "bottom": 52,
       "right": "35px",
+      "zIndex": 5000,
     }
   }
   tabIndex="-1"

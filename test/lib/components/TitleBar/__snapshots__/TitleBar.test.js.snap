@@ -14,10 +14,6 @@ exports[`TitleBar TitleBar component renders correctly 1`] = `
     <div
       className="brand"
     >
-      <img
-        alt="UKAID"
-        className="brand-icon"
-      />
       <div
         className="brand-title"
       >

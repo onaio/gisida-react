@@ -1,6 +1,6 @@
 import React from 'react';
 import { Legend } from '../../../../src/lib/components/Legend/Legend'
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
 describe('Legend', () => {
@@ -14,7 +14,7 @@ describe('Legend', () => {
   };
   const layersData = [layerObj];
 
-  const componentWrapper = shallow(
+  const componentWrapper = mount(
     <Legend
       layerObj={layerObj}
       timeSeriesObj={timeSeriesObj}

@@ -32,6 +32,18 @@ exports[`Filter Filter component renders correctly 1`] = `
           <h5>
             LAYER FILTERS
           </h5>
+          <div
+            className="advanced-controls"
+          >
+            <div>
+              <button
+                className="And"
+                id="or-and"
+                onClick={[Function]}
+                title="Cross Filtering: And"
+              />
+            </div>
+          </div>
         </div>
       </div>
       <div

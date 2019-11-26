@@ -1,14 +1,50 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Legend component renderes correctly 1`] = `
-<div>
-  <div
-    className="legend map-1"
-    style={
-      Object {
-        "right": "20px",
-      }
+<Legend
+  MAP={Object {}}
+  activeLayerIds={
+    Array [
+      "test-layer-1",
+    ]
+  }
+  layerObj={
+    Object {
+      "testlayer": "layer1",
     }
-  />
-</div>
+  }
+  layers={
+    Object {
+      "test-layer-1": Object {
+        "credit": "legend",
+        "visible": true,
+      },
+    }
+  }
+  layersData={
+    Array [
+      Object {
+        "testlayer": "layer1",
+      },
+    ]
+  }
+  mapId="map-1"
+  primaryLayer=""
+  timeSeriesObj={
+    Object {
+      "testTimelayer": "timeLayer1",
+    }
+  }
+>
+  <div>
+    <div
+      className="legend map-1"
+      style={
+        Object {
+          "right": "20px",
+        }
+      }
+    />
+  </div>
+</Legend>
 `;
