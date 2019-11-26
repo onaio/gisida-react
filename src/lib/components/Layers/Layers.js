@@ -1,19 +1,19 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import Layer from '../Layer/Layer';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import Layer from "../Layer/Layer";
 
 export class Layers extends Component {
   constructor(props) {
     super(props);
     const groups = {};
     if (this.props.layers) {
-      this.props.layers.forEach((layer) => {
+      this.props.layers.forEach(layer => {
         if (!layer.id) {
-          Object.keys(layer).forEach((l) => {
+          Object.keys(layer).forEach(l => {
             groups[l] = { isOpen: false };
           });
         }
-      })
+      });
     }
     this.state = groups;
   }
@@ -22,7 +22,7 @@ export class Layers extends Component {
     e.preventDefault();
     this.setState({
       ...this.state,
-      [layer]: { isOpen: !this.state[layer].isOpen },
+      [layer]: { isOpen: !this.state[layer].isOpen }
     });
   }
 
@@ -49,41 +49,49 @@ export class Layers extends Component {
       }
     }
 
-    layers.forEach((layer) => {
-      if ((!currentRegion
-        || (layer.region
-          && layer.region === currentRegion))
-        && !subLayerIds.includes(layer.id)) {
+    layers.forEach(layer => {
+      if (
+        (!currentRegion || (layer.region && layer.region === currentRegion)) &&
+        !subLayerIds.includes(layer.id)
+      ) {
         if (layer.id) {
-          layerItem.push((<Layer
-            key={layer.id}
-            mapId={mapId}
-            layer={layer}
-          />))
+          if (this.props.layerItem) {
+            const CustomLayerItem = this.props.layerItem;
+
+            layerItem.push(
+              <CustomLayerItem key={layer.id} mapId={mapId} layer={layer} />
+            );
+          } else {
+            layerItem.push(
+              <Layer key={layer.id} mapId={mapId} layer={layer} />
+            );
+          }
         } else {
           Object.keys(layer).forEach((d, i) => {
             layerItem = layerItem.concat([
-              (<li>
+              <li>
                 <a
                   key={`${d}-${i}-link`}
                   className="sub-category"
-                  onClick={(e) => this.toggleSubMenu(e, d)}
+                  onClick={e => this.toggleSubMenu(e, d)}
                 >
                   {d}
                   <span
-                    className={`category glyphicon glyphicon-chevron-${this.state[d].isOpen ? 'down' : 'right'}`}
+                    className={`category glyphicon glyphicon-chevron-${
+                      this.state[d].isOpen ? "down" : "right"
+                    }`}
                   />
                 </a>
-              </li>),
-              (this.state[d].isOpen ?
-                  <Layers
-                    key={`${d}-${i}`}
-                    mapId={mapId}
-                    layers={layer[d].layers}
-                    currentRegion={currentRegion}
-                    preparedLayers={preparedLayers}
-                  />
-              : null)
+              </li>,
+              this.state[d].isOpen ? (
+                <Layers
+                  key={`${d}-${i}`}
+                  mapId={mapId}
+                  layers={layer[d].layers}
+                  currentRegion={currentRegion}
+                  preparedLayers={preparedLayers}
+                />
+              ) : null
             ]);
           });
         }
@@ -91,18 +99,14 @@ export class Layers extends Component {
       return null;
     });
 
-    return (
-      <ul className="layers">
-        {layerItem}
-      </ul>
-    );
+    return <ul className="layers">{layerItem}</ul>;
   }
 }
 
 Layers.propTypes = {
   mapId: PropTypes.string.isRequired,
   layers: PropTypes.arrayOf(PropTypes.any).isRequired,
-  currentRegion: PropTypes.string,
+  currentRegion: PropTypes.string
 };
 
 export default Layers;
