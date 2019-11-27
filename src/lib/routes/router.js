@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  BrowserRouter as RRouter,
+  Router as RRouter,
   Redirect as RRedirect,
   Link as RLink
 } from 'react-router-dom';
@@ -15,12 +15,12 @@ const Wrapper = (history) => {
   // Wrapper component for React Router Router DOM <Router>, passing props to children
   return class Wrapper extends React.Component {
     render() {
-      return (<RRouter history={history}>
+      return <RRouter history={history}>
         <div>
           {React.Children.map(this.props.children, child =>
             React.cloneElement(child, {...child.props, ...this.props }))}
         </div>
-      </RRouter>)
+      </RRouter>
     }
   }
 }
