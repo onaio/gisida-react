@@ -40,7 +40,7 @@ export class Legend extends React.Component {
 
 componentWillReceiveProps(nextProps) {
   const { layerObj } = nextProps;
-  if(nextProps.timeSeriesObj && (this.props.timeSeriesObj !== nextProps.timeSeriesObj) && layerObj.type !== 'chart' && layerObj.property) {
+  if(nextProps.timeSeriesObj && (this.props.timeSeriesObj !== nextProps.timeSeriesObj)  && layerObj && layerObj.type !== 'chart' && layerObj.property) {
     const { timeSeriesObj, dispatch } = nextProps;
 
     const stops = generateStops(timeSeriesObj,
@@ -59,7 +59,7 @@ componentWillReceiveProps(nextProps) {
   }
  componentWillUpdate(nextProps, nextState) {
    const { layerObj } = nextProps;
-   if (this.props.primaryLayer !== nextProps.primaryLayer && layerObj.type !== 'chart' && layerObj.property) {
+   if (this.props.primaryLayer !== nextProps.primaryLayer && layerObj && layerObj.type !== 'chart' && layerObj.property) {
      const { timeSeriesObj } = nextProps;
      
      if(timeSeriesObj && timeSeriesObj.layerObj && 
@@ -125,7 +125,7 @@ componentWillReceiveProps(nextProps) {
         }
       }
 
-      if (this.state.primaryLayer !== primaryLayer && layers[primaryLayer].credit) {
+      if (this.state.primaryLayer !== primaryLayer && layers[primaryLayer] && layers[primaryLayer].credit) {
         activeLegendLayer = primaryLayer;
       }
 
