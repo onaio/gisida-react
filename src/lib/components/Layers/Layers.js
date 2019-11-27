@@ -85,6 +85,7 @@ export class Layers extends Component {
               </li>,
               this.state[d].isOpen ? (
                 <Layers
+                  layerItem={this.props.layerItem}
                   key={`${d}-${i}`}
                   mapId={mapId}
                   layers={layer[d].layers}
