@@ -1,29 +1,29 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import Layer from "../Layer/Layer";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import Layer from '../Layer/Layer';
+import { connect } from 'react-redux';
+import { Actions } from 'gisida';
+
+const mapStateToProps = (state, ownProps) => {
+  const MAP = state[ownProps.mapId];
+  const { mapId, layers, currentRegion, preparedLayers } = ownProps;
+
+  return {
+    openGroups: MAP.openGroups,
+    mapId,
+    layers,
+    currentRegion,
+    preparedLayers,
+  };
+};
 
 export class Layers extends Component {
-  constructor(props) {
-    super(props);
-    const groups = {};
-    if (this.props.layers) {
-      this.props.layers.forEach(layer => {
-        if (!layer.id) {
-          Object.keys(layer).forEach(l => {
-            groups[l] = { isOpen: false };
-          });
-        }
-      });
-    }
-    this.state = groups;
-  }
-
   toggleSubMenu(e, layer) {
     e.preventDefault();
-    this.setState({
-      ...this.state,
-      [layer]: { isOpen: !this.state[layer].isOpen }
-    });
+    console.log(this.props.openGroups);
+    const { openGroups } = this.props;
+    const index = openGroups.indexOf(layer);
+    this.props.dispatch(Actions.toggleGroups(this.props.mapId, layer, index));
   }
 
   render() {
@@ -58,13 +58,9 @@ export class Layers extends Component {
           if (this.props.layerItem) {
             const CustomLayerItem = this.props.layerItem;
 
-            layerItem.push(
-              <CustomLayerItem key={layer.id} mapId={mapId} layer={layer} />
-            );
+            layerItem.push(<CustomLayerItem key={layer.id} mapId={mapId} layer={layer} />);
           } else {
-            layerItem.push(
-              <Layer key={layer.id} mapId={mapId} layer={layer} />
-            );
+            layerItem.push(<Layer key={layer.id} mapId={mapId} layer={layer} />);
           }
         } else {
           Object.keys(layer).forEach((d, i) => {
@@ -78,12 +74,12 @@ export class Layers extends Component {
                   {d}
                   <span
                     className={`category glyphicon glyphicon-chevron-${
-                      this.state[d].isOpen ? "down" : "right"
+                      this.props.openGroups && this.props.openGroups.includes(d) ? 'down' : 'right'
                     }`}
                   />
                 </a>
               </li>,
-              this.state[d].isOpen ? (
+              this.props.openGroups && this.props.openGroups.includes(d) ? (
                 <Layers
                   layerItem={this.props.layerItem}
                   key={`${d}-${i}`}
@@ -92,7 +88,7 @@ export class Layers extends Component {
                   currentRegion={currentRegion}
                   preparedLayers={preparedLayers}
                 />
-              ) : null
+              ) : null,
             ]);
           });
         }
@@ -107,7 +103,7 @@ export class Layers extends Component {
 Layers.propTypes = {
   mapId: PropTypes.string.isRequired,
   layers: PropTypes.arrayOf(PropTypes.any).isRequired,
-  currentRegion: PropTypes.string
+  currentRegion: PropTypes.string,
 };
 
-export default Layers;
+export default connect(mapStateToProps)(Layers);

@@ -1,9 +1,9 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import PropTypes from "prop-types";
-import { Actions } from "gisida";
-import Layers from "../Layers/Layers";
-import "./Menu.scss";
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import { Actions } from 'gisida';
+import Layers from '../Layers/Layers';
+import './Menu.scss';
 
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {} };
@@ -13,7 +13,7 @@ const mapStateToProps = (state, ownProps) => {
 
   if (Object.keys(LAYERS.groups).length) {
     const groupMapper = layer => {
-      if (typeof layer === "string") {
+      if (typeof layer === 'string') {
         return MAP.layers[layer];
       }
 
@@ -21,9 +21,7 @@ const mapStateToProps = (state, ownProps) => {
       Object.keys(layer).forEach(l => {
         subGroup[l] = {
           category: l,
-          layers: layer[l]
-            .map(groupMapper)
-            .filter(l => typeof l !== "undefined")
+          layers: layer[l].map(groupMapper).filter(l => typeof l !== 'undefined'),
         };
       });
       return subGroup;
@@ -32,9 +30,7 @@ const mapStateToProps = (state, ownProps) => {
     categories = Object.keys(LAYERS.groups).map(group => {
       return {
         category: group,
-        layers: LAYERS.groups[group]
-          .map(groupMapper)
-          .filter(l => typeof l !== "undefined")
+        layers: LAYERS.groups[group].map(groupMapper).filter(l => typeof l !== 'undefined'),
       };
     });
   } else if (Object.keys(MAP.layers).length) {
@@ -47,7 +43,7 @@ const mapStateToProps = (state, ownProps) => {
         if (!categories[category]) {
           categories[category] = {
             category,
-            layers: []
+            layers: [],
           };
         }
         categories[category].layers.push(MAP.layers[l]);
@@ -67,20 +63,20 @@ const mapStateToProps = (state, ownProps) => {
   const currentRegion =
     state.REGIONS && state.REGIONS.length
       ? state.REGIONS.filter(region => region.current)[0].name
-      : "";
+      : '';
   return {
     categories,
     // layers, // todo - support layers without categories
     LAYERS,
-    menuId: "sector-menu-1",
-    mapTargetId: "",
+    menuId: 'sector-menu-1',
+    mapTargetId: '',
     regions: state.REGIONS,
     currentRegion: currentRegion,
     loaded: state.APP.loaded,
     preparedLayers: MAP.layers,
     menuIsOpen: MAP.menuIsOpen,
     openCategories: MAP.openCategories,
-    layerItem: ownProps.layerItem
+    layerItem: ownProps.layerItem,
   };
 };
 
@@ -88,7 +84,7 @@ class Menu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      openCategories: []
+      openCategories: [],
     };
   }
 
@@ -102,9 +98,7 @@ class Menu extends Component {
     e.preventDefault();
     const { openCategories } = this.props;
     const index = openCategories.indexOf(category);
-    this.props.dispatch(
-      Actions.toggleCategories(this.props.mapId, category, index)
-    );
+    this.props.dispatch(Actions.toggleCategories(this.props.mapId, category, index));
   };
 
   onRegionClick = e => {
@@ -123,28 +117,20 @@ class Menu extends Component {
       return React.cloneElement(child, { mapId });
     });
 
-    const {
-      regions,
-      currentRegion,
-      preparedLayers,
-      childrenPosition
-    } = this.props;
-    const childrenPositionClass = childrenPosition || "top";
+    const { regions, currentRegion, preparedLayers, childrenPosition } = this.props;
+    const childrenPositionClass = childrenPosition || 'top';
 
     return (
       <div>
         <div>
           {this.props.loaded ? (
             // Menu Wrapper
-            <div
-              id={`${mapId}-menu-wrapper`}
-              className={`menu-wrapper ${childrenPositionClass}`}
-            >
+            <div id={`${mapId}-menu-wrapper`} className={`menu-wrapper ${childrenPositionClass}`}>
               {/* Open button menu */}
               <a
                 onClick={e => this.onToggleMenu(e)}
                 className="open-btn"
-                style={{ display: this.props.menuIsOpen ? "none" : "block" }}
+                style={{ display: this.props.menuIsOpen ? 'none' : 'block' }}
               >
                 <span className="glyphicon glyphicon-menu-hamburger"></span>
               </a>
@@ -152,7 +138,7 @@ class Menu extends Component {
               <div
                 id={`${mapId}-menu`}
                 className="sectors-menu"
-                style={{ display: this.props.menuIsOpen ? "block" : "none" }}
+                style={{ display: this.props.menuIsOpen ? 'block' : 'none' }}
               >
                 {/* Close menu button */}
                 <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
@@ -160,13 +146,13 @@ class Menu extends Component {
                 </a>
 
                 {/* Children Elements (top) */}
-                {children && childrenPosition !== "bottom" ? children : ""}
+                {children && childrenPosition !== 'bottom' ? children : ''}
 
                 {/* Menu List*/}
                 <ul className="sectors">
                   {regions && regions.length ? (
                     <li className="sector">
-                      <a onClick={e => this.onCategoryClick(e, "Regions")}>
+                      <a onClick={e => this.onCategoryClick(e, 'Regions')}>
                         Regions
                         <span className="caret" />
                       </a>
@@ -197,28 +183,20 @@ class Menu extends Component {
                   {(categories && categories.length) > 0 ? (
                     categories.map((category, i) => (
                       <li className="sector" key={i}>
-                        <a
-                          onClick={e =>
-                            this.onCategoryClick(e, category.category)
-                          }
-                        >
+                        <a onClick={e => this.onCategoryClick(e, category.category)}>
                           {category.category}
                           <span
                             className={
-                              "category glyphicon " +
+                              'category glyphicon ' +
                               (this.props.openCategories &&
-                              this.props.openCategories.includes(
-                                category.category
-                              )
-                                ? "glyphicon-chevron-down"
-                                : "glyphicon-chevron-right")
+                              this.props.openCategories.includes(category.category)
+                                ? 'glyphicon-chevron-down'
+                                : 'glyphicon-chevron-right')
                             }
                           />
                         </a>
                         {this.props.openCategories &&
-                        this.props.openCategories.includes(
-                          category.category
-                        ) ? (
+                        this.props.openCategories.includes(category.category) ? (
                           <Layers
                             layerItem={this.props.layerItem}
                             mapId={mapId}
@@ -237,11 +215,11 @@ class Menu extends Component {
                 </ul>
 
                 {/* Children Elements (top) */}
-                {children && childrenPosition === "bottom" ? children : ""}
+                {children && childrenPosition === 'bottom' ? children : ''}
               </div>
             </div>
           ) : (
-            ""
+            ''
           )}
         </div>
       </div>
@@ -252,7 +230,7 @@ class Menu extends Component {
 Menu.propTypes = {
   menuId: PropTypes.string.isRequired,
   // mapTargetId: PropTypes.string.isRequired,
-  categories: PropTypes.arrayOf(PropTypes.any).isRequired
+  categories: PropTypes.arrayOf(PropTypes.any).isRequired,
 };
 
 export default connect(mapStateToProps)(Menu);
