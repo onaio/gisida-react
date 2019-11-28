@@ -28,6 +28,8 @@ class Callback extends Component {
     const { dispatch } = this.props;
     const { AUTH } = this.props.global;
     const accessToken = this.getAccessToken();
+    const expiryTime = this.getExpiryTime();
+    localStorage.setItem('expiry_time', expiryTime)
     dispatch(Actions.receiveToken(accessToken));
     const { isAuth,  authConfig, user } = await SupAuth.authorizeUser(APP, AUTH, accessToken);
     if (isAuth && authConfig) {
@@ -49,6 +51,12 @@ class Callback extends Component {
  
   getAccessToken() {
     return this.getParameterByName('access_token');
+  }
+
+  getExpiryTime() {
+    const expiresIn = Number(this.getParameterByName('expires_in'))/3600;
+    const now = new Date();
+    return now.setHours(now.getHours() + expiresIn);
   }
 
   render() {

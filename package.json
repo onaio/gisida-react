@@ -84,6 +84,7 @@
         "rc-slider": "^8.6.1",
         "react-load-script": "^0.0.6",
         "react-redux": "^5.0.6",
+        "react-router-dom": "^5.1.2",
         "redux": "^4.0.0"
     },
     "devDependencies": {
