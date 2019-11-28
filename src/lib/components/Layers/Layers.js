@@ -20,7 +20,6 @@ const mapStateToProps = (state, ownProps) => {
 export class Layers extends Component {
   toggleSubMenu(e, layer) {
     e.preventDefault();
-    console.log(this.props.openGroups);
     const { openGroups } = this.props;
     const index = openGroups.indexOf(layer);
     this.props.dispatch(Actions.toggleGroups(this.props.mapId, layer, index));
