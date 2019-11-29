@@ -35,7 +35,7 @@ export class Layers extends Component {
 
     const ifPermissionDenied = () => {
       return layers.length > 0 ? 
-      (<p>You don't have permision to view this category</p>) :
+      (<p>You don't have permission to view this category</p>) :
        (<p>No layers available</p>);
     }
 
