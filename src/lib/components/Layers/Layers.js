@@ -60,14 +60,12 @@ export class Layers extends Component {
           && layer.region === currentRegion))
         && !subLayerIds.includes(layer.id)) {
         if (layer.id && !auth) {
-          console.log('not auth')
           layerItem.push((<Layer
             key={layer.id}
             mapId={mapId}
             layer={layer}
           />))
         } else if (layer.id && auth) {
-          console.log('is auth')
           const { authConfigs, userInfo } = auth;
           let activeId = layer.id;
           let users;
@@ -86,7 +84,6 @@ export class Layers extends Component {
             || (authConfigs.LAYERS
               && authConfigs.LAYERS.ALL
               && authConfigs.LAYERS.ALL.includes(userInfo.username))) {
-                console.log('seeeee ')
             layerItem.push((<Layer
               key={layer.id}
               mapId={mapId}
@@ -95,7 +92,6 @@ export class Layers extends Component {
           }
         } else {
 
-          console.log('else')
           Object.keys(layer).forEach((d, i) => {
             layerItem = layerItem.concat([
               (<li>
