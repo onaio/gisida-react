@@ -1,37 +1,43 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
-import { connect } from 'react-redux';
-import { Actions } from 'gisida';
-
-const mapStateToProps = (state, ownProps) => {
-  const MAP = state[ownProps.mapId];
-  const { mapId, layers, currentRegion, preparedLayers } = ownProps;
-
-  return {
-    openGroups: MAP.openGroups,
-    mapId,
-    layers,
-    currentRegion,
-    preparedLayers,
-  };
-};
 
 export class Layers extends Component {
+  constructor(props) {
+    super(props);
+    const groups = {};
+    if (this.props.layers) {
+      this.props.layers.forEach((layer) => {
+        if (!layer.id) {
+          Object.keys(layer).forEach((l) => {
+            groups[l] = { isOpen: false };
+          });
+        }
+      })
+    }
+    this.state = groups;
+  }
+
   toggleSubMenu(e, layer) {
     e.preventDefault();
-    const { openGroups } = this.props;
-    const index = openGroups.indexOf(layer);
-    this.props.dispatch(Actions.toggleGroups(this.props.mapId, layer, index));
+    this.setState({
+      ...this.state,
+      [layer]: { isOpen: !this.state[layer].isOpen },
+    });
   }
 
   render() {
-    const { mapId, layers, currentRegion, preparedLayers } = this.props;
-
+    const { mapId, layers, currentRegion, preparedLayers, auth } = this.props;
     let layerKeys;
     let layerObj;
     let layerItem = [];
     const subLayerIds = [];
+
+    const ifPermissionDenied = () => {
+      return layers.length > 0 ? 
+      (<p>You don't have permision to view this category</p>) :
+       (<p>No layers available</p>);
+    }
 
     if (!preparedLayers) {
       return false;
@@ -48,46 +54,72 @@ export class Layers extends Component {
       }
     }
 
-    layers.forEach(layer => {
-      if (
-        (!currentRegion || (layer.region && layer.region === currentRegion)) &&
-        !subLayerIds.includes(layer.id)
-      ) {
-        if (layer.id) {
-          if (this.props.layerItem) {
-            const CustomLayerItem = this.props.layerItem;
+    layers.forEach((layer) => {
+      if ((!currentRegion
+        || (layer.region
+          && layer.region === currentRegion))
+        && !subLayerIds.includes(layer.id)) {
+        if (layer.id && !auth) {
+          console.log('not auth')
+          layerItem.push((<Layer
+            key={layer.id}
+            mapId={mapId}
+            layer={layer}
+          />))
+        } else if (layer.id && auth) {
+          console.log('is auth')
+          const { authConfigs, userInfo } = auth;
+          let activeId = layer.id;
+          let users;
+          if (activeId.indexOf('.json') !== -1) {
+            // layer ids from github shared repo have .json suffix
+            // split to remove .json part
+            activeId = activeId.split('.')[0];
+          }
 
-            layerItem.push(<CustomLayerItem key={layer.id} mapId={mapId} layer={layer} />);
-          } else {
-            layerItem.push(<Layer key={layer.id} mapId={mapId} layer={layer} />);
+          users = authConfigs.LAYERS[activeId]; // list of users with access to the layer
+          // check if logged in user exists in the list of users
+          // who have access to the layer
+          if ((users
+            && userInfo
+            && users.includes(userInfo.username))
+            || (authConfigs.LAYERS
+              && authConfigs.LAYERS.ALL
+              && authConfigs.LAYERS.ALL.includes(userInfo.username))) {
+                console.log('seeeee ')
+            layerItem.push((<Layer
+              key={layer.id}
+              mapId={mapId}
+              layer={layer}
+            />))
           }
         } else {
+
+          console.log('else')
           Object.keys(layer).forEach((d, i) => {
             layerItem = layerItem.concat([
-              <li>
+              (<li>
                 <a
                   key={`${d}-${i}-link`}
                   className="sub-category"
-                  onClick={e => this.toggleSubMenu(e, d)}
+                  onClick={(e) => this.toggleSubMenu(e, d)}
                 >
                   {d}
                   <span
-                    className={`category glyphicon glyphicon-chevron-${
-                      this.props.openGroups && this.props.openGroups.includes(d) ? 'down' : 'right'
-                    }`}
+                    className={`category glyphicon glyphicon-chevron-${this.state[d].isOpen ? 'down' : 'right'}`}
                   />
                 </a>
-              </li>,
-              this.props.openGroups && this.props.openGroups.includes(d) ? (
-                <Layers
-                  layerItem={this.props.layerItem}
-                  key={`${d}-${i}`}
-                  mapId={mapId}
-                  layers={layer[d].layers}
-                  currentRegion={currentRegion}
-                  preparedLayers={preparedLayers}
-                />
-              ) : null,
+              </li>),
+              (this.state[d].isOpen ?
+                  <Layers
+                    key={`${d}-${i}`}
+                    mapId={mapId}
+                    layers={layer[d].layers}
+                    currentRegion={currentRegion}
+                    preparedLayers={preparedLayers}
+                    auth={this.props.auth}
+                  />
+              : null)
             ]);
           });
         }
@@ -95,7 +127,11 @@ export class Layers extends Component {
       return null;
     });
 
-    return <ul className="layers">{layerItem}</ul>;
+    return (
+      <ul className="layers">
+        { layerItem.length > 0 ? layerItem :  ifPermissionDenied() }
+      </ul>
+    );
   }
 }
 
@@ -105,4 +141,4 @@ Layers.propTypes = {
   currentRegion: PropTypes.string,
 };
 
-export default connect(mapStateToProps)(Layers);
+export default Layers;
