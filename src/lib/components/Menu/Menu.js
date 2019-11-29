@@ -77,6 +77,7 @@ const mapStateToProps = (state, ownProps) => {
     preparedLayers: MAP.layers,
     menuIsOpen: MAP.menuIsOpen,
     openCategories: MAP.openCategories,
+    layerItem: ownProps.layerItem,
   };
 }
 
@@ -180,7 +181,8 @@ class Menu extends Component {
                           </a>
                           {
                             this.props.openCategories && this.props.openCategories.includes(category.category) ?
-                              <Layers
+                              <Layers 
+                                layerItem={this.props.layerItem}
                                 mapId={mapId}
                                 layers={category.layers}
                                 currentRegion={currentRegion}

@@ -1,29 +1,29 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
+import { connect } from 'react-redux';
+import { Actions } from 'gisida';
+
+const mapStateToProps = (state, ownProps) => {
+  const MAP = state[ownProps.mapId];
+  const { mapId, layers, currentRegion, preparedLayers } = ownProps;
+
+  return {
+    openGroups: MAP.openGroups,
+    mapId,
+    layers,
+    currentRegion,
+    preparedLayers,
+  };
+};
+
 
 export class Layers extends Component {
-  constructor(props) {
-    super(props);
-    const groups = {};
-    if (this.props.layers) {
-      this.props.layers.forEach((layer) => {
-        if (!layer.id) {
-          Object.keys(layer).forEach((l) => {
-            groups[l] = { isOpen: false };
-          });
-        }
-      })
-    }
-    this.state = groups;
-  }
-
   toggleSubMenu(e, layer) {
     e.preventDefault();
-    this.setState({
-      ...this.state,
-      [layer]: { isOpen: !this.state[layer].isOpen },
-    });
+    const { openGroups } = this.props;
+    const index = openGroups.indexOf(layer);
+    this.props.dispatch(Actions.toggleGroups(this.props.mapId, layer, index));
   }
 
   render() {
@@ -60,11 +60,13 @@ export class Layers extends Component {
           && layer.region === currentRegion))
         && !subLayerIds.includes(layer.id)) {
         if (layer.id && !auth) {
-          layerItem.push((<Layer
-            key={layer.id}
-            mapId={mapId}
-            layer={layer}
-          />))
+          if (this.props.layerItem) {
+            const CustomLayerItem = this.props.layerItem;
+
+            layerItem.push(<CustomLayerItem key={layer.id} mapId={mapId} layer={layer} />);
+          } else {
+            layerItem.push(<Layer key={layer.id} mapId={mapId} layer={layer} />);
+          }
         } else if (layer.id && auth) {
           const { authConfigs, userInfo } = auth;
           let activeId = layer.id;
@@ -84,11 +86,13 @@ export class Layers extends Component {
             || (authConfigs.LAYERS
               && authConfigs.LAYERS.ALL
               && authConfigs.LAYERS.ALL.includes(userInfo.username))) {
-            layerItem.push((<Layer
-              key={layer.id}
-              mapId={mapId}
-              layer={layer}
-            />))
+                if (this.props.layerItem) {
+                  const CustomLayerItem = this.props.layerItem;
+      
+                  layerItem.push(<CustomLayerItem key={layer.id} mapId={mapId} layer={layer} />);
+                } else {
+                  layerItem.push(<Layer key={layer.id} mapId={mapId} layer={layer} />);
+                }
           }
         } else {
 
@@ -102,12 +106,15 @@ export class Layers extends Component {
                 >
                   {d}
                   <span
-                    className={`category glyphicon glyphicon-chevron-${this.state[d].isOpen ? 'down' : 'right'}`}
+                    className={`category glyphicon glyphicon-chevron-${
+                      this.props.openGroups && this.props.openGroups.includes(d) ? 'down' : 'right'
+                    }`}
                   />
                 </a>
               </li>),
-              (this.state[d].isOpen ?
+              (this.props.openGroups && this.props.openGroups.includes(d) ? (
                   <Layers
+                    layerItem={this.props.layerItem}
                     key={`${d}-${i}`}
                     mapId={mapId}
                     layers={layer[d].layers}
@@ -115,6 +122,7 @@ export class Layers extends Component {
                     preparedLayers={preparedLayers}
                     auth={this.props.auth}
                   />
+              )
               : null)
             ]);
           });
@@ -137,4 +145,4 @@ Layers.propTypes = {
   currentRegion: PropTypes.string,
 };
 
-export default Layers;
+export default connect(mapStateToProps)(Layers);
