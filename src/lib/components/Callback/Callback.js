@@ -44,10 +44,6 @@ class Callback extends Component {
     if (isAuth && authConfig) {
       dispatch(Actions.getAuthConfigs(authConfig));
     }
-    if (!accessToken || Date.now() > expiryTime) {
-      deAuthZ();
-      return this.history.push("/login");
-    }
     // const user = await SupAuth.getUser(accessToken, dispatch);
     dispatch(Actions.receiveLogin(user));
     return this.history.push("/");
