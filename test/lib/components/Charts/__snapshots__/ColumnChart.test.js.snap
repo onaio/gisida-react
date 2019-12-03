@@ -1,3 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ColumnChart ColumnChart component renders correctly 1`] = `<div />`;
+exports[`ColumnChart ColumnChart component renders correctly 1`] = `
+<ColumnChart
+  categories={Array []}
+  chartHeight={30}
+  chartWidth={30}
+  seriesData={Array []}
+  seriesTitle="Ex-title"
+  yAxisLabel="Ex-label"
+>
+  <div />
+</ColumnChart>
+`;

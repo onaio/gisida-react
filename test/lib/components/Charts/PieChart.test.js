@@ -1,16 +1,15 @@
 import React from 'react';
 import { PieChart }  from '../../../../src/lib/components/Charts/PieChart.jsx'
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
 //Error receiving:
 	//TypeError: Cannot read property 'nodeName' of undefined
 
-const componentWrapper = shallow(
+const componentWrapper = mount(
 	<PieChart 
 		seriesName='ex-name'
 		seriesData={{}}
-		seriesTitle='ex-title'
 		chartWidth={30}
 		chartHeight={30}
 		donut={30}

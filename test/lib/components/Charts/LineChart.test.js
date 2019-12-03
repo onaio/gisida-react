@@ -1,11 +1,11 @@
 import React from 'react';
 import { LineChart }  from '../../../../src/lib/components/Charts/LineChart.jsx'
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
 const pointClickCallback = jest.fn();
 
-const componentWrapper = shallow(
+const componentWrapper = mount(
 	<LineChart 
 		series={{}}
 		chartTitle='ex-title'
@@ -18,6 +18,7 @@ const componentWrapper = shallow(
 
 describe('LineChart', () => {
 	it('LineChart component renders correctly', () => {
+		// componentWrapper.instance().componentWillReceiveProps()
 		const json = toJson(componentWrapper)
 		expect(json).toMatchSnapshot();
 	})

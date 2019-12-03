@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HorizontalBarChart HorizontalBarChart component renders correctly 1`] = `
+<HorizontalBarChart
+  categories={Array []}
+  series={Array []}
+>
+  <div />
+</HorizontalBarChart>
+`;
