@@ -1,9 +1,9 @@
 export function formatNum(num, decimal) {
-  let x = (`${num}`).length;
+  let x = `${num}`.length;
   if (Number.isInteger(num) && x > 3) {
     const pow = 10 ** decimal;
     x -= x % 3;
-    return Math.round(num * pow / (10 ** x)) / pow + ' kMGTPE'[x / 3];
+    return Math.round((num * pow) / 10 ** x) / pow + ' kMGTPE'[x / 3];
   }
   return num;
 }
@@ -12,20 +12,23 @@ export function getLastIndex(arr, item) {
   const indices = [];
 
   for (let i = 0; i < arr.length; i += 1) {
-    if (arr[i] === item) { indices.push(i); }
+    if (arr[i] === item) {
+      indices.push(i);
+    }
   }
   return indices[indices.length - 1];
 }
 
-
 export function groupBy(collection, property) {
-  var i = 0, val, index,
-    values = [], result = [];
+  var i = 0,
+    val,
+    index,
+    values = [],
+    result = [];
   for (; i < collection.length; i++) {
     val = collection[i][property];
     index = values.indexOf(val);
-    if (index > -1)
-      result[index].push(collection[i]);
+    if (index > -1) result[index].push(collection[i]);
     else {
       values.push(val);
       result.push([collection[i]]);
@@ -146,8 +149,8 @@ export function isFiltered(options, isOriginal) {
 export function buildLayersObj(layers) {
   const layersObj = [];
   let layerObj;
-  Object.keys(layers).forEach((key) => {
-    const layer = { ...layers[key]};
+  Object.keys(layers).forEach(key => {
+    const layer = { ...layers[key] };
     if (layer.visible) {
       layerObj = layer;
       layersObj.push(layerObj);
@@ -167,92 +170,82 @@ export const parseColValue = (datum, col) => {
     val = Number(datum[col]);
   }
   return val;
-}
+};
 
 export function deepCopy(x) {
   return JSON.parse(JSON.stringify(x));
-};
-
-export function orderLayers(activeLayersData, map, nextLayerId) {
-  let fill = activeLayersData.filter(d => d['type'] === 'fill'
-     && !d['detail-view']);
-     if (fill.length) {
-       Object.keys(fill).forEach((key) => {
-         if (map.getLayer(fill[key].id)) {
-           map.moveLayer(fill[key].id);
-         }
-       });
-       if (fill.find(c => c.id === nextLayerId) && map.getLayer(nextLayerId)) {
-          map.moveLayer(nextLayerId);
-       }
-     }
-
-  let circles = activeLayersData.filter(d => d['type'] === 'circle');
-     if (circles.length) {
-       Object.keys(circles).forEach((key) => {
-         if (map.getLayer(circles[key].id)) {
-           map.moveLayer(circles[key].id);
-         }
-       });
-       if (circles.find(c => c.id === nextLayerId) && map.getLayer(nextLayerId)) {
-          map.moveLayer(nextLayerId);
-       }
-     }
-
-    let symbols = activeLayersData.filter(d => d['type'] === 'symbol');
-    if (symbols.length) {
-      Object.keys(symbols).forEach((key) => {
-        if (map.getLayer(symbols[key].id)) {
-          map.moveLayer(symbols[key].id)
-        }
-      });
-      if (symbols.find(s => s.id === nextLayerId) && map.getLayer(nextLayerId)) {
-        map.moveLayer(nextLayerId);
-      }
-    }
-
-    let line = activeLayersData.filter(d => d['type'] === 'line');
-     if (line.length) {
-       Object.keys(line).forEach((key) => {
-         if (map.getLayer(line[key].id)) {
-           map.moveLayer(line[key].id);
-         }
-       });
-       if (line.find(c => c.id === nextLayerId) && map.getLayer(nextLayerId)) {
-          map.moveLayer(nextLayerId);
-       }
-     }
-
-    let detailViewActive = activeLayersData.filter(d => d['detail-view']);
-    if (detailViewActive.length) {
-      Object.keys(detailViewActive).forEach((key) => {
-        if (map.getLayer(detailViewActive[key].id)) {
-          map.moveLayer(detailViewActive[key].id);
-        }
-      });
-      if (detailViewActive.find(d => d.id === nextLayerId) && map.getLayer(nextLayerId)) {
-        map.moveLayer(nextLayerId);
-      }
-    }
-    let isLabelActive = activeLayersData.filter(d => d.isLabel);
-
-    if (isLabelActive.length) {
-      Object.keys(isLabelActive).forEach((key) => {
-        if (map.getLayer(isLabelActive[key].id)) {
-          map.moveLayer(isLabelActive[key].id);
-        }
-      });
-      if (isLabelActive.find(d => d.id === nextLayerId) && map.getLayer(nextLayerId)) {
-        map.moveLayer(nextLayerId);
-      }
-    }
-
 }
 
-export function checkTokenExpiry() {
-  const expiresIn = localStorage.getItem('expiry_time');
-  if (!expiresIn) return false;
-  const expiryTimeDiff = new Date(Number(expiresIn)) - new Date();
-  const expiryInHours = ((expiryTimeDiff % 86400000) / 3600000)
-  return expiryInHours < 1;
+export function orderLayers(activeLayersData, map, nextLayerId) {
+  let fill = activeLayersData.filter(d => d['type'] === 'fill' && !d['detail-view']);
+  if (fill.length) {
+    Object.keys(fill).forEach(key => {
+      if (map.getLayer(fill[key].id)) {
+        map.moveLayer(fill[key].id);
+      }
+    });
+    if (fill.find(c => c.id === nextLayerId) && map.getLayer(nextLayerId)) {
+      map.moveLayer(nextLayerId);
+    }
+  }
+
+  let circles = activeLayersData.filter(d => d['type'] === 'circle');
+  if (circles.length) {
+    Object.keys(circles).forEach(key => {
+      if (map.getLayer(circles[key].id)) {
+        map.moveLayer(circles[key].id);
+      }
+    });
+    if (circles.find(c => c.id === nextLayerId) && map.getLayer(nextLayerId)) {
+      map.moveLayer(nextLayerId);
+    }
+  }
+
+  let symbols = activeLayersData.filter(d => d['type'] === 'symbol');
+  if (symbols.length) {
+    Object.keys(symbols).forEach(key => {
+      if (map.getLayer(symbols[key].id)) {
+        map.moveLayer(symbols[key].id);
+      }
+    });
+    if (symbols.find(s => s.id === nextLayerId) && map.getLayer(nextLayerId)) {
+      map.moveLayer(nextLayerId);
+    }
+  }
+
+  let line = activeLayersData.filter(d => d['type'] === 'line');
+  if (line.length) {
+    Object.keys(line).forEach(key => {
+      if (map.getLayer(line[key].id)) {
+        map.moveLayer(line[key].id);
+      }
+    });
+    if (line.find(c => c.id === nextLayerId) && map.getLayer(nextLayerId)) {
+      map.moveLayer(nextLayerId);
+    }
+  }
+
+  let detailViewActive = activeLayersData.filter(d => d['detail-view']);
+  if (detailViewActive.length) {
+    Object.keys(detailViewActive).forEach(key => {
+      if (map.getLayer(detailViewActive[key].id)) {
+        map.moveLayer(detailViewActive[key].id);
+      }
+    });
+    if (detailViewActive.find(d => d.id === nextLayerId) && map.getLayer(nextLayerId)) {
+      map.moveLayer(nextLayerId);
+    }
+  }
+  let isLabelActive = activeLayersData.filter(d => d.isLabel);
+
+  if (isLabelActive.length) {
+    Object.keys(isLabelActive).forEach(key => {
+      if (map.getLayer(isLabelActive[key].id)) {
+        map.moveLayer(isLabelActive[key].id);
+      }
+    });
+    if (isLabelActive.find(d => d.id === nextLayerId) && map.getLayer(nextLayerId)) {
+      map.moveLayer(nextLayerId);
+    }
+  }
 }
