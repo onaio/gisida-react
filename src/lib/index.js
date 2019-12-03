@@ -24,6 +24,10 @@ import LineChart from './components/Charts/LineChart';
 import ColumnChart from './components/Charts/BarChartStacked';
 import BarChartStacked from './components/Charts/BarChartStacked';
 
+import Callback from './components/Callback/Callback';
+
+import Router from './routes/router';
+
 export {
   App,
   TitleBar,

@@ -51,6 +51,7 @@ const isIE = detectIE();
 
 window.maps = [];
 
+
 class Map extends Component {
   constructor(props) {
     super(props);
@@ -75,6 +76,14 @@ class Map extends Component {
   
       // Handle Map Load Event
       this.map.on('load', () => {
+        /** Add icons from external source to map since they aren't available on the basemap */
+        if (mapIcons) {
+          mapIcons.forEach((element) => {
+            this.map.loadImage(element.imageUrl, (error, res) => {
+                this.map.addImage(element.id, res);
+              });
+          });
+        }
         const mapLoaded = true;
         this.addMouseEvents(mapId);
         this.setState({ mapLoaded });
@@ -116,18 +125,11 @@ class Map extends Component {
     const { handlers, APP } = this.props;
     if (handlers && Array.isArray(handlers)) {
       let handler;
-      let sublayer;
       for (let c = 0; c < handlers.length; c += 1) {
         handler = handlers[c];
-        if (handler.layer) {
-          if (handler.layer.layers) {
-            // If it is a grouped layer loop through the layer.layers array
-            for (let l = 0; l < handler.layer.layers.length; l += 1) {
-              sublayer = handler.layer.layers[l];
-              this.map.on(handler.type, sublayer, handler.method);
-            }
-          } else {
-            this.map.on(handler.type, handler.layer.id, handler.method);
+        if (Array.isArray(handler.layer)) {
+          for (let l = 0; l < handler.layer.length; l += 1) {
+            this.map.on(handler.type, handler.layer[l], handler.method)
           }
         } else {
           this.map.on(handler.type, handler.method);
@@ -297,12 +299,28 @@ class Map extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidMount() {
+    const { MAP, APP, mapId } = this.props;
+    if (APP && MAP && mapId) {
+      const { isRendered, accessToken, mapConfig } = APP;
+      // Check if map is initialized, use mapId as container value
+      if (!isRendered && (!isIE || mapboxgl.supported()) && !MAP.blockLoad) {
+        this.initMap(accessToken, { ...mapConfig, container: mapId }, mapId);
+      }
+    }
+  }
+
+  componentWillReceiveProps(nextProps){
     if (this.map) {
-      this.map.resize();
+      try {
+        this.map.resize();
+      } catch (e) {
+        console.warn('resize error', e)
+      }
     }
     const accessToken = nextProps.APP.accessToken;
     let mapConfig = nextProps.APP.mapConfig;
+    const mapIcons = nextProps.APP.mapIcons;
     const isRendered = nextProps.MAP.isRendered;
     const isLoaded = nextProps.MAP.isLoaded;
     const currentStyle = nextProps.MAP.currentStyle;
@@ -414,9 +432,34 @@ class Map extends Component {
         });
         sortLayers(this.map, (intelLayers || layers), (primaryLayer || activeLayerId));
       }
-
+      /** Move symbol layer on top when we have no primary layer */
+      if (!this.props.MAP.primaryLayer && nextProps.activeLayers.length) {
+        nextProps.layersObj.forEach((layer) => {
+          if (layer.type === "symbol" && this.map.getLayer(layer.id)) {
+            this.map.moveLayer(layer.id);
+          }
+        });
+      }
       if (this.props.MAP.primaryLayer !== primaryLayer) {
         this.setPrimaryLayer(primaryLayer, activeLayerId, layers, activelayersData, activeLayerIds);
+        if (layers[primaryLayer] && layers[primaryLayer].location) {
+          this.map.easeTo(layers[primaryLayer].location);
+        } else if (mapConfig.center) {
+          if (!Array.isArray(mapConfig.center)) {
+            this.map.easeTo({
+              center: mapConfig.center,
+              zoom: mapConfig.zoom
+            });
+          } else {
+            this.map.easeTo({
+              center: {
+                "lng": mapConfig.center[0],
+                "lat": mapConfig.center[1]
+              },
+              zoom: mapConfig.zoom
+            });
+          }
+        }
       }
     }
     // Assign global variable for debugging purposes.
@@ -425,7 +468,12 @@ class Map extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (this.map) {
-      this.map.resize();
+      try {
+        this.map.resize();
+      } catch (e) {
+        console.warn('resize error',e)
+      }
+      
       const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj } = this.props;
       if (LOC && LOC.doUpdateMap === mapId && LOC.location &&
          ((prevProps.LOC.active !== LOC.active) || (prevProps.layersObj.length !== layersObj.length) ||
