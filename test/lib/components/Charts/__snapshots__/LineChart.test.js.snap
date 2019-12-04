@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`LineChart LineChart component renders correctly 1`] = `
+exports[`HorizontalBarChart HorizontalBarChart component renders correctly 1`] = `
 <LineChart
   categories={Object {}}
   chartHeight={30}

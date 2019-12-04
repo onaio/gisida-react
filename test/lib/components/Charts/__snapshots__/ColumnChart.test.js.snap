@@ -7,7 +7,7 @@ exports[`ColumnChart ColumnChart component renders correctly 1`] = `
   chartWidth={30}
   seriesData={Array []}
   seriesTitle="Ex-title"
-  yAxisLabel="Ex-label"
+  yAxisLabel="test-chart"
 >
   <div />
 </ColumnChart>

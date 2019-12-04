@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PieChart PieChart component renders correctly 1`] = `
+exports[`HorizontalBarChart HorizontalBarChart component renders correctly 1`] = `
 <PieChart
   chartHeight={30}
   chartSpacing={false}
@@ -10,6 +10,7 @@ exports[`PieChart PieChart component renders correctly 1`] = `
   legendOptions={false}
   seriesData={Object {}}
   seriesName="ex-name"
+  seriesTitle="test chart"
   showInLegend={false}
   titleOptions={false}
   tooltipOptions={false}

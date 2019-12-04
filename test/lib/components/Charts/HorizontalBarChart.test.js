@@ -31,7 +31,7 @@ describe('HorizontalBarChart', () => {
 	})
 
 	it('should unmount', () => {
-		const componentUnmountMock = jest.spyOn(mountWrapper.instance(), 'componentWillReceiveProps');
+		const componentUnmountMock = jest.spyOn(mountWrapper.instance(), 'componentWillUnmount');
 		mountWrapper.unmount()
 		expect(componentUnmountMock).toHaveBeenCalledTimes(1);
 	})

@@ -1,18 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`QuantColumnChart QuantColumnChart component renders correctly 1`] = `
-<ColumnChart
-  categories={Array []}
-  chartHeight={150}
-  chartWidth={230}
-  isPercent={false}
-  pointFormatterFunc={[Function]}
-  seriesData={Array []}
-  yAxis={
-    Object {
-      "endOnTick": false,
-      "visible": false,
+<QuantColumnChart
+  data={Array []}
+  passing={Array []}
+>
+  <ColumnChart
+    categories={Array []}
+    chartHeight={150}
+    chartWidth={230}
+    isPercent={false}
+    pointFormatterFunc={[Function]}
+    seriesData={Array []}
+    yAxis={
+      Object {
+        "endOnTick": false,
+        "visible": false,
+      }
     }
-  }
-/>
+  >
+    <div />
+  </ColumnChart>
+</QuantColumnChart>
 `;
