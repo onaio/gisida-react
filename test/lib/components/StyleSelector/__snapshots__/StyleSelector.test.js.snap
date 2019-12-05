@@ -1,72 +1,145 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`StyleSelector StyleSelector component renderes correctly 1`] = `
-<div
-  className="leaflet-left leaflet-top leaflet-right layer-selector"
-  data-html2canvas-ignore={true}
-  style={
+<Connect(StyleSelector)
+  store={
     Object {
-      "right": "0",
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
     }
   }
+  styles={
+    Array [
+      Object {
+        "label": "Satelitte",
+        "url": "mapbox://styles/mapbox/satellite-v9",
+      },
+      Object {
+        "label": "Satelitte Streets",
+        "url": "mapbox://styles/mapbox/satellite-streets-v9",
+      },
+    ]
+  }
 >
-  <div
-    aria-haspopup="true"
-    className="leaflet-control leaflet-control-layers"
+  <StyleSelector
+    MAP={Object {}}
+    dispatch={[Function]}
+    store={
+      Object {
+        "clearActions": [Function],
+        "dispatch": [Function],
+        "getActions": [Function],
+        "getState": [Function],
+        "replaceReducer": [Function],
+        "subscribe": [Function],
+      }
+    }
+    storeSubscription={
+      Subscription {
+        "listeners": Object {
+          "clear": [Function],
+          "get": [Function],
+          "notify": [Function],
+          "subscribe": [Function],
+        },
+        "onStateChange": [Function],
+        "parentSub": undefined,
+        "store": Object {
+          "clearActions": [Function],
+          "dispatch": [Function],
+          "getActions": [Function],
+          "getState": [Function],
+          "replaceReducer": [Function],
+          "subscribe": [Function],
+        },
+        "unsubscribe": [Function],
+      }
+    }
+    styles={
+      Array [
+        Object {
+          "label": "Satelitte",
+          "url": "mapbox://styles/mapbox/satellite-v9",
+        },
+        Object {
+          "label": "Satelitte Streets",
+          "url": "mapbox://styles/mapbox/satellite-streets-v9",
+        },
+      ]
+    }
   >
-    <a
-      className="leaflet-control-layers-toggle"
-      title="styles"
-    >
-       
-    </a>
-    <form
-      className="leaflet-control-layers-list"
+    <div
+      className="leaflet-left leaflet-top leaflet-right layer-selector"
+      data-html2canvas-ignore={true}
+      style={
+        Object {
+          "right": "0",
+        }
+      }
     >
       <div
-        className="leaflet-control-layers-base"
+        aria-haspopup="true"
+        className="leaflet-control leaflet-control-layers"
       >
-        <label
-          htmlFor="Satelitte-undefined"
-          key="label_Satelitte-undefined"
+        <a
+          className="leaflet-control-layers-toggle"
+          title="styles"
         >
-          <input
-            className="leaflet-control-layers-selector"
-            defaultValue="mapbox://styles/mapbox/satellite-v9"
-            id="Satelitte-undefined"
-            key="input_Satelitte-undefined"
-            name="leaflet-base-layers"
-            onChange={[Function]}
-            readOnly={true}
-            type="radio"
-          />
-          <span>
-            Satelitte
-          </span>
-        </label>
-        <label
-          htmlFor="Satelitte Streets-undefined"
-          key="label_Satelitte Streets-undefined"
+           
+        </a>
+        <form
+          className="leaflet-control-layers-list"
         >
-          <input
-            className="leaflet-control-layers-selector"
-            defaultValue="mapbox://styles/mapbox/satellite-streets-v9"
-            id="Satelitte Streets-undefined"
-            key="input_Satelitte Streets-undefined"
-            name="leaflet-base-layers"
-            onChange={[Function]}
-            readOnly={true}
-            type="radio"
+          <div
+            className="leaflet-control-layers-base"
+          >
+            <label
+              htmlFor="Satelitte-undefined"
+              key="label_Satelitte-undefined"
+            >
+              <input
+                className="leaflet-control-layers-selector"
+                defaultValue="mapbox://styles/mapbox/satellite-v9"
+                id="Satelitte-undefined"
+                key="input_Satelitte-undefined"
+                name="leaflet-base-layers"
+                onChange={[Function]}
+                readOnly={true}
+                type="radio"
+              />
+              <span>
+                Satelitte
+              </span>
+            </label>
+            <label
+              htmlFor="Satelitte Streets-undefined"
+              key="label_Satelitte Streets-undefined"
+            >
+              <input
+                className="leaflet-control-layers-selector"
+                defaultValue="mapbox://styles/mapbox/satellite-streets-v9"
+                id="Satelitte Streets-undefined"
+                key="input_Satelitte Streets-undefined"
+                name="leaflet-base-layers"
+                onChange={[Function]}
+                readOnly={true}
+                type="radio"
+              />
+              <span>
+                Satelitte Streets
+              </span>
+            </label>
+          </div>
+          <div
+            className="leaflet-control-layers-overlays"
           />
-          <span>
-            Satelitte Streets
-          </span>
-        </label>
+        </form>
       </div>
-      <div
-        className="leaflet-control-layers-overlays"
-      />
-    </form>
-  </div>
-</div>
+    </div>
+  </StyleSelector>
+</Connect(StyleSelector)>
 `;

@@ -1,18 +1,26 @@
 import React from 'react';
-import { TimeSeriesSlider }  from '../../../../src/lib/components/TimeSeriesSlider/TimeSeriesSlider.js'
-import { shallow } from 'enzyme';
+import TimeSeriesSlider from '../../../../src/lib/components/TimeSeriesSlider/TimeSeriesSlider.js'
+import { mount } from 'enzyme';
 import toJson from 'enzyme-to-json';
+import layers from '../../../fixtures/layers.json'
+import configureStore from 'redux-mock-store';
 
-//probably need to pass something here for it actually include something in 
-//the snapshot
-//timeSeriesObj={{}}
+const initialState = {
+	"map-1": {
+		layers: {...layers},
+		timeseries: {}
+	},
+}
+
+const mockStore = configureStore()
+const store = mockStore(initialState);
 
 const updateTimeseriesState = jest.fn();
 
-const componentWrapper = shallow(
+const componentWrapper = mount(
 	<TimeSeriesSlider 
+		store={store}
 		mapId='map-1'
-		
 		updateTimeseriesState={updateTimeseriesState}
 	/>
 );

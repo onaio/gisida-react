@@ -1,0 +1,215 @@
+{
+    "Education-adolescents-15-to-18": {
+        "label": "RC - Adolescents (15-18 years) enrolled in non-formal/formal education",
+        "source": {
+          "type": "vector",
+          "layer": "180528_outline_rohingya_refug-c2ep2k",
+          "url": "mapbox://ona.5t6fsdlt",
+          "data": [
+            315361,
+            "/data/180320_Outline_Rohingya_refugee_camps_sites_centroids.csv"
+          ],
+          "join": [
+            "SSID",
+            "submission/rc_loc",
+            "New_Camp_S"
+          ],
+          "relation": {
+            "type": "one-to-many",
+            "key": [
+              "vector",
+              "many",
+              "one"
+            ]
+          }
+        },
+        "type": "fill",
+        "property": "total_15_18_adolscent",
+        "categories": {
+          "breaks": "yes",
+          "color": "RdPu",
+          "clusters": 7
+        },
+        "aggregate": {
+          "type": "sum",
+          "group-by": "submission/rc_loc",
+          "date-by": "submission/reporting_period",
+          "date-parse": {
+            "split": " to ",
+            "chunk": 0
+          },
+          "timeseries": {
+            "type": "cumulative",
+            "field": "period"
+          },
+          "extraProps": [
+            "total_15_18_adolscent",
+            "total_15_18_adolscent_girls",
+            "total_15_18_adolscent_boys",
+            "rc_rep/rc_boys_cal3",
+            "rc_rep/rc_girls_cal3",
+            "rc_rep/total3",
+            "submission/location_type",
+            "reporter/reporter_org",
+            "Settlement",
+            "submission/reporting_period",
+            "New_Camp_S",
+            "New_Camp_N",
+            "Upazila"
+          ],
+          "filter": [
+            "reporter/reporter_org",
+            "Upazila"
+          ],
+          "accepted-filter-values": [
+            "all",
+            "all"
+          ],
+          "filter-label": [
+            "Partner",
+            "Upazila"
+          ],
+          "filter-type": [
+            "stops",
+            "stops"
+          ]
+        },
+        "labels": {
+          "data": "data/180320_Outline_Rohingya_refugee_camps_sites_centroids.csv",
+          "label": "<b> {{total_15_18_adolscent}} </b>",
+          "join": [
+            "New_Camp_S",
+            "submission/rc_loc"
+          ],
+          "coordinates": [
+            "longitude",
+            "latitude"
+          ],
+          "minZoom": 4.5,
+          "height": 30,
+          "width": 30
+        },
+        "data-parse": {
+          "submission/rc_loc": {
+            "new-prop-name": "parsedUID",
+            "key": {
+              "CXB-201": "Camp 1E",
+              "CXB-202": "Camp 1W",
+              "CXB-203": "Camp 2E",
+              "CXB-204": "Camp 2W",
+              "CXB-205": "Camp 3",
+              "CXB-206": "Camp 4",
+              "CXB-232": "Camp 4 Extension",
+              "CXB-209": "Camp 5",
+              "CXB-208": "Camp 6",
+              "CXB-207": "Camp 7",
+              "CXB-210": "Camp 8E",
+              "CXB-211": "Camp 8W",
+              "CXB-213": "Camp 9",
+              "CXB-214": "Camp 10",
+              "CXB-217": "Camp 11",
+              "CXB-218": "Camp 12",
+              "CXB-220": "Camp 13 (Thangkhali-Burmapara)",
+              "CXB-222": "Camp 14 (Hakimapara)",
+              "CXB-223": "Camp 15 (Jamtoli)",
+              "CXB-224": "Camp 16 (Bagghona-Putibonia)",
+              "CXB-212": "Camp 17",
+              "CXB-215": "Camp 18",
+              "CXB-219": "Camp 19",
+              "CXB-216": "Camp 20",
+              "CXB-234": "Camp 20 Extension",
+              "CXB-108": "Camp 21 (Chakmarkul)",
+              "CXB-085": "C￼￼￼amp 22 (Unchiprang)",
+              "CXB-032": "C￼￼￼amp 23 (Shamlapur)",
+              "CXB-233": "C￼￼￼amp 24 (Leda)",
+              "CXB-017": "C￼￼￼amp 25 (Alikhali)",
+              "CXB-025": "C￼￼￼amp 26 (Nayapara)",
+              "CXB-037": "Camp 27 (Jadimura)",
+              "CXB-221": "Kutupalong RC",
+              "CXB-089": "Nayapara RC"
+            }
+          },
+          "submission/reporting_period": {
+            "type": "single",
+            "key": {
+              "t_A17-F18": "August 2017 to February 2018",
+              "t_jan": "January 1 to January 31",
+              "t_feb": "February 1 to February 28",
+              "t_1": "March 1 to March 20",
+              "t_2": "March 21 to April 3",
+              "t_3": "April 4 to April 17",
+              "t_4": "April 18 to May 1",
+              "t_5": "May 2 to May 15",
+              "t_6": "May 16 to May 29",
+              "t_7": "May 30 to June 12",
+              "t_8": "June 13 to June 26",
+              "t_9": "June 27 to July 10",
+              "t_10": "July 11 to July 24",
+              "t_11": "July 26 to August 8",
+              "t_12": "August 9 to August 22",
+              "t_13": "August 23 to September 5",
+              "t_14": "September 6 to September 19",
+              "t_15": "September 20 to October 3",
+              "t_16": "October 4 to October 17",
+              "t_17": "October 18 to October 31",
+              "t_18": "November 1 to November 14",
+              "t_19": "November 15 to November 28",
+              "t_20": "November 29 to December 12",
+              "t_21": "December 13 to December 31"
+            }
+          }
+        },
+        "detail-view": {
+          "UID": "SSID",
+          "title": {
+            "prop": "Site_name"
+          },
+          "sub-title": {
+            "prop": "New_Camp_N"
+          },
+          "basic-info": [
+            {
+              "value": "New_Camp_S",
+              "icon": "map-marker",
+              "alt": "Location ID"
+            },
+            {
+              "value": "Settlement",
+              "icon": "home",
+              "alt": "Settlement Type"
+            },
+            {
+              "value": {
+                "prop": [
+                  "longitude",
+                  "latitude"
+                ],
+                "join": ", "
+              },
+              "icon": "screenshot",
+              "alt": "GPS coordinates"
+            },
+            {
+              "value": "reporter/reporter_org",
+              "icon": "user",
+              "alt": "Reporter Org"
+            }
+          ]
+        },
+        "rohingyaIndicators": {
+          "location_type": "submission/location_type",
+          "rc_boys": "rc_rep/rc_boys_cal3",
+          "rc_girls": "rc_rep/rc_girls_cal3",
+          "rc_total": "rc_rep/total3"
+        },
+        "popup": {
+          "header": "parsedUID",
+          "body": "<p style=text-align:left;> <b>Girls:</b> {{total_15_18_adolscent_girls}} <br> <b>Boys:</b> {{total_15_18_adolscent_boys}}<span style=float:right;>"
+        },
+        "visible": false,
+        "credit": "Adolescents (15-18 years) enrolled in non-formal/formal education.",
+        "category": "Education",
+        "id": "Education-adolescents-15-to-18",
+        "loaded": true
+      }
+}

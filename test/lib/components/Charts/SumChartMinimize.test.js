@@ -3,7 +3,6 @@ import SumChartMinimize  from '../../../../src/lib/components/Charts/SumChartMin
 import { mount } from 'enzyme';
 import toJson from 'enzyme-to-json';
 import configureStore from 'redux-mock-store';
-import { Provider } from "react-redux";
 
 const toggleChart = jest.fn();
 

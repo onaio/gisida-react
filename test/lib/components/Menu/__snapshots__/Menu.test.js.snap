@@ -1,7 +1,140 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Menu Menu component renders correctly 1`] = `
-<div>
-  <div />
-</div>
+<Connect(Menu)
+  appConfig={
+    Object {
+      "appColor": "#aaa",
+      "appIcon": "test.jpg",
+      "appName": "test app",
+      "appNameDesc": "This is a test app",
+    }
+  }
+  categories={
+    Array [
+      Object {
+        "cat1": "test",
+      },
+    ]
+  }
+  isSplitScreen={true}
+  mapId="map-1"
+  menuId="menu-1"
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+  toggleSingleScreen={[MockFunction]}
+  toggleSplitScreen={[MockFunction]}
+>
+  <Menu
+    LAYERS={
+      Object {
+        "groups": Object {},
+      }
+    }
+    appConfig={
+      Object {
+        "appColor": "#aaa",
+        "appIcon": "test.jpg",
+        "appName": "test app",
+        "appNameDesc": "This is a test app",
+      }
+    }
+    currentRegion=""
+    dispatch={[Function]}
+    isSplitScreen={true}
+    loaded={true}
+    mapId="map-1"
+    mapTargetId=""
+    menuId="sector-menu-1"
+    preparedLayers={Object {}}
+    store={
+      Object {
+        "clearActions": [Function],
+        "dispatch": [Function],
+        "getActions": [Function],
+        "getState": [Function],
+        "replaceReducer": [Function],
+        "subscribe": [Function],
+      }
+    }
+    storeSubscription={
+      Subscription {
+        "listeners": Object {
+          "clear": [Function],
+          "get": [Function],
+          "notify": [Function],
+          "subscribe": [Function],
+        },
+        "onStateChange": [Function],
+        "parentSub": undefined,
+        "store": Object {
+          "clearActions": [Function],
+          "dispatch": [Function],
+          "getActions": [Function],
+          "getState": [Function],
+          "replaceReducer": [Function],
+          "subscribe": [Function],
+        },
+        "unsubscribe": [Function],
+      }
+    }
+    toggleSingleScreen={[MockFunction]}
+    toggleSplitScreen={[MockFunction]}
+  >
+    <div>
+      <div>
+        <div
+          className="menu-wrapper top"
+          id="map-1-menu-wrapper"
+        >
+          <a
+            className="open-btn"
+            onClick={[Function]}
+            style={
+              Object {
+                "display": "block",
+              }
+            }
+          >
+            <span
+              className="glyphicon glyphicon-menu-hamburger"
+            />
+          </a>
+          <div
+            className="sectors-menu"
+            id="map-1-menu"
+            style={
+              Object {
+                "display": "none",
+              }
+            }
+          >
+            <a
+              className="close-btn"
+              onClick={[Function]}
+            >
+              <span
+                className="glyphicon glyphicon-remove"
+              />
+            </a>
+            <ul
+              className="sectors"
+            >
+              <li />
+              <li />
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Menu>
+</Connect(Menu)>
 `;

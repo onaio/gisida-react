@@ -1,10 +1,19 @@
 import React from 'react';
-import { Spinner }  from '../../../../src/lib/components/Spinner/Spinner.js'
-import { shallow } from 'enzyme';
+import Spinner  from '../../../../src/lib/components/Spinner/Spinner.js'
+import { mount } from 'enzyme';
 import toJson from 'enzyme-to-json';
+import configureStore from 'redux-mock-store';
 
-const componentWrapper = shallow(
+const initialState = {
+	"map-1": {blockLoad: false, showSpinner: true}
+}
+
+const mockStore = configureStore()
+const store = mockStore(initialState);
+
+const componentWrapper = mount(
 	<Spinner 
+		store={store}
 		mapId='map-1'
 		MAP={{}}
 	/>

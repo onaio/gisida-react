@@ -1,13 +1,70 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Spinner Spinner component renders correctly 1`] = `
-<div
-  className="spinner"
-  id="spinner-map-1"
-  style={
+<Connect(Spinner)
+  MAP={Object {}}
+  mapId="map-1"
+  store={
     Object {
-      "display": "none",
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
     }
   }
-/>
+>
+  <Spinner
+    MAP={
+      Object {
+        "blockLoad": false,
+        "showSpinner": true,
+      }
+    }
+    dispatch={[Function]}
+    mapId="map-1"
+    store={
+      Object {
+        "clearActions": [Function],
+        "dispatch": [Function],
+        "getActions": [Function],
+        "getState": [Function],
+        "replaceReducer": [Function],
+        "subscribe": [Function],
+      }
+    }
+    storeSubscription={
+      Subscription {
+        "listeners": Object {
+          "clear": [Function],
+          "get": [Function],
+          "notify": [Function],
+          "subscribe": [Function],
+        },
+        "onStateChange": [Function],
+        "parentSub": undefined,
+        "store": Object {
+          "clearActions": [Function],
+          "dispatch": [Function],
+          "getActions": [Function],
+          "getState": [Function],
+          "replaceReducer": [Function],
+          "subscribe": [Function],
+        },
+        "unsubscribe": [Function],
+      }
+    }
+  >
+    <div
+      className="spinner"
+      id="spinner-map-1"
+      style={
+        Object {
+          "display": "block",
+        }
+      }
+    />
+  </Spinner>
+</Connect(Spinner)>
 `;
