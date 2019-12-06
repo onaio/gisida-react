@@ -1,6 +1,6 @@
 import React from 'react';
 import { Export } from '../../../../src/lib/components/Export/Export';
-import { shallow } from 'enzyme';
+import { mount } from 'enzyme';
 import toJson from 'enzyme-to-json';
 
 describe('Export', () => {
@@ -24,7 +24,7 @@ describe('Export', () => {
       "zoom": 10,
       "preserveDrawingBuffer": true
   };
-  const componentWrapper = shallow(
+  const componentWrapper = mount(
     <Export
       mapId='map-1'
       map={{}}

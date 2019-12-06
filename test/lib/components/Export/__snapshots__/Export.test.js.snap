@@ -1,3 +1,30 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Export component renderes correctly 1`] = `""`;
+exports[`Export component renderes correctly 1`] = `
+<Export
+  config={
+    Object {
+      "center": Array [
+        0,
+        0,
+      ],
+      "container": "map-1",
+      "mapBounds": Array [
+        Object {
+          "lat": -1,
+          "lng": 40,
+        },
+        Object {
+          "lat": 12,
+          "lng": 51,
+        },
+      ],
+      "preserveDrawingBuffer": true,
+      "style": "mapbox://teststyle",
+      "zoom": 10,
+    }
+  }
+  map={Object {}}
+  mapId="map-1"
+/>
+`;

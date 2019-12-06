@@ -106,8 +106,7 @@ export class Menu extends Component {
   }
 
   render() {
-    const mapId = this.props.mapId;
-    const categories = this.props.categories;
+    const {categories, mapId, regions, currentRegion, preparedLayers, childrenPosition } = this.props;
 
     const {disableDefault } = this.props;
     if (disableDefault) return this.props.children || null;
@@ -116,9 +115,7 @@ export class Menu extends Component {
       return React.cloneElement(child, { mapId });
     })
 
-    const { regions, currentRegion, preparedLayers, childrenPosition } = this.props;
     const childrenPositionClass = childrenPosition || 'top';
-
     return (
       <div>
           <div>

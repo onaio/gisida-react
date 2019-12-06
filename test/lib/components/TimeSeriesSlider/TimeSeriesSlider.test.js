@@ -30,4 +30,8 @@ describe('TimeSeriesSlider', () => {
 		const json = toJson(componentWrapper)
 		expect(json).toMatchSnapshot();
 	})
+
+	it('should handle input change', () => {
+		// console.log(componentWrapper.find('input').length)
+	})
 });
