@@ -1,0 +1,21 @@
+{
+    "mapConfig": {
+      "container": "map-1",
+      "style": "mapbox://styles/ona/cj50x94t60tlf2rn6r4axcsqz",
+      "center": [
+        92.1,
+        21.15
+      ],
+      "zoom": 11.5
+    },
+    "accessToken": "pk.eyJ1Ijoib",
+    "appName": "Test App",
+    "loaded": true,
+    "apiAccessToken": "ed7237b96",
+    "appIcon": "",
+    "appColor": "#0099ff",
+    "appNameDesc": "Rohingya Realtime Monitoring",
+    "password": [
+      "unicefroh"
+    ]
+  }

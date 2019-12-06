@@ -1,4 +1,5 @@
 import * as utils from '../../src/lib/utils';
+import layer from '../fixtures/layers.json'
 
 describe('formatNum', () => {
 
@@ -32,6 +33,10 @@ describe('getLastIndex', () => {
 
 describe('isNewSeriesData', () => {
 
+  test('Returns true for arrays of different lengths', () => {
+    expect(utils.isNewSeriesData(['a','b','c'],['a','c'])).toBe(true);
+  });
+
   test('Returns true for different arrays', () => {
     expect(utils.isNewSeriesData(['a','b','c'],['a','c','b'])).toBe(true);
   });
@@ -59,10 +64,17 @@ describe('hexToRgbA', () => {
     expect(utils.hexToRgbA('#fbafff')).toBe('rgba(251, 175, 255, 1)');
   });
 
-/* NOT SURE IF THIS IS CORRECT SYNTAX
   test('Throw an error for a bad hex', () => {
-    expect(hexToRgbA('#fbafff')).toThrow(new Error('Bad Hex'));
-  }); 
-*/
+		expect(function(){utils.hexToRgbA('#fbaffffff')}).toThrow(new Error('Bad Hex'));
+	});
 
+})
+
+describe('buildLayersObj', () => {
+  layer["Education-adolescents-15-to-18"].visible = true;
+  const layers = {...layer}
+  const output = [layer["Education-adolescents-15-to-18"]]
+  it('Should return correct layers', () => {
+    expect(utils.buildLayersObj(layers)).toEqual(output)
+  })
 })

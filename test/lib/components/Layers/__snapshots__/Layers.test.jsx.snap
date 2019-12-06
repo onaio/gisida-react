@@ -4,28 +4,185 @@ exports[`Layers component renders correctly 1`] = `
 <ul
   className="layers"
 >
-  <Connect(Layer)
-    key="sample-layer"
-    layer={
-      Object {
-        "category": "Boundaries and Place Labels",
-        "id": "sample-layer",
-        "label": "Boundaries",
-        "paint": Object {
-          "line-color": "#444",
-          "line-opacity": 0.6,
-          "line-width": 1,
-        },
-        "source": Object {
-          "layer": "som_adm_2-0j5bly",
-          "type": "vector",
-          "url": "mapbox://ona.6gl2shzi",
-        },
-        "type": "line",
-        "visible": true,
-      }
-    }
-    mapId="map-1"
-  />
+  <li>
+    <a
+      className="sub-category"
+      key="label-0-link"
+      onClick={[Function]}
+    >
+      label
+      <span
+        className="category glyphicon glyphicon-chevron-right"
+      />
+    </a>
+  </li>
+  <li>
+    <a
+      className="sub-category"
+      key="source-1-link"
+      onClick={[Function]}
+    >
+      source
+      <span
+        className="category glyphicon glyphicon-chevron-right"
+      />
+    </a>
+  </li>
+  <li>
+    <a
+      className="sub-category"
+      key="type-2-link"
+      onClick={[Function]}
+    >
+      type
+      <span
+        className="category glyphicon glyphicon-chevron-right"
+      />
+    </a>
+  </li>
+  <li>
+    <a
+      className="sub-category"
+      key="property-3-link"
+      onClick={[Function]}
+    >
+      property
+      <span
+        className="category glyphicon glyphicon-chevron-right"
+      />
+    </a>
+  </li>
+  <li>
+    <a
+      className="sub-category"
+      key="categories-4-link"
+      onClick={[Function]}
+    >
+      categories
+      <span
+        className="category glyphicon glyphicon-chevron-right"
+      />
+    </a>
+  </li>
+  <li>
+    <a
+      className="sub-category"
+      key="aggregate-5-link"
+      onClick={[Function]}
+    >
+      aggregate
+      <span
+        className="category glyphicon glyphicon-chevron-right"
+      />
+    </a>
+  </li>
+  <li>
+    <a
+      className="sub-category"
+      key="labels-6-link"
+      onClick={[Function]}
+    >
+      labels
+      <span
+        className="category glyphicon glyphicon-chevron-right"
+      />
+    </a>
+  </li>
+  <li>
+    <a
+      className="sub-category"
+      key="data-parse-7-link"
+      onClick={[Function]}
+    >
+      data-parse
+      <span
+        className="category glyphicon glyphicon-chevron-right"
+      />
+    </a>
+  </li>
+  <li>
+    <a
+      className="sub-category"
+      key="detail-view-8-link"
+      onClick={[Function]}
+    >
+      detail-view
+      <span
+        className="category glyphicon glyphicon-chevron-right"
+      />
+    </a>
+  </li>
+  <li>
+    <a
+      className="sub-category"
+      key="rohingyaIndicators-9-link"
+      onClick={[Function]}
+    >
+      rohingyaIndicators
+      <span
+        className="category glyphicon glyphicon-chevron-right"
+      />
+    </a>
+  </li>
+  <li>
+    <a
+      className="sub-category"
+      key="popup-10-link"
+      onClick={[Function]}
+    >
+      popup
+      <span
+        className="category glyphicon glyphicon-chevron-right"
+      />
+    </a>
+  </li>
+  <li>
+    <a
+      className="sub-category"
+      key="visible-11-link"
+      onClick={[Function]}
+    >
+      visible
+      <span
+        className="category glyphicon glyphicon-chevron-right"
+      />
+    </a>
+  </li>
+  <li>
+    <a
+      className="sub-category"
+      key="credit-12-link"
+      onClick={[Function]}
+    >
+      credit
+      <span
+        className="category glyphicon glyphicon-chevron-right"
+      />
+    </a>
+  </li>
+  <li>
+    <a
+      className="sub-category"
+      key="category-13-link"
+      onClick={[Function]}
+    >
+      category
+      <span
+        className="category glyphicon glyphicon-chevron-right"
+      />
+    </a>
+  </li>
+  <li>
+    <a
+      className="sub-category"
+      key="loaded-14-link"
+      onClick={[Function]}
+    >
+      loaded
+      <span
+        className="category glyphicon glyphicon-chevron-right"
+      />
+    </a>
+  </li>
 </ul>
 `;
