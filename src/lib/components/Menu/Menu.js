@@ -105,7 +105,7 @@ class Menu extends Component {
   };
 
   componentDidUpdate(prevProps) {
-    if (this.props.showMap !== prevProps.showMap && this.props.menuScroll) {
+    if (this.props.showMap && this.props.showMap !== prevProps.showMap && this.props.menuScroll) {
       this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop
     }
   }
