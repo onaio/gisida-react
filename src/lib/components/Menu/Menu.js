@@ -7,7 +7,7 @@ import './Menu.scss';
 
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {} };
-  const { LAYERS, AUTH } = state;
+  const { LAYERS, AUTH, VIEW } = state;
   let categories;
   // let layers;
 
@@ -80,6 +80,7 @@ const mapStateToProps = (state, ownProps) => {
     openCategories: MAP.openCategories,
     layerItem: ownProps.layerItem,
     menuScroll: MAP.menuScroll,
+    showMap: VIEW.showMap
   };
 };
 
@@ -103,6 +104,12 @@ class Menu extends Component {
     this.props.dispatch(Actions.setMenuScroll(this.props.mapId, element.scrollTop));
   };
 
+  componentDidUpdate(prevProps) {
+    if (this.props.showMap !== prevProps.showMap && this.props.menuScroll) {
+      this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop
+    }
+  }
+
   onToggleMenu = e => {
     e.preventDefault();
     const { dispatch } = this.props;
@@ -124,11 +131,6 @@ class Menu extends Component {
   render() {
     const mapId = this.props.mapId;
     const categories = this.props.categories;
-    
-    if (this.props.menuIsOpen && this.menuWrapper && this.menuWrapper.current && this.props.menuScroll) {
-      this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop;
-    }
-
     const { disableDefault } = this.props;
     if (disableDefault) return this.props.children || null;
 
