@@ -1,3 +1,63 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`FilterSelector FilterSelector component renders correctly 1`] = `""`;
+exports[`FilterSelector FilterSelector component renders correctly 1`] = `
+<Connect(FilterSelector)
+  filter={Object {}}
+  filterKey=""
+  onFilterOptionClick={[MockFunction]}
+  onToggleAllOptions={[MockFunction]}
+  searchFilterOptions={[MockFunction]}
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+  toggleAllOn={false}
+>
+  <FilterSelector
+    dispatch={[Function]}
+    filter={Object {}}
+    filterKey=""
+    onFilterOptionClick={[MockFunction]}
+    onToggleAllOptions={[MockFunction]}
+    searchFilterOptions={[MockFunction]}
+    store={
+      Object {
+        "clearActions": [Function],
+        "dispatch": [Function],
+        "getActions": [Function],
+        "getState": [Function],
+        "replaceReducer": [Function],
+        "subscribe": [Function],
+      }
+    }
+    storeSubscription={
+      Subscription {
+        "listeners": Object {
+          "clear": [Function],
+          "get": [Function],
+          "notify": [Function],
+          "subscribe": [Function],
+        },
+        "onStateChange": [Function],
+        "parentSub": undefined,
+        "store": Object {
+          "clearActions": [Function],
+          "dispatch": [Function],
+          "getActions": [Function],
+          "getState": [Function],
+          "replaceReducer": [Function],
+          "subscribe": [Function],
+        },
+        "unsubscribe": [Function],
+      }
+    }
+    toggleAllOn={false}
+  />
+</Connect(FilterSelector)>
+`;

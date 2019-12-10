@@ -1,0 +1,18 @@
+{
+    "filter": {
+        "label": "Community",
+        "isFiltered": false,
+        "isOriginal": true,
+        "toggleAllOn": false,
+        "options": {
+          "Rohingya Community": {
+            "enabled": true,
+            "count": 3
+          }
+        },
+        "isOpen": true,
+        "dataType": "ordinal",
+        "doAdvFiltering": false,
+        "queries": []
+      }
+}

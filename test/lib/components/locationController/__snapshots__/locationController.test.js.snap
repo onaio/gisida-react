@@ -1,0 +1,121 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LocationController FilterSelector component renders correctly 1`] = `
+<Connect(LocationController)
+  dispatch={[MockFunction]}
+  mapId="map-1"
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [MockFunction],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <LocationController
+    dispatch={[MockFunction]}
+    mapId="map-1"
+    state={
+      Object {
+        "active": true,
+        "location": Object {},
+        "locations": Object {
+          "locA": Object {
+            "label": "test 1",
+          },
+          "locB": Object {
+            "label": "test 2",
+          },
+        },
+        "mapId": "map-1",
+      }
+    }
+    store={
+      Object {
+        "clearActions": [Function],
+        "dispatch": [MockFunction],
+        "getActions": [Function],
+        "getState": [Function],
+        "replaceReducer": [Function],
+        "subscribe": [Function],
+      }
+    }
+    storeSubscription={
+      Subscription {
+        "listeners": Object {
+          "clear": [Function],
+          "get": [Function],
+          "notify": [Function],
+          "subscribe": [Function],
+        },
+        "onStateChange": [Function],
+        "parentSub": undefined,
+        "store": Object {
+          "clearActions": [Function],
+          "dispatch": [MockFunction],
+          "getActions": [Function],
+          "getState": [Function],
+          "replaceReducer": [Function],
+          "subscribe": [Function],
+        },
+        "unsubscribe": [Function],
+      }
+    }
+  >
+    <section
+      className="location-controller"
+    >
+      <h4
+        className="loc-title"
+      >
+        Map Locations
+      </h4>
+      <ul
+        className="loc-list"
+      >
+        <li
+          className="loc-item"
+          key="0"
+        >
+          <a
+            alt="Center on test 1"
+            className="loc-link"
+            data-id="locA"
+            onClick={[Function]}
+            style={
+              Object {
+                "fontWeight": "normal",
+              }
+            }
+            title="Center on test 1"
+          >
+            test 1
+          </a>
+        </li>
+        <li
+          className="loc-item"
+          key="1"
+        >
+          <a
+            alt="Center on test 2"
+            className="loc-link"
+            data-id="locB"
+            onClick={[Function]}
+            style={
+              Object {
+                "fontWeight": "normal",
+              }
+            }
+            title="Center on test 2"
+          >
+            test 2
+          </a>
+        </li>
+      </ul>
+    </section>
+  </LocationController>
+</Connect(LocationController)>
+`;
