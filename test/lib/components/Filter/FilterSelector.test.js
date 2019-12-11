@@ -40,10 +40,8 @@ describe('FilterSelector', () => {
 	})
 
 	it('should call passed prop fuctions on call', () => {
-		// console.log(componentWrapper.find('input').length)
 		componentWrapper.find('input').at(1).simulate('change')
 		expect(onToggleAllOptions).toHaveBeenCalledTimes(1)
-		// expect(searchFilterOptions).toHaveBeenCalledTimes(1)
 
 		componentWrapper.find('input').at(2).simulate('change')
 		expect(onFilterOptionClick).toHaveBeenCalledTimes(1)
