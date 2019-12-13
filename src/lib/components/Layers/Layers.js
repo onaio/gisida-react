@@ -7,7 +7,6 @@ import { Actions } from 'gisida';
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId];
   const { mapId, layers, currentRegion, preparedLayers } = ownProps;
-  console.log(MAP.openGroups);
   return {
     openGroups: MAP.openGroups,
     mapId,
