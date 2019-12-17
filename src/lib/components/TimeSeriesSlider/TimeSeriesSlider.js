@@ -85,21 +85,19 @@ class TimeSeriesSlider extends React.Component {
       field
     } = sliderLayerObj.layerObj.aggregate.timeseries;
     sliderLayerObj.data = sliderLayerObj.periodData[sliderLayerObj.period[nextIndex]].data;
-    const activeStops = generateStops(sliderLayerObj, field, this.props.dispatch, nextIndex);
-
+    
     const {
       primaryLayer
     } = this.props;
     const activeLayer = layers.find(l => l.id === sliderLayerObj.layerId);
     if (activeLayer.type !== 'chart') {
+      const activeStops = generateStops(sliderLayerObj, field, this.props.dispatch, nextIndex);
       if (this.props.layers[primaryLayer].layers) {
         this.props.layers[primaryLayer].layers.map(i =>
           nextTimeseries[i].newBreaks = activeStops[3]);
         this.props.layers[primaryLayer].layers.map(i =>
           nextTimeseries[i].newColors = [...new Set(sliderLayerObj.colorStops[nextIndex].map(d =>
             d[1]))]);
-
-        this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, this.props.timeLayer));
       } else {
         nextTimeseries[sliderLayerObj.layerId].newBreaks = activeStops[3];
         nextTimeseries[sliderLayerObj.layerId].newColors = [...new Set(sliderLayerObj.colorStops[nextIndex].map(d => d[1]))];
@@ -109,7 +107,6 @@ class TimeSeriesSlider extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    
     if (nextProps.timeSeriesObj && nextProps.timeSeriesObj.periodData) {
       const { period, temporalIndex } = nextProps.timeSeriesObj;
       this.setState({
