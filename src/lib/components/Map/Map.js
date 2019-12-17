@@ -152,7 +152,7 @@ class Map extends Component {
           layers: activeLayers.filter(i => this.map.getLayer(i) !== undefined),
         });
         const feature = features.find(
-          f => f.layer.id === layerObj.id || layerObj.layers.includes(f.layer.id)
+          f => f.layer.id === layerObj.id || layerObj.layers && layerObj.layers.includes(f.layer.id)
         );
         if (!feature) {
           return false;
