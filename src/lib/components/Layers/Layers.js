@@ -31,14 +31,6 @@ export class Layers extends Component {
     let layerItem = [];
     const subLayerIds = [];
 
-    const ifPermissionDenied = () => {
-      return layers.length > 0 ? (
-        <p>You don't have permission to view this category</p>
-      ) : (
-        <p>No layers available</p>
-      );
-    };
-
     if (!preparedLayers) {
       return false;
     }
@@ -131,7 +123,7 @@ export class Layers extends Component {
       return null;
     });
 
-    return <ul className="layers">{layerItem.length > 0 ? layerItem : ifPermissionDenied()}</ul>;
+    return <ul className="layers">{layerItem}</ul>;
   }
 }
 

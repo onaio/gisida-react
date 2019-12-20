@@ -80,7 +80,7 @@ const mapStateToProps = (state, ownProps) => {
     openCategories: MAP.openCategories,
     layerItem: ownProps.layerItem,
     menuScroll: MAP.menuScroll,
-    showMap: VIEW.showMap
+    showMap: VIEW.showMap,
   };
 };
 
@@ -106,7 +106,7 @@ class Menu extends Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.showMap && this.props.showMap !== prevProps.showMap && this.props.menuScroll) {
-      this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop
+      this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop;
     }
   }
 
@@ -130,7 +130,38 @@ class Menu extends Component {
 
   render() {
     const mapId = this.props.mapId;
-    const categories = this.props.categories;
+    let categories = this.props.categories;
+
+    if (categories && this.props.AUTH) {
+      // Prevents the view from showing empty category if the user does,
+      // not have access to ALL layers under that category, hides the entire
+      // category instead. Excludes categories that have groups. Targets categores that have one level of children
+      const { userInfo, authConfigs } = this.props.AUTH;
+      const filteredCategories = categories.filter(category => {
+        const accesibleLayers = category.layers.filter(layer => {
+          if (!authConfigs || !authConfigs.LAYERS) {
+            return true;
+          }
+          // Make sure not to filter out category groups
+          if (!layer.id) {
+            return true;
+          }
+
+          let users = authConfigs.LAYERS[layer.id];
+
+          return (
+            (users && userInfo && users.includes(userInfo.username)) ||
+            (authConfigs.LAYERS &&
+              authConfigs.LAYERS.ALL &&
+              authConfigs.LAYERS.ALL.includes(userInfo.username))
+          );
+        });
+
+        return accesibleLayers.length > 0;
+      });
+      categories = filteredCategories;
+    }
+
     const { disableDefault } = this.props;
     if (disableDefault) return this.props.children || null;
 
