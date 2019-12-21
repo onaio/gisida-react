@@ -323,16 +323,6 @@ class Map extends Component {
     }
   }
 
-  componentDidMount() {
-    const { APP, MAP, mapId } = this.props;
-    if (APP && MAP && mapId) {
-      const { isRendered, accessToken, mapConfig } = APP;
-      if (!isRendered && (!isIE || mapboxgl.supported()) && !MAP.blockLoad) {
-        this.initMap(accessToken, { ...mapConfig, container: mapId }, mapId);
-      }
-    }
-  }
-
   componentWillReceiveProps(nextProps) {
     if (this.map) {
       try {
