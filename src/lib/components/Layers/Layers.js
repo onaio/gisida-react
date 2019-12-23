@@ -74,7 +74,14 @@ export class Layers extends Component {
             // split to remove .json part
             activeId = activeId.split('.')[0];
           }
-
+          // if (auth.isAuthenticated && (!authConfigs || !authConfigs.LAYERS)) {
+          //   layerItem.push((<Layer
+          //     key={layer.id}
+          //     mapId={mapId}
+          //     layer={layer}
+          //   />))
+          //   return true;
+          // }
           users = authConfigs.LAYERS[activeId]; // list of users with access to the layer
           // check if logged in user exists in the list of users
           // who have access to the layer
