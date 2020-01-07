@@ -128,37 +128,91 @@ class Menu extends Component {
     this.props.dispatch(Actions.changeRegion(region));
   };
 
+  /**
+   * Get the accessible group layers
+   * @param {*} layer - The layer group that may or may not have that nested layers
+   * @param {*} authConfigs - Authentication configaurations
+   * @param {*} userInfo - Auth user details
+   */
+  getAccessibleGroupLayers(layer, authConfigs, userInfo) {
+    let layerName = Object.keys(layer)[0];
+    let accesibleSubLayers = [];
+    let accesibleLayers = [];
+
+    if (!layer[layerName].layers) {
+      // If layer has has no sublayers then no need to check for permissions
+      accesibleLayers.push(layer);
+    }
+
+    layer[layerName].layers.forEach(subLayer => {
+      if (!subLayer.id) {
+        accesibleSubLayers = accesibleSubLayers.concat(
+          this.getAccessibleGroupLayers(subLayer, authConfigs, userInfo)
+        );
+      }
+
+      let subLayerUsers = authConfigs.LAYERS[subLayer.id];
+
+      if (
+        (subLayerUsers && subLayerUsers && subLayerUsers.includes(userInfo.username)) ||
+        (authConfigs.LAYERS &&
+          authConfigs.LAYERS.ALL &&
+          authConfigs.LAYERS.ALL.includes(userInfo.username))
+      ) {
+        accesibleSubLayers.push(subLayer);
+      }
+    });
+
+    if (accesibleSubLayers.length > 0) {
+      // Modify sublayers, only return those which user has access to
+      layer[layerName].layers = accesibleSubLayers;
+      accesibleLayers.push(layer);
+    }
+
+    return accesibleLayers;
+  }
+
   render() {
     const mapId = this.props.mapId;
     let categories = this.props.categories;
 
     if (categories && this.props.AUTH) {
-      // Prevents the view from showing empty category if the user does,
-      // not have access to ALL layers under that category, hides the entire
-      // category instead. Excludes categories that have groups. Targets categores that have one level of children
       const { userInfo, authConfigs } = this.props.AUTH;
-      const filteredCategories = categories.filter(category => {
-        const accesibleLayers = category.layers.filter(layer => {
+      const filteredCategories = [];
+
+      categories.forEach(category => {
+        let accesibleLayers = [];
+
+        category.layers.forEach(layer => {
           if (!authConfigs || !authConfigs.LAYERS) {
-            return true;
-          }
-          // Make sure not to filter out category groups
-          if (!layer.id) {
-            return true;
-          }
+            // If auth exists but authconfigs have not loaded. Bug should be fixed from ONA data and gisida core
+            accesibleLayers.push(layer);
+          } else if (!layer.id) {
+            accesibleLayers = accesibleLayers.concat(
+              this.getAccessibleGroupLayers(layer, authConfigs, userInfo)
+            );
+          } else {
+            // Level one layer. Check for permission
+            let users = authConfigs.LAYERS[layer.id];
 
-          let users = authConfigs.LAYERS[layer.id];
-
-          return (
-            (users && userInfo && users.includes(userInfo.username)) ||
-            (authConfigs.LAYERS &&
-              authConfigs.LAYERS.ALL &&
-              authConfigs.LAYERS.ALL.includes(userInfo.username))
-          );
+            if (
+              (users && userInfo && users.includes(userInfo.username)) ||
+              (authConfigs.LAYERS &&
+                authConfigs.LAYERS.ALL &&
+                authConfigs.LAYERS.ALL.includes(userInfo.username))
+            ) {
+              accesibleLayers.push(layer);
+            }
+          }
         });
 
-        return accesibleLayers.length > 0;
+        if (accesibleLayers.length > 0) {
+          // Modify category layers with the new updated layers
+          category.layers = accesibleLayers;
+          filteredCategories.push(category);
+        }
       });
+
       categories = filteredCategories;
     }
 
