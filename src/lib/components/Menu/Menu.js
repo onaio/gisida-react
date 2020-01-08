@@ -134,7 +134,8 @@ class Menu extends Component {
    * @param {*} userInfo - User details
    */
   canAccessLayer(layer, authConfigs, userInfo) {
-    let users = authConfigs.LAYERS[layer.id];
+    const users = authConfigs.LAYERS[layer.id];
+
     return (
       (users && userInfo && users.includes(userInfo.username)) ||
       (authConfigs.LAYERS &&
@@ -152,10 +153,10 @@ class Menu extends Component {
    */
   getAccessibleGroupLayer(layer, authConfigs, userInfo) {
     const keys = Object.keys(layer);
-    let accessibleKeys = [];
+    const accessibleKeys = [];
 
     keys.forEach(key => {
-      let accessibleKeySubLayers = [];
+      const accessibleKeySubLayers = [];
 
       layer[key].layers.forEach(subLayer => {
         if (!subLayer.id) {
@@ -164,10 +165,10 @@ class Menu extends Component {
           if (groupLayer) {
             accessibleKeySubLayers.push(groupLayer);
           }
-        }
-
-        if (this.canAccessLayer(subLayer, authConfigs, userInfo)) {
-          accessibleKeySubLayers.push(subLayer);
+        } else {
+          if (this.canAccessLayer(subLayer, authConfigs, userInfo)) {
+            accessibleKeySubLayers.push(subLayer);
+          }
         }
       });
 
