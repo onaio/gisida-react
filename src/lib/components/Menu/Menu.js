@@ -129,47 +129,68 @@ class Menu extends Component {
   };
 
   /**
-   * Get the accessible group layers
-   * @param {*} layer - The layer group that may or may not have that nested layers
+   * Check if a user has permission to access layer
+   * @param {*} authConfigs - Authentication configurations
+   * @param {*} userInfo - User details
+   */
+  canAccessLayer(layer, authConfigs, userInfo) {
+    let users = authConfigs.LAYERS[layer.id];
+    return (
+      (users && userInfo && users.includes(userInfo.username)) ||
+      (authConfigs.LAYERS &&
+        authConfigs.LAYERS.ALL &&
+        authConfigs.LAYERS.ALL.includes(userInfo.username))
+    );
+  }
+
+  /**
+   * Return an accesible group layer. If the layer has no accessible children
+   * return false, else return the modified layer with the accessible children
+   * @param {*} layer - Group layer
    * @param {*} authConfigs - Authentication configaurations
    * @param {*} userInfo - Auth user details
    */
-  getAccessibleGroupLayers(layer, authConfigs, userInfo) {
-    let layerName = Object.keys(layer)[0];
-    let accesibleSubLayers = [];
-    let accesibleLayers = [];
+  getAccessibleGroupLayer(layer, authConfigs, userInfo) {
+    const keys = Object.keys(layer);
+    let accessibleKeys = [];
 
-    if (!layer[layerName].layers) {
-      // If layer has has no sublayers then no need to check for permissions
-      accesibleLayers.push(layer);
-    }
+    keys.forEach(key => {
+      let accessibleKeySubLayers = [];
 
-    layer[layerName].layers.forEach(subLayer => {
-      if (!subLayer.id) {
-        accesibleSubLayers = accesibleSubLayers.concat(
-          this.getAccessibleGroupLayers(subLayer, authConfigs, userInfo)
-        );
-      }
+      layer[key].layers.forEach(subLayer => {
+        if (!subLayer.id) {
+          let groupLayer = this.getAccessibleGroupLayer(subLayer, authConfigs, userInfo);
 
-      let subLayerUsers = authConfigs.LAYERS[subLayer.id];
+          if (groupLayer) {
+            accessibleKeySubLayers.push(groupLayer);
+          }
+        }
 
-      if (
-        (subLayerUsers && subLayerUsers && subLayerUsers.includes(userInfo.username)) ||
-        (authConfigs.LAYERS &&
-          authConfigs.LAYERS.ALL &&
-          authConfigs.LAYERS.ALL.includes(userInfo.username))
-      ) {
-        accesibleSubLayers.push(subLayer);
+        if (this.canAccessLayer(subLayer, authConfigs, userInfo)) {
+          accessibleKeySubLayers.push(subLayer);
+        }
+      });
+
+      if (accessibleKeySubLayers.length > 0) {
+        // Modify sublayers, only return those which user has access to
+        layer[key].layers = accessibleKeySubLayers;
+        accessibleKeys.push(key);
       }
     });
 
-    if (accesibleSubLayers.length > 0) {
-      // Modify sublayers, only return those which user has access to
-      layer[layerName].layers = accesibleSubLayers;
-      accesibleLayers.push(layer);
+    keys.forEach(key => {
+      if (!accessibleKeys.includes(key)) {
+        // Delete key if key is not in accessible keys
+        delete layer[key];
+      }
+    });
+
+    // Now get the final keys. If keys exist, return modified layer
+    if (Object.keys(layer).length > 0) {
+      return layer;
     }
 
-    return accesibleLayers;
+    return false;
   }
 
   render() {
@@ -188,19 +209,13 @@ class Menu extends Component {
             // If auth exists but authconfigs have not loaded. Bug should be fixed from ONA data and gisida core
             accesibleLayers.push(layer);
           } else if (!layer.id) {
-            accesibleLayers = accesibleLayers.concat(
-              this.getAccessibleGroupLayers(layer, authConfigs, userInfo)
-            );
-          } else {
-            // Level one layer. Check for permission
-            let users = authConfigs.LAYERS[layer.id];
+            let groupLayer = this.getAccessibleGroupLayer(layer, authConfigs, userInfo);
 
-            if (
-              (users && userInfo && users.includes(userInfo.username)) ||
-              (authConfigs.LAYERS &&
-                authConfigs.LAYERS.ALL &&
-                authConfigs.LAYERS.ALL.includes(userInfo.username))
-            ) {
+            if (groupLayer) {
+              accesibleLayers.push(groupLayer);
+            }
+          } else {
+            if (this.canAccessLayer(layer, authConfigs, userInfo)) {
               accesibleLayers.push(layer);
             }
           }
