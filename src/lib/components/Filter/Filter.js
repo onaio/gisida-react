@@ -8,7 +8,7 @@ import {
   clearFilterState,
   lngLat,
   mergeFilters,
-  buildFiltersMap
+  buildFilters
 } from 'gisida';
 import { buildLayersObj} from '../../utils';
 import FilterSelector from './FilterSelector';
@@ -155,11 +155,11 @@ export class Filter extends Component {
       (timeseriesObj.temporalIndex !== (this.props.timeseriesObj &&
         this.props.timeseriesObj.temporalIndex)) && !layerFilters &&
       !(filterState && filterState.doUpdate)) {
-      filters = buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters)
+      filters = buildFilters(filterOptions, layerFilters, this.state.prevFilters)
     } else {
       filters = (filterState && filterState.filters) ||
         (this.state.isFiltered && this.state.prevFilters) ||
-        buildFiltersMap(filterOptions, layerFilters, this.state.prevFilters)
+        buildFilters(filterOptions, layerFilters, this.state.prevFilters)
     }
 
     // determine whether to update the compnent state
@@ -266,7 +266,7 @@ export class Filter extends Component {
 
     const filterState = {
       filterOptions,
-      filters: buildFiltersMap(filterOptions),
+      filters: buildFilters(filterOptions),
       aggregate: {
         ...(oldLayerObj && oldLayerObj.aggregate)
       },
@@ -662,7 +662,7 @@ export class Filter extends Component {
       'data-parse': layerObj['data-parse'],
     };
     const newLayerOptions = generateFilterOptions(newLayerObj);
-    const filteredFilters = buildFiltersMap(newLayerOptions);
+    const filteredFilters = buildFilters(newLayerOptions);
     return mergeFilters(filters, filteredFilters, clickedFilterKey);
   }
 
@@ -754,7 +754,7 @@ export class Filter extends Component {
       nextFilters = this.state.isOr ? nextFilters : this.buildFilteredFilters(filterKey, nextFilters);
     } else if (isResetable) {
       const layerFilters = this.getLayerFilter(this.props.layerObj.id);
-      nextFilters = buildFiltersMap(filterOptions, layerFilters, nextFilters);
+      nextFilters = buildFilters(filterOptions, layerFilters, nextFilters);
     }
   
     return { isFiltered, nextFilters };
