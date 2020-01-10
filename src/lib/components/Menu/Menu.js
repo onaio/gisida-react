@@ -129,6 +129,59 @@ class Menu extends Component {
   };
 
   /**
+   * Modify a layer by giving its group and nested groups a count
+   * @param {Object} layer - A layer with groups
+   * @param {number} groupCounter - A group counter that will give each group a number
+   * @returns {Object} Modified layer and current group counter increment
+   */
+  insertGroupCount(layer, groupCounter) {
+    Object.keys(layer).forEach(key => {
+      layer[key].count = groupCounter;
+      groupCounter += 1;
+
+      layer[key].layers.forEach(keyLayer => {
+        if (!keyLayer.id) {
+          keyLayer = this.insertGroupCount(keyLayer, groupCounter);
+        }
+      });
+    });
+
+    return {
+      layer,
+      groupCounter,
+    };
+  }
+
+  /**
+   * Loop over the categories and modify data
+   * @param {array} categories Menu categories and their layers, basically all menu items
+   * @returns {array} Modified categories
+   */
+  parseCategories(categories) {
+    let groupCounter = 0;
+    categories.forEach(category => {
+      category.layers.forEach(layer => {
+        if (!layer.id) {
+          // This is a group. Give it and its nested groups a count
+          // This will make sure when we toggle a group, another group with the
+          // exact same name is not toggled. The array of open groups is stored as an
+          // array in the store. Another implementaion would to give each group an Id e.g a random no but
+          // this means different menu instances will have groups that have different Ids which we do not
+          // want (We would like menu instances under the same map ID to behave the same. If say I open a group in one
+          // menu, it should appear open the other ). A contigous int counter is
+          // therefore used to ensure the counter for a group in different menu
+          // instances is the same, and also, groups in the same menu instances do not share a count.
+          const obj = this.insertGroupCount(layer, groupCounter);
+          layer = obj.layer;
+          groupCounter = obj.groupCounter;
+        }
+      });
+    });
+
+    return categories;
+  }
+
+  /**
    * Check if a user has permission to access layer
    * @param {*} authConfigs - Authentication configurations
    * @param {*} userInfo - User details
@@ -194,15 +247,21 @@ class Menu extends Component {
     return false;
   }
 
-  render() {
-    const mapId = this.props.mapId;
-    let categories = this.props.categories;
+  /**
+   * Get which categories and their groups and nested groups user has
+   * permission to view
+   * @returns {array} Filtered categories
+   */
+  getAccessibleCategories() {
+    if (!this.props.AUTH) {
+      return this.props.categories;
+    }
+    const filteredCategories = [];
 
-    if (categories && this.props.AUTH) {
+    if (this.props.categories) {
       const { userInfo, authConfigs } = this.props.AUTH;
-      const filteredCategories = [];
 
-      categories.forEach(category => {
+      this.props.categories.forEach(category => {
         let accesibleLayers = [];
 
         category.layers.forEach(layer => {
@@ -228,8 +287,17 @@ class Menu extends Component {
           filteredCategories.push(category);
         }
       });
+    }
 
-      categories = filteredCategories;
+    return filteredCategories;
+  }
+
+  render() {
+    const mapId = this.props.mapId;
+    let categories = this.getAccessibleCategories();
+
+    if (categories) {
+      categories = this.parseCategories(categories);
     }
 
     const { disableDefault } = this.props;

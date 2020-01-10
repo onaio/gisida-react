@@ -7,6 +7,7 @@ import { Actions } from 'gisida';
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId];
   const { mapId, layers, currentRegion, preparedLayers } = ownProps;
+
   return {
     openGroups: MAP.openGroups,
     mapId,
@@ -17,11 +18,43 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 export class Layers extends Component {
-  toggleSubMenu(e, layer) {
+  /**
+   * Toggle open and close a menu group
+   * @param {Object} e Event
+   * @param {Object} layer Group to be toggled
+   * @param {numner} groupCount Group count
+   */
+  toggleSubMenu(e, layer, groupCount) {
     e.preventDefault();
     const { openGroups } = this.props;
-    const index = openGroups.indexOf(layer);
-    this.props.dispatch(Actions.toggleGroups(this.props.mapId, layer, index));
+    let index = -1;
+    let count = 0;
+    let found = false;
+
+    while (!found && count < openGroups.length) {
+      if (openGroups[count].count === groupCount && openGroups[count].group === layer) {
+        index = count;
+        found = true;
+      }
+
+      count += 1;
+    }
+
+    this.props.dispatch(Actions.toggleGroups(this.props.mapId, layer, index, false, groupCount));
+  }
+
+  /**
+   * Get the group open state
+   * @param {number} groupCount Group count
+   * @param {string} groupName Group name
+   * @returns {boolean} Whether the group is open or not
+   */
+  isGroupOpen(groupCount, groupName) {
+    return (
+      this.props.openGroups &&
+      this.props.openGroups.filter(group => group.count === groupCount && group.group === groupName)
+        .length
+    );
   }
 
   render() {
@@ -93,17 +126,17 @@ export class Layers extends Component {
                 <a
                   key={`${d}-${i}-link`}
                   className="sub-category"
-                  onClick={e => this.toggleSubMenu(e, d)}
+                  onClick={e => this.toggleSubMenu(e, d, layer[d].count)}
                 >
                   {d}
                   <span
                     className={`category glyphicon glyphicon-chevron-${
-                      this.props.openGroups && this.props.openGroups.includes(d) ? 'down' : 'right'
+                      this.isGroupOpen(layer[d].count, d) ? 'down' : 'right'
                     }`}
                   />
                 </a>
               </li>,
-              this.props.openGroups && this.props.openGroups.includes(d) ? (
+              this.isGroupOpen(layer[d].count, d) ? (
                 <Layers
                   openGroups={this.props.openGroups}
                   dispatch={this.props.dispatch}
