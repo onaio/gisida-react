@@ -102,7 +102,9 @@ class PieChart extends React.Component {
     } = nextProps;
 
     if (isNewSeriesData(this.state.series[0].data, seriesData)) {
-      this.chart.destroy();
+      if (this.chart) {
+        this.chart.destroy();
+      }
 
       this.setState({
         chart: Object.assign({}, this.state.chart, {
@@ -125,7 +127,9 @@ class PieChart extends React.Component {
   }
 
   componentWillUnmount() {
-    this.chart.destroy();
+    if (this.chart) {
+      this.chart.destroy();
+    }
   }
 
   render() {
@@ -135,7 +139,7 @@ class PieChart extends React.Component {
 
 PieChart.propTypes = {
   seriesName: PropTypes.string.isRequired,
-  seriesData: PropTypes.objectOf(PropTypes.any).isRequired,
+  seriesData: PropTypes.arrayOf(PropTypes.any).isRequired,
   seriesTitle: PropTypes.string.isRequired,
   chartWidth: PropTypes.number.isRequired,
   chartHeight: PropTypes.number.isRequired,
