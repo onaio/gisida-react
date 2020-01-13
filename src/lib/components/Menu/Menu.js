@@ -320,6 +320,7 @@ class Menu extends Component {
               ref={this.menuWrapper}
               id={`${mapId}-menu-wrapper`}
               className={`menu-wrapper ${childrenPositionClass}`}
+              style={{ marginTop: '-80px' }}
             >
               {/* Open button menu */}
               <a

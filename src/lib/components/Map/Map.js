@@ -522,14 +522,14 @@ class Map extends Component {
       this.handleLabelsOnMapZoom();
 
       if (this.props.VIEW.showMap && prevProps.VIEW.showMap !== this.props.VIEW.showMap) {
-        const { mapConfig } = this.props.APP
-  
+        const { mapConfig } = this.props.APP;
+
         this.map.jumpTo({
           center: {
             lng: mapConfig.center[0],
             lat: mapConfig.center[1],
-          }
-        })
+          },
+        });
       }
     }
 
@@ -924,6 +924,7 @@ class Map extends Component {
                 this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
                   ? 'none'
                   : 'inline',
+              top: '80px',
             }}
           >
             <div className="widgets">
