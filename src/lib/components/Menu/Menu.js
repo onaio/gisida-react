@@ -7,10 +7,10 @@ import './Menu.scss';
 
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {} };
-  const { LAYERS, AUTH } = state;
+  const { LAYERS, AUTH, APP } = state;
   let categories;
   // let layers;
-
+  const { NULL_LAYER_TEXT } = APP;
   if (Object.keys(LAYERS.groups).length) {
     const groupMapper = (layer) => {
       if (typeof layer === 'string') {
@@ -77,6 +77,7 @@ const mapStateToProps = (state, ownProps) => {
     preparedLayers: MAP.layers,
     menuIsOpen: MAP.menuIsOpen,
     openCategories: MAP.openCategories,
+    noLayerText: NULL_LAYER_TEXT
   };
 }
 
@@ -186,6 +187,7 @@ class Menu extends Component {
                                 currentRegion={currentRegion}
                                 preparedLayers={preparedLayers}
                                 auth={this.props.AUTH}
+                                noLayerText={this.props.noLayerText}
                               />
                               : <ul />}
                         </li>)) :

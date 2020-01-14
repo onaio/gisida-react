@@ -27,16 +27,15 @@ export class Layers extends Component {
   }
 
   render() {
-    const { mapId, layers, currentRegion, preparedLayers, auth } = this.props;
+    const { mapId, layers, currentRegion, preparedLayers, auth, noLayerText } = this.props;
     let layerKeys;
     let layerObj;
     let layerItem = [];
     const subLayerIds = [];
-
     const ifPermissionDenied = () => {
       return layers.length > 0 ? 
       (<p>You don't have permision to view this category</p>) :
-       (<p>No layers available</p>);
+       (<p>{noLayerText ? noLayerText : 'No layers available'}</p>);
     }
 
     if (!preparedLayers) {
@@ -74,6 +73,7 @@ export class Layers extends Component {
             // split to remove .json part
             activeId = activeId.split('.')[0];
           }
+          /** Evade Authenticating when authconfigs don't exist */
           // if (auth.isAuthenticated && (!authConfigs || !authConfigs.LAYERS)) {
           //   layerItem.push((<Layer
           //     key={layer.id}
@@ -120,6 +120,7 @@ export class Layers extends Component {
                     currentRegion={currentRegion}
                     preparedLayers={preparedLayers}
                     auth={this.props.auth}
+                    noLayerText={noLayerText}
                   />
               : null)
             ]);
