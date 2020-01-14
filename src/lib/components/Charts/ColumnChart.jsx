@@ -20,7 +20,6 @@ class ColumnChart extends React.Component {
       yAxis,
       yAxisLabel,
       pointFormatterFunc,
-      isPercent,
     } = this.props;
 
     this.state = {
@@ -32,17 +31,20 @@ class ColumnChart extends React.Component {
         spacingTop: 15,
         spacintRight: 10,
       },
-      xAxis:
-        typeof xAxis !== 'undefined'
-          ? xAxis || null
-          : {
-              categories,
-              labels: {
-                style: {
-                  fontSize: 9,
-                },
-              },
-            },
+      xAxis: {
+        categories,
+        crosshair: true
+      },
+        // typeof xAxis !== 'undefined'
+        //   ? xAxis || null
+        //   : {
+        //       categories,
+        //       labels: {
+        //         style: {
+        //           fontSize: 9,
+        //         },
+        //       },
+        //     },
       yAxis:
         typeof yAxis !== 'undefined'
           ? yAxis || null
@@ -104,17 +106,13 @@ class ColumnChart extends React.Component {
           },*/
         },
       },
-      series: [
-        {
-          name: seriesTitle,
-          data: seriesData,
-        },
-      ],
+      series: seriesData
     };
   }
 
   componentDidMount() {
     const self = this;
+    debugger;
     setTimeout(() => {
       self.chart = Highcharts.chart(self.chartEl, self.state);
     }, 300);
@@ -122,7 +120,7 @@ class ColumnChart extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const { seriesTitle, seriesData, chartHeight, chartWidth, categories, xAxis } = nextProps;
-
+    debugger;
     if (isNewSeriesData(this.state.series[0].data, seriesData)) {
       if (this.chart) {
         this.chart.destroy();
@@ -137,26 +135,18 @@ class ColumnChart extends React.Component {
           title: {
             text: seriesTitle || null,
           },
-          xAxis:
-            typeof xAxis !== 'undefined'
-              ? xAxis || null
-              : {
-                  categories,
-                  labels: {
-                    style: {
-                      fontSize: 9,
-                    },
-                  },
-                },
-          series: [
-            {
-              name: seriesTitle,
-              data: seriesData,
-              animation: {
-                duration: 0,
-              },
-            },
-          ],
+          xAxis: { categories },
+            // typeof xAxis !== 'undefined'
+            //   ? xAxis || null
+            //   : {
+            //       categories,
+            //       labels: {
+            //         style: {
+            //           fontSize: 9,
+            //         },
+            //       },
+            //     },
+          series: seriesData,
         },
         () => {
           this.chart = Highcharts.chart(this.chartEl, this.state);
@@ -172,6 +162,7 @@ class ColumnChart extends React.Component {
   }
 
   render() {
+    debugger;
     return (
       <div
         ref={el => {
