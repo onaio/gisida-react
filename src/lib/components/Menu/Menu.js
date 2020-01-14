@@ -81,6 +81,7 @@ const mapStateToProps = (state, ownProps) => {
     layerItem: ownProps.layerItem,
     menuScroll: MAP.menuScroll,
     showMap: VIEW.showMap,
+    hasNavbar: ownProps.hasNavbar,
   };
 };
 
@@ -309,6 +310,7 @@ class Menu extends Component {
 
     const { regions, currentRegion, preparedLayers, childrenPosition } = this.props;
     const childrenPositionClass = childrenPosition || 'top';
+    const marginTop = this.props.hasNavbar ? '-80px' : 0;
 
     return (
       <div>
@@ -320,7 +322,7 @@ class Menu extends Component {
               ref={this.menuWrapper}
               id={`${mapId}-menu-wrapper`}
               className={`menu-wrapper ${childrenPositionClass}`}
-              style={{ marginTop: '-80px' }}
+              style={{ marginTop }}
             >
               {/* Open button menu */}
               <a
