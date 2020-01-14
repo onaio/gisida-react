@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
 import { detectIE, buildLayersObj, detailViewData, orderLayers } from '../../utils';
 import './Map.scss';
@@ -42,6 +43,7 @@ const mapStateToProps = (state, ownProps) => {
     showFilterPanel: !!MAP.showFilterPanel,
     activeLayers,
     handlers: ownProps.handlers,
+    hasNavbar: ownProps.hasNavbar,
   };
 };
 
@@ -897,6 +899,7 @@ class Map extends Component {
         ? detailViewProps && typeof detailViewProps !== undefined
         : this.props.showDetailView;
     let mapWidth = '100%';
+    let mapheight = this.props.hasNavbar ? '92%' : '100%';
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
     }
@@ -920,6 +923,7 @@ class Map extends Component {
             }`}
             style={{
               width: mapWidth,
+              height: mapheight,
               display:
                 this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
                   ? 'none'
@@ -941,5 +945,9 @@ class Map extends Component {
     );
   }
 }
+
+Map.propTypes = {
+  hasNavbar: PropTypes.bool,
+};
 
 export default connect(mapStateToProps)(Map);
