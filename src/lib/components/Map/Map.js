@@ -900,6 +900,7 @@ class Map extends Component {
         : this.props.showDetailView;
     let mapWidth = '100%';
     let mapheight = this.props.hasNavbar ? '92%' : '100%';
+    let mapTop = this.props.hasNavbar ? '80px' : 0;
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
     }
@@ -928,7 +929,7 @@ class Map extends Component {
                 this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
                   ? 'none'
                   : 'inline',
-              top: '80px',
+              top: mapTop,
             }}
           >
             <div className="widgets">
