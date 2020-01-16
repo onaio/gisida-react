@@ -20,6 +20,8 @@ class ColumnChart extends React.Component {
       yAxis,
       yAxisLabel,
       pointFormatterFunc,
+      chartType,
+      doubleChart,
     } = this.props;
 
     this.state = {
@@ -28,24 +30,38 @@ class ColumnChart extends React.Component {
         height: chartHeight || null,
         width: chartWidth || null,
         backgroundColor: 'rgba(255,255,255,0)',
-        spacingTop: 15,
-        spacintRight: 10,
+        alignTicks: false,
+				left:0,
+				marginRight:2,
+				marginLeft:1,
+				marginTop:1,
+				marginBotton:20,
+				spacingBottom:8,
+				borderWidth: 0,
+				borderRadius:0
       },
-      xAxis: {
-        categories,
-        crosshair: true
-      },
-        // typeof xAxis !== 'undefined'
-        //   ? xAxis || null
-        //   : {
-        //       categories,
-        //       labels: {
-        //         style: {
-        //           fontSize: 9,
-        //         },
-        //       },
-        //     },
-      yAxis:
+      xAxis: (doubleChart === 'multibar' || chartType === 'multi') ? { 
+        lineWidth: 0,
+        minorGridLineWidth: 0,
+        lineColor: 'transparent',
+        categories,  
+        labels: {
+            enabled: true
+        },
+        minorTickLength: 0,
+        tickLength: 0
+       } :
+        typeof xAxis !== 'undefined'
+          ? xAxis || null
+          : {
+              categories,
+              labels: {
+                style: {
+                  fontSize: 9,
+                },
+              },
+            },
+      yAxis: (doubleChart === 'multibar' || chartType === 'multi') ? [{gridLineWidth: 0, visible: false}, ] :
         typeof yAxis !== 'undefined'
           ? yAxis || null
           : [
@@ -70,12 +86,13 @@ class ColumnChart extends React.Component {
       tooltip: {
         useHTML: true,
         shared: true,
-        headerFormat: '<b>{point.key}: </b>',
-        //pointFormat: '',
-        pointFormatter:
-          pointFormatterFunc ||
+        headerFormat: '<b>Range: </b> {point.key} <br/>',
+        pointFormat: chartType ? '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+        '<td style="padding:0"><b>{point.y:.1f}</b><br/></td></tr>' : null,
+        pointFormatter: chartType ? null : pointFormatterFunc ||
           function pointFormatterFunc() {
-            return `<span>${this.y.toLocaleString()}</span>`;
+            return  chartType ? `<tr><td style="color:${this.color};padding:0">${this.name}: </td>' +
+            '<td style="padding:0"><b>${this.y}</b></td></tr>` : `<span>${this.y.toLocaleString()}</span>`;
           },
         //shadow: false,
         //backgroundColor: 'transparent',
@@ -90,8 +107,9 @@ class ColumnChart extends React.Component {
       },
       plotOptions: {
         column: {
-          showInLegend: false,
-          pointPadding: 0.2,
+          showInLegend: true,
+          pointPadding: doubleChart ? 0 : 0.2,
+          groupPadding: 0,
           borderWidth: 0,
           /*tooltip: {
             distance: 0,
@@ -106,21 +124,27 @@ class ColumnChart extends React.Component {
           },*/
         },
       },
-      series: seriesData
+      series: chartType === 'multi' ? seriesData : 
+      [
+        {	
+          name: seriesTitle,	
+          data: seriesData,	
+        },	
+      ],
     };
   }
 
   componentDidMount() {
     const self = this;
-    debugger;
+    
     setTimeout(() => {
       self.chart = Highcharts.chart(self.chartEl, self.state);
     }, 300);
   }
 
   componentWillReceiveProps(nextProps) {
-    const { seriesTitle, seriesData, chartHeight, chartWidth, categories, xAxis } = nextProps;
-    debugger;
+    const { seriesTitle, seriesData, chartHeight, chartWidth, categories, xAxis, chartType, doubleChart } = nextProps;
+    
     if (isNewSeriesData(this.state.series[0].data, seriesData)) {
       if (this.chart) {
         this.chart.destroy();
@@ -135,7 +159,19 @@ class ColumnChart extends React.Component {
           title: {
             text: seriesTitle || null,
           },
-          xAxis: { categories },
+          xAxis: (chartType === 'multi' || doubleChart === 'multibar') ? { 
+            lineWidth: 0,
+            minorGridLineWidth: 0,
+            lineColor: 'transparent',
+            categories,    
+            labels: {
+                enabled: true
+            },
+            minorTickLength: 0,
+            tickLength: 0
+           } : {
+             categories
+           },
             // typeof xAxis !== 'undefined'
             //   ? xAxis || null
             //   : {
@@ -146,7 +182,13 @@ class ColumnChart extends React.Component {
             //         },
             //       },
             //     },
-          series: seriesData,
+          series: chartType === 'multi' ? seriesData : 
+          [
+            {	
+              name: seriesTitle,	
+              data: seriesData,	
+            },	
+          ],
         },
         () => {
           this.chart = Highcharts.chart(this.chartEl, this.state);
@@ -162,7 +204,6 @@ class ColumnChart extends React.Component {
   }
 
   render() {
-    debugger;
     return (
       <div
         ref={el => {
