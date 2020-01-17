@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import Highcharts from 'highcharts';
 import { isNewSeriesData } from './../../utils';
 
+const isNumber = (x) => !Number.isNaN(Number(x));
+
 class ColumnChart extends React.Component {
   static pointFormatterFunc() {
     return `<span>${this.y}%</span>`;
@@ -22,7 +24,13 @@ class ColumnChart extends React.Component {
       pointFormatterFunc,
       chartType,
       doubleChart,
+      chartSpacing,
+      chartMargin,
+      legendOptions,
     } = this.props;
+
+    const { spacingTop, spacingRight, spacingBottom, spacingLeft } = (chartSpacing || {});
+    const { marginTop, marginRight, marginBottom, marginLeft } = (chartMargin || {});
 
     this.state = {
       chart: {
@@ -31,14 +39,17 @@ class ColumnChart extends React.Component {
         width: chartWidth || null,
         backgroundColor: 'rgba(255,255,255,0)',
         alignTicks: false,
-				left:0,
-				marginRight:2,
-				marginLeft:1,
-				marginTop:1,
-				marginBotton:20,
-				spacingBottom:8,
-				borderWidth: 0,
-				borderRadius:0
+        left:0,
+        marginTop: isNumber(marginTop) ? marginTop : 1,
+        marginRight: isNumber(marginRight) ? marginRight : 2,
+        marginBottom: isNumber(marginBottom) ? marginBottom : 20,
+        marginLeft: isNumber(marginLeft) ? marginLeft : 1,
+        spacingTop: isNumber(spacingTop) ? spacingTop : 10,
+        spacingRight: isNumber(spacingRight) ? spacingRight : 10,
+        spacingBottom: isNumber(spacingBottom) ? spacingBottom : 8,
+        spacingLeft: isNumber(spacingLeft) ? spacingLeft : 10,
+        borderWidth: 0,
+        borderRadius:0
       },
       xAxis: (doubleChart === 'multibar' || chartType === 'multi') ? { 
         lineWidth: 0,
@@ -105,11 +116,14 @@ class ColumnChart extends React.Component {
       credits: {
         enabled: false,
       },
+      legend: legendOptions || {
+        enabled: true,
+      },
       plotOptions: {
         column: {
-          showInLegend: true,
-          pointPadding: doubleChart ? 0 : 0.2,
-          groupPadding: 0,
+          showInLegend: legendOptions && typeof legendOptions.enabled !== 'undefined' ? legendOptions.enabled : true,
+          pointPadding: doubleChart || chartType === 'multi' ? 0 : 0.2,
+          groupPadding: doubleChart || chartType === 'multi' ? 0.1 : 0,
           borderWidth: 0,
           /*tooltip: {
             distance: 0,
