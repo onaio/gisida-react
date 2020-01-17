@@ -27,6 +27,8 @@ class ColumnChart extends React.Component {
       chartSpacing,
       chartMargin,
       legendOptions,
+      series,
+      tooltip,
     } = this.props;
 
     const { spacingTop, spacingRight, spacingBottom, spacingLeft } = (chartSpacing || {});
@@ -94,7 +96,7 @@ class ColumnChart extends React.Component {
                },
             }, **/
             ],
-      tooltip: {
+      tooltip: tooltip || {
         useHTML: true,
         shared: true,
         headerFormat: '<b>Range: </b> {point.key} <br/>',
@@ -138,13 +140,13 @@ class ColumnChart extends React.Component {
           },*/
         },
       },
-      series: chartType === 'multi' ? seriesData : 
+      series: series || (chartType === 'multi' ? seriesData : 
       [
         {	
           name: seriesTitle,	
           data: seriesData,	
         },	
-      ],
+      ]),
     };
   }
 
@@ -157,9 +159,9 @@ class ColumnChart extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { seriesTitle, seriesData, chartHeight, chartWidth, categories, xAxis, chartType, doubleChart } = nextProps;
+    const { seriesTitle, seriesData, series, chartHeight, chartWidth, categories, xAxis, chartType, doubleChart } = nextProps;
     
-    if (isNewSeriesData(this.state.series[0].data, seriesData)) {
+    if (isNewSeriesData(this.state.series[0].data, (seriesData || series[0].data))) {
       if (this.chart) {
         this.chart.destroy();
       }
@@ -183,7 +185,7 @@ class ColumnChart extends React.Component {
             },
             minorTickLength: 0,
             tickLength: 0
-           } : {
+           } : typeof xAxis !== 'undefined' ? xAxis || null : {
              categories
            },
             // typeof xAxis !== 'undefined'
@@ -196,7 +198,7 @@ class ColumnChart extends React.Component {
             //         },
             //       },
             //     },
-          series: chartType === 'multi' ? seriesData : 
+          series: series || chartType === 'multi' ? seriesData : 
           [
             {	
               name: seriesTitle,	
