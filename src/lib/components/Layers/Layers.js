@@ -84,7 +84,7 @@ export class Layers extends Component {
         (!currentRegion || (layer.region && layer.region === currentRegion)) &&
         !subLayerIds.includes(layer.id)
       ) {
-        if (layer.id && !auth) {
+        if (layer.id && (!auth || !auth.authConfigs)) {
           if (this.props.layerItem) {
             const CustomLayerItem = this.props.layerItem;
 
