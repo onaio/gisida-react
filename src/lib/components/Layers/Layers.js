@@ -74,8 +74,11 @@ export class Layers extends Component {
             // split to remove .json part
             activeId = activeId.split('.')[0];
           }
-
-          users = authConfigs.LAYERS[activeId]; // list of users with access to the layer
+          // this is a temporary fix
+          const LocalAuthConfig = JSON.parse(localStorage.getItem('authConfig'))
+          users = authConfigs.LAYERS && authConfigs.LAYERS[activeId]; // list of users with access to the layer
+          authConfigs.LAYERS = authConfigs.LAYERS || LocalAuthConfig.LAYERS;
+          // users = authConfigs.LAYERS[activeId]; // list of users with access to the layer
           // check if logged in user exists in the list of users
           // who have access to the layer
           if ((users
