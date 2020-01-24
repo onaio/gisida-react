@@ -522,17 +522,6 @@ class Map extends Component {
       // zoom levels
       this.removeLabels();
       this.handleLabelsOnMapZoom();
-
-      if (this.props.VIEW.showMap && prevProps.VIEW.showMap !== this.props.VIEW.showMap) {
-        const { mapConfig } = this.props.APP;
-
-        this.map.jumpTo({
-          center: {
-            lng: mapConfig.center[0],
-            lat: mapConfig.center[1],
-          },
-        });
-      }
     }
 
     // Update Layer Filters
