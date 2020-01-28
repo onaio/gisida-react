@@ -1,6 +1,6 @@
 {
     "name": "gisida-react",
-    "version": "1.2.7",
+    "version": "1.3.0",
     "description": "React Components Library for Gisida",
     "homepage": "https://github.com/onaio/gisida-react#readme",
     "bugs": {
@@ -78,6 +78,7 @@
         "camelcase": "^4.1.0",
         "colorbrewer": "^1.1.0",
         "enzyme-adapter-react-16": "^1.1.1",
+        "gisida": "1.3.2",
         "highcharts": "^6.0.6",
         "html-react-parser": "^0.4.2",
         "jquery": "^3.3.1",
