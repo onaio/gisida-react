@@ -20,6 +20,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     APP: state.APP,
     MAP: MAP,
+    LOC: state.LOC,
     mapId: ownProps.mapId,
     timeSeriesObj: MAP.timeseries[timeLayer],
     isSplitScreen: state.VIEW && state.VIEW.splitScreen,
@@ -113,11 +114,29 @@ class DetailView extends Component {
 
   onCloseClick(e) {
     e.preventDefault();
-    const center = Array.isArray(this.props.APP.mapConfig.center) ?
-    { lng: this.props.APP.mapConfig.center[0], lat: this.props.APP.mapConfig.center[1] } : { ...this.props.APP.mapConfig.center }
+    let center, zoom;
+    /**
+     * Datermining center and zoom when closing detailview 
+     * on Close Click Ease to layer location 
+     * if layer has no location ease to active LOC
+     * else ease into mapconfig levels*/
+    if (this.props.MAP.layers[this.props.MAP.primaryLayer].location) {
+      center = this.props.MAP.layers[this.props.MAP.primaryLayer].location.center;
+      zoom = this.props.MAP.layers[this.props.MAP.primaryLayer].location.zoom;
+    } else if (this.props.LOC && this.props.LOC.location) {
+      center = Array.isArray(this.props.LOC.location.center) ? 
+      {lng: this.props.LOC.location.center[0], lat: this.props.LOC.location.center[1] } 
+       : {...this.props.LOC.location.center};
+      zoom = this.props.LOC.location.zoom;
+    } else {
+      center = Array.isArray(this.props.APP.mapConfig.center) ?
+      { lng: this.props.APP.mapConfig.center[0], lat: this.props.APP.mapConfig.center[1] } 
+        : { ...this.props.APP.mapConfig.center };
+      zoom = this.props.LOC.location ? this.props.LOC.location.zoom : this.props.APP.mapConfig.zoom;
+    }
     window.maps[0].easeTo({
       center,
-      zoom: this.props.APP.mapConfig.zoom,
+      zoom: zoom,
     });
     buildDetailView(this.props.mapId, null, null, this.props.dispatch);
   }
@@ -183,7 +202,7 @@ class DetailView extends Component {
                 id="facilityImg"
                 alt={`${title}`}
                 onClick={(e) => this.onFacilityImageClick(e)}
-                src="/assets/img/no-facility-img.jpg" /> : null}
+                src={imageURL} /> : null}
           </div>
           <div className="detail-list">
             <ul>{detailList}</ul>
@@ -210,7 +229,7 @@ class DetailView extends Component {
             >&times;</span>
             <img
               alt={`${title}`}
-              src="/assets/img/no-facility-img.jpg"
+              src={imageURL}
               className="modal-content"
               id="facility-image" />
             <div id="caption">

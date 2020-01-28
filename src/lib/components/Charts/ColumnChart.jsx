@@ -32,40 +32,49 @@ class ColumnChart extends React.Component {
         spacingTop: 15,
         spacintRight: 10,
       },
-      xAxis: typeof xAxis !== 'undefined' ? (xAxis || null) : {
-        categories,
-        labels: {
-          style: {
-            fontSize: 9,
-          },
-        },
-      },
-      yAxis: typeof yAxis !== 'undefined' ? (yAxis || null) : [
-        {
-          title: {
-            text: (yAxisLabel && yAxisLabel) || 'Target Percentage (%)',
-            y: 10,
-          },
-          endOnTick: false,
-        },
-        {
-          linkedTo: 0,
-          opposite: true,
-          title: {
-            text: (yAxisLabel && yAxisLabel) || 'Target Percentage (%)',
-            y: 10,
-            x: -10,
-          },
-        },
-      ],
+      xAxis:
+        typeof xAxis !== 'undefined'
+          ? xAxis || null
+          : {
+              categories,
+              labels: {
+                style: {
+                  fontSize: 9,
+                },
+              },
+            },
+      yAxis:
+        typeof yAxis !== 'undefined'
+          ? yAxis || null
+          : [
+              {
+                title: {
+                  text: (yAxisLabel && yAxisLabel) || 'Target Percentage (%)',
+                  y: 10,
+                },
+                endOnTick: false,
+              },
+              /** The code shows the second label which in some cases maybe undesiarable */
+              /**{
+                linkedTo: 0,
+                opposite: true,
+                title: {
+                  text: (yAxisLabel && yAxisLabel) || 'Target Percentage (%)',
+                  y: 10,
+                  x: -10,
+               },
+            }, **/
+            ],
       tooltip: {
         useHTML: true,
         shared: true,
         headerFormat: '<b>{point.key}: </b>',
         //pointFormat: '',
-        pointFormatter: pointFormatterFunc || function pointFormatterFunc() {
-          return `<span>${this.y.toLocaleString()}</span>`;
-        },
+        pointFormatter:
+          pointFormatterFunc ||
+          function pointFormatterFunc() {
+            return `<span>${this.y.toLocaleString()}</span>`;
+          },
         //shadow: false,
         //backgroundColor: 'transparent',
         //borderWidth: 0,
@@ -79,10 +88,10 @@ class ColumnChart extends React.Component {
       },
       plotOptions: {
         column: {
-        showInLegend: false,
+          showInLegend: false,
           pointPadding: 0.2,
           borderWidth: 0,
-        /*tooltip: {
+          /*tooltip: {
             distance: 0,
             padding: 0,
             pointFormatter: pointFormatterFunc || function pointFormatterFunc() {
@@ -95,10 +104,12 @@ class ColumnChart extends React.Component {
           },*/
         },
       },
-      series: [{
-        name: seriesTitle,
-        data: seriesData,
-      }],
+      series: [
+        {
+          name: seriesTitle,
+          data: seriesData,
+        },
+      ],
     };
   }
 
@@ -110,46 +121,47 @@ class ColumnChart extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const {
-      seriesTitle,
-      seriesData,
-      chartHeight,
-      chartWidth,
-      categories,
-      xAxis,
-    } = nextProps;
+    const { seriesTitle, seriesData, chartHeight, chartWidth, categories, xAxis } = nextProps;
 
     if (isNewSeriesData(this.state.series[0].data, seriesData)) {
       if (this.chart) {
         this.chart.destroy();
       }
 
-      this.setState({
-        chart: Object.assign({}, this.state.chart, {
-          height: chartHeight || null,
-          width: chartWidth || null,
-        }),
-        title: {
-          text: seriesTitle || null,
-        },
-        xAxis: typeof xAxis !== 'undefined' ? (xAxis || null) : {
-          categories,
-          labels: {
-            style: {
-              fontSize: 9,
+      this.setState(
+        {
+          chart: Object.assign({}, this.state.chart, {
+            height: chartHeight || null,
+            width: chartWidth || null,
+          }),
+          title: {
+            text: seriesTitle || null,
+          },
+          xAxis:
+            typeof xAxis !== 'undefined'
+              ? xAxis || null
+              : {
+                  categories,
+                  labels: {
+                    style: {
+                      fontSize: 9,
+                    },
+                  },
+                },
+          series: [
+            {
+              name: seriesTitle,
+              data: seriesData,
+              animation: {
+                duration: 0,
+              },
             },
-          },
+          ],
         },
-        series: [{
-          name: seriesTitle,
-          data: seriesData,
-          animation: {
-            duration: 0,
-          },
-        }],
-      }, () => {
-        this.chart = Highcharts.chart(this.chartEl, this.state);
-      });
+        () => {
+          this.chart = Highcharts.chart(this.chartEl, this.state);
+        }
+      );
     } else if (this.chart && (chartWidth !== this.chart.chartWidth || this.chart.chartHeight)) {
       this.chart.setSize(chartWidth, chartHeight);
     }
@@ -160,7 +172,13 @@ class ColumnChart extends React.Component {
   }
 
   render() {
-    return <div ref={(el) => { this.chartEl = el; }} />;
+    return (
+      <div
+        ref={el => {
+          this.chartEl = el;
+        }}
+      />
+    );
   }
 }
 
@@ -172,6 +190,5 @@ ColumnChart.propTypes = {
   categories: PropTypes.arrayOf(PropTypes.string).isRequired,
   yAxisLabel: PropTypes.string.isRequired,
 };
-
 
 export default ColumnChart;
