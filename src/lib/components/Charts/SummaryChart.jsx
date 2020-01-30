@@ -300,13 +300,24 @@ class SummaryChart extends React.Component {
       !this.state ||
       Object.keys(this.state).length < 2 ||
       !this.props.showMinimize ||
-      this.props.activeLayerId !== this.props.layerId ||
-      !this.state.charts
+      this.props.activeLayerId !== this.props.layerId
     ) {
       return null;
     }
 
-    const { layerId, layerData, layer, charts, primaryChart, locations } = this.state;
+    const { layerId, layerData, layer, primaryChart, locations } = this.state;
+
+    let charts = this.state.charts;
+    if (!charts) {
+      /**
+       * Work around to solve an undefined charts bug that occurs when a user loads a layer with
+       * a summary chart, uses react router to navigate to another component, then navigates
+       * back to the map component
+       */
+      const chartSpecs = SummaryChart.defineCharts(this.props.layer.charts);
+      charts = chartSpecs.charts;
+    }
+
     const { doShowModal, chartHeight, buttonBottom, isFullBleed, chartWidth } = this.state;
     let chartKey = '';
     const sumCharts = [];
