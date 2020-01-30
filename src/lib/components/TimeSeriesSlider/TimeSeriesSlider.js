@@ -10,6 +10,7 @@ require('./TimeSeriesSlider.scss');
 
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {}, timeseries: {} };
+  const { APP } = state;
   let timeLayer;
   let timeSubLayer;
   buildLayersObj(MAP.layers).forEach((layer) => {
@@ -26,6 +27,7 @@ const mapStateToProps = (state, ownProps) => {
     primaryLayer: MAP.primaryLayer,
     showFilterPanel: MAP.showFilterPanel,
     timeLayer,
+    showSinglePeriods: APP.showSinglePeriods
   }
 }
 
@@ -127,7 +129,8 @@ class TimeSeriesSlider extends React.Component {
   }
 
   render() {
-    return ((this.props.timeSeriesObj) && (this.state && this.state.periods.length > 1)) ? (
+    const {timeSeriesObj, showSinglePeriods} = this.props;
+    return ((timeSeriesObj) && ((this.state && this.state.periods.length) > 1 || showSinglePeriods)) ? (
       <div
         className="series"
         style={{ right: '50px'}}>
