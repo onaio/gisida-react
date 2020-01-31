@@ -82,6 +82,7 @@
         "highcharts": "^6.0.6",
         "html-react-parser": "^0.4.2",
         "jquery": "^3.3.1",
+        "js-cookie": "^2.1.4",
         "rc-slider": "^8.6.1",
         "react-load-script": "^0.0.6",
         "react-redux": "^5.0.6",
