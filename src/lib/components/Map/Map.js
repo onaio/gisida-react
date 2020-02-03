@@ -152,7 +152,7 @@ class Map extends Component {
           layers: activeLayers.filter(i => this.map.getLayer(i) !== undefined),
         });
         const feature = features.find(
-          f => f.layer.id === layerObj.id || layerObj.layers && layerObj.layers.includes(f.layer.id)
+          f => f.layer.id === layerObj.id || (layerObj.layers && layerObj.layers.includes(f.layer.id))
         );
         if (!feature) {
           return false;
@@ -323,7 +323,18 @@ class Map extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidMount() {
+    const { MAP, APP, mapId } = this.props;
+    if (APP && MAP && mapId) {
+      const { isRendered, accessToken, mapConfig } = APP;
+      // Check if map is initialized, use mapId as container value
+      if (!isRendered && (!isIE || mapboxgl.supported()) && !MAP.blockLoad) {
+        this.initMap(accessToken, { ...mapConfig, container: mapId }, mapId);
+      }
+    }
+  }
+
+  componentWillReceiveProps(nextProps){
     if (this.map) {
       try {
         this.map.resize();
