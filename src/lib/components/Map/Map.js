@@ -926,6 +926,7 @@ class Map extends Component {
               {React.Children.map(this.props.children, child => {
                 return React.cloneElement(child, {
                   mapId: this.props.mapId,
+                  hasNavbar: this.props.hasNavbar,
                 });
               })}
             </div>
