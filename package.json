@@ -73,6 +73,7 @@
         ]
     },
     "dependencies": {
+        "@onaio/gatekeeper": "^0.0.18",
         "ansi-regex": "^3.0.0",
         "babel-plugin-transform-class-properties": "^6.24.1",
         "camelcase": "^4.1.0",
@@ -87,7 +88,8 @@
         "react-load-script": "^0.0.6",
         "react-redux": "^5.0.6",
         "react-router-dom": "^5.1.2",
-        "redux": "^4.0.0"
+        "redux": "^4.0.0",
+        "seamless-immutable": "^7.1.4"
     },
     "devDependencies": {
         "autoprefixer": "7.1.2",
