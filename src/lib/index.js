@@ -18,7 +18,7 @@ import HorizontalBarChart from './components/Charts/HorizontalBarChart';
 import ColumnChart from './components/Charts/ColumnChart';
 
 import Callback from './components/Callback/Callback';
-import Login from './components/Login/Login'
+import OnaOauthLogin from './components/Login/OnaOauthLogin';
 
 import Router from './routes/router';
 
@@ -43,5 +43,5 @@ export {
   Export,
   Router,
   Callback,
-  Login
-}
+  OnaOauthLogin,
+};

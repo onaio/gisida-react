@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import './Login.scss';
-import { useOAuthLogin } from '../../../../node_modules/@onaio/gatekeeper/dist/components/login.js';
+import './OnaOauthLogin.scss';
+import { useOAuthLogin } from '@onaio/gatekeeper/dist/components/login';
 import { AuthorizationGrantType } from '@onaio/gatekeeper';
 
 const mapStateToProps = state => {
@@ -16,7 +16,7 @@ const mapStateToProps = state => {
   };
 };
 
-class Login extends Component {
+class OnaOauthLogin extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -88,4 +88,4 @@ class Login extends Component {
   }
 }
 
-export default connect(mapStateToProps)(Login);
+export default connect(mapStateToProps)(OnaOauthLogin);
