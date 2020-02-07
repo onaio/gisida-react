@@ -61,7 +61,6 @@ class Map extends Component {
   initMap(accessToken, mapConfig, mapId, mapIcons) {
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;
-      console.log("evn????", process.env.GISIDA_MAPBOX_API_KEY)
       this.map = new mapboxgl.Map(mapConfig);
       window.maps.push(this.map);
       this.map.controls = new mapboxgl.NavigationControl();
