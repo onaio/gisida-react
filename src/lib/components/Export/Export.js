@@ -125,7 +125,6 @@ export class Export extends Component {
     const {  mapId } = this.props;
     const { map, config } = this.state;
     const self = this;
-   
     // save the previous position of the map
     const prevMapState = {
       zoom: map.getZoom(),
@@ -136,7 +135,6 @@ export class Export extends Component {
     $(`#${mapId}.mapboxgl-map`).innerWidth(dimWidth / resValue).innerHeight(dimHeight / resValue);
     if (!config.includeNavControls) {
       map.removeControl(map.controls);
-      
     }
       map.resize();
 
@@ -219,7 +217,6 @@ export class Export extends Component {
 
       // scale the scalling containers
       $('.topLeft, .topRight, .bottomLeft, .bottomRight', exportEl).css('transform');
-        // .css('transform', `scale(${scale})`);
       // insert the export container element in the DOM
       $('body').append(exportEl);
       // move (not copy) the map into the export container
