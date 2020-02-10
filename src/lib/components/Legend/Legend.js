@@ -542,7 +542,6 @@ export class Legend extends React.Component {
             : layers[primaryLayer].layers
             ? layerObj && layerObj.categories && layerObj.categories.breaks
             : layer.breaks;
-        // debugger
         const lastBreaks = stopsBreak && Math.max(...stopsBreak);
         const layerStops =
           timeSeriesObj &&
