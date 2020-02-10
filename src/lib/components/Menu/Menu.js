@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types';
 import { Actions } from 'gisida';
 import Layers from '../Layers/Layers';
+import SearchBar from '../Searchbar/SearchBar';
 import './Menu.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -111,7 +112,7 @@ class Menu extends Component {
     const mapId = this.props.mapId;
     const categories = this.props.categories;
 
-    const {disableDefault } = this.props;
+    const {disableDefault, searchBar } = this.props;
     if (disableDefault) return this.props.children || null;
 
     const children = React.Children.map(this.props.children, child => {
@@ -143,6 +144,10 @@ class Menu extends Component {
                   {/* Children Elements (top) */}
                   {(children && childrenPosition !== 'bottom') ? children : ''}
 
+                  {/* search bar */}
+                  {searchBar ?
+                   <div style={{"height":"70px"}}>  <SearchBar />  </div> : null
+                  }
                   {/* Menu List*/}
                   <ul className="sectors">
                     {regions && regions.length ?
