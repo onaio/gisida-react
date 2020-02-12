@@ -94,7 +94,7 @@
 
   li {
     text-align: center;
-    height: 17px;
+    height: 20px;
     padding-top: 2px;
   }
 }
@@ -161,15 +161,64 @@
     display: inline-block;
   }
 
-  .triangle-15 {
-    width: 0;
-    height: 0;
-    margin: 0 10px 0 0;
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-bottom: 12px solid white;
-    display: inline-block;
-  }
+}
+
+.triangle-15 {
+  width: 0;
+  height: 0;
+  margin: 0 10px 0 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 12px solid white;
+  display: inline-block;
+}
+
+.orange-water {
+  content: url('/assets/img/orange-water.svg');
+  max-height: 15px;
+  padding-right: 5px;
+}
+
+.elec-purple {
+  content: url('/assets/img/elec-purple.svg');
+  max-height: 15px;
+  padding-right: 5px;
+}
+
+.ranger-station-15-black {
+  content: url('/assets/img/ranger-station-15-black.svg');
+  max-height: 15px;
+  padding-right: 5px;
+}
+
+.irrigate1 {
+  content: url('/assets/img/irrigate1.svg');
+  max-height: 15px;
+  padding-right: 5px;
+}
+
+.bridge2 {
+  content: url('/assets/img/bridge2.svg');
+  max-height: 15px;
+  padding-right: 5px;
+}
+
+.govt-off {
+  content: url('/assets/img/govt-off.svg');
+  max-height: 15px;
+  padding-right: 5px;
+}
+
+.tank1 {
+  content: url('/assets/img/tank1.svg');
+  max-height: 15px;
+  padding-right: 5px;
+}
+
+.hospital-15-black {
+  content: url('/assets/img/hospital-15-black.svg');
+  max-height: 15px;
+  padding-right: 5px;
 }
 
 .layer-symbols {
