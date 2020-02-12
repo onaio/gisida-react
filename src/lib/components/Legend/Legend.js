@@ -268,11 +268,12 @@ export class Legend extends React.Component {
           const fillWidth = (
             100 / layer.categories.color.filter(c => c !== 'transparent').length
           ).toString();
-
+            
           layer.categories.color.forEach((color, index) => {
             if (color !== 'transparent') {
+              const textColor = layer.categories && layer.categories['text-color'];
               background.push(
-                <li key={index} style={{ background: color, width: `${fillWidth}%` }}>
+                <li key={index} style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
                   {layer.categories.label[index]}
                 </li>
               );
@@ -473,7 +474,7 @@ export class Legend extends React.Component {
         const fillWidth = (
           100 / layer.categories.color.filter(c => c !== 'transparent').length
         ).toString();
-
+          
         layer.categories.color.forEach((color, index) => {
           if (color !== 'transparent') {
             background.push(
