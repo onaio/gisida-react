@@ -165,11 +165,6 @@ export class Legend extends React.Component {
 
     for (let l = 0; l < this.props.layersData.length; l += 1) {
       layer = this.props.layersData[l];
-      var shapeClass = null;
-      if (layer.categories && layer.categories.shape && layer.categories.shape.length &&
-          typeof layer.layout["icon-image"] == "string" ) {
-        shapeClass = layer.categories.shape[0]
-      }
       const circleLayerType =
         layer &&
         layer.credit &&
@@ -270,19 +265,29 @@ export class Legend extends React.Component {
           );
         }
         if (fillLayerNoBreaks && !layer.parent) {
+          const hasShape = (layer.categories && layer.categories.shape && layer.categories.shape.length);
           const fillWidth = (
             100 / layer.categories.color.filter(c => c !== 'transparent').length
           ).toString();
             
           layer.categories.color.forEach((color, index) => {
             if (color !== 'transparent') {
-              const textColor = layer.categories && layer.categories['text-color'];
-              background.push(
-                <li className="layer-symbols" key={index}>
-                  <span className={`${layer.categories.shape[index]}`} />
-                  {layer.categories.label[index]}
-              </li>
-              );
+              if (hasShape) {
+                background.push(
+                  <li className="layer-symbols" key={index}>
+                    <span className={`${layer.categories.shape[index]}`} />
+                    {layer.categories.label[index]}
+                  </li>
+                );
+              } else {
+                const textColor = layer.categories && layer.categories['text-color'];
+                background.push(
+                  <li key={index} style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
+                    {layer.categories.label[index]}
+                  </li>
+                );
+              }
+              
             }
           });
 
@@ -297,7 +302,7 @@ export class Legend extends React.Component {
               key={l}
             >
               <b>{layer.label}</b>
-              <div className={`legend-shapes ${legendClass}`}>
+              <div className={`${hasShape ? 'legend-shapes' : 'legend-fill'} ${legendClass}`}>
                 <ul>{background}</ul>
               </div>
               <span>{Parser(layer.credit)}</span>
@@ -446,8 +451,12 @@ export class Legend extends React.Component {
         );
       } else if (symbolLayer) {
         layer.categories.color.forEach((color, index) => {
-          
-          const styleString = `background: ${color}`;
+          const style =
+            layer.categories.shape[index] === 'triangle-stroked-11' ||
+            layer.categories.shape[index] === 'triangle-15'
+              ? 'border-bottom-color:'
+              : 'background:';
+          const styleString = `${style}: ${color}`;
           background.push(
             <li className="layer-symbols" key={index}>
               <span className={`${layer.categories.shape[index]}`} style={{ styleString }} />
@@ -481,7 +490,7 @@ export class Legend extends React.Component {
           if (color !== 'transparent') {
             background.push(
               <li key={index} style={{ background: color, width: `${fillWidth}%` }}>
-                <span className={shapeClass}></span>{layer.categories.label[index]}
+                {layer.categories.label[index]}
               </li>
             );
           }
@@ -498,7 +507,7 @@ export class Legend extends React.Component {
             key={l}
           >
             <b>{layer.label}</b>
-            <div className={`legend-shapes ${legendClass}`}>
+            <div className={`legend-fill ${legendClass}`}>
               <ul>{background}</ul>
             </div>
             <span>{Parser(layer.credit)}</span>
