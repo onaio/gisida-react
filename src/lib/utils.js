@@ -176,3 +176,53 @@ export function deepCopy(x) {
   return JSON.parse(JSON.stringify(x));
 }
 
+export function orderLayers(activeLayersData, map, nextLayerId) {
+    /**
+     * Rearranges rendered layers and puts selected layer on top. 
+     * @param {Object} filteredLayers - Mapbox layers
+     */
+    const moveLayers = filteredLayers => {
+        Object.keys(filteredLayers).forEach((key) => {
+            if (map.getLayer(filteredLayers[key].id)) {
+                map.moveLayer(filteredLayers[key].id);
+            }
+        });
+        if (
+            filteredLayers.find(d => d.id === nextLayerId) &&
+            map.getLayer(nextLayerId)
+        ) {
+            map.moveLayer(nextLayerId);
+        }
+    }
+
+
+    const fill = activeLayersData.filter(d => d['type'] === 'fill' && !d['detail-view']);
+    if (fill.length) {
+        moveLayers(fill);
+    }
+
+    const circles = activeLayersData.filter(d => d['type'] === 'circle');
+    if (circles.length) {
+        moveLayers(circle);
+    }
+
+    const symbols = activeLayersData.filter(d => d['type'] === 'symbol');
+    if (symbols.length) {
+        moveLayers(symbols);
+    }
+
+    const line = activeLayersData.filter(d => d['type'] === 'line');
+    if (line.length) {
+        moveLayers(line);
+    }
+
+    const detailViewActive = activeLayersData.filter(d => d['detail-view'] && !d['level-view']);
+    if (detailViewActive.length) {
+        moveLayers(detailViewActive);
+    }
+
+    const isLabelActive = activeLayersData.filter(d => d.isLabel);
+    if (isLabelActive.length) {
+        moveLayers(isLabelActive);
+    }
+}
