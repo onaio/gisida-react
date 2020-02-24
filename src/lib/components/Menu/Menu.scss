@@ -45,6 +45,22 @@
     }
   }
 
+  .sectors li.search-sector a {
+    color: #555;
+    display: block;
+    font-weight: 400;
+    padding: 10px 10px;
+    background: rgba(255, 255, 255, 0.4);
+    border-bottom: 1px solid #eee;
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+      text-decoration: none;
+      color: #555;
+    }
+  }
+
   .layers {
     padding: 0px 0 0 20px;
 

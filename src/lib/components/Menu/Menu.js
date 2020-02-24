@@ -140,6 +140,18 @@ class Menu extends Component {
     this.props.dispatch(Actions.changeRegion(region));
   }
 
+  boldQuery(indicator, query){
+    const indicatorToUpper = indicator.toUpperCase();
+    const queryToUpper = query.toUpperCase();
+    if (!indicatorToUpper.includes(queryToUpper)) {
+      return null;
+    }
+    const matchIndex = indicatorToUpper.indexOf(queryToUpper);
+    const querryLen = queryToUpper.length;
+
+    return <a>{indicator.substr(0,matchIndex)}<b>{indicator.substr(matchIndex, querryLen)}</b>{indicator.substr(matchIndex+querryLen)}</a>
+  }
+
   handleSearch(e) {
     e.preventDefault();
     let input = e.target.value;
@@ -150,13 +162,16 @@ class Menu extends Component {
     if (!input) {
       return searching ? this.setState({ searching: false}) : null; 
     }
+    this.setState({ searchResults: [], })
     const searchResults = [];
     Object.keys(searchterms).forEach(key => {
-      if (key.includes(input)) {
-        searchResults.push(
-          <li className="sector"> <a>{key}</a></li>
-        )
-      }
+        const id = searchterms[key].id;
+        const result = this.boldQuery(key, input)
+        if (result) {
+          searchResults.push(
+            <li key={id} className="search-sector">{result}</li>
+          )
+        }
     })
     this.setState({
       searchResults,
