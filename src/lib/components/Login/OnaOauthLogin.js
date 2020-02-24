@@ -1,20 +1,6 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import './Login.scss';
 import { useOAuthLogin } from '@onaio/gatekeeper/dist/components/login';
 import { AuthorizationGrantType } from '@onaio/gatekeeper';
-
-const mapStateToProps = state => {
-  const { APP } = state;
-  return {
-    appIcon: APP.appIcon,
-    loginIcon: APP.appLoginIcon,
-    publicUsername: APP.authPublicUsername,
-    publicPassword: APP.authPublicPassword,
-    clientID: APP.authClientID,
-    redirectUri: APP.authRedirectUri,
-  };
-};
 
 class OnaOauthLogin extends Component {
   constructor(props) {
@@ -55,10 +41,7 @@ class OnaOauthLogin extends Component {
   }
 
   render() {
-    const { loginIcon, appIcon, publicPassword, publicUsername } = this.props;
-    const loginImage = {
-      background: `url(${loginIcon || appIcon}) no-repeat center center`,
-    };
+    const { loginImageStyle, publicPassword, publicUsername } = this.props;
     const providerKey = this.getProviderKey();
 
     return (
@@ -66,7 +49,7 @@ class OnaOauthLogin extends Component {
         <div>
           <form className="login-form">
             <div className="form-group">
-              <div className="brand-login" style={loginImage}></div>
+              <div className="brand-login" style={loginImageStyle}></div>
               {publicPassword && publicUsername ? (
                 <div>
                   <small>Username: {publicUsername}</small>
@@ -88,4 +71,4 @@ class OnaOauthLogin extends Component {
   }
 }
 
-export default connect(mapStateToProps)(OnaOauthLogin);
+export default OnaOauthLogin
