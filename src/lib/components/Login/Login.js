@@ -34,17 +34,26 @@ class Login extends Component {
         const { appPassword, clientID, redirectUri, publicPassword, publicUsername } = this.props;
         const loginImageStyle = this.getLoginImageStyle
 
-        return appPassword ?
+        if (!appPassword || !(clientID && redirectUri)) {
+            return null;
+        }
+
+        return (
+            <div className="login">
+                appPassword ?
             <BasicAuthLogin loginImageStyle={loginImageStyle} appPassword={appPassword} />
-            : clientID && redirectUri ?
-                <OnaOauthLogin
+                :
+            <OnaOauthLogin
                     loginImageStyle={loginImageStyle}
                     publicUsername={publicUsername}
                     publicPassword={publicPassword}
                     clientID={clientID}
                     redirectUri={redirectUri}
                 />
-                : null;
+            </div>
+        )
+
+
     }
 }
 

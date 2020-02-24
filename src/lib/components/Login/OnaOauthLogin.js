@@ -45,28 +45,24 @@ class OnaOauthLogin extends Component {
     const providerKey = this.getProviderKey();
 
     return (
-      <div className="login">
-        <div>
-          <form className="login-form">
-            <div className="form-group">
-              <div className="brand-login" style={loginImageStyle}></div>
-              {publicPassword && publicUsername ? (
-                <div>
-                  <small>Username: {publicUsername}</small>
-                  <br />
-                  <small>Password: {publicPassword}</small>
-                </div>
-              ) : null}
+      <form className="login-form">
+        <div className="form-group">
+          <div className="brand-login" style={loginImageStyle}></div>
+          {publicPassword && publicUsername ? (
+            <div>
+              <small>Username: {publicUsername}</small>
+              <br />
+              <small>Password: {publicPassword}</small>
             </div>
-            <a
-              className="btn btn-default center-block btn-block"
-              href={this.state.authorizationUris[providerKey]}
-            >
-              Login
-            </a>
-          </form>
+          ) : null}
         </div>
-      </div>
+        <a
+          className="btn btn-default center-block btn-block"
+          href={this.state.authorizationUris[providerKey]}
+        >
+          Login
+            </a>
+      </form>
     );
   }
 }
