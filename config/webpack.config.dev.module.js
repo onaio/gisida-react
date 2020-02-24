@@ -125,8 +125,7 @@ module.exports = {
           // Make sure to add the new loader(s) before the "file" loader.
         ]
       }
-    ],
-    plugins: [new Dotenv()],
+    ]
   },
   externals: {
     'react': 'react',
@@ -140,4 +139,5 @@ module.exports = {
     net: 'empty',
     tls: 'empty',
   },
+  plugins: [new Dotenv()],
 }

@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import './Login.scss';
-import BasicAuthLogin from './BasicAuthLogin'
-import OnaOauthLogin from './OnaOauthLogin'
+import BasicAuthLogin from './BasicAuthLogin/BasicAuthLogin'
+import OnaOauthLogin from './OnaOauthLogin/OnaOauthLogin'
 
 const mapStateToProps = state => {
     const { APP } = state;
     return {
         appIcon: APP.appIcon,
         loginIcon: APP.appLoginIcon,
-        publicUsername: APP.authPublicUsername,
-        publicPassword: APP.authPublicPassword,
         appPassword: APP.password,
         appNameDesc: APP.appNameDesc
     };
@@ -18,11 +16,11 @@ const mapStateToProps = state => {
 
 class Login extends Component {
     render() {
-        if (!this.props.appPassword || !(this.props.clientID && this.props.redirectUri)) {
+        if (!this.props.appPassword && !process.env.REACT_APP_GISIDA_CANOPY_CLIENT_ID) {
             return null;
         }
 
-        const { appPassword, publicPassword, publicUsername, appNameDesc } = this.props;
+        const { appPassword, appNameDesc, loginIcon, appIcon } = this.props;
 
         return (
             <div className="login">
@@ -30,12 +28,7 @@ class Login extends Component {
                 {appPassword ?
                     <BasicAuthLogin appPassword={appPassword} />
                     :
-                    <OnaOauthLogin
-                        publicUsername={publicUsername}
-                        publicPassword={publicPassword}
-                        clientID={clientID}
-                        redirectUri={redirectUri}
-                    />
+                    <OnaOauthLogin />
                 }
             </div>
         )
