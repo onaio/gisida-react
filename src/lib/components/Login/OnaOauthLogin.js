@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import './OnaOauthLogin.scss';
+import './Login.scss';
 import { useOAuthLogin } from '@onaio/gatekeeper/dist/components/login';
 import { AuthorizationGrantType } from '@onaio/gatekeeper';
 
