@@ -117,6 +117,7 @@ class Menu extends Component {
     this.state = {
       openCategories: [],
       searching: false,
+      searchResults: [],
     }
     this.handleSearch = this.handleSearch.bind(this);
   }
@@ -149,11 +150,22 @@ class Menu extends Component {
     if (!input) {
       return searching ? this.setState({ searching: false}) : null; 
     }
-    return searching ? null : this.setState({ searching: true});
+    const searchResults = [];
+    Object.keys(searchterms).forEach(key => {
+      if (key.includes(input)) {
+        searchResults.push(
+          <li className="sector"> <a>{key}</a></li>
+        )
+      }
+    })
+    this.setState({
+      searchResults,
+      searching: true
+    });
   }
 
   render() {
-    const { searching } = this.state;
+    const { searching, searchResults } = this.state;
     const mapId = this.props.mapId;
     const categories = this.props.categories;
 
@@ -247,7 +259,11 @@ class Menu extends Component {
                           </li>)) :
                         <li></li>
                       }
-                    </ul> : ""
+                    </ul> :
+                    searchResults.length ?
+                    <ul className="sectors">
+                      {searchResults}
+                    </ul> : <li /> 
                   }
                   
                   {/* Children Elements (top) */}
