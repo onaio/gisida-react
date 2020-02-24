@@ -78,7 +78,8 @@ const mapStateToProps = (state, ownProps) => {
     preparedLayers: MAP.layers,
     menuIsOpen: MAP.menuIsOpen,
     openCategories: MAP.openCategories,
-    noLayerText: NULL_LAYER_TEXT
+    noLayerText: NULL_LAYER_TEXT,
+    showSearchBar: APP.searchBar,
   };
 }
 
@@ -87,7 +88,9 @@ class Menu extends Component {
     super(props)
     this.state = {
       openCategories: [],
+      searching: false,
     }
+    this.handleSearch = this.handleSearch.bind(this);
   }
 
   onToggleMenu = (e) => {
@@ -108,11 +111,24 @@ class Menu extends Component {
     this.props.dispatch(Actions.changeRegion(region));
   }
 
+  handleSearch(e) {
+    e.preventDefault();
+    let input = e.target.value;
+    input = input.replace(/\s+/g, ' ')
+    input = input.trimStart()
+    const { searching } = this.state;
+    if (!input) {
+      return searching ? this.setState({ searching: false}) : null; 
+    }
+    return searching ? null : this.setState({ searching: true});
+  }
+
   render() {
+    const { searching } = this.state;
     const mapId = this.props.mapId;
     const categories = this.props.categories;
 
-    const {disableDefault, searchBar } = this.props;
+    const {disableDefault, showSearchBar } = this.props;
     if (disableDefault) return this.props.children || null;
 
     const children = React.Children.map(this.props.children, child => {
@@ -121,7 +137,6 @@ class Menu extends Component {
 
     const { regions, currentRegion, preparedLayers, childrenPosition } = this.props;
     const childrenPositionClass = childrenPosition || 'top';
-
     return (
       <div>
           <div>
@@ -145,11 +160,16 @@ class Menu extends Component {
                   {(children && childrenPosition !== 'bottom') ? children : ''}
 
                   {/* search bar */}
-                  {searchBar ?
-                   <div style={{"height":"70px"}}>  <SearchBar />  </div> : null
+                  {showSearchBar ?
+                   <div style={{"height":"70px"}}>
+                      <SearchBar 
+                        handleSearch={this.handleSearch}
+                      />
+                    </div> : null
                   }
                   {/* Menu List*/}
-                  <ul className="sectors">
+                  { !searching ?
+                    <ul className="sectors">
                     {regions && regions.length ?
                       <li className="sector">
                         <a onClick={e => this.onCategoryClick(e, 'Regions')}>Regions
@@ -198,7 +218,7 @@ class Menu extends Component {
                         </li>)) :
                       <li></li>
                     }
-                  </ul>
+                  </ul> : null }
                   
                   {/* Children Elements (top) */}
                   {(children && childrenPosition === 'bottom') ? children : ''}

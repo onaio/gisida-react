@@ -7,6 +7,8 @@ const mapStateToProps = (state, ownProps) => {
     return {
       LAYERS,
       appColor: APP.appColor,
+      searchBarColor: APP.searchBarColor,
+      handleSearch: ownProps.handleSearch,
     };
   };
 
@@ -17,34 +19,29 @@ class SearchBar extends Component {
     this.state = {
       text: '',
     }
-    this.handleChange = this.handleChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
   }
 
-  handleChange(e) {
-    e.preventDefault();
-    const input = e.target.value;
-    this.setState({ input});
-  }
+  
 
   handleClick() {
     
   }
 
   render() {
-    const { appColor } = this.props;
+    const { appColor, searchBarColor, handleSearch } = this.props;
     const searchBtn = {
-      border: `1px solid ${ appColor || '#00B4CC'}`,
-      background: `${ appColor || '#00B4CC'}`,
+      border: `1px solid ${ searchBarColor || appColor || '#00B4CC'}`,
+      background: `${ searchBarColor || appColor || '#00B4CC'}`,
     }
     const serchtearm = {
-      border: `2px solid ${ appColor || '#00B4CC'}`,
+      border: `2px solid ${ searchBarColor || appColor || '#00B4CC'}`,
     }
     return (
       <div className="search-wrapper">
       <div className="search">
           <input type="text" className="searchTerm" style={serchtearm} placeholder="Search..." 
-            onChange={ this.handleChange }
+            onChange={ handleSearch }
           />
           <button type="button" className="searchButton" style={searchBtn}
             onClick={this.handleClick} >
