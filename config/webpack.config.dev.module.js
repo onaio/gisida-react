@@ -6,6 +6,7 @@ process.env.NODE_ENV = 'development';
 const autoprefixer = require('autoprefixer');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const paths = require('./paths');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
   // Don't attempt to continue if there are any errors.
@@ -124,7 +125,8 @@ module.exports = {
           // Make sure to add the new loader(s) before the "file" loader.
         ]
       }
-    ]
+    ],
+    plugins: [new Dotenv()],
   },
   externals: {
     'react': 'react',

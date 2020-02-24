@@ -11,8 +11,6 @@ const mapStateToProps = state => {
         loginIcon: APP.appLoginIcon,
         publicUsername: APP.authPublicUsername,
         publicPassword: APP.authPublicPassword,
-        clientID: APP.authClientID,
-        redirectUri: APP.authRedirectUri,
         appPassword: APP.password,
         appNameDesc: APP.appNameDesc
     };
@@ -24,7 +22,7 @@ class Login extends Component {
             return null;
         }
 
-        const { appPassword, clientID, redirectUri, publicPassword, publicUsername, appNameDesc } = this.props;
+        const { appPassword, publicPassword, publicUsername, appNameDesc } = this.props;
 
         return (
             <div className="login">
