@@ -23,12 +23,9 @@ class BasicAuthLogin extends Component {
     }
 
     render() {
-        const { loginImageStyle } = this.props;
-
         return (
             <form className="login-form" onSubmit={(e) => { e.preventDefault(); this.handleLogin(this.password.value); }}>
                 <div className="form-group">
-                    <div className="brand-login" style={loginImageStyle}></div>
                     {this.state.loginError === true ? <div className="alert alert-danger">Incorrect password.</div> : null}
                     <label htmlFor="password">Enter your Password</label>
                     <input className="form-control" type="password" ref={(input) => { this.password = input; }} autoFocus />

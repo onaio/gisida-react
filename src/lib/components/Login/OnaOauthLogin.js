@@ -41,13 +41,12 @@ class OnaOauthLogin extends Component {
   }
 
   render() {
-    const { loginImageStyle, publicPassword, publicUsername } = this.props;
+    const { publicPassword, publicUsername } = this.props;
     const providerKey = this.getProviderKey();
 
     return (
       <form className="login-form">
         <div className="form-group">
-          <div className="brand-login" style={loginImageStyle}></div>
           {publicPassword && publicUsername ? (
             <div>
               <small>Username: {publicUsername}</small>

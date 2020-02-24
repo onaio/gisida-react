@@ -14,42 +14,31 @@ const mapStateToProps = state => {
         clientID: APP.authClientID,
         redirectUri: APP.authRedirectUri,
         appPassword: APP.password,
+        appNameDesc: APP.appNameDesc
     };
 };
 
 class Login extends Component {
-    getLoginImageStyle() {
-        const { loginIcon, appIcon } = this.props;
-
-        if (!loginIcon && !appIcon) {
-            return {}
-        }
-
-        return {
-            background: `url(${loginIcon || appIcon}) no-repeat center center`,
-        };
-    }
-
     render() {
-        const { appPassword, clientID, redirectUri, publicPassword, publicUsername } = this.props;
-        const loginImageStyle = this.getLoginImageStyle
-
-        if (!appPassword || !(clientID && redirectUri)) {
+        if (!this.props.appPassword || !(this.props.clientID && this.props.redirectUri)) {
             return null;
         }
 
+        const { appPassword, clientID, redirectUri, publicPassword, publicUsername, appNameDesc } = this.props;
+
         return (
             <div className="login">
-                appPassword ?
-            <BasicAuthLogin loginImageStyle={loginImageStyle} appPassword={appPassword} />
-                :
-            <OnaOauthLogin
-                    loginImageStyle={loginImageStyle}
-                    publicUsername={publicUsername}
-                    publicPassword={publicPassword}
-                    clientID={clientID}
-                    redirectUri={redirectUri}
-                />
+                <img className="brand-login" src={loginIcon || appIcon} title={appNameDesc} alt={appNameDesc}></img>
+                {appPassword ?
+                    <BasicAuthLogin appPassword={appPassword} />
+                    :
+                    <OnaOauthLogin
+                        publicUsername={publicUsername}
+                        publicPassword={publicPassword}
+                        clientID={clientID}
+                        redirectUri={redirectUri}
+                    />
+                }
             </div>
         )
 
