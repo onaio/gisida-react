@@ -33,7 +33,9 @@ const mapStateToProps = (state, ownProps) => {
     primarySubLayer: MAP.primarySubLayer,
     activeLayerIds: MAP.activeLayerIds,
     detailView: MAP.detailView,
-    timeSeriesObj: MAP.timeseries ? MAP.timeseries[MAP.primarySubLayer || MAP.activeLayerId] : null,
+    timeSeriesObj: MAP.timeseries
+      ? MAP.timeseries[MAP.primarySubLayer || MAP.primaryLayer || MAP.activeLayerId]
+      : null,
     timeseries: MAP.timeseries,
     layersObj: MAP.layers ? buildLayersObj(MAP.layers) : {},
     layerObj: MAP.layers ? MAP.layers[MAP.primaryLayer || MAP.activeLayerId] : null,
@@ -144,18 +146,23 @@ class Map extends Component {
       // this.addMouseMoveEvents()
       // etc
       this.map.on('mousemove', e => {
-        const { activeLayers, layerObj } = this.props;
+        const { activeLayers, layerObj, layers } = this.props;
         if (!layerObj) {
           return false;
         }
         const features = this.map.queryRenderedFeatures(e.point, {
           layers: activeLayers.filter(i => this.map.getLayer(i) !== undefined),
         });
-        const feature = features.find(f => f.layer.id === layerObj.id);
+        const feature = features.find(
+          f => f.layer.id === layerObj.id || (layerObj.layers && layerObj.layers.includes(f.layer.id))
+        );
         if (!feature) {
           return false;
         }
-        this.map.getCanvas().style.cursor = layerObj['detail-view'] ? 'pointer' : '';
+        this.map.getCanvas().style.cursor =
+          layerObj['detail-view'] || layers[feature && feature.layer.id]['detail-view']
+            ? 'pointer'
+            : '';
         return true;
       });
     }
@@ -172,25 +179,42 @@ class Map extends Component {
   //   }
   // }
   onFeatureClick(e) {
-    const activeLayers = this.props.layersObj.map(l => l.id);
-    const { mapId } = this.props;
+    const { layerObj, mapId, layersObj, layers } = this.props;
+    const activeLayers = layersObj.map(l => l.id);
     const features = this.map.queryRenderedFeatures(e.point, {
       layers: activeLayers.filter(l => this.map.getLayer(l) !== undefined),
     });
+    /** Inestigate why fill layer picks one feature object which is not what we desire */
     const feature = features[0];
     if (!feature) return false;
-    const activeLayerObj = this.props.layersObj.find(l => l.id === feature.layer.id);
-
+    const activeLayerObj = layersObj.find(l => l.id === feature.layer.id);
     if (feature && activeLayerObj['detail-view']) {
       const newZoom = this.map.getZoom() < 7.5 ? 7.5 : this.map.getZoom();
       this.map.easeTo({
         center: e.lngLat,
         zoom: newZoom,
       });
+      /** Build properties for fill layer the existing one's are not desirable
+       * We get them from the Map component onFeatureClick method
+       * The implementation below is hacky and may need some r&d to be standard
+       */
+      let { properties } = feature;
+      if (
+        properties &&
+        properties.OBJECTID &&
+        properties.Shape_Area &&
+        properties.Shape_Area &&
+        properties.Shape_Leng &&
+        properties.PD_Name
+      ) {
+        properties = layers[feature.layer.id].source.data.find(
+          d => d.PD_Name === properties.PD_Name
+        );
+      }
       buildDetailView(
         mapId,
         activeLayerObj,
-        feature.properties,
+        properties || feature.properties,
         this.props.dispatch,
         this.props.timeSeriesObj
       );
@@ -451,6 +475,8 @@ class Map extends Component {
           }
         });
       }
+
+      /** Set primary layer and EaseTo location if location property is provided */
       if (this.props.MAP.primaryLayer !== primaryLayer) {
         this.setPrimaryLayer(primaryLayer, activeLayerId, layers, activelayersData, activeLayerIds);
         if (layers[primaryLayer] && layers[primaryLayer].location) {
@@ -536,6 +562,18 @@ class Map extends Component {
           prevProps.FILTER[primaryLayer].doUpdate)
       ) {
         this.buildFilters();
+      }
+    }
+    if (this.props.layersObj.length !== prevProps.layersObj.length) {
+      const { primaryLayer, layersObj, layers } = this.props;
+      const location =
+        layers && layers[primaryLayer] && layers[primaryLayer].location
+          ? layers[primaryLayer].location
+          : layersObj &&
+            layersObj.find(layer => layer.location) &&
+            layersObj.find(layer => layer.location).location;
+      if (location) {
+        this.map.easeTo(location);
       }
     }
   }

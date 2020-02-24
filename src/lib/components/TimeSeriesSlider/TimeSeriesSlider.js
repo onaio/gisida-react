@@ -43,9 +43,7 @@ class TimeSeriesSlider extends React.Component {
     let temporalIndex;
     let period;
     const nextTimeseries = Object.assign({}, this.props.timeseries);
-
     const timeSeriesLayers = getSliderLayers(this.props.layers);
-
     const activeLayers = [];
     const layers = [];
     const loadedlayers = this.props.layers;
@@ -135,10 +133,15 @@ class TimeSeriesSlider extends React.Component {
         className="series"
         style={{ right: '50px'}}>
         <label
-          id={`${this.props.mapId}-label`}
-          className="label"
-          htmlFor="slider"
-        >{this.state.period}</label>
+            id={`${this.props.mapId}-label`}
+            className="label"
+            htmlFor="slider"
+          >{
+               /** Render this based of a config at layer level */
+               this.props.timeSeriesObj && this.props.timeSeriesObj.textDateFormat ?  
+               new Date(this.state.period).toString().split(' ').slice(0, 4).join(' ') : this.state.period
+          }
+        </label>
         {this.state.periods.length > 1 ?
           <input
             id={`${this.props.mapId}-slider`}

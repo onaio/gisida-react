@@ -7,10 +7,10 @@ import './Menu.scss';
 
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {} };
-  const { LAYERS, AUTH, VIEW } = state;
+  const { LAYERS, AUTH, APP, VIEW } = state;
   let categories;
   // let layers;
-
+  const { NULL_LAYER_TEXT } = APP;
   if (Object.keys(LAYERS.groups).length) {
     const groupMapper = layer => {
       if (typeof layer === 'string') {
@@ -82,6 +82,7 @@ const mapStateToProps = (state, ownProps) => {
     menuScroll: MAP.menuScroll,
     showMap: VIEW.showMap,
     hasNavbar: ownProps.hasNavbar,
+    noLayerText: NULL_LAYER_TEXT,
   };
 };
 

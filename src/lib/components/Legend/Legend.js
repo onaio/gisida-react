@@ -1,14 +1,14 @@
 /* eslint-disable no-loop-func */
-import React from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
-import { Actions, formatNum, hexToRgbA, generateStops } from "gisida";
-import { buildLayersObj } from "../../utils";
-import Parser from "html-react-parser";
-import "./Legend.scss";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { Actions, formatNum, hexToRgbA, generateStops } from 'gisida';
+import { buildLayersObj } from '../../utils';
+import Parser from 'html-react-parser';
+import './Legend.scss';
 
 const mapStateToProps = (state, ownProps) => {
-  const mapId = ownProps.mapId || "map-1";
+  const mapId = ownProps.mapId || 'map-1';
   const MAP = state[ownProps.mapId] || { layers: {}, timeseries: {} };
 
   let subLayerCheck =
@@ -29,7 +29,7 @@ const mapStateToProps = (state, ownProps) => {
     layers: MAP.layers,
     primaryLayer: MAP.primaryLayer,
     showFilterPanel: MAP.showFilterPanel,
-    primarySubLayer: MAP.primarySubLayer
+    primarySubLayer: MAP.primarySubLayer,
   };
 };
 
@@ -67,12 +67,10 @@ export class Legend extends React.Component {
       ) {
         timeSeriesObj.newBreaks = stops[3];
         timeSeriesObj.newColors = [
-          ...new Set(
-            timeSeriesObj.colorStops[timeSeriesObj.temporalIndex].map(d => d[1])
-          )
+          ...new Set(timeSeriesObj.colorStops[timeSeriesObj.temporalIndex].map(d => d[1])),
         ];
         this.setState({
-          timeSeriesObj: timeSeriesObj
+          timeSeriesObj: timeSeriesObj,
         });
       }
     }
@@ -101,13 +99,11 @@ export class Legend extends React.Component {
 
         timeSeriesObj.newBreaks = stops[3];
         timeSeriesObj.newColors = [
-          ...new Set(
-            timeSeriesObj.colorStops[timeSeriesObj.temporalIndex].map(d => d[1])
-          )
+          ...new Set(timeSeriesObj.colorStops[timeSeriesObj.temporalIndex].map(d => d[1])),
         ];
 
         this.setState({
-          timeSeriesObj: nextProps.timeSeriesObj
+          timeSeriesObj: nextProps.timeSeriesObj,
         });
       }
     }
@@ -121,7 +117,7 @@ export class Legend extends React.Component {
       this.props.layers[this.props.primaryLayer].credit
     ) {
       this.setState({
-        primaryLayer: prevProps.primaryLayer
+        primaryLayer: prevProps.primaryLayer,
       });
     }
   }
@@ -144,23 +140,19 @@ export class Legend extends React.Component {
       layers,
       primaryLayer,
       primarySubLayer,
-      activeLayerIds
+      activeLayerIds,
     } = this.props;
     if (!layerObj) {
       return false;
     }
     let latestTimestamp;
     if (
-      layerObj["timestamp"] &&
+      layerObj['timestamp'] &&
       Array.isArray(layerObj.source.data.features || layerObj.source.data) &&
       (layerObj.source.data.features || layerObj.source.data).length > 1
     ) {
       latestTimestamp = (layerObj.source.data.features || layerObj.source.data)
-        .map(
-          d =>
-            (d.properties && d.properties[layerObj["timestamp"]]) ||
-            d[layerObj["timestamp"]]
-        )
+        .map(d => (d.properties && d.properties[layerObj['timestamp']]) || d[layerObj['timestamp']])
         .sort()
         .reverse()[0];
     }
@@ -181,8 +173,7 @@ export class Legend extends React.Component {
 
     if (
       this.state.primaryLayer !== primaryLayer &&
-      layers[primaryLayer] &&
-      layers[primaryLayer].credit
+      (layers[primaryLayer] && layers[primaryLayer].credit)
     ) {
       activeLegendLayer = primaryLayer;
     }
@@ -192,7 +183,7 @@ export class Legend extends React.Component {
       const circleLayerType =
         layer &&
         layer.credit &&
-        layer.type === "circle" &&
+        layer.type === 'circle' &&
         !layer.categories.shape &&
         layer.visible;
       const symbolLayer =
@@ -200,22 +191,18 @@ export class Legend extends React.Component {
         layer.credit &&
         layer.categories &&
         layer.categories.shape &&
-        layer.type !== "circle";
+        layer.type !== 'circle';
       const fillLayerNoBreaks =
-        layer &&
-        layer.credit &&
-        layer.categories &&
-        layer.categories.breaks === "no";
+        layer && layer.credit && layer.categories && layer.categories.breaks === 'no';
       const fillLayerWithBreaks =
         layer &&
         layer.credit &&
-        layer.type !== "chart" &&
-        layer.type !== "circle" &&
+        layer.type !== 'chart' &&
+        layer.type !== 'circle' &&
         layer.categories &&
-        layer.categories.breaks === "yes";
+        layer.categories.breaks === 'yes';
 
-      const activeLayerSelected =
-        activeLegendLayer === layer.id ? "primary" : "";
+      const activeLayerSelected = activeLegendLayer === layer.id ? 'primary' : '';
 
       let background = [];
 
@@ -238,7 +225,6 @@ export class Legend extends React.Component {
             ...new Set(layer.stops[1][temporalIndex].map(d => d[1]))
           ];
           const currentBreakStops = [...new Set(layer.stops[6][temporalIndex])];
-
           currentRadiusStops.forEach((s, i) => {
             quantiles.push(
               <span className="circle-container" key={s}>
@@ -267,7 +253,6 @@ export class Legend extends React.Component {
         const colors = [...new Set(layer.colorStops.map(d => d[1]))];
 
         uniqueStops = [...new Set(layer.stopsData.map(d => d[1]))];
-
         uniqueStops.forEach((s, i) => {
           quantiles.push(
             <span className="circle-container" key={s}>
@@ -345,9 +330,7 @@ export class Legend extends React.Component {
           const { stopsData, breaks } = layer;
           const colorLegend = layer &&
             layer.stopsData && [...new Set(stopsData.map(stop => stop[1]))];
-          const legendSuffix = layer.categories.suffix
-            ? layer.categories.suffix
-            : "";
+          const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
 
           const activeColors =
             timeSeriesObj &&
@@ -361,19 +344,16 @@ export class Legend extends React.Component {
                 layerObj.aggregate &&
                 layerObj.aggregate.timeseries
               ? this.state.timeSeriesObj.newColors
-              : layerObj &&
-                layerObj.stops &&
-                layerObj.stops[0] &&
-                layerObj.stops[0][0]
+              : layerObj && layerObj.stops && layerObj.stops[0] && layerObj.stops[0][0]
               ? [...new Set(layerObj.stops[0][0].map(d => d[1]))]
               : layer.colors;
 
           if (
             colorLegend &&
-            colorLegend.includes("transparent") &&
-            !activeColors.includes("transparent")
+            colorLegend.includes('transparent') &&
+            !activeColors.includes('transparent')
           ) {
-            activeColors.splice(0, 0, "transparent");
+            activeColors.splice(0, 0, 'transparent');
             breaks.splice(1, 0, breaks[0]);
           }
           let lastVal;
@@ -394,13 +374,7 @@ export class Legend extends React.Component {
             layerObj &&
             layerObj.aggregate &&
             layerObj.aggregate.timeseries
-              ? [
-                  ...new Set(
-                    timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(
-                      d => d[1]
-                    )
-                  )
-                ]
+              ? [...new Set(timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(d => d[1]))]
               : layerObj && layerObj.stops && layerObj.stops[0][0]
               ? [...new Set(layerObj.stops[0][0].map(d => d[1]))]
               : [...new Set(layer.colorStops.map(d => d[1]))];
@@ -421,17 +395,13 @@ export class Legend extends React.Component {
                   key={index}
                   className={`background-block-${layer.id}-${mapId}`}
                   data-tooltip={`${
-                    typeof formatNum(firstVal, 1) === "undefined"
-                      ? 0
-                      : formatNum(firstVal, 1)
+                    typeof formatNum(firstVal, 1) === 'undefined' ? 0 : formatNum(firstVal, 1)
                   }-${
-                    typeof formatNum(lastVal, 1) === "undefined"
-                      ? 0
-                      : formatNum(lastVal, 1)
+                    typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)
                   }${legendSuffix}`}
                   style={{
                     background: hexToRgbA(color, 0.9).toString(),
-                    width: 100 / activeColors.length + "%"
+                    width: 100 / activeColors.length + '%',
                   }}
                 ></li>
               );
@@ -447,7 +417,7 @@ export class Legend extends React.Component {
               onClick={e => this.onUpdatePrimaryLayer(e)}
             >
               <b>{layer.label}</b>
-              <ul className="legend-limit" style={{ padding: "0% 0% 3% 0%" }}>
+              <ul className="legend-limit" style={{ padding: '0% 0% 3% 0%' }}>
                 <li
                   id={`first-limit-${layer.id}`}
                   className={`${mapId}`}
@@ -465,10 +435,10 @@ export class Legend extends React.Component {
                   id={`last-limit-${layer.id}`}
                   className={`${mapId}`}
                   style={{
-                    position: "absolute",
-                    listStyle: "none",
-                    display: "inline",
-                    right: "3%"
+                    position: 'absolute',
+                    listStyle: 'none',
+                    display: 'inline',
+                    right: '3%',
                   }}
                 >
                   {typeof formatNum(lastVal, 1) === "undefined"
@@ -505,17 +475,14 @@ export class Legend extends React.Component {
       } else if (symbolLayer) {
         layer.categories.color.forEach((color, index) => {
           const style =
-            layer.categories.shape[index] === "triangle-stroked-11" ||
-            layer.categories.shape[index] === "triangle-15"
-              ? "border-bottom-color:"
-              : "background:";
+            layer.categories.shape[index] === 'triangle-stroked-11' ||
+            layer.categories.shape[index] === 'triangle-15'
+              ? 'border-bottom-color:'
+              : 'background:';
           const styleString = `${style}: ${color}`;
           background += (
             <li className="layer-symbols" key={index}>
-              <span
-                className={`${layer.categories.shape[index]}`}
-                style={{ styleString }}
-              />
+              <span className={`${layer.categories.shape[index]}`} style={{ styleString }} />
               {layer.categories.label[index]}
             </li>
           );
@@ -531,7 +498,7 @@ export class Legend extends React.Component {
           >
             <b>{layer.label}</b>
             <div className="legend-shapes">
-              <ul style={{ left: "0" }}>{background}</ul>
+              <ul style={{ left: '0' }}>{background}</ul>
             </div>
             <span>{Parser(layer.credit)}</span>
             {latestTimestamp}
@@ -539,16 +506,13 @@ export class Legend extends React.Component {
         );
       } else if (fillLayerNoBreaks && !layer.parent) {
         const fillWidth = (
-          100 / layer.categories.color.filter(c => c !== "transparent").length
+          100 / layer.categories.color.filter(c => c !== 'transparent').length
         ).toString();
 
         layer.categories.color.forEach((color, index) => {
-          if (color !== "transparent") {
+          if (color !== 'transparent') {
             background.push(
-              <li
-                key={index}
-                style={{ background: color, width: `${fillWidth}%` }}
-              >
+              <li key={index} style={{ background: color, width: `${fillWidth}%` }}>
                 {layer.categories.label[index]}
               </li>
             );
@@ -577,9 +541,7 @@ export class Legend extends React.Component {
         const { stopsData, breaks } = layer;
         const colorLegend = layer &&
           layer.stopsData && [...new Set(stopsData.map(stop => stop[1]))];
-        const legendSuffix = layer.categories.suffix
-          ? layer.categories.suffix
-          : "";
+        const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
 
         const activeColors =
           timeSeriesObj &&
@@ -593,19 +555,16 @@ export class Legend extends React.Component {
               layerObj.aggregate &&
               layerObj.aggregate.timeseries
             ? this.state.timeSeriesObj.newColors
-            : layerObj &&
-              layerObj.stops &&
-              layerObj.stops[0] &&
-              layerObj.stops[0][0]
+            : layerObj && layerObj.stops && layerObj.stops[0] && layerObj.stops[0][0]
             ? [...new Set(layerObj.stops[0][0].map(d => d[1]))]
             : layer.colors;
 
         if (
           colorLegend &&
-          colorLegend.includes("transparent") &&
-          !activeColors.includes("transparent")
+          colorLegend.includes('transparent') &&
+          !activeColors.includes('transparent')
         ) {
-          activeColors.splice(0, 0, "transparent");
+          activeColors.splice(0, 0, 'transparent');
           breaks.splice(1, 0, breaks[0]);
         }
         let lastVal;
@@ -618,21 +577,14 @@ export class Legend extends React.Component {
             : layers[primaryLayer].layers
             ? layerObj && layerObj.categories && layerObj.categories.breaks
             : layer.breaks;
-
-        const lastBreaks = Math.max(...stopsBreak);
+        const lastBreaks = stopsBreak && Math.max(...stopsBreak);
         const layerStops =
           timeSeriesObj &&
           timeSeriesObj.stops &&
           layerObj &&
           layerObj.aggregate &&
           layerObj.aggregate.timeseries
-            ? [
-                ...new Set(
-                  timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(
-                    d => d[1]
-                  )
-                )
-              ]
+            ? [...new Set(timeSeriesObj.stops[timeSeriesObj.temporalIndex].map(d => d[1]))]
             : layerObj && layerObj.stops && layerObj.stops[0][0]
             ? [...new Set(layerObj.stops[0][0].map(d => d[1]))]
             : [...new Set(layer.colorStops.map(d => d[1]))];
@@ -640,30 +592,26 @@ export class Legend extends React.Component {
         activeColors.forEach((color, index, activeColors) => {
           const stopsIndex = layerStops ? layerStops.indexOf(color) : -1;
           if (stopsIndex !== -1) {
-            const firstVal = stopsIndex ? stopsBreak[stopsIndex - 1] : 0;
+            const firstVal = stopsIndex ? stopsBreak && stopsBreak[stopsIndex - 1] : 0;
 
             if (Object.is(activeColors.length - 1, index)) {
               // execute last item logic
               lastVal = lastBreaks;
             } else {
-              lastVal = stopsBreak[stopsIndex];
+              lastVal = stopsBreak && stopsBreak[stopsIndex];
             }
             background.push(
               <li
                 key={index}
                 className={`background-block-${layer.id}-${mapId}`}
                 data-tooltip={`${
-                  typeof formatNum(firstVal, 1) === "undefined"
-                    ? 0
-                    : formatNum(firstVal, 1)
+                  typeof formatNum(firstVal, 1) === 'undefined' ? 0 : formatNum(firstVal, 1)
                 }-${
-                  typeof formatNum(lastVal, 1) === "undefined"
-                    ? 0
-                    : formatNum(lastVal, 1)
+                  typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)
                 }${legendSuffix}`}
                 style={{
                   background: hexToRgbA(color, 0.9).toString(),
-                  width: 100 / activeColors.length + "%"
+                  width: 100 / activeColors.length + '%',
                 }}
               ></li>
             );
@@ -679,7 +627,7 @@ export class Legend extends React.Component {
             onClick={e => this.onUpdatePrimaryLayer(e)}
           >
             <b>{layer.label}</b>
-            <ul className="legend-limit" style={{ padding: "0% 0% 3% 0%" }}>
+            <ul className="legend-limit" style={{ padding: '0% 0% 3% 0%' }}>
               <li
                 id={`first-limit-${layer.id}`}
                 className={`${mapId}`}
@@ -726,7 +674,7 @@ export class Legend extends React.Component {
       <div>
         <div
           className={`legend ${mapId}`}
-          style={{ right: this.props.showFilterPanel ? "30px" : "20px" }}
+          style={{ right: this.props.showFilterPanel ? '30px' : '20px' }}
         >
           {legendItems}
         </div>

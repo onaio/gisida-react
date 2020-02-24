@@ -18,26 +18,17 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 export class Layers extends Component {
-  /**
-   * Toggle open and close a menu group
-   * @param {Object} e Event
-   * @param {Object} layer Group to be toggled
-   * @param {numner} groupCount Group count
-   */
-  toggleSubMenu(e, layer, groupCount) {
-    e.preventDefault();
-    const { openGroups } = this.props;
-    let index = -1;
-    let count = 0;
-    let found = false;
-
-    while (!found && count < openGroups.length) {
-      if (openGroups[count].count === groupCount && openGroups[count].group === layer) {
-        index = count;
-        found = true;
-      }
-
-      count += 1;
+  constructor(props) {
+    super(props);
+    const groups = {};
+    if (this.props.layers) {
+      this.props.layers.forEach(layer => {
+        if (!layer.id) {
+          Object.keys(layer).forEach(l => {
+            groups[l] = { isOpen: false };
+          });
+        }
+      });
     }
 
     this.props.dispatch(Actions.toggleGroups(this.props.mapId, layer, index, false, groupCount));
@@ -58,11 +49,18 @@ export class Layers extends Component {
   }
 
   render() {
-    const { mapId, layers, currentRegion, preparedLayers, auth } = this.props;
+    const { mapId, layers, currentRegion, preparedLayers, auth, noLayerText } = this.props;
     let layerKeys;
     let layerObj;
     let layerItem = [];
     const subLayerIds = [];
+    const ifPermissionDenied = () => {
+      return layers.length > 0 ? (
+        <p>You don't have permision to view this category</p>
+      ) : (
+        <p>{noLayerText ? noLayerText : 'No layers available'}</p>
+      );
+    };
 
     if (!preparedLayers) {
       return false;
@@ -85,13 +83,7 @@ export class Layers extends Component {
         !subLayerIds.includes(layer.id)
       ) {
         if (layer.id && (!auth || !auth.authConfigs)) {
-          if (this.props.layerItem) {
-            const CustomLayerItem = this.props.layerItem;
-
-            layerItem.push(<CustomLayerItem key={layer.id} mapId={mapId} layer={layer} />);
-          } else {
-            layerItem.push(<Layer key={layer.id} mapId={mapId} layer={layer} />);
-          }
+          layerItem.push(<Layer key={layer.id} mapId={mapId} layer={layer} />);
         } else if (layer.id && auth) {
           const { authConfigs, userInfo } = auth;
           let activeId = layer.id;
@@ -101,8 +93,11 @@ export class Layers extends Component {
             // split to remove .json part
             activeId = activeId.split('.')[0];
           }
-
-          users = authConfigs.LAYERS[activeId]; // list of users with access to the layer
+          // this is a temporary fix
+          const LocalAuthConfig = JSON.parse(localStorage.getItem('authConfig'));
+          users = authConfigs.LAYERS && authConfigs.LAYERS[activeId]; // list of users with access to the layer
+          authConfigs.LAYERS = authConfigs.LAYERS || LocalAuthConfig.LAYERS;
+          // users = authConfigs.LAYERS[activeId]; // list of users with access to the layer
           // check if logged in user exists in the list of users
           // who have access to the layer
           if (
@@ -111,13 +106,7 @@ export class Layers extends Component {
               authConfigs.LAYERS.ALL &&
               authConfigs.LAYERS.ALL.includes(userInfo.username))
           ) {
-            if (this.props.layerItem) {
-              const CustomLayerItem = this.props.layerItem;
-
-              layerItem.push(<CustomLayerItem key={layer.id} mapId={mapId} layer={layer} />);
-            } else {
-              layerItem.push(<Layer key={layer.id} mapId={mapId} layer={layer} />);
-            }
+            layerItem.push(<Layer key={layer.id} mapId={mapId} layer={layer} />);
           }
         } else {
           Object.keys(layer).forEach((d, i) => {
@@ -126,27 +115,25 @@ export class Layers extends Component {
                 <a
                   key={`${d}-${i}-link`}
                   className="sub-category"
-                  onClick={e => this.toggleSubMenu(e, d, layer[d].count)}
+                  onClick={e => this.toggleSubMenu(e, d)}
                 >
                   {d}
                   <span
                     className={`category glyphicon glyphicon-chevron-${
-                      this.isGroupOpen(layer[d].count, d) ? 'down' : 'right'
+                      this.state[d].isOpen ? 'down' : 'right'
                     }`}
                   />
                 </a>
               </li>,
-              this.isGroupOpen(layer[d].count, d) ? (
+              this.state[d].isOpen ? (
                 <Layers
-                  openGroups={this.props.openGroups}
-                  dispatch={this.props.dispatch}
-                  layerItem={this.props.layerItem}
                   key={`${d}-${i}`}
                   mapId={mapId}
                   layers={layer[d].layers}
                   currentRegion={currentRegion}
                   preparedLayers={preparedLayers}
                   auth={this.props.auth}
+                  noLayerText={noLayerText}
                 />
               ) : null,
             ]);
@@ -156,7 +143,7 @@ export class Layers extends Component {
       return null;
     });
 
-    return <ul className="layers">{layerItem}</ul>;
+    return <ul className="layers">{layerItem.length > 0 ? layerItem : ifPermissionDenied()}</ul>;
   }
 }
 
