@@ -130,14 +130,37 @@ class Menu extends Component {
 
   onCategoryClick = (e, category) => {
     e.preventDefault();
-    const { openCategories } = this.props;
-    const index = openCategories.indexOf(category);
+    const index = this.getCategoryIndex(category);
     this.props.dispatch(Actions.toggleCategories(this.props.mapId, category, index))
+  }
+
+  getCategoryIndex = (category) => {
+    const { openCategories } = this.props;
+    return openCategories.indexOf(category);
   }
 
   onRegionClick = (e) => {
     const region = e.target.value;
     this.props.dispatch(Actions.changeRegion(region));
+  }
+
+  OnsearchResultClick(e, indicator) {
+    e.preventDefault();
+    const { searchterms } = this.props;
+    const inidcatorDetails = searchterms[indicator];
+    const isArray = Array.isArray(inidcatorDetails);
+    const parentLayers = isArray ? inidcatorDetails : inidcatorDetails.parentLayers;
+    parentLayers.forEach((layer, i) => {
+      if (i === 0) {
+        this.getCategoryIndex(layer) ?  this.onCategoryClick(e, layer) : null;
+      } else {
+      }
+      
+    })
+    this.setState({
+      searchResults: [],
+      searching: false
+    });
   }
 
   boldQuery(indicator, query){
@@ -149,7 +172,11 @@ class Menu extends Component {
     const matchIndex = indicatorToUpper.indexOf(queryToUpper);
     const querryLen = queryToUpper.length;
 
-    return <a>{indicator.substr(0,matchIndex)}<b>{indicator.substr(matchIndex, querryLen)}</b>{indicator.substr(matchIndex+querryLen)}</a>
+    return (
+      <a onClick={e => this.OnsearchResultClick(e, indicator)}>
+        {indicator.substr(0,matchIndex)}<b>{indicator.substr(matchIndex, querryLen)}</b>{indicator.substr(matchIndex+querryLen)}
+      </a>
+    )
   }
 
   handleSearch(e) {
