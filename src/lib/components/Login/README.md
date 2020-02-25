@@ -54,6 +54,8 @@ if (isBasicAuthLoggedIn()) {
 You must have an Ona application client ID. If, you do not have the client ID, [Register your client application with Ona](https://api.ona.io/static/docs/authentication.html#using-oauth2-with-the-ona-api) to obtain yout client ID
 
 
+### Set Up
+
 In your client project's `site-config.json`, remove the property password if it exists.
 
 ```
@@ -67,9 +69,6 @@ In your client project's `site-config.json`, remove the property password if it 
     ...
 }
 ```
-
-At the root of this project, create a `.env` and copy the contents of `.env.sample` into your `.env`.
-Assign your client ID to the key `REACT_APP_GISIDA_CANOPY_CLIENT_ID`
 
 In `index.js` file
 
@@ -103,3 +102,8 @@ ReactDOM.render(
   rootElement
 );
 ```
+
+### Local development
+
+At the root of this project, create a `.env` and copy the contents of `.env.sample` into your `.env`.
+Assign your client ID to the key `REACT_APP_GISIDA_CANOPY_CLIENT_ID`
