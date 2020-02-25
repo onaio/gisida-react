@@ -1,4 +1,4 @@
-import { mount, shallow } from 'enzyme';
+import { mount } from 'enzyme';
 import React from 'react';
 import toJson from 'enzyme-to-json';
 import BasicAuthLogin from './../BasicAuthLogin';

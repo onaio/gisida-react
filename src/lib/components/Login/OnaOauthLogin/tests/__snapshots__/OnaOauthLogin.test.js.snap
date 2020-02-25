@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`/src/lib/components/Login/OnaOauthLogin renders correctly 1`] = `
+<OnaOauthLogin>
+  <form
+    className="login-form"
+  >
+    <div
+      className="form-group"
+    >
+      <a
+        className="btn btn-default center-block btn-block"
+        href="https://api.ona.io/o/authorize/?client_id=clientId&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read%20write&response_type=token&state=abc"
+      >
+        Login
+      </a>
+    </div>
+  </form>
+</OnaOauthLogin>
+`;
