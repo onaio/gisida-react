@@ -109,6 +109,10 @@ ReactDOM.render(
 At the root of this project, create a `.env` and copy the contents of `.env.sample` into your `.env`.
 Assign your client ID to the key `REACT_APP_GISIDA_CANOPY_CLIENT_ID`
 
+```
+REACT_APP_GISIDA_CANOPY_CLIENT_ID=<Your client id>
+```
+
 ### Deployment
 
 Export your client ID as an environmental variable in your production server and restart. There are many
