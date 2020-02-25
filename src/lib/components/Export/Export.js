@@ -86,6 +86,7 @@ export class Export extends Component {
     this.resetMapAfterExport = this.resetMapAfterExport.bind(this);
   }
 
+
   componentWillReceiveProps(nextProps) {
     if (nextProps && nextProps.map) {
       const { html2canvas, devicePixelRatio, innerHeight, innerWidth } = window;
@@ -121,10 +122,9 @@ export class Export extends Component {
   onCaptureClick(e) {
     e.preventDefault();
     const { resValue, dimWidth, dimHeight, titleText, doFitMap, ppi, preset } = this.state;
-    const {  mapId } = this.props;
+    const { mapId } = this.props;
     const { map, config } = this.state;
     const self = this;
-
     // save the previous position of the map
     const prevMapState = {
       zoom: map.getZoom(),
@@ -133,7 +133,9 @@ export class Export extends Component {
 
     // resize map container / map
     $(`#${mapId}.mapboxgl-map`).innerWidth(dimWidth / resValue).innerHeight(dimHeight / resValue);
-    map.removeControl(map.controls);
+    if (!config.includeNavControls) {
+      map.removeControl(map.controls);
+    }
     map.resize();
 
     if (config.mapBounds && doFitMap) {
@@ -214,8 +216,7 @@ export class Export extends Component {
       }
 
       // scale the scalling containers
-      $('.topLeft, .topRight, .bottomLeft, .bottomRight', exportEl)
-        .css('transform', `scale(${scale})`);
+      $('.topLeft, .topRight, .bottomLeft, .bottomRight', exportEl).css('transform');
       // insert the export container element in the DOM
       $('body').append(exportEl);
       // move (not copy) the map into the export container
@@ -351,7 +352,7 @@ export class Export extends Component {
 
   scriptIsLoaded() {
     this.setState({
-        isH2Cloaded: true
+      isH2Cloaded: true
     });
   }
 
@@ -552,13 +553,13 @@ export class Export extends Component {
                         >Fit map to export size and aspect ratio</label>
                       </div>
                     ) : (
-                      // todo - add link to documentation
-                      <span className="boundsNote">
-                        Note: Provide the &apos;mapBounds&apos; configuration
+                        // todo - add link to documentation
+                        <span className="boundsNote">
+                          Note: Provide the &apos;mapBounds&apos; configuration
                         option to enable fitting the map<br />
-                        within the exported image.
+                          within the exported image.
                       </span>
-                    )
+                      )
                   }
                 </div>
                 <div>
@@ -600,12 +601,12 @@ export class Export extends Component {
               </a>
             </div>
           ) : (
-            <Script
-              url="https://html2canvas.hertzen.com/dist/html2canvas.min.js"
-              onLoad={() => { this.scriptIsLoaded(); }}
-            />
-          )
-        : ''}
+              <Script
+                url="https://html2canvas.hertzen.com/dist/html2canvas.min.js"
+                onLoad={() => { this.scriptIsLoaded(); }}
+              />
+            )
+          : ''}
       </div>
     );
   }
