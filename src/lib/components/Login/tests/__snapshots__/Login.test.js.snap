@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`/src/lib/components/Login/Login renders correctly: img 1`] = `
+exports[`/src/lib/components/Login renders correctly: img 1`] = `
 Object {
   "alt": "App name description",
   "className": "brand-login",

@@ -1,4 +1,4 @@
-import { mount, shallow } from 'enzyme';
+import { mount } from 'enzyme';
 import React from 'react';
 import { Provider } from 'react-redux';
 import Login from './../Login';
@@ -10,7 +10,7 @@ const initStore = {
         appIcon: '/path/to/appicon.jpg',
         appLoginIcon: '/path/to/loginicon.jpg',
         appNameDesc: 'App name description',
-        password: '$0me $s+rong p@$$w0rd'
+        password: ['$0me $s+rong p@$$w0rd']
     }
 }
 const store = mockStore(initStore);
@@ -19,7 +19,7 @@ afterEach(() => {
     delete process.env.REACT_APP_GISIDA_CANOPY_CLIENT_ID;
 });
 
-describe('/src/lib/components/Login/Login', () => {
+describe('/src/lib/components/Login', () => {
     it('renders correctly', () => {
         const wrapper = mount(
             <Provider store={store}>
@@ -51,8 +51,6 @@ describe('/src/lib/components/Login/Login', () => {
     it('renders null if basic auth password and ona oauth client ID is missing', () => {
         const storeNull = mockStore({ APP: {} });
         process.env.REACT_APP_GISIDA_CANOPY_CLIENT_ID = ''
-
-        jest.resetModules()
         const wrapper = mount(
             <Provider store={storeNull}>
                 <Login />
@@ -69,7 +67,7 @@ describe('/src/lib/components/Login/Login', () => {
             </Provider>
         )
         expect(wrapper.find('BasicAuthLogin').props()).toEqual({
-            appPassword: '$0me $s+rong p@$$w0rd'
+            appPassword: ['$0me $s+rong p@$$w0rd']
         })
         wrapper.mount()
     })
