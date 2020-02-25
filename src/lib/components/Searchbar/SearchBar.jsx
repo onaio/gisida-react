@@ -4,11 +4,14 @@ import './SearchBar.scss'
 
 const mapStateToProps = (state, ownProps) => {
     const { LAYERS, APP } = state;
+    const { handleSearch, searching, handleSearchClick } = ownProps;
     return {
       LAYERS,
       appColor: APP.appColor,
       searchBarColor: APP.searchBarColor,
-      handleSearch: ownProps.handleSearch,
+      handleSearch,
+      searching,
+      handleSearchClick,
     };
   };
 
@@ -19,17 +22,16 @@ class SearchBar extends Component {
     this.state = {
       text: '',
     }
-    this.handleClick = this.handleClick.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
   }
 
-  
-
-  handleClick() {
-    
+  handleCancel(e) {
+    e.preventDefault();
+    this.props.handleSearchClick(e, true)
   }
 
   render() {
-    const { appColor, searchBarColor, handleSearch } = this.props;
+    const { appColor, searchBarColor, handleSearch, searching, handleSearchClick } = this.props;
     const searchBtn = {
       border: `1px solid ${ searchBarColor || appColor || '#00B4CC'}`,
       background: `${ searchBarColor || appColor || '#00B4CC'}`,
@@ -43,10 +45,16 @@ class SearchBar extends Component {
           <input type="text" className="searchTerm" style={serchtearm} placeholder="Search..." 
             onChange={ handleSearch }
           />
-          <button type="button" className="searchButton" style={searchBtn}
-            onClick={this.handleClick} >
+          { searching ?
+            <button type="button" className="searchButton" style={searchBtn}
+            onClick={e => this.handleCancel(e)} >
+            <i className="fa fa-times"></i>
+            </button> :
+            <button type="button" className="searchButton" style={searchBtn}
+            onClick={e => handleSearchClick(e, false)} >
             <i className="fa fa-search"></i>
-        </button>
+            </button>
+          }
       </div>
     </div>
     )

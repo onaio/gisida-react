@@ -120,6 +120,7 @@ class Menu extends Component {
       searchResults: [],
     }
     this.handleSearch = this.handleSearch.bind(this);
+    this.handleSearchClick = this.handleSearchClick.bind(this);
   }
 
   onToggleMenu = (e) => {
@@ -157,10 +158,7 @@ class Menu extends Component {
       }
       
     })
-    this.setState({
-      searchResults: [],
-      searching: false
-    });
+    this.setState({ searching: false });
   }
 
   boldQuery(indicator, query){
@@ -186,10 +184,10 @@ class Menu extends Component {
     input = input.trimStart()
     const { searching } = this.state;
     const { searchterms } = this.props;
+    this.setState({ searchResults: [], })
     if (!input) {
       return searching ? this.setState({ searching: false}) : null; 
     }
-    this.setState({ searchResults: [], })
     const searchResults = [];
     Object.keys(searchterms).forEach(key => {
         const id = searchterms[key].id;
@@ -204,6 +202,18 @@ class Menu extends Component {
       searchResults,
       searching: true
     });
+  }
+
+  handleSearchClick(e, cancel) {
+    e.preventDefault();
+    if (cancel) {
+      this.setState({
+        searchResults: [],
+        searching: false
+      });
+    } else {
+      this.setState({ searching: true });
+    }
   }
 
   render() {
@@ -247,6 +257,8 @@ class Menu extends Component {
                    <div style={{"height":"70px"}}>
                       <SearchBar 
                         handleSearch={this.handleSearch}
+                        searching={searching}
+                        handleSearchClick={this.handleSearchClick}
                       />
                     </div> : null
                   }
