@@ -20,6 +20,23 @@ the correct password to be checked against.
 }
 ```
 
+### Routing
+
+If your client project supports routing, protect your routes by importing `Router` from `gisida-react`
+
+```
+import { Router } from 'gisida-react'
+....
+
+<Router.PrivateRoute
+    exact
+    path="/"
+    auth={Cookie.get('dsauth') === "true"}
+    component={() => MapView}
+/>
+```
+
+
 ## Ona OAuth2 Implicit Grant Type Authentication (Recommended)
 
 ### Prerequisites
@@ -43,3 +60,20 @@ In the `site-config.json` file for the client project, remove the property passw
 
 At the root of this project, create a `.env` and copy the contents of `.env.sample` into your `.env`.
 Assign your client ID to the key `REACT_APP_GISIDA_CANOPY_CLIENT_ID`
+
+### Routing
+
+If your client project supports routing, protect your routes by importing `Router` from `gisida-react`
+
+```
+import { Router } from 'gisida-react'
+import { SupAuth } from 'gisida'
+....
+
+<Router.PrivateRoute
+    exact
+    path="/"
+    auth={SupAuth.defaultSupViewAuthC}
+    component={() => MapView}
+/>
+```
