@@ -24,7 +24,7 @@ the correct password to be checked against.
 
 ### Prerequisites
 
-Ona application client ID. If, you do not have the client ID, [Register your client application with Ona](https://api.ona.io/static/docs/authentication.html#using-oauth2-with-the-ona-api) to obtain yout client ID
+You must have an Ona application client ID. If, you do not have the client ID, [Register your client application with Ona](https://api.ona.io/static/docs/authentication.html#using-oauth2-with-the-ona-api) to obtain yout client ID
 
 
 In the `site-config.json` file for the client project, remove the property password if it exists.
