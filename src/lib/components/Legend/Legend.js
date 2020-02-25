@@ -542,8 +542,7 @@ export class Legend extends React.Component {
             : layers[primaryLayer].layers
             ? layerObj && layerObj.categories && layerObj.categories.breaks
             : layer.breaks;
-
-        const lastBreaks = Math.max(...stopsBreak);
+        const lastBreaks = stopsBreak && Math.max(...stopsBreak);
         const layerStops =
           timeSeriesObj &&
           timeSeriesObj.stops &&
@@ -558,13 +557,13 @@ export class Legend extends React.Component {
         activeColors.forEach((color, index, activeColors) => {
           const stopsIndex = layerStops ? layerStops.indexOf(color) : -1;
           if (stopsIndex !== -1) {
-            const firstVal = stopsIndex ? stopsBreak[stopsIndex - 1] : 0;
+            const firstVal = stopsIndex ? stopsBreak && stopsBreak[stopsIndex - 1] : 0;
 
             if (Object.is(activeColors.length - 1, index)) {
               // execute last item logic
               lastVal = lastBreaks;
             } else {
-              lastVal = stopsBreak[stopsIndex];
+              lastVal = stopsBreak && stopsBreak[stopsIndex];
             }
             background.push(
               <li
