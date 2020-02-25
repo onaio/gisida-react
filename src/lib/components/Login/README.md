@@ -74,6 +74,7 @@ In `index.js` file
 
 ```
 import { Login, Callback, Router } from 'gisida-react'
+import { SupAuth } from 'gisidia'
 ....
 
 const AppView = (
@@ -107,3 +108,12 @@ ReactDOM.render(
 
 At the root of this project, create a `.env` and copy the contents of `.env.sample` into your `.env`.
 Assign your client ID to the key `REACT_APP_GISIDA_CANOPY_CLIENT_ID`
+
+### Deployment
+
+Export your client ID as an environmental variable in your production server and restart. There are many
+ways to achieving this and you are not confined to using the one below.
+
+```
+export REACT_APP_GISIDA_CANOPY_CLIENT_ID=<Your client id>
+```
