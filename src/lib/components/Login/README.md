@@ -6,6 +6,8 @@ Ona OAuth2 Implicit Grant Type Authentication based on configuration.
 
 ## Basic Authentication (Not recommended)
 
+Caution: basic authentication is not a secure method of protecting sensitive data, it should only be used to grant basic access to view sites which do not include sensitive information
+
 Update your client project with the following changes:
 
 In `site-config.json` file, add the `password` property with a value for
