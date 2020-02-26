@@ -209,12 +209,18 @@ export class Legend extends React.Component {
       let uniqueStops;
 
       const quantiles = [];
-      const legendListLimitStyle = {
+      const rightListLimitStyle = {
+        position: "absolute",
+        listStyle: "none",
+        display: "inline",
+        right: "3%"
+      };
+      const leftListLimitStyle = {
         position: "absolute",
         listStyle: "none",
         display: "inline",
         left: "3%"
-      };
+      }
       const legendLimitStyle = { padding: '0% 0% 3% 0%' }
       if (timeSeriesObj) {
         const { temporalIndex } = timeSeriesObj;
@@ -427,7 +433,7 @@ export class Legend extends React.Component {
                 <li
                   id={`first-limit-${layer.id}`}
                   className={`${mapId}`}
-                  style={legendListLimitStyle}
+                  style={leftListLimitStyle}
                 >
                   {0}
                   {legendSuffix}
@@ -435,7 +441,7 @@ export class Legend extends React.Component {
                 <li
                   id={`last-limit-${layer.id}`}
                   className={`${mapId}`}
-                  style={legendListLimitStyle}
+                  style={rightListLimitStyle}
                 >
                   {typeof formatNum(lastVal, 1) === "undefined"
                     ? 0
@@ -627,7 +633,7 @@ export class Legend extends React.Component {
               <li
                 id={`first-limit-${layer.id}`}
                 className={`${mapId}`}
-                style={legendListLimitStyle}
+                style={leftListLimitStyle}
               >
                 {0}
                 {legendSuffix}
@@ -635,7 +641,7 @@ export class Legend extends React.Component {
               <li
                 id={`last-limit-${layer.id}`}
                 className={`${mapId}`}
-                style={legendListLimitStyle}
+                style={rightListLimitStyle}
               >
                 {typeof formatNum(lastVal, 1) === "undefined"
                   ? 0
