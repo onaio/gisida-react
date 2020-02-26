@@ -62,6 +62,23 @@ You must have an Ona application client ID. If, you do not have the client ID, [
 
 Update your client project with the following changes:
 
+[Install `dotenv-webpack`](https://www.npmjs.com/package/dotenv-webpack) and [update the client `webpack.config.js`](https://www.npmjs.com/package/dotenv-webpack#add-it-to-your-webpack-config-file) to use `dotenv-webpack`
+
+Add `.env` to `.gitignore`
+
+Add a `.env` file to the root directory of your client project and assign the client ID to the key
+`REACT_APP_GISIDA_CANOPY_CLIENT_ID`
+
+```
+REACT_APP_GISIDA_CANOPY_CLIENT_ID=<Your client Id>
+```
+
+Add a `.env.sample` a best practice that is used as an information file for all team members to know what keys and values may be needed. Add the variable
+
+```
+REACT_APP_GISIDA_CANOPY_CLIENT_ID=<Your client Id>
+```
+
 In `site-config.json` file, remove the property password if it exists.
 
 ```
@@ -89,8 +106,8 @@ const AppView = (
         ...
     </App>
 );
-const LoginView = <Login />;
-
+const oauthclientID = process.env.REACT_APP_GISIDA_CANOPY_CLIENT_ID;
+const LoginView = <Login oauthclientID={oauthclientID}/>;
 const CallbackView = <Callback />;
 
 ReactDOM.render(
@@ -108,23 +125,6 @@ ReactDOM.render(
   </Provider>,
   rootElement
 );
-```
-
-[Install `dotenv-webpack`](https://www.npmjs.com/package/dotenv-webpack) and [update the client `webpack.config.js`](https://www.npmjs.com/package/dotenv-webpack#add-it-to-your-webpack-config-file) to use `dotenv-webpack`
-
-Add `.env` to `.gitignore`
-
-Add a `.env` file to the root directory of your client project and assign the client ID to the key
-`REACT_APP_GISIDA_CANOPY_CLIENT_ID`
-
-```
-REACT_APP_GISIDA_CANOPY_CLIENT_ID=<Your client Id>
-```
-
-Add a `.env.sample` a best practice that is used as an information file for all team members to know what keys and values may be needed. Add the variable
-
-```
-REACT_APP_GISIDA_CANOPY_CLIENT_ID=<Your client Id>
 ```
 
 ### Deployment
