@@ -75,7 +75,7 @@ export class Legend extends React.Component {
       }
     }
   }
-  componentWillUpdate(nextProps, nextState) {
+  componentWillUpdate(nextProps) {
     const { layerObj } = nextProps;
     if (
       this.props.primaryLayer !== nextProps.primaryLayer &&
@@ -109,7 +109,7 @@ export class Legend extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     if (
       this.props.primaryLayer !== prevProps.primaryLayer &&
       this.props.layers &&
@@ -209,7 +209,13 @@ export class Legend extends React.Component {
       let uniqueStops;
 
       const quantiles = [];
-
+      const legendListLimitStyle = {
+        position: "absolute",
+        listStyle: "none",
+        display: "inline",
+        left: "3%"
+      };
+      const legendLimitStyle = { padding: '0% 0% 3% 0%' }
       if (timeSeriesObj) {
         const { temporalIndex } = timeSeriesObj;
         if (
@@ -417,16 +423,11 @@ export class Legend extends React.Component {
               onClick={e => this.onUpdatePrimaryLayer(e)}
             >
               <b>{layer.label}</b>
-              <ul className="legend-limit" style={{ padding: '0% 0% 3% 0%' }}>
+              <ul className="legend-limit" style={legendLimitStyle}>
                 <li
                   id={`first-limit-${layer.id}`}
                   className={`${mapId}`}
-                  style={{
-                    position: "absolute",
-                    listStyle: "none",
-                    display: "inline",
-                    left: "3%"
-                  }}
+                  style={legendListLimitStyle}
                 >
                   {0}
                   {legendSuffix}
@@ -434,12 +435,7 @@ export class Legend extends React.Component {
                 <li
                   id={`last-limit-${layer.id}`}
                   className={`${mapId}`}
-                  style={{
-                    position: 'absolute',
-                    listStyle: 'none',
-                    display: 'inline',
-                    right: '3%',
-                  }}
+                  style={legendListLimitStyle}
                 >
                   {typeof formatNum(lastVal, 1) === "undefined"
                     ? 0
@@ -627,16 +623,11 @@ export class Legend extends React.Component {
             onClick={e => this.onUpdatePrimaryLayer(e)}
           >
             <b>{layer.label}</b>
-            <ul className="legend-limit" style={{ padding: '0% 0% 3% 0%' }}>
+            <ul className="legend-limit" style={legendLimitStyle}>
               <li
                 id={`first-limit-${layer.id}`}
                 className={`${mapId}`}
-                style={{
-                  position: "absolute",
-                  listStyle: "none",
-                  display: "inline",
-                  left: "3%"
-                }}
+                style={legendListLimitStyle}
               >
                 {0}
                 {legendSuffix}
@@ -644,12 +635,7 @@ export class Legend extends React.Component {
               <li
                 id={`last-limit-${layer.id}`}
                 className={`${mapId}`}
-                style={{
-                  position: "absolute",
-                  listStyle: "none",
-                  display: "inline",
-                  right: "3%"
-                }}
+                style={legendListLimitStyle}
               >
                 {typeof formatNum(lastVal, 1) === "undefined"
                   ? 0

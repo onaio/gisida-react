@@ -926,8 +926,8 @@ class Map extends Component {
         ? detailViewProps && typeof detailViewProps !== undefined
         : this.props.showDetailView;
     let mapWidth = '100%';
-    let mapheight = this.props.hasNavbar ? '92%' : '100%';
-    let mapTop = this.props.hasNavbar ? '80px' : 0;
+    const mapheight = this.props.hasNavbar ? '92%' : '100%';
+    const mapTop = this.props.hasNavbar ? '80px' : 0;
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
     }

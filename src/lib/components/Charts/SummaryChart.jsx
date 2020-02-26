@@ -315,7 +315,7 @@ class SummaryChart extends React.Component {
        * back to the map component
        */
       const chartSpecs = SummaryChart.defineCharts(this.props.layer.charts);
-      charts = chartSpecs.charts;
+      charts = chartSpecs && chartSpecs.charts;
     }
 
     const { doShowModal, chartHeight, buttonBottom, isFullBleed, chartWidth } = this.state;

@@ -215,10 +215,10 @@ class Menu extends Component {
 
       layer[key].layers.forEach(subLayer => {
         if (!subLayer.id) {
-          let groupLayer = this.getAccessibleGroupLayer(subLayer, authConfigs, userInfo);
+          const groupSubLayer = this.getAccessibleGroupLayer(subLayer, authConfigs, userInfo);
 
-          if (groupLayer) {
-            accessibleKeySubLayers.push(groupLayer);
+          if (groupSubLayer) {
+            accessibleKeySubLayers.push(groupSubLayer);
           }
         } else {
           if (this.canAccessLayer(subLayer, authConfigs, userInfo)) {
@@ -271,7 +271,7 @@ class Menu extends Component {
             // If auth exists but authconfigs have not loaded. Bug should be fixed from ONA data and gisida core
             accesibleLayers.push(layer);
           } else if (!layer.id) {
-            let groupLayer = this.getAccessibleGroupLayer(layer, authConfigs, userInfo);
+            const groupLayer = this.getAccessibleGroupLayer(layer, authConfigs, userInfo);
 
             if (groupLayer) {
               accesibleLayers.push(groupLayer);
