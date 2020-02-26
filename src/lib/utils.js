@@ -177,75 +177,52 @@ export function deepCopy(x) {
 }
 
 export function orderLayers(activeLayersData, map, nextLayerId) {
-  let fill = activeLayersData.filter(d => d['type'] === 'fill' && !d['detail-view']);
-  if (fill.length) {
-    Object.keys(fill).forEach(key => {
-      if (map.getLayer(fill[key].id)) {
-        map.moveLayer(fill[key].id);
-      }
-    });
-    if (fill.find(c => c.id === nextLayerId) && map.getLayer(nextLayerId)) {
-      map.moveLayer(nextLayerId);
+    /**
+     * Rearranges rendered layers and puts selected layer on top. 
+     * @param {Object} filteredLayers - Mapbox layers
+     */
+    const moveLayers = filteredLayers => {
+        Object.keys(filteredLayers).forEach((key) => {
+            if (map.getLayer(filteredLayers[key].id)) {
+                map.moveLayer(filteredLayers[key].id);
+            }
+        });
+        if (
+            filteredLayers.find(d => d.id === nextLayerId) &&
+            map.getLayer(nextLayerId)
+        ) {
+            map.moveLayer(nextLayerId);
+        }
     }
-  }
 
-  let circles = activeLayersData.filter(d => d['type'] === 'circle');
-  if (circles.length) {
-    Object.keys(circles).forEach(key => {
-      if (map.getLayer(circles[key].id)) {
-        map.moveLayer(circles[key].id);
-      }
-    });
-    if (circles.find(c => c.id === nextLayerId) && map.getLayer(nextLayerId)) {
-      map.moveLayer(nextLayerId);
-    }
-  }
 
-  let symbols = activeLayersData.filter(d => d['type'] === 'symbol');
-  if (symbols.length) {
-    Object.keys(symbols).forEach(key => {
-      if (map.getLayer(symbols[key].id)) {
-        map.moveLayer(symbols[key].id);
-      }
-    });
-    if (symbols.find(s => s.id === nextLayerId) && map.getLayer(nextLayerId)) {
-      map.moveLayer(nextLayerId);
+    const fills = activeLayersData.filter(d => d['type'] === 'fill' && !d['detail-view']);
+    if (fills.length) {
+        moveLayers(fills);
     }
-  }
 
-  let line = activeLayersData.filter(d => d['type'] === 'line');
-  if (line.length) {
-    Object.keys(line).forEach(key => {
-      if (map.getLayer(line[key].id)) {
-        map.moveLayer(line[key].id);
-      }
-    });
-    if (line.find(c => c.id === nextLayerId) && map.getLayer(nextLayerId)) {
-      map.moveLayer(nextLayerId);
+    const lines = activeLayersData.filter(d => d['type'] === 'line');
+    if (lines.length) {
+        moveLayers(lines);
     }
-  }
 
-  let detailViewActive = activeLayersData.filter(d => d['detail-view']);
-  if (detailViewActive.length) {
-    Object.keys(detailViewActive).forEach(key => {
-      if (map.getLayer(detailViewActive[key].id)) {
-        map.moveLayer(detailViewActive[key].id);
-      }
-    });
-    if (detailViewActive.find(d => d.id === nextLayerId) && map.getLayer(nextLayerId)) {
-      map.moveLayer(nextLayerId);
+    const circles = activeLayersData.filter(d => d['type'] === 'circle');
+    if (circles.length) {
+        moveLayers(circle);
     }
-  }
-  let isLabelActive = activeLayersData.filter(d => d.isLabel);
 
-  if (isLabelActive.length) {
-    Object.keys(isLabelActive).forEach(key => {
-      if (map.getLayer(isLabelActive[key].id)) {
-        map.moveLayer(isLabelActive[key].id);
-      }
-    });
-    if (isLabelActive.find(d => d.id === nextLayerId) && map.getLayer(nextLayerId)) {
-      map.moveLayer(nextLayerId);
+    const symbols = activeLayersData.filter(d => d['type'] === 'symbol');
+    if (symbols.length) {
+        moveLayers(symbols);
     }
-  }
+
+    const detailViewActive = activeLayersData.filter(d => d['detail-view'] && !d['level-view']);
+    if (detailViewActive.length) {
+        moveLayers(detailViewActive);
+    }
+
+    const isLabelActive = activeLayersData.filter(d => d.isLabel);
+    if (isLabelActive.length) {
+        moveLayers(isLabelActive);
+    }
 }

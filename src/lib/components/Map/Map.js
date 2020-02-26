@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
-import { detectIE, buildLayersObj, detailViewData, orderLayers } from '../../utils';
+import { detectIE, buildLayersObj, orderLayers} from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -255,7 +255,7 @@ class Map extends Component {
               this.map.moveLayer(sublayers[s]);
             }
           }
-          orderLayers(sortedLayers, map, nextLayerId);
+          typeof sortLayers === 'function' ? sortLayers(map, activeLayersData, nextLayerId) : orderLayers(sortLayers, map, nextLayerId);
         }
       }
     }
@@ -298,7 +298,7 @@ class Map extends Component {
     // }
     // Order active layers
 
-    orderLayers(sortedLayers, map, nextLayerId);
+    typeof sortLayers === 'function' ? sortLayers(map, activeLayersData, nextLayerId) : orderLayers(sortLayers, map, nextLayerId);
     const nextlayersObj = activeLayersData.filter(lo => lo.id !== nextLayerId);
     nextlayersObj.push(nextLayerObj);
 
