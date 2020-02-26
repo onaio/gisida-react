@@ -7,6 +7,7 @@ const autoprefixer = require('autoprefixer');
 const webpack = require('webpack');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const paths = require('./paths');
+const Dotenv = require('dotenv-webpack');
 
 const shouldUseSourceMap = false;
 
@@ -150,7 +151,8 @@ module.exports = {
         ascii_only: true,
       },
       sourceMap: shouldUseSourceMap,
-    })
+    }),
+    new Dotenv(),
   ],
   externals: {
     'react': 'react',

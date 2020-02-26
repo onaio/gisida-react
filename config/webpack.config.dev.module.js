@@ -6,6 +6,9 @@ process.env.NODE_ENV = 'development';
 const autoprefixer = require('autoprefixer');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const paths = require('./paths');
+const Dotenv = require('dotenv-webpack');
+
+require('dotenv').load();
 
 module.exports = {
   // Don't attempt to continue if there are any errors.
@@ -21,6 +24,9 @@ module.exports = {
   resolve: {
     extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx'],
   },
+  plugins: [
+    new Dotenv()
+  ],
   module: {
     strictExportPresence: true,
     rules: [
