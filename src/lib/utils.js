@@ -201,6 +201,11 @@ export function orderLayers(activeLayersData, map, nextLayerId) {
         moveLayers(fills);
     }
 
+    const lines = activeLayersData.filter(d => d['type'] === 'line');
+    if (lines.length) {
+        moveLayers(lines);
+    }
+
     const circles = activeLayersData.filter(d => d['type'] === 'circle');
     if (circles.length) {
         moveLayers(circle);
@@ -209,11 +214,6 @@ export function orderLayers(activeLayersData, map, nextLayerId) {
     const symbols = activeLayersData.filter(d => d['type'] === 'symbol');
     if (symbols.length) {
         moveLayers(symbols);
-    }
-
-    const lines = activeLayersData.filter(d => d['type'] === 'line');
-    if (lines.length) {
-        moveLayers(lines);
     }
 
     const detailViewActive = activeLayersData.filter(d => d['detail-view'] && !d['level-view']);
