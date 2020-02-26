@@ -6,32 +6,35 @@ class OnaOauthLogin extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      authorizationUris: {},
+      authorizationUris: {}
     };
   }
 
-  componentDidMount() {
-    const clientID = process.env.REACT_APP_GISIDA_CANOPY_CLIENT_ID
-    const redirectUri = location.protocol + '//' + location.host + '/callback';
-    const providers = {
-      onadata: {
-        accessTokenUri: '',
-        authorizationUri: 'https://api.ona.io/o/authorize/',
-        clientId: clientID,
-        redirectUri: redirectUri,
-        scopes: ['read', 'write'],
-        state: 'abc',
-        userUri: 'https://api.ona.io/user',
-      },
-    };
-    const options = {
-      providers,
-      authorizationGrantType: AuthorizationGrantType.IMPLICIT,
-    };
-    const authorizationUris = useOAuthLogin(options);
-    this.setState({
-      authorizationUris,
-    });
+  componentDidUpdate(prevProps) {
+    if (prevProps.clientID !== this.props.clientID) {
+      const clientID = this.props.clientID
+      const redirectUri = location.protocol + '//' + location.host + '/callback';
+      const providers = {
+        onadata: {
+          accessTokenUri: '',
+          authorizationUri: 'https://api.ona.io/o/authorize/',
+          clientId: clientID,
+          redirectUri: redirectUri,
+          scopes: ['read', 'write'],
+          state: 'abc',
+          userUri: 'https://api.ona.io/user',
+        },
+      };
+      const options = {
+        providers,
+        authorizationGrantType: AuthorizationGrantType.IMPLICIT,
+      };
+      const authorizationUris = useOAuthLogin(options);
+      this.setState({
+        redirect: false,
+        authorizationUris,
+      });
+    }
   }
 
   getProviderKey() {
@@ -39,7 +42,7 @@ class OnaOauthLogin extends Component {
   }
 
   render() {
-    if (!process.env.REACT_APP_GISIDA_CANOPY_CLIENT_ID) {
+    if (!this.props.clientID) {
       return null;
     }
     const providerKey = this.getProviderKey();

@@ -4,23 +4,24 @@ import './Login.scss';
 import BasicAuthLogin from './BasicAuthLogin/BasicAuthLogin'
 import OnaOauthLogin from './OnaOauthLogin/OnaOauthLogin'
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
     const { APP } = state;
     return {
         appIcon: APP.appIcon,
         loginIcon: APP.appLoginIcon,
         appPassword: APP.password,
-        appNameDesc: APP.appNameDesc
+        appNameDesc: APP.appNameDesc,
+        clientID: ownProps.clientID
     };
 };
 
 class Login extends Component {
     render() {
-        if (!this.props.appPassword && !process.env.REACT_APP_GISIDA_CANOPY_CLIENT_ID) {
+        if (!this.props.appPassword && !this.props.clientID) {
             return null;
         }
 
-        const { appPassword, appNameDesc, loginIcon, appIcon } = this.props;
+        const { appPassword, appNameDesc, loginIcon, appIcon, clientID } = this.props;
 
         return (
             <div className="login">
@@ -28,7 +29,7 @@ class Login extends Component {
                 {appPassword ?
                     <BasicAuthLogin appPassword={appPassword} />
                     :
-                    <OnaOauthLogin />
+                    <OnaOauthLogin clientID={clientID} />
                 }
             </div>
         )

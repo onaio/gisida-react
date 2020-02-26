@@ -6,7 +6,9 @@ Ona OAuth2 Implicit Grant Type Authentication based on configuration.
 
 ## Basic Authentication (Not recommended)
 
-In your client project's `site-config.json`, add the `password` property with a value for
+Update your client project with the following changes:
+
+In `site-config.json` file, add the `password` property with a value for
 the correct password to be checked against.
 
 ```
@@ -56,7 +58,9 @@ You must have an Ona application client ID. If, you do not have the client ID, [
 
 ### Set Up
 
-In your client project's `site-config.json`, remove the property password if it exists.
+Update your client project with the following changes:
+
+In `site-config.json` file, remove the property password if it exists.
 
 ```
 {
@@ -104,13 +108,21 @@ ReactDOM.render(
 );
 ```
 
-### Local development
+[Install `dotenv-webpack`](https://www.npmjs.com/package/dotenv-webpack) and [update the client `webpack.config.js`](https://www.npmjs.com/package/dotenv-webpack#add-it-to-your-webpack-config-file) to use `dotenv-webpack`
 
-At the root of this project, create a `.env` and copy the contents of `.env.sample` into your `.env`.
-Assign your client ID to the key `REACT_APP_GISIDA_CANOPY_CLIENT_ID`
+Add `.env` to `.gitignore`
+
+Add a `.env` file to the root directory of your client project and assign the client ID to the key
+`REACT_APP_GISIDA_CANOPY_CLIENT_ID`
 
 ```
-REACT_APP_GISIDA_CANOPY_CLIENT_ID=<Your client id>
+REACT_APP_GISIDA_CANOPY_CLIENT_ID=<Your client Id>
+```
+
+Add a `.env.sample` a best practice that is used as an information file for all team members to know what keys and values may be needed. Add the variable
+
+```
+REACT_APP_GISIDA_CANOPY_CLIENT_ID=<Your client Id>
 ```
 
 ### Deployment

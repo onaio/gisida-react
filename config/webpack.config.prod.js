@@ -151,8 +151,7 @@ module.exports = {
         ascii_only: true,
       },
       sourceMap: shouldUseSourceMap,
-    }),
-    new Dotenv()
+    })
   ],
   externals: {
     'react': 'react',

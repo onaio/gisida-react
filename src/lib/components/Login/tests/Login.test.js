@@ -15,10 +15,6 @@ const initStore = {
 }
 const store = mockStore(initStore);
 
-afterEach(() => {
-    delete process.env.REACT_APP_GISIDA_CANOPY_CLIENT_ID;
-});
-
 describe('/src/lib/components/Login', () => {
     it('renders correctly', () => {
         const wrapper = mount(
@@ -50,7 +46,6 @@ describe('/src/lib/components/Login', () => {
 
     it('renders null if basic auth password and ona oauth client ID is missing', () => {
         const storeNull = mockStore({ APP: {} });
-        process.env.REACT_APP_GISIDA_CANOPY_CLIENT_ID = ''
         const wrapper = mount(
             <Provider store={storeNull}>
                 <Login />
@@ -73,7 +68,6 @@ describe('/src/lib/components/Login', () => {
     })
 
     it('renders ona oauth correctly', () => {
-        process.env.REACT_APP_GISIDA_CANOPY_CLIENT_ID = 'clientId'
         const storeOnaOauth = mockStore({
             ...initStore,
             APP: {
@@ -82,9 +76,12 @@ describe('/src/lib/components/Login', () => {
 
             },
         });
+        const props = {
+            clientID: 'client_id'
+        }
         const wrapper = mount(
             <Provider store={storeOnaOauth}>
-                <Login />
+                <Login {...props} />
             </Provider>
         )
         expect(wrapper.find('OnaOauthLogin')).toBeTruthy()
