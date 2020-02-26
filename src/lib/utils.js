@@ -196,9 +196,9 @@ export function orderLayers(activeLayersData, map, nextLayerId) {
     }
 
 
-    const fill = activeLayersData.filter(d => d['type'] === 'fill' && !d['detail-view']);
-    if (fill.length) {
-        moveLayers(fill);
+    const fills = activeLayersData.filter(d => d['type'] === 'fill' && !d['detail-view']);
+    if (fills.length) {
+        moveLayers(fills);
     }
 
     const circles = activeLayersData.filter(d => d['type'] === 'circle');
@@ -211,9 +211,9 @@ export function orderLayers(activeLayersData, map, nextLayerId) {
         moveLayers(symbols);
     }
 
-    const line = activeLayersData.filter(d => d['type'] === 'line');
-    if (line.length) {
-        moveLayers(line);
+    const lines = activeLayersData.filter(d => d['type'] === 'line');
+    if (lines.length) {
+        moveLayers(lines);
     }
 
     const detailViewActive = activeLayersData.filter(d => d['detail-view'] && !d['level-view']);
