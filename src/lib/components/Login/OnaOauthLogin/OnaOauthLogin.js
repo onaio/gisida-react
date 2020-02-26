@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { useOAuthLogin } from '@onaio/gatekeeper/dist/components/login';
 import { AuthorizationGrantType } from '@onaio/gatekeeper';
 
@@ -60,6 +61,10 @@ class OnaOauthLogin extends Component {
       </form>
     );
   }
+}
+
+OnaOauthLogin.PropTypes = {
+  clientID: PropTypes.string
 }
 
 export default OnaOauthLogin

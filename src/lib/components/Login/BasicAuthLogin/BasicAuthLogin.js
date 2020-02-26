@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Cookie from 'js-cookie';
 
 export const isLoggedIn = function () {
     return Cookie.get('dsauth') === "true";
 };
-
 
 class BasicAuthLogin extends Component {
     constructor(props) {
@@ -23,7 +23,7 @@ class BasicAuthLogin extends Component {
     }
 
     render() {
-        if (!this.props.appPassword) {
+        if (!this.props.appPassword || !this.props.appPassword.length) {
             return null;
         }
 
@@ -38,6 +38,14 @@ class BasicAuthLogin extends Component {
             </form>
         );
     }
+}
+BasicAuthLogin.defaultProps = {
+    appPassword: []
+
+}
+
+BasicAuthLogin.PropTypes = {
+    appPassword: PropTypes.string
 }
 
 export default BasicAuthLogin

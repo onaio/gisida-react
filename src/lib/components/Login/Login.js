@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import './Login.scss';
 import BasicAuthLogin from './BasicAuthLogin/BasicAuthLogin'
 import OnaOauthLogin from './OnaOauthLogin/OnaOauthLogin'
@@ -33,9 +34,15 @@ class Login extends Component {
                 }
             </div>
         )
-
-
     }
+}
+
+Login.PropTypes = {
+    clientID: PropTypes.string,
+    appIcon: PropTypes.string,
+    loginIcon: PropTypes.string,
+    appPassword: PropTypes.string.length,
+    appNameDesc: PropTypes.string
 }
 
 export default connect(mapStateToProps)(Login);
