@@ -19,6 +19,7 @@
         "start": "node scripts/start.js",
         "test": "node scripts/test.js --env=jsdom"
     },
+    "types": "./build/types/index.ts",
     "babel": {
         "presets": [
             "react-app",
