@@ -6,14 +6,10 @@ import { AuthorizationGrantType } from '@onaio/gatekeeper';
 class OnaOauthLogin extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      authorizationUris: {}
-    };
-  }
+    const clientID = this.props.clientID
+    let authorizationUris = {}
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.clientID !== this.props.clientID) {
-      const clientID = this.props.clientID
+    if (clientID) {
       const redirectUri = location.protocol + '//' + location.host + '/callback';
       const providers = {
         onadata: {
@@ -30,30 +26,28 @@ class OnaOauthLogin extends Component {
         providers,
         authorizationGrantType: AuthorizationGrantType.IMPLICIT,
       };
-      const authorizationUris = useOAuthLogin(options);
-      this.setState({
-        redirect: false,
-        authorizationUris,
-      });
+      authorizationUris = useOAuthLogin(options);
     }
+
+    this.state = {
+      authorizationUris
+    };
   }
 
-  getProviderKey() {
-    return Object.keys(this.state.authorizationUris).filter(key => key === 'onadata')[0];
-  }
 
   render() {
-    if (!this.props.clientID) {
+    const { provider } = this.props
+
+    if (!this.props.clientID || !this.state.authorizationUris[provider]) {
       return null;
     }
-    const providerKey = this.getProviderKey();
 
     return (
       <form className="login-form">
         <div className="form-group">
           <a
             className="btn btn-default center-block btn-block"
-            href={this.state.authorizationUris[providerKey]}
+            href={this.state.authorizationUris[provider]}
           >
             Login
             </a>
@@ -63,8 +57,13 @@ class OnaOauthLogin extends Component {
   }
 }
 
+OnaOauthLogin.defaultProps = {
+  provider: 'onadata'
+}
+
 OnaOauthLogin.PropTypes = {
-  clientID: PropTypes.string
+  clientID: PropTypes.string,
+  provider: PropTypes.string,
 }
 
 export default OnaOauthLogin

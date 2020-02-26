@@ -12,17 +12,19 @@ const mapStateToProps = (state, ownProps) => {
         loginIcon: APP.appLoginIcon,
         appPassword: APP.password,
         appNameDesc: APP.appNameDesc,
-        clientID: ownProps.clientID
+        oauthclientID: ownProps.oauthclientID,
+        oauthProvider: ownProps.oauthProvider || 'onadata'
     };
 };
 
 class Login extends Component {
     render() {
-        if (!this.props.appPassword && !this.props.clientID) {
+        if (!this.props.appPassword && !this.props.oauthclientID) {
             return null;
         }
 
-        const { appPassword, appNameDesc, loginIcon, appIcon, clientID } = this.props;
+        const { appPassword, appNameDesc, loginIcon, appIcon,
+            oauthclientID, oauthProvider } = this.props;
 
         return (
             <div className="login">
@@ -30,7 +32,7 @@ class Login extends Component {
                 {appPassword ?
                     <BasicAuthLogin appPassword={appPassword} />
                     :
-                    <OnaOauthLogin clientID={clientID} />
+                    <OnaOauthLogin clientID={oauthclientID} provider={oauthProvider} />
                 }
             </div>
         )

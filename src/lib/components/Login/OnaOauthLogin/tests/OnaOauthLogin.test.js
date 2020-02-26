@@ -5,7 +5,8 @@ import OnaOauthLogin from './../OnaOauthLogin';
 
 describe('/src/lib/components/Login/OnaOauthLogin', () => {
     const props = {
-        clientID: 'client_id'
+        clientID: 'client_id',
+        provider: 'onadata'
     }
     it('renders correctly', () => {
         const wrapper = mount(<OnaOauthLogin {...props} />)
@@ -18,4 +19,13 @@ describe('/src/lib/components/Login/OnaOauthLogin', () => {
         expect(wrapper.isEmptyRender()).toBe(true)
         wrapper.unmount()
     });
+
+    it('renders default oauth provider if provider is not provided', () => {
+        const propsDefaultProvider = {
+            clientID: 'client_id'
+        }
+        const wrapper = mount(<OnaOauthLogin  {...propsDefaultProvider} />)
+        expect(toJson(wrapper)).toMatchSnapshot()
+        wrapper.unmount()
+    })
 })
