@@ -135,3 +135,6 @@ ways to achieving this and you are not confined to using the one below.
 ```
 export REACT_APP_GISIDA_CANOPY_CLIENT_ID=<Your client id>
 ```
+
+It is also recommended to use an additional layer of server side protection to secure static resources from
+being accessible without authentication.
