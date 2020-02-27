@@ -184,6 +184,15 @@ class Map extends Component {
     const feature = features[0];
     if (!feature) return false;
     const activeLayerObj = this.props.layersObj.find((l) => l.id === feature.layer.id);
+    /**
+     * Move magic strings to constants file
+     * Investigate why some points won't change colors
+     * Investigate why other points will change instead of the selected points
+     */
+    if (feature.layer && feature.layer.id === 'nutrition-sites-live') {
+      this.map.setFilter("nutrition-sites-live", ["all", ["!=", "facility_id", feature.properties.facility_id]])
+      this.map.setFilter("nutrition-sites-live-highlight", ["all", ["==", "facility_id", feature.properties.facility_id]])
+    }
 
     if (feature && activeLayerObj['detail-view']) {
       const newZoom = this.map.getZoom() < 7.5 ? 7.5 : this.map.getZoom();
@@ -372,6 +381,14 @@ class Map extends Component {
               highlightLayer.id += '-highlight';
               // add the highlight layer to the map
               if (!this.map.getLayer(highlightLayer.id)) {
+                /**
+                 * Investigate opacity issues
+                 */
+                // highlightLayer.paint = {
+                //   ...highlightLayer.paint,
+                //   'icon-opacity': 0
+                // };
+                console.log('highlitedlayer------------->', highlightLayer);
                 this.map.addLayer(highlightLayer);
               }
             }
