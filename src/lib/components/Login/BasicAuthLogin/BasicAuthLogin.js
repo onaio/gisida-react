@@ -45,7 +45,7 @@ BasicAuthLogin.defaultProps = {
 }
 
 BasicAuthLogin.PropTypes = {
-    appPassword: PropTypes.string
+    appPassword: PropTypes.arrayOf(PropTypes.string).isRequired
 }
 
 export default BasicAuthLogin

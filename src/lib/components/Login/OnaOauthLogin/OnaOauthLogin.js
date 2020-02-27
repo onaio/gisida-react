@@ -6,7 +6,7 @@ import { AuthorizationGrantType } from '@onaio/gatekeeper';
 class OnaOauthLogin extends Component {
   constructor(props) {
     super(props);
-    const clientID = this.props.clientID
+    const { clientID } = this.props
     let authorizationUris = {}
 
     if (clientID) {
@@ -62,7 +62,7 @@ OnaOauthLogin.defaultProps = {
 }
 
 OnaOauthLogin.PropTypes = {
-  clientID: PropTypes.string,
+  clientID: PropTypes.string.isRequired,
   provider: PropTypes.string,
 }
 

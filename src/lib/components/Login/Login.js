@@ -43,7 +43,7 @@ Login.PropTypes = {
     clientID: PropTypes.string,
     appIcon: PropTypes.string,
     loginIcon: PropTypes.string,
-    appPassword: PropTypes.string.length,
+    appPassword: PropTypes.arrayOf(PropTypes.string),
     appNameDesc: PropTypes.string
 }
 
