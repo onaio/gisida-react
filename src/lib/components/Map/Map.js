@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
-import { detectIE, buildLayersObj, detailViewData, orderLayers } from '../../utils';
+import { detectIE, buildLayersObj, orderLayers } from '../../utils';
 import './Map.scss';
+import { NUTRITION_SITES_LIVE, NUTRITION_SITES_LIVE_HIGHLIGHT, ALL, ICON_OPACITY, FACILITY_ID } from '../../constants'
 
 const mapStateToProps = (state, ownProps) => {
   const { APP, STYLES, REGIONS, VIEW, FILTER, LOC } = state;
@@ -176,6 +177,7 @@ class Map extends Component {
   //   }
   // }
   onFeatureClick(e) {
+    
     const activeLayers = this.props.layersObj.map(l => l.id)
     const { mapId } = this.props;
     const features = this.map.queryRenderedFeatures(e.point, {
@@ -185,20 +187,31 @@ class Map extends Component {
     if (!feature) return false;
     const activeLayerObj = this.props.layersObj.find((l) => l.id === feature.layer.id);
     /**
-     * Move magic strings to constants file
+     * Todo:
      * Investigate why some points won't change colors
      * Investigate why other points will change instead of the selected points
      */
     if (feature.layer && feature.layer.id === 'nutrition-sites-live') {
-      this.map.setFilter("nutrition-sites-live", ["all", ["!=", "facility_id", feature.properties.facility_id]])
-      this.map.setFilter("nutrition-sites-live-highlight", ["all", ["==", "facility_id", feature.properties.facility_id]])
+      /**
+       * 1. Set Icon opacity to one for the highlight layer
+       * 2. Filter out the selected feature
+       * 3. Filter in highlight layer feature with simillar facility_id
+       */
+      this.map.setPaintProperty(NUTRITION_SITES_LIVE_HIGHLIGHT, ICON_OPACITY, 1);
+      this.map.setFilter(NUTRITION_SITES_LIVE, [ALL, ["!=", FACILITY_ID, feature.properties.facility_id]]);
+      this.map.setFilter(NUTRITION_SITES_LIVE_HIGHLIGHT, [ALL, ["==", FACILITY_ID, feature.properties.facility_id]]);
+      this.map.setFilter(NUTRITION_SITES_LIVE, [ALL, ["==", 'reporting_period', feature.properties.reporting_period], ["!=", "facility_id", feature.properties.facility_id]])
+      this.map.easeTo()
     }
 
     if (feature && activeLayerObj['detail-view']) {
       const newZoom = this.map.getZoom() < 7.5 ? 7.5 : this.map.getZoom();
-      this.map.easeTo({
-        center: e.lngLat,
-        zoom: newZoom
+      this.map.flyTo({
+        center: {
+          "lng": feature.properties.longitude,
+          "lat": feature.properties.latitude
+        },
+        essential: true
       });
       buildDetailView(
         mapId,
@@ -358,6 +371,7 @@ class Map extends Component {
         }
       });
 
+
       // Add current layers to map
       if (this.props.MAP.reloadLayers !== reloadLayers) {
         Object.keys(layers).forEach((key) => {
@@ -382,13 +396,13 @@ class Map extends Component {
               // add the highlight layer to the map
               if (!this.map.getLayer(highlightLayer.id)) {
                 /**
-                 * Investigate opacity issues
+                 * Set highlight icon opacity to zero when loading the map
+                 * This prevents seeing highlight layer before it's filtered out on initial render 
                  */
-                // highlightLayer.paint = {
-                //   ...highlightLayer.paint,
-                //   'icon-opacity': 0
-                // };
-                console.log('highlitedlayer------------->', highlightLayer);
+                  highlightLayer.paint = {
+                    ...highlightLayer.paint,
+                    'icon-opacity': 0
+                  }
                 this.map.addLayer(highlightLayer);
               }
             }
