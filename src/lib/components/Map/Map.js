@@ -188,8 +188,7 @@ class Map extends Component {
     const activeLayerObj = this.props.layersObj.find((l) => l.id === feature.layer.id);
     /**
      * Todo:
-     * Investigate why some points won't change colors
-     * Investigate why other points will change instead of the selected points
+     * Investigate adjusting zoom to show selected feature
      */
     if (feature.layer && feature.layer.id === 'nutrition-sites-live') {
       /**
@@ -197,21 +196,17 @@ class Map extends Component {
        * 2. Filter out the selected feature
        * 3. Filter in highlight layer feature with simillar facility_id
        */
-      this.map.setPaintProperty(NUTRITION_SITES_LIVE_HIGHLIGHT, ICON_OPACITY, 1);
       this.map.setFilter(NUTRITION_SITES_LIVE, [ALL, ["!=", FACILITY_ID, feature.properties.facility_id]]);
       this.map.setFilter(NUTRITION_SITES_LIVE_HIGHLIGHT, [ALL, ["==", FACILITY_ID, feature.properties.facility_id]]);
-      this.map.setFilter(NUTRITION_SITES_LIVE, [ALL, ["==", 'reporting_period', feature.properties.reporting_period], ["!=", "facility_id", feature.properties.facility_id]])
-      this.map.easeTo()
+      this.map.setPaintProperty(NUTRITION_SITES_LIVE_HIGHLIGHT, ICON_OPACITY, 1);
+      this.map.setFilter(NUTRITION_SITES_LIVE, [ALL, ["==", 'reporting_period', feature.properties.reporting_period], ["!=", "facility_id", feature.properties.facility_id]]);
     }
 
     if (feature && activeLayerObj['detail-view']) {
       const newZoom = this.map.getZoom() < 7.5 ? 7.5 : this.map.getZoom();
       this.map.flyTo({
-        center: {
-          "lng": feature.properties.longitude,
-          "lat": feature.properties.latitude
-        },
-        essential: true
+        center: e.lngLat,
+        zoom: newZoom,
       });
       buildDetailView(
         mapId,
@@ -370,8 +365,6 @@ class Map extends Component {
           })
         }
       });
-
-
       // Add current layers to map
       if (this.props.MAP.reloadLayers !== reloadLayers) {
         Object.keys(layers).forEach((key) => {
@@ -406,7 +399,17 @@ class Map extends Component {
                 this.map.addLayer(highlightLayer);
               }
             }
-          } else if (this.map.getLayer(layer.id) && nextProps.MAP.reloadLayerId === layer.id) {
+          } else if (this.map.getLayer(layer.id) && layer.filters && layer.filters.highlight && nextProps.primaryLayer !== this.props.primaryLayer) {
+            /**
+             * Remove Nutrition sites layer & Highlight layer on map
+             */
+            [layer.id, `${layer.id}-highlight`].forEach((id) => {
+              this.map.removeLayer(id);
+              this.map.removeSource(id);
+            });
+          }
+          
+          else if (this.map.getLayer(layer.id) && nextProps.MAP.reloadLayerId === layer.id) {
             // 1) remove layer and source
             let doUpdateTsLayer = true;
             let filterOptions = false;
