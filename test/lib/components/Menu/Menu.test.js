@@ -1,7 +1,6 @@
 import React from 'react';
 import Menu from '../../../../src/lib/components/Menu/Menu.js'
 import { shallow, mount } from 'enzyme';
-import toJson from 'enzyme-to-json';
 import configureStore from 'redux-mock-store';
 import { layer1 } from '../../../fixtures/defaultLayers.js';
 import { Actions } from 'gisida';
@@ -34,8 +33,12 @@ describe('Menu Component', () => {
         shallow( <Menu {...props} store={store} /> );
     });
 
-    it('Menu component renders correctly with layer groups', () => {
+    it('Menu component renders correctly with all propes', () => {
         initialState.LAYERS.groups = {...groups}
+        initialState.REGIONS = [
+            {name: 'reg1', current: false},
+            {name: 'reg2', current: true}
+        ]
         const store = mockStore(initialState);
         const wrapper = mount(
             <Menu 
@@ -52,7 +55,15 @@ describe('Menu Component', () => {
         wrapper.find('a.open-btn').simulate('click');
         expect(toggleMenuAction).toHaveBeenCalledWith(props.mapId);
         wrapper.find('a.close-btn').simulate('click');
-        expect(toggleMenuAction).toHaveBeenCalledTimes(2);   
+        expect(toggleMenuAction).toHaveBeenCalledTimes(2); 
+        
+        // test onCategoryClick
+        const toggleCategoriesAction = jest.spyOn(Actions, 'toggleCategories');
+        wrapper.find('li.sector').at(0).find('a').simulate('click');
+        expect(toggleCategoriesAction).toHaveBeenCalledWith(props.mapId, 'Regions', -1);
+        wrapper.find('li.sector').at(1).find('a').simulate('click');
+        expect(toggleCategoriesAction).toHaveBeenCalledWith(props.mapId, 'Severity of needs', 0)
+        expect(toggleCategoriesAction).toHaveBeenCalledTimes(2); 
     })
 
 });

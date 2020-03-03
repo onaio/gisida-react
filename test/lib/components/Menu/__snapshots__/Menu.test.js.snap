@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Menu Component Menu component renders correctly with layer groups: Menu props 1`] = `
+exports[`Menu Component Menu component renders correctly with all propes: Menu props 1`] = `
 Object {
   "AUTH": undefined,
   "LAYERS": Object {
@@ -177,7 +177,7 @@ Object {
       ],
     },
   ],
-  "currentRegion": "",
+  "currentRegion": "reg2",
   "dispatch": [Function],
   "loaded": true,
   "mapId": "map-1",
@@ -339,7 +339,16 @@ Object {
       "visible": false,
     },
   },
-  "regions": Array [],
+  "regions": Array [
+    Object {
+      "current": false,
+      "name": "reg1",
+    },
+    Object {
+      "current": true,
+      "name": "reg2",
+    },
+  ],
   "store": Object {
     "clearActions": [Function],
     "dispatch": [Function],
