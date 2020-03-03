@@ -33,7 +33,7 @@ describe('Menu Component', () => {
         shallow( <Menu {...props} store={store} /> );
     });
 
-    it('Menu component renders correctly with all propes', () => {
+    it('Menu component renders correctly with all props', () => {
         initialState.LAYERS.groups = {...groups}
         initialState.REGIONS = [
             {name: 'reg1', current: false},
@@ -62,8 +62,14 @@ describe('Menu Component', () => {
         wrapper.find('li.sector').at(0).find('a').simulate('click');
         expect(toggleCategoriesAction).toHaveBeenCalledWith(props.mapId, 'Regions', -1);
         wrapper.find('li.sector').at(1).find('a').simulate('click');
-        expect(toggleCategoriesAction).toHaveBeenCalledWith(props.mapId, 'Severity of needs', 0)
+        expect(toggleCategoriesAction).toHaveBeenCalledWith(props.mapId, 'Severity of needs', 0);
         expect(toggleCategoriesAction).toHaveBeenCalledTimes(2); 
+
+        // test onRegionClick
+        const changeRegionAction = jest.spyOn(Actions, 'changeRegion');
+        wrapper.find('#reg1').simulate('change');
+        expect(changeRegionAction).toHaveBeenCalledWith('reg1');
+        expect(changeRegionAction).toHaveBeenCalledTimes(1); 
     })
 
 });

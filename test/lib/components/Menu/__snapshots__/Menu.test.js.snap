@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Menu Component Menu component renders correctly with all propes: Menu props 1`] = `
+exports[`Menu Component Menu component renders correctly with all props: Menu props 1`] = `
 Object {
   "AUTH": undefined,
   "LAYERS": Object {
