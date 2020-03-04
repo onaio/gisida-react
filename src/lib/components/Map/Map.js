@@ -192,14 +192,18 @@ class Map extends Component {
      */
     if (feature.layer && feature.layer.id === 'nutrition-sites-live') {
       /**
-       * 1. Set Icon opacity to one for the highlight layer
-       * 2. Filter out the selected feature
-       * 3. Filter in highlight layer feature with simillar facility_id
+       * 1. Filter out the selected feature based on period and facility id 
+       (equal to feature period & not equal to facility_id)
+       * 2. Filter in highlight layer features with simillar facility_id
+       * 3. Set Icon opacity to one for the highlight layer 
+       * (This was set to 0 on initial render not to show the icon before it's filtered out)
+       * 4. Filter nutrition-site-live with same reporting_period and different facility_id from selected feature
+       * 5. Move highlight layer to the top (ensure the highlighted layer is not hidden due to mapbox clustering)
        */
-      this.map.setFilter(NUTRITION_SITES_LIVE, [ALL, ["!=", FACILITY_ID, feature.properties.facility_id]]);
+      this.map.setFilter(NUTRITION_SITES_LIVE, [ALL, ["==", 'reporting_period', feature.properties.reporting_period], ["!=", FACILITY_ID, feature.properties.facility_id]]);
       this.map.setFilter(NUTRITION_SITES_LIVE_HIGHLIGHT, [ALL, ["==", FACILITY_ID, feature.properties.facility_id]]);
       this.map.setPaintProperty(NUTRITION_SITES_LIVE_HIGHLIGHT, ICON_OPACITY, 1);
-      this.map.setFilter(NUTRITION_SITES_LIVE, [ALL, ["==", 'reporting_period', feature.properties.reporting_period], ["!=", "facility_id", feature.properties.facility_id]]);
+      this.map.moveLayer(NUTRITION_SITES_LIVE_HIGHLIGHT);
     }
 
     if (feature && activeLayerObj['detail-view']) {
