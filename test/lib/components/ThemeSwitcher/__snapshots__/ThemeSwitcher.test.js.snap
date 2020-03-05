@@ -1,31 +1,84 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ThemeSwitcher ThemeSwitcher component renderes correctly 1`] = `
-<div>
-  <div
-    className="wrap"
-    style={
+exports[`ThemeSwitcher Switches themes as expecte 1`] = `
+<Connect(ThemeSwitcher)
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <ThemeSwitcher
+    MAP={
       Object {
-        "right": "75px",
+        "showFilterPanel": true,
+      }
+    }
+    dispatch={[Function]}
+    mapId="map-1"
+    showFilterPanel={true}
+    store={
+      Object {
+        "clearActions": [Function],
+        "dispatch": [Function],
+        "getActions": [Function],
+        "getState": [Function],
+        "replaceReducer": [Function],
+        "subscribe": [Function],
+      }
+    }
+    storeSubscription={
+      Subscription {
+        "listeners": Object {
+          "clear": [Function],
+          "get": [Function],
+          "notify": [Function],
+          "subscribe": [Function],
+        },
+        "onStateChange": [Function],
+        "parentSub": undefined,
+        "store": Object {
+          "clearActions": [Function],
+          "dispatch": [Function],
+          "getActions": [Function],
+          "getState": [Function],
+          "replaceReducer": [Function],
+          "subscribe": [Function],
+        },
+        "unsubscribe": [Function],
       }
     }
   >
-    <div
-      className="btn-group btn-toggle theme-toggle"
-      onClick={[Function]}
-      role="button"
-      tabIndex="0"
-    >
-      <button
-        alt="Theme: light"
-        className="glyphicon glyphicon-list-alt theme-toggle-btn light"
-      />
-    </div>
-  </div>
-  <style
-    media="screen"
-  >
-    
+    <div>
+      <div
+        className="wrap"
+        style={
+          Object {
+            "right": "-180px",
+          }
+        }
+      >
+        <div
+          className="btn-group btn-toggle theme-toggle"
+          onClick={[Function]}
+          role="button"
+          tabIndex="0"
+        >
+          <button
+            alt="Theme: light"
+            className="glyphicon glyphicon-list-alt theme-toggle-btn light"
+          />
+        </div>
+      </div>
+      <style
+        media="screen"
+      >
+        
     .filter-container {
       background: #eae3bc !important;
       color: #555 !important;
@@ -96,6 +149,8 @@ exports[`ThemeSwitcher ThemeSwitcher component renderes correctly 1`] = `
       color: inherit;
     }
     
-  </style>
-</div>
+      </style>
+    </div>
+  </ThemeSwitcher>
+</Connect(ThemeSwitcher)>
 `;
