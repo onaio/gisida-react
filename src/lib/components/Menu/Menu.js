@@ -3,7 +3,9 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Actions } from 'gisida';
 import Layers from '../Layers/Layers';
+import ConnectedLayers from '../Layers/ConnectedLayers';
 import './Menu.scss';
+import _ from 'lodash';
 
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {} };
@@ -92,7 +94,16 @@ class Menu extends Component {
     this.state = {
       openCategories: [],
     };
+    /**
+     * Currently we are loading two menu's one for superset view at layer level & one for map view
+     * The menu menuWrapper references the menu on which to track scroll position.
+     * This ensures we snap back to the exact map scroll position when moving from superset layer view to map view 
+     */
     this.menuWrapper = React.createRef();
+    /**
+     * Gets scroll position after scroll ceases
+     */
+    this.delayedCallback = _.debounce(this.persistScrollPosition, 1000)
   }
 
   componentDidMount() {
@@ -100,10 +111,14 @@ class Menu extends Component {
       this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop;
     }
   }
-
-  handleScroll = e => {
-    let element = e.target;
+  persistScrollPosition(event) {
+    let element = event.target;
     this.props.dispatch(Actions.setMenuScroll(this.props.mapId, element.scrollTop));
+  }
+
+  handleScroll = event => {
+    event.persist() // This will ensure that the event is not pooled for more details https://reactjs.org/docs/events.html
+    this.delayedCallback(event)
   };
 
   componentDidUpdate(prevProps) {
@@ -185,8 +200,8 @@ class Menu extends Component {
 
   /**
    * Check if a user has permission to access layer
-   * @param {*} authConfigs - Authentication configurations
-   * @param {*} userInfo - User details
+   * @param {Object} authConfigs - Authentication configurations
+   * @param {Object} userInfo - User details
    */
   canAccessLayer(layer, authConfigs, userInfo) {
     const users = authConfigs.LAYERS[layer.id];
@@ -202,9 +217,9 @@ class Menu extends Component {
   /**
    * Return an accesible group layer. If the layer has no accessible children
    * return false, else return the modified layer with the accessible children
-   * @param {*} layer - Group layer
-   * @param {*} authConfigs - Authentication configaurations
-   * @param {*} userInfo - Auth user details
+   * @param {Object} layer - Group layer
+   * @param {Object} authConfigs - Authentication configaurations
+   * @param {Object} userInfo - Auth user details
    */
   getAccessibleGroupLayer(layer, authConfigs, userInfo) {
     const keys = Object.keys(layer);
@@ -309,7 +324,7 @@ class Menu extends Component {
       return React.cloneElement(child, { mapId });
     });
 
-    const { regions, currentRegion, preparedLayers, childrenPosition } = this.props;
+    const { regions, currentRegion, preparedLayers, childrenPosition, layers } = this.props;
     const childrenPositionClass = childrenPosition || 'top';
     const marginTop = this.props.hasNavbar ? '-80px' : 0;
 
@@ -395,7 +410,7 @@ class Menu extends Component {
                           />
                         </a>
                         {this.props.openCategories &&
-                        this.props.openCategories.includes(category.category) ? (
+                        this.props.openCategories.includes(category.category) && !layers ? (
                           <Layers
                             layerItem={this.props.layerItem}
                             mapId={mapId}
@@ -404,7 +419,16 @@ class Menu extends Component {
                             preparedLayers={preparedLayers}
                             auth={this.props.AUTH}
                           />
-                        ) : (
+                        ) : this.props.openCategories &&
+                        this.props.openCategories.includes(category.category) && layers ? 
+                        (<ConnectedLayers
+                            layerItem={this.props.layerItem}
+                            mapId={mapId}
+                            layers={category.layers}
+                            currentRegion={currentRegion}
+                            preparedLayers={preparedLayers}
+                            auth={this.props.AUTH}
+                          />) : (
                           <ul />
                         )}
                       </li>
