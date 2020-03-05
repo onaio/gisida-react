@@ -384,18 +384,11 @@ class Map extends Component {
               if (layer['highlight-paint']) {
                 highlightLayer.paint = Object.assign({}, highlightLayer.paint, layer['highlight-paint']);
               }
+
               // append suffix to highlight layer id
               highlightLayer.id += '-highlight';
               // add the highlight layer to the map
               if (!this.map.getLayer(highlightLayer.id)) {
-                /**
-                 * Set highlight icon opacity to zero when loading the map
-                 * This prevents seeing highlight layer before it's filtered out on initial render 
-                 */
-                  highlightLayer.paint = {
-                    ...highlightLayer.paint,
-                    'icon-opacity': 0
-                  }
                 this.map.addLayer(highlightLayer);
               }
             }
@@ -496,7 +489,7 @@ class Map extends Component {
         console.warn('resize error',e)
       }
       
-      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj } = this.props;
+      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj, showDetailView } = this.props;
       if (LOC && LOC.doUpdateMap === mapId && LOC.location &&
          ((prevProps.LOC.active !== LOC.active) || (prevProps.layersObj.length !== layersObj.length) ||
           (this.map.getZoom() !== LOC.location.zoom && LOC.location.doUpdateLOC))) {
@@ -521,6 +514,15 @@ class Map extends Component {
       if (((layerObj && layerObj.aggregate && layerObj.aggregate.timeseries) || timeSeriesObj)
         && (doUpdateTSlayers || (FILTER && FILTER[primaryLayer] && FILTER[primaryLayer].isClear))) {
         this.updateTimeseriesLayers();
+      }
+
+      // clear highlight filters once detail view is close
+      if (!showDetailView && !!prevProps.showDetailView) {
+        if (layerObj && layerObj['highlight-filter-property'] && this.map.getLayer(layerObj.id)) {
+          layerObj.filters.highlight[2] = '';
+          layerObj.filters.rHighlight[2] = '';
+          this.buildFilters(layerObj);
+        }
       }
 
       // Update Labels and handle labels visibility at different
