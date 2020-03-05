@@ -95,7 +95,7 @@ class Menu extends Component {
       openCategories: [],
     };
     /**
-     * Currently we are loading two menu's one for superset view at layer level & one for map view
+     * Currently we can load two menus one for superset view at layer level & one for map view
      * The menu menuWrapper references the menu on which to track scroll position.
      * This ensures we snap back to the exact map scroll position when moving from superset layer view to map view 
      */
@@ -324,7 +324,7 @@ class Menu extends Component {
       return React.cloneElement(child, { mapId });
     });
 
-    const { regions, currentRegion, preparedLayers, childrenPosition, layers } = this.props;
+    const { regions, currentRegion, preparedLayers, childrenPosition, useConnectedLayers } = this.props;
     const childrenPositionClass = childrenPosition || 'top';
     const marginTop = this.props.hasNavbar ? '-80px' : 0;
 
@@ -410,7 +410,7 @@ class Menu extends Component {
                           />
                         </a>
                         {this.props.openCategories &&
-                        this.props.openCategories.includes(category.category) && !layers ? (
+                        this.props.openCategories.includes(category.category) && !useConnectedLayers ? (
                           <Layers
                             layerItem={this.props.layerItem}
                             mapId={mapId}
@@ -420,7 +420,7 @@ class Menu extends Component {
                             auth={this.props.AUTH}
                           />
                         ) : this.props.openCategories &&
-                        this.props.openCategories.includes(category.category) && layers ? 
+                        this.props.openCategories.includes(category.category) && useConnectedLayers ? 
                         (<ConnectedLayers
                             layerItem={this.props.layerItem}
                             mapId={mapId}

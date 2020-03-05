@@ -1,3 +1,11 @@
+/**
+ * Handle display of submenu and layer items by utilizing state.
+ * Keeps track of open submenus in state
+ * 
+ * Usage:
+ * <Menu useConnectedLayers />
+ */
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
@@ -19,7 +27,7 @@ export class ConnectedLayers extends Component {
    * Toggle open and close a menu group
    * @param {Object} e Event
    * @param {Object} layer Group to be toggled
-   * @param {numner} groupCount Group count
+   * @param {number} groupCount Group count
    */
   toggleSubMenu(e, layer, groupCount) {
     e.preventDefault();
