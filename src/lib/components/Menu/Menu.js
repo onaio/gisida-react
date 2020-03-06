@@ -93,7 +93,7 @@ class Menu extends Component {
       openCategories: [],
     };
     /**
-     * Currently we are loading two menu's one for superset view at layer level & one for map view
+     * Currently we can load two menus one for superset view at layer level & one for map view
      * The menu menuWrapper references the menu on which to track scroll position.
      * This ensures we snap back to the exact map scroll position when moving from superset layer view to map view 
      */
