@@ -310,7 +310,7 @@ class Menu extends Component {
   }
 
   componentDidUpdate(prevPops) {
-    if (_.isEqual(prevPops.categories, this.props.categories)) {
+    if (!_.isEqual(prevPops.categories, this.props.categories)) {
       let categories = this.getAccessibleCategories();
 
       if (categories) {
