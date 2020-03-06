@@ -24,7 +24,7 @@ describe('ThemeSwitcher', () => {
     );
   });
 
-  it('Switches themes as expecte', () => {
+  it('Switches themes as expected', () => {
     const wrapper = mount(
       <ThemeSwitcher
         store={store}
