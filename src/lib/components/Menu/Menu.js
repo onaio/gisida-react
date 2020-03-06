@@ -80,11 +80,9 @@ const mapStateToProps = (state, ownProps) => {
     preparedLayers: MAP.layers,
     menuIsOpen: MAP.menuIsOpen,
     openCategories: MAP.openCategories,
-    layerItem: ownProps.layerItem,
-    menuScroll: MAP.menuScroll,
-    showMap: VIEW.showMap,
-    hasNavbar: ownProps.hasNavbar,
-    noLayerText: NULL_LAYER_TEXT,
+    menuScroll: MAP.menuScroll, // Set's scroll position to zero when loading superset Menu component
+    showMap: VIEW.showMap, // A flag to determine map/superset view
+    noLayerText: NULL_LAYER_TEXT, // Text to be displayed when a category has no layer pulled from config file
   };
 };
 
@@ -204,7 +202,9 @@ class Menu extends Component {
    * @param {Object} userInfo - User details
    */
   canAccessLayer(layer, authConfigs, userInfo) {
-    const users = authConfigs.LAYERS[layer.id];
+    const LocalAuthConfig = JSON.parse(localStorage.getItem('authConfig'));
+    const users = authConfigs && authConfigs.LAYERS && authConfigs.LAYERS[layer.id]; // list of users with access to the layer
+    authConfigs.LAYERS = authConfigs.LAYERS || LocalAuthConfig.LAYERS;
 
     return (
       (users && userInfo && users.includes(userInfo.username)) ||
@@ -222,10 +222,10 @@ class Menu extends Component {
    * @param {Object} userInfo - Auth user details
    */
   getAccessibleGroupLayer(layer, authConfigs, userInfo) {
-    const keys = Object.keys(layer);
+    const layerKeys = Object.keys(layer);
     const accessibleKeys = [];
 
-    keys.forEach(key => {
+    layerKeys.forEach(key => {
       const accessibleKeySubLayers = [];
 
       layer[key].layers.forEach(subLayer => {
@@ -249,8 +249,8 @@ class Menu extends Component {
       }
     });
 
-    keys.forEach(key => {
-      if (!accessibleKeys.includes(key)) {
+    layerKeys.forEach(key => {
+      if (!accessibleKeys.includes(key) && layer[key].layers.length) {
         // Delete key if key is not in accessible keys
         delete layer[key];
       }
@@ -333,10 +333,13 @@ class Menu extends Component {
     const children = React.Children.map(this.props.children, child => {
       return React.cloneElement(child, { mapId });
     });
-
-    const { regions, currentRegion, preparedLayers, childrenPosition, useConnectedLayers } = this.props;
+    /**
+     * layerItem Glyphicon that toggles superset/map dashboards at layer level
+     * hasNavBar A flag to check if instance has navbar
+     */
+    const { regions, currentRegion, preparedLayers, childrenPosition, layerItem, hasNavBar, useConnectedLayers } = this.props;
     const childrenPositionClass = childrenPosition || 'top';
-    const marginTop = this.props.hasNavbar ? '-80px' : 0;
+    const marginTop = hasNavBar ? '-80px' : 0;
 
     return (
       <div>
@@ -422,7 +425,7 @@ class Menu extends Component {
                         {this.props.openCategories &&
                         this.props.openCategories.includes(category.category) && !useConnectedLayers ? (
                           <Layers
-                            layerItem={this.props.layerItem}
+                            layerItem={layerItem}
                             mapId={mapId}
                             layers={category.layers}
                             currentRegion={currentRegion}
