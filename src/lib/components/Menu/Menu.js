@@ -92,7 +92,7 @@ class Menu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      openCategories: [],
+      categories: [],
     };
     /**
      * Currently we can load two menus one for superset view at layer level & one for map view
@@ -309,13 +309,23 @@ class Menu extends Component {
     return filteredCategories;
   }
 
+  componentDidUpdate(prevPops) {
+    if (_.isEqual(prevPops.categories, this.props.categories)) {
+      let categories = this.getAccessibleCategories();
+
+      if (categories) {
+        categories = this.parseCategories(categories);
+      }
+
+      this.setState({
+        categories
+      })
+    }
+  }
+
   render() {
     const mapId = this.props.mapId;
-    let categories = this.getAccessibleCategories();
-
-    if (categories) {
-      categories = this.parseCategories(categories);
-    }
+    const categories = this.state.categories;
 
     const { disableDefault } = this.props;
     if (disableDefault) return this.props.children || null;
