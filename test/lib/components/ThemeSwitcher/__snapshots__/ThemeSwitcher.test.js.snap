@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ThemeSwitcher Switches themes as expecte 1`] = `
+exports[`ThemeSwitcher Switches themes as expected 1`] = `
 <Connect(ThemeSwitcher)
   store={
     Object {
