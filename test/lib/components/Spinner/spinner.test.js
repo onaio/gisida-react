@@ -13,24 +13,24 @@ const store = mockStore(initialState);
 
 describe('Spinner', () => {
 
-    it('renders without crashing', () => {
-        shallow(
-            <Spinner 
-                store={store}
-                mapId='map-1'
-                MAP={{}}
-	        />
-        );
-    });
+  it('renders without crashing', () => {
+    shallow(
+      <Spinner 
+        store={store}
+        mapId='map-1'
+        MAP={{}}
+      />
+    );
+  });
 
-	it('Spinner component renders correctly', () => {
-        const componentWrapper = mount(
-            <Spinner 
-                store={store}
-                mapId='map-1'
-                MAP={{}}
-            />
-        );
-		expect(toJson(componentWrapper)).toMatchSnapshot();
-	})
+  it('Spinner component renders correctly', () => {
+    const componentWrapper = mount(
+      <Spinner 
+        store={store}
+        mapId='map-1'
+        MAP={{}}
+      />
+    );
+    expect(toJson(componentWrapper)).toMatchSnapshot();
+  })
 });
