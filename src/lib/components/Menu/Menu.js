@@ -123,6 +123,18 @@ class Menu extends Component {
     if (this.props.showMap && this.props.showMap !== prevProps.showMap && this.props.menuScroll) {
       this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop;
     }
+
+    if (!_.isEqual(prevPops.categories, this.props.categories)) {
+      let categories = this.getAccessibleCategories();
+
+      if (categories) {
+        categories = this.parseCategories(categories);
+      }
+
+      this.setState({
+        categories
+      })
+    }
   }
 
   onToggleMenu = e => {
@@ -307,20 +319,6 @@ class Menu extends Component {
     }
 
     return filteredCategories;
-  }
-
-  componentDidUpdate(prevPops) {
-    if (!_.isEqual(prevPops.categories, this.props.categories)) {
-      let categories = this.getAccessibleCategories();
-
-      if (categories) {
-        categories = this.parseCategories(categories);
-      }
-
-      this.setState({
-        categories
-      })
-    }
   }
 
   render() {
