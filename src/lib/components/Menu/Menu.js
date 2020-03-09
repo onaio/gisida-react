@@ -156,9 +156,17 @@ class Menu extends Component {
   };
 
   /**
-   * Modify a layer by giving its group and nested groups a count
-   * @param {Object} layer - A layer with groups
-   * @param {number} groupCounter - A group counter that will give each group a number
+   * Modify a group by giving its group and nested groups a count (or ID)
+   * This will make sure when we toggle a group, another group with the
+   * exact same name is not toggled. The array of open groups is stored as an
+   * array of group names in the store. Another implementaion would to give each group a random number but
+   * this means different menu instances will have groups that have different Ids which we do not
+   * want (We would like menu instances under the same map ID to behave the same. If say I open a group in one
+   * menu, it should appear open in another other). A contigous int counter is
+   * therefore used to ensure the counter for a group in different menu instances is the same, 
+   * and also, groups in the same menu instances do not share a count.
+   * @param {Object} layer Category layer
+   * @param {number} groupCounter Group counter (or ID) that will give each group a number
    * @returns {Object} Modified layer and current group counter increment
    */
   insertGroupCount(layer, groupCounter) {
@@ -168,6 +176,7 @@ class Menu extends Component {
 
       layer[key].layers.forEach(keyLayer => {
         if (!keyLayer.id) {
+          // Layer has no id so this is a group
           keyLayer = this.insertGroupCount(keyLayer, groupCounter);
         }
       });
@@ -180,24 +189,17 @@ class Menu extends Component {
   }
 
   /**
-   * Loop over the categories and modify data
-   * @param {array} categories Menu categories and their layers, basically all menu items
-   * @returns {array} Modified categories
+   * Generic function to modify categories. If you need to modify/extend categories,
+   * do it here
+   * @param {array} categories Menu categories and their subgroups and layers
+   * @returns {array} Extended/Modified categories
    */
   parseCategories(categories) {
     let groupCounter = 0;
     categories.forEach(category => {
       category.layers.forEach(layer => {
         if (!layer.id) {
-          // This is a group. Give it and its nested groups a count
-          // This will make sure when we toggle a group, another group with the
-          // exact same name is not toggled. The array of open groups is stored as an
-          // array in the store. Another implementaion would to give each group an Id e.g a random no but
-          // this means different menu instances will have groups that have different Ids which we do not
-          // want (We would like menu instances under the same map ID to behave the same. If say I open a group in one
-          // menu, it should appear open the other ). A contigous int counter is
-          // therefore used to ensure the counter for a group in different menu
-          // instances is the same, and also, groups in the same menu instances do not share a count.
+          // Layer has no id, so it's a group, give it a count (or an ID)
           const obj = this.insertGroupCount(layer, groupCounter);
           layer = obj.layer;
           groupCounter = obj.groupCounter;
@@ -324,8 +326,8 @@ class Menu extends Component {
   render() {
     const mapId = this.props.mapId;
     const categories = this.state.categories;
-
     const { disableDefault } = this.props;
+    
     if (disableDefault) return this.props.children || null;
 
     const children = React.Children.map(this.props.children, child => {
