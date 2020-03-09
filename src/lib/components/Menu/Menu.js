@@ -93,13 +93,14 @@ class Menu extends Component {
     /**
      * Currently we can load two menus one for superset view at layer level & one for map view
      * The menu menuWrapper references the menu on which to track scroll position.
-     * This ensures we snap back to the exact map scroll position when moving from superset layer view to map view 
+     * This ensures we snap back to the exact map scroll position when moving from superset 
+     * layer view to map view 
      */
     this.menuWrapper = React.createRef();
     /**
      * Gets scroll position after scroll ceases
      */
-    this.delayedCallback = _.debounce(this.persistScrollPosition, 1000)
+    this.delayedMenuScrollCallback = _.debounce(this.persistScrollPosition, 1000)
   }
 
   componentDidMount() {
@@ -114,7 +115,7 @@ class Menu extends Component {
 
   handleScroll = event => {
     event.persist() // This will ensure that the event is not pooled for more details https://reactjs.org/docs/events.html
-    this.delayedCallback(event)
+    this.delayedMenuScrollCallback(event)
   };
 
   componentDidUpdate(prevProps) {
