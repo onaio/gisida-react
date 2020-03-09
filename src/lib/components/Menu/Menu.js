@@ -327,7 +327,7 @@ class Menu extends Component {
     const mapId = this.props.mapId;
     const categories = this.state.categories;
     const { disableDefault } = this.props;
-    
+
     if (disableDefault) return this.props.children || null;
 
     const children = React.Children.map(this.props.children, child => {
@@ -353,7 +353,7 @@ class Menu extends Component {
               className={`menu-wrapper ${childrenPositionClass}`}
               style={{ marginTop }}
             >
-              {/* Open button menu */}
+              {/* Open menu button */}
               <a
                 onClick={e => this.onToggleMenu(e)}
                 className="open-btn"
