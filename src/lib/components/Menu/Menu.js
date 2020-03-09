@@ -312,10 +312,10 @@ class Menu extends Component {
   render() {
     const mapId = this.props.mapId;
     let categories = this.getAccessibleCategories();
+    
+    if (!categories) return null;
 
-    if (categories) {
-      categories = this.parseCategories(categories);
-    }
+    categories = this.parseCategories(categories);
     const { disableDefault } = this.props;
 
     if (disableDefault) return this.props.children || null;
