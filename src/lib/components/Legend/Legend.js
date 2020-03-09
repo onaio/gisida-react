@@ -178,7 +178,7 @@ export class Legend extends React.Component {
         layer.categories.shape &&
         layer.type !== 'circle';
       const fillLayerNoBreaks =
-        layer && layer.credit && layer.categories && layer.categories.breaks === 'no';
+        (layer && layer.credit && layer.categories && layer.categories.breaks === 'no') || Array.isArray(layer.categories);
       const fillLayerWithBreaks =
         layer &&
         layer.credit &&
@@ -265,11 +265,51 @@ export class Legend extends React.Component {
           );
         }
         if (fillLayerNoBreaks && !layer.parent) {
-          const hasShape = (layer.categories && layer.categories.shape && layer.categories.shape.length);
+          let hasShape;
+          if (Array.isArray(layer.categories)) {
+            layer.categories.forEach((category, key) => {
+              let textColor  = category['text-color'];
+              if (category.type === "fill") {
+                let fillWidth = (
+                  100 / category.color.filter(c => c !== 'transparent').length
+                ).toString();
+                category.color.forEach((color, index) => {
+                      background.push(
+                        <li key={index} style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
+                          {category.label[index]}
+                        </li>
+                      );
+                  });
+              } else if (category.type === "circle") {
+                /** Get this from spec 
+                 * Get the specific radiuses and the right values for the same
+                 */
+                category.radiuses.forEach((s, i) => {
+                  quantiles.push(
+                    <span className="circle-container" key={s}>
+                      <span
+                        style={{
+                          background: Array.isArray(category.color)
+                            ? category.color[i]
+                            : colors[i] || colors[0],
+                          width: `${s * 2}px`,
+                          height: `${s * 2}px`,
+                          margin: `0px ${i + 2}px`,
+                        }}
+                      ></span>
+                      <p style={{ color: textColor ? textColor : '#fff'}}>{category.label[i]}</p>
+                    </span>
+                  );
+                });
+              }
+            });
+          } else {
+          hasShape = (layer.categories && layer.categories.shape && layer.categories.shape.length);
           const fillWidth = (
             100 / layer.categories.color.filter(c => c !== 'transparent').length
           ).toString();
-            
+            debugger;
+          const textColor = layer.categories && layer.categories['text-color'];
           layer.categories.color.forEach((color, index) => {
             if (color !== 'transparent') {
               if (hasShape) {
@@ -280,7 +320,6 @@ export class Legend extends React.Component {
                   </li>
                 );
               } else {
-                const textColor = layer.categories && layer.categories['text-color'];
                 background.push(
                   <li key={index} style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
                     {layer.categories.label[index]}
@@ -289,14 +328,14 @@ export class Legend extends React.Component {
               }
               
             }
-          });
-
+          }); 
+        }
           const legendClass = layer.categories ? 'legend-label' : '';
-
+          const circleQuantiles = quantiles ? <div className="legend-symbols">{quantiles}</div> : null;
           primaryLegend = (
             <div
               id={`legend-${layer.id}-${mapId}`}
-              className={`legend-row ${activeLayerSelected}`}
+              className={`legend-shapes legend-row ${activeLayerSelected}`}
               data-layer={`${layer.id}`}
               onClick={e => this.onUpdatePrimaryLayer(e)}
               key={l}
@@ -305,6 +344,7 @@ export class Legend extends React.Component {
               <div className={`${hasShape ? 'legend-shapes' : 'legend-fill'} ${legendClass}`}>
                 <ul>{background}</ul>
               </div>
+              {circleQuantiles}
               <span>{Parser(layer.credit)}</span>
               {latestTimestamp}
             </div>
@@ -482,6 +522,7 @@ export class Legend extends React.Component {
           </div>
         );
       } else if (fillLayerNoBreaks && !layer.parent) {
+        debugger;
         const fillWidth = (
           100 / layer.categories.color.filter(c => c !== 'transparent').length
         ).toString();
