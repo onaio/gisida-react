@@ -203,7 +203,8 @@ class Menu extends Component {
    */
   canAccessLayer(layer, authConfigs, userInfo) {
     const LocalAuthConfig = JSON.parse(localStorage.getItem('authConfig'));
-    const users = authConfigs && authConfigs.LAYERS && authConfigs.LAYERS[layer.id]; // list of users with access to the layer
+    // list of users with access to the layer
+    const users = authConfigs && authConfigs.LAYERS && authConfigs.LAYERS[layer.id];
     authConfigs.LAYERS = authConfigs.LAYERS || LocalAuthConfig.LAYERS;
 
     return (
@@ -218,7 +219,7 @@ class Menu extends Component {
    * Return an accesible group layer. If the layer has no accessible children
    * return false, else return the modified layer with the accessible children
    * @param {Object} layer - Group layer
-   * @param {Object} authConfigs - Authentication configaurations
+   * @param {Object} authConfigs - Authentication configurations
    * @param {Object} userInfo - Auth user details
    */
   getAccessibleGroupLayer(layer, authConfigs, userInfo) {
