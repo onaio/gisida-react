@@ -320,7 +320,7 @@ class Menu extends Component {
     });
     const categories = this.parseCategories(this.getAccessibleCategories(this.props.categories));
     const { regions, currentRegion, preparedLayers, childrenPosition, 
-      layerItem, hasNavBar, useConnectedLayers } = this.props;
+      layerItem, hasNavBar, useConnectedLayers, AUTH } = this.props;
     const childrenPositionClass = childrenPosition || 'top';
     const marginTop = hasNavBar ? '-80px' : 0;
 
@@ -408,22 +408,21 @@ class Menu extends Component {
                         {this.props.openCategories &&
                         this.props.openCategories.includes(category.category) && !useConnectedLayers ? (
                           <Layers
+                            mapId={mapId}
+                            layers={category.layers}
+                            currentRegion={currentRegion}
+                            preparedLayers={preparedLayers}
+                            auth={AUTH}
+                          />
+                        ) : this.props.openCategories &&
+                        this.props.openCategories.includes(category.category) && useConnectedLayers ? 
+                        (<ConnectedLayers
                             layerItem={layerItem}
                             mapId={mapId}
                             layers={category.layers}
                             currentRegion={currentRegion}
                             preparedLayers={preparedLayers}
-                            auth={this.props.AUTH}
-                          />
-                        ) : this.props.openCategories &&
-                        this.props.openCategories.includes(category.category) && useConnectedLayers ? 
-                        (<ConnectedLayers
-                            layerItem={this.props.layerItem}
-                            mapId={mapId}
-                            layers={category.layers}
-                            currentRegion={currentRegion}
-                            preparedLayers={preparedLayers}
-                            auth={this.props.AUTH}
+                            auth={AUTH}
                           />) : (
                           <ul />
                         )}
