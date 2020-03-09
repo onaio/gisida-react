@@ -6,6 +6,7 @@ import Layers from '../Layers/Layers';
 import ConnectedLayers from '../Layers/ConnectedLayers';
 import './Menu.scss';
 import _ from 'lodash';
+import memoize from "memoize-one";
 
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {} };
@@ -89,9 +90,6 @@ const mapStateToProps = (state, ownProps) => {
 class Menu extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      categories: [],
-    };
     /**
      * Currently we can load two menus one for superset view at layer level & one for map view
      * The menu menuWrapper references the menu on which to track scroll position.
@@ -122,18 +120,6 @@ class Menu extends Component {
   componentDidUpdate(prevProps) {
     if (this.props.showMap && this.props.showMap !== prevProps.showMap && this.props.menuScroll) {
       this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop;
-    }
-
-    if (!_.isEqual(prevPops.categories, this.props.categories)) {
-      let categories = this.getAccessibleCategories();
-
-      if (categories) {
-        categories = this.parseCategories(categories);
-      }
-
-      this.setState({
-        categories
-      })
     }
   }
 
@@ -194,7 +180,7 @@ class Menu extends Component {
    * @param {array} categories Menu categories and their subgroups and layers
    * @returns {array} Extended/Modified categories
    */
-  parseCategories(categories) {
+  parseCategories = memoize((categories) => {
     let groupCounter = 0;
     categories.forEach(category => {
       category.layers.forEach(layer => {
@@ -208,7 +194,7 @@ class Menu extends Component {
     });
 
     return categories;
-  }
+  })
 
   /**
    * Check if a user has permission to access layer
@@ -325,7 +311,11 @@ class Menu extends Component {
 
   render() {
     const mapId = this.props.mapId;
-    const categories = this.state.categories;
+    let categories = this.getAccessibleCategories();
+
+    if (categories) {
+      categories = this.parseCategories(categories);
+    }
     const { disableDefault } = this.props;
 
     if (disableDefault) return this.props.children || null;
