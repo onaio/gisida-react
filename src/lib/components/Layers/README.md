@@ -67,7 +67,7 @@ but would like to keep the map's menu in that view.
 </Map>
 
 <SomeOtherView>
-  {/** This component will use map-1 menu**/}
+  {/** This component will use map-1 menu **/}
 
   <Menu useConnectedLayers>
 </SomeOtherView>
