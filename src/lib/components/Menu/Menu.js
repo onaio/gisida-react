@@ -269,65 +269,57 @@ class Menu extends Component {
    * permission to view
    * @returns {array} Filtered categories
    */
-  getAccessibleCategories() {
+  getAccessibleCategories = memoize((categories) => {
     if (!this.props.AUTH) {
-      return this.props.categories;
+      // If no authenitcation, then all categories are accessible.
+      return categories;
     }
+
     const filteredCategories = [];
+    const { userInfo, authConfigs } = this.props.AUTH;
+    categories.forEach(category => {
+      let accesibleLayers = [];
 
-    if (this.props.categories) {
-      const { userInfo, authConfigs } = this.props.AUTH;
+      category.layers.forEach(layer => {
+        if (!authConfigs || !authConfigs.LAYERS) {
+          // If auth exists but authconfigs have not loaded. Bug should be fixed from ONA data and gisida core
+          accesibleLayers.push(layer);
+        } else if (!layer.id) {
+          const groupLayer = this.getAccessibleGroupLayer(layer, authConfigs, userInfo);
 
-      this.props.categories.forEach(category => {
-        let accesibleLayers = [];
-
-        category.layers.forEach(layer => {
-          if (!authConfigs || !authConfigs.LAYERS) {
-            // If auth exists but authconfigs have not loaded. Bug should be fixed from ONA data and gisida core
-            accesibleLayers.push(layer);
-          } else if (!layer.id) {
-            const groupLayer = this.getAccessibleGroupLayer(layer, authConfigs, userInfo);
-
-            if (groupLayer) {
-              accesibleLayers.push(groupLayer);
-            }
-          } else {
-            if (this.canAccessLayer(layer, authConfigs, userInfo)) {
-              accesibleLayers.push(layer);
-            }
+          if (groupLayer) {
+            accesibleLayers.push(groupLayer);
           }
-        });
-
-        if (accesibleLayers.length > 0) {
-          // Modify category layers with the new updated layers
-          category.layers = accesibleLayers;
-          filteredCategories.push(category);
+        } else {
+          if (this.canAccessLayer(layer, authConfigs, userInfo)) {
+            accesibleLayers.push(layer);
+          }
         }
       });
-    }
+
+      if (accesibleLayers.length > 0) {
+        // Modify category layers with the new updated layers
+        category.layers = accesibleLayers;
+        filteredCategories.push(category);
+      }
+    });
 
     return filteredCategories;
-  }
+  })
 
   render() {
-    const mapId = this.props.mapId;
-    let categories = this.getAccessibleCategories();
-    
-    if (!categories) return null;
-
-    categories = this.parseCategories(categories);
+    if (!this.props.categories) return null;
     const { disableDefault } = this.props;
 
     if (disableDefault) return this.props.children || null;
 
+    const { mapId } = this.props;
     const children = React.Children.map(this.props.children, child => {
       return React.cloneElement(child, { mapId });
     });
-    /**
-     * layerItem Glyphicon that toggles superset/map dashboards at layer level
-     * hasNavBar A flag to check if instance has navbar
-     */
-    const { regions, currentRegion, preparedLayers, childrenPosition, layerItem, hasNavBar, useConnectedLayers } = this.props;
+    const categories = this.parseCategories(this.getAccessibleCategories(this.props.categories));
+    const { regions, currentRegion, preparedLayers, childrenPosition, 
+      layerItem, hasNavBar, useConnectedLayers } = this.props;
     const childrenPositionClass = childrenPosition || 'top';
     const marginTop = hasNavBar ? '-80px' : 0;
 
@@ -456,8 +448,10 @@ class Menu extends Component {
 
 Menu.propTypes = {
   menuId: PropTypes.string.isRequired,
-  // mapTargetId: PropTypes.string.isRequired,
   categories: PropTypes.arrayOf(PropTypes.any).isRequired,
+  hasNavBar: PropTypes.bool, // Pass true if app has a navbar
+  layerItem: PropTypes.element, // Custom layer list item. Use in place of components/Layer/Layer
+  useConnectedLayers: PropTypes.bool // If true, use components/Layers/ConnectedLayers
 };
 
 export default connect(mapStateToProps)(Menu);

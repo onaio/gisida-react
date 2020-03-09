@@ -976,7 +976,7 @@ class Map extends Component {
 }
 
 Map.propTypes = {
-  hasNavbar: PropTypes.bool,
+  hasNavbar: PropTypes.bool, // Pass true if app has a navbar
 };
 
 export default connect(mapStateToProps)(Map);
