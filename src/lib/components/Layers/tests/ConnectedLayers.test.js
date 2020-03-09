@@ -1,8 +1,8 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
-import Layers from '../../../../src/lib/components/Layers/Layers'
-import layerObj from '../../../fixtures/sample-layer.json';
+import ConnectedLayers from './../ConnectedLayers'
+import layerObj from './fixtures/sample-layer.json';
 import configureMockStore from "redux-mock-store";
 import { Provider } from 'react-redux';
 /** Mock store */
@@ -30,12 +30,12 @@ describe('Layers', () => {
   
   const componentWrapper = shallow(
     <Provider store={store}>
-    <Layers
-      mapId={'map-1'}
-      layers={layers}
-      currentRegion={undefined}
-      preparedLayers={preparedLayers}
-    />
+        <ConnectedLayers
+        mapId={'map-1'}
+        layers={layers}
+        currentRegion={undefined}
+        preparedLayers={preparedLayers}
+        />
     </Provider>
   );
   it('component renders correctly', () => {
