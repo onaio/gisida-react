@@ -46,6 +46,12 @@ instantiating the `Menu`
 <Menu useConnectedLayers/>
 ```
 
+The custom layer item can also be directly passed to the `Menu` as a prop
+
+```
+<Menu layerItem={CustomLayerComponent} useConnectedLayers />
+```
+
 ### Why choose ConnectedLayers over Layers?
 
 The advantage of using this component over the `Layers` component is that different `Menu` instances will
