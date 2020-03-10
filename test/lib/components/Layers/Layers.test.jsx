@@ -42,9 +42,14 @@ describe('Layers', () => {
       />
     );
     expect(toJson(wrapper)).toMatchSnapshot('Layer without id');
-    expect(wrapper.find('.sub-category').length).toEqual(1)
+    expect(wrapper.find('.sub-category').length).toEqual(1);
+    // toggle layers
+    const event = Object.assign(jest.fn(), {preventDefault: () => {}})
+    expect(wrapper.state()['sample-layer'].isOpen).toBeFalsy();
+    wrapper.find('.sub-category').simulate('click', event);
+    expect(wrapper.state()['sample-layer'].isOpen).toBeTruthy();
 
-    // layer without id
+    // layer with id
     wrapper.setProps({layers: [{...layerObj, id: 'sample-layer'}]});
     wrapper.update();
     expect(toJson(wrapper)).toMatchSnapshot('Layer with id');
