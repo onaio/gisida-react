@@ -393,6 +393,14 @@ class Map extends Component {
               highlightLayer.id += HIGHLIGHT;
               // add the highlight layer to the map
               if (!this.map.getLayer(highlightLayer.id)) {
+                /**	
+                 * Set highlight icon opacity to zero when loading the map	
+                 * This prevents seeing highlight layer before it's filtered out on initial render 	
+                 */	
+                highlightLayer.paint = {	
+                  ...highlightLayer.paint,	
+                  'icon-opacity': 0	
+                }
                 this.map.addLayer(highlightLayer);
               }
             }
