@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
 import { detectIE, buildLayersObj, orderLayers } from '../../utils';
 import './Map.scss';
-import { NUTRITION_SITES_LIVE, NUTRITION_SITES_LIVE_HIGHLIGHT, ALL, ICON_OPACITY, FACILITY_ID } from '../../constants'
+import { ALL, ICON_OPACITY, HIGHLIGHT_FILTER_PROPERTY, HIGHLIGHT } from '../../constants'
 
 const mapStateToProps = (state, ownProps) => {
   const { APP, STYLES, REGIONS, VIEW, FILTER, LOC } = state;
@@ -190,7 +190,7 @@ class Map extends Component {
      * Todo:
      * Investigate adjusting zoom to show selected feature
      */
-    if (feature.layer && feature.layer.id === 'nutrition-sites-live') {
+    if (feature.layer && feature.layer.id && activeLayerObj[HIGHLIGHT_FILTER_PROPERTY]) {
       /**
        * 1. Filter out the selected feature based on period and facility id 
        (equal to feature period & not equal to facility_id)
@@ -200,10 +200,10 @@ class Map extends Component {
        * 4. Filter nutrition-site-live with same reporting_period and different facility_id from selected feature
        * 5. Move highlight layer to the top (ensure the highlighted layer is not hidden due to mapbox clustering)
        */
-      this.map.setFilter(NUTRITION_SITES_LIVE, [ALL, ["==", 'reporting_period', feature.properties.reporting_period], ["!=", FACILITY_ID, feature.properties.facility_id]]);
-      this.map.setFilter(NUTRITION_SITES_LIVE_HIGHLIGHT, [ALL, ["==", FACILITY_ID, feature.properties.facility_id]]);
-      this.map.setPaintProperty(NUTRITION_SITES_LIVE_HIGHLIGHT, ICON_OPACITY, 1);
-      this.map.moveLayer(NUTRITION_SITES_LIVE_HIGHLIGHT);
+      this.map.setFilter(activeLayerObj.id, [ALL, ["==", 'reporting_period', feature.properties.reporting_period], ["!=", activeLayerObj.source.join[0], feature.properties.facility_id]]);
+      this.map.setFilter(`${activeLayerObj.id}${HIGHLIGHT}`, [ALL, ["==", activeLayerObj.source.join[0], feature.properties.facility_id]]);
+      this.map.setPaintProperty(`${activeLayerObj.id}${HIGHLIGHT}`, ICON_OPACITY, 1);
+      this.map.moveLayer(`${activeLayerObj.id}${HIGHLIGHT}`);
     }
 
     if (feature && activeLayerObj['detail-view']) {
@@ -312,8 +312,8 @@ class Map extends Component {
     if (this.map.getLayer(layerId)) {
       this.map.setLayoutProperty(layerId, 'visibility', visibility ? 'visible' : 'none');
       // if layer has a highlight layer, update its visibility too
-      if (this.map.getLayer(`${layerId}-highlight`)) {
-        this.map.setLayoutProperty(`${layerId}-highlight`, 'visibility', visibility ? 'visible' : 'none');
+      if (this.map.getLayer(`${layerId}${HIGHLIGHT}`)) {
+        this.map.setLayoutProperty(`${layerId}${HIGHLIGHT}`, 'visibility', visibility ? 'visible' : 'none');
       }
     }
   }
@@ -389,7 +389,7 @@ class Map extends Component {
                 highlightLayer.paint = Object.assign({}, highlightLayer.paint, layer['highlight-paint']);
               }
               // append suffix to highlight layer id
-              highlightLayer.id += '-highlight';
+              highlightLayer.id += HIGHLIGHT;
               // add the highlight layer to the map
               if (!this.map.getLayer(highlightLayer.id)) {
                 /**
@@ -407,7 +407,7 @@ class Map extends Component {
             /**
              * Remove Nutrition sites layer & Highlight layer on map
              */
-            [layer.id, `${layer.id}-highlight`].forEach((id) => {
+            [layer.id, `${layer.id}${HIGHLIGHT}`].forEach((id) => {
               this.map.removeLayer(id);
               this.map.removeSource(id);
             });
@@ -574,7 +574,7 @@ class Map extends Component {
 
       if (filterKeys[f] === 'highlight') {
         // handle highlight filter seperately
-        this.applyFilters(`${layerId}-highlight`, filter);
+        this.applyFilters(`${layerId}${HIGHLIGHT}`, filter);
       } else if (filter) {
         // build out combined filters
         combinedFilters.push(filter);
@@ -694,8 +694,8 @@ class Map extends Component {
 
             this.map.setLayoutProperty(layerObj.id, 'visibility', 'none');
             // if layer has a highlight layer, update its visibility too
-            if (this.map.getLayer(`${layerObj.id}-highlight`)) {
-              this.map.setLayoutProperty(`${layerObj.id}-highlight`, 'visibility', 'none');
+            if (this.map.getLayer(`${layerObj.id}${HIGHLIGHT}`)) {
+              this.map.setLayoutProperty(`${layerObj.id}${HIGHLIGHT}`, 'visibility', 'none');
             }
 
           // if the layer is not in the map and does have a match, handle it
@@ -704,8 +704,8 @@ class Map extends Component {
             if (this.map.getLayoutProperty(id, 'visibility') === 'none') {
               this.map.setLayoutProperty(layerObj.id, 'visibility', 'visible');
               // if layer has a highlight layer, update its visibility too
-              if (this.map.getLayer(`${layerObj.id}-highlight`)) {
-                this.map.setLayoutProperty(`${layerObj.id}-highlight`, 'visibility', 'visible');
+              if (this.map.getLayer(`${layerObj.id}${HIGHLIGHT}`)) {
+                this.map.setLayoutProperty(`${layerObj.id}${HIGHLIGHT}`, 'visibility', 'visible');
               }
             }
 
