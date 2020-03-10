@@ -17,6 +17,12 @@ import Export from './components/Export/Export';
 import HorizontalBarChart from './components/Charts/HorizontalBarChart';
 import ColumnChart from './components/Charts/ColumnChart';
 
+import Callback from './components/Callback/Callback';
+import Login from './components/Login/Login';
+import { isLoggedIn as isBasicAuthLoggedIn } from './components/Login/BasicAuthLogin/BasicAuthLogin'
+
+import Router from './routes/router';
+
 export {
   App,
   TitleBar,
@@ -36,4 +42,8 @@ export {
   ColumnChart,
   ThemeSwitcher,
   Export,
-}
+  Router,
+  Callback,
+  Login,
+  isBasicAuthLoggedIn
+};
