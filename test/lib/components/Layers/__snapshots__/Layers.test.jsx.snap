@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Layers component renders correctly 1`] = `
+exports[`Layers should render correctly when user not authenticated: Layer with id 1`] = `
 <ul
   className="layers"
 >
@@ -27,5 +27,24 @@ exports[`Layers component renders correctly 1`] = `
     }
     mapId="map-1"
   />
+</ul>
+`;
+
+exports[`Layers should render correctly when user not authenticated: Layer without id 1`] = `
+<ul
+  className="layers"
+>
+  <li>
+    <a
+      className="sub-category"
+      key="sample-layer-0-link"
+      onClick={[Function]}
+    >
+      sample-layer
+      <span
+        className="category glyphicon glyphicon-chevron-right"
+      />
+    </a>
+  </li>
 </ul>
 `;
