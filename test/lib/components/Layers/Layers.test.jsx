@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow, mount } from 'enzyme';
+import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 import { Layers } from '../../../../src/lib/components/Layers/Layers'
 import layerObj from '../../../fixtures/sample-layer.json';
@@ -17,7 +17,7 @@ const auth = {
   userInfo: {
     username: 'gisidaUser1'
   }
-}
+};
 
 describe('Layers', () => {
   
@@ -44,7 +44,7 @@ describe('Layers', () => {
     expect(toJson(wrapper)).toMatchSnapshot('Layer without id');
     expect(wrapper.find('.sub-category').length).toEqual(1);
     // toggle layers
-    const event = Object.assign(jest.fn(), {preventDefault: () => {}})
+    const event = Object.assign(jest.fn(), {preventDefault: () => {}});
     expect(wrapper.state()['sample-layer'].isOpen).toBeFalsy();
     wrapper.find('.sub-category').simulate('click', event);
     expect(wrapper.state()['sample-layer'].isOpen).toBeTruthy();
