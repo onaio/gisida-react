@@ -55,4 +55,26 @@ describe('Layers', () => {
     expect(toJson(wrapper)).toMatchSnapshot('Layer with id');
     expect(wrapper.find('Connect(Layer)').length).toEqual(1);
   })
+
+  it('should apply permissions corectly for authenticated users', () => {
+    const wrapper = shallow(
+      <Layers
+        mapId={'map-1'}
+        layers={[{...layer1}]}
+        currentRegion={undefined}
+        preparedLayers={preparedLayers}
+        auth={auth}
+      />
+    );
+    // user with no credential to view layer
+    expect(toJson(wrapper)).toMatchSnapshot('User with wrong credentials');
+    expect(wrapper.text()).toEqual("You don't have permision to view this category");
+    
+    // user with credentials to view layer
+    auth.userInfo.username = 'gisidaUser2';
+    wrapper.setProps({auth, });
+    wrapper.update();
+    expect(toJson(wrapper)).toMatchSnapshot('User with right credentials');
+    expect(wrapper.find('Connect(Layer)').length).toEqual(1);
+  })
 });
