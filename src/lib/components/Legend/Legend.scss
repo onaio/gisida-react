@@ -1,316 +1,299 @@
 .legend {
-  position: absolute;
-  bottom: 40px;
-  right: 20px;
-  width: 320px;
-  background-color: #f7f6ef;
-  z-index: 1000;
-  color: #555;
-  font-size: 11px;
-  font-family: 'Montserrat', sans-serif;
-  line-height: 1.2;
-  .legend-row {
-    padding: 15px;
-    position: relative;
-    box-shadow: 0 1px 7px rgba(0, 0, 0, 0.2);
-
-    b {
-      display: inline-block;
-      padding-right: 14px;
+    position: absolute;
+    bottom: 40px;
+    right: 20px;
+    width: 320px;
+    background-color: #f7f6ef;
+    z-index: 1000;
+    color: #555;
+    font-size: 11px;
+    font-family: 'Montserrat', sans-serif;
+    line-height: 1.2;
+    .legend-row {
+        padding: 15px;
+        position: relative;
+        box-shadow: 0 1px 7px rgba(0, 0, 0, 0.2);
+        b {
+            display: inline-block;
+            padding-right: 14px;
+        }
+        &>span {
+            padding-right: 30px;
+            display: inline-block;
+        }
     }
-
-    & > span {
-      padding-right: 30px;
-      display: inline-block;
+    [data-visible="false"] {
+        display: none;
     }
-  }
-
-  [data-visible="false"] {
-    display: none;
-  }
 }
 
 .circle-legend {
-  background-color: #f7f6ef;
-  border-radius: 3px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-  padding: 10px;
-  position: absolute;
-  min-width: 150px;
-  z-index: 1;
-
-  h4 {
-    margin: 0 0 10px;
-    display: block !important;
-  }
-
-  p {
-    margin-left: 40px;
+    background-color: #f7f6ef;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    padding: 10px;
     position: absolute;
-    display: block;
-    top: 0;
-  }
-
-  div {
-    position: relative;
-
-    span {
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 5px;
-      opacity: 0.8;
+    min-width: 150px;
+    z-index: 1;
+    h4 {
+        margin: 0 0 10px;
+        display: block !important;
     }
-  }
+    p {
+        margin-left: 40px;
+        position: absolute;
+        display: block;
+        top: 0;
+    }
+    div {
+        position: relative;
+        span {
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            opacity: 0.8;
+        }
+    }
 }
 
 .mapboxgl-ctrl-attrib {
-  font-size: 11px;
-  padding: 3px !important;
+    font-size: 11px;
+    padding: 3px !important;
 }
 
 .legend-fill {
-  height: 10px;
-  background: #eee;
-  margin: 3px 0;
-
-  ul {
-    padding: 0;
-    list-style-type: none;
-  }
-
-  li {
-    width: 30px;
-    float: left;
-    display: block;
     height: 10px;
-    color: #fff;
-    opacity: 0.8;
-  }
+    background: #eee;
+    margin: 3px 0;
+    ul {
+        padding: 0;
+        list-style-type: none;
+    }
+    li {
+        width: 30px;
+        float: left;
+        display: block;
+        height: 10px;
+        color: #fff;
+        opacity: 0.8;
+    }
 }
 
 .legend-fill.legend-label {
-  height: 17px;
-
-  li {
-    text-align: center;
-    height: 15px;
-    padding-top: 2px;
-  }
+    height: 17px;
+    li {
+        text-align: center;
+        height: 15px;
+        padding-top: 2px;
+    }
 }
 
 .legend-shapes {
-  position: relative;
-
-  .legend-symbols {
-    min-width: 320px;
-
-    .circle-container {
-      display: inline-grid;
-      min-width: 5px;
-      min-height: 5px;
-      position: relative;
-      text-align: center;
-      padding: 0 4px;
-
-      span {
-        display: inline-block;
-        border-radius: 50%;
-      }
-
-      p {
-        padding-top: 5px;
-      }
+    position: relative;
+    .legend-symbols {
+        min-width: 320px;
+        .circle-container {
+            display: inline-grid;
+            min-width: 5px;
+            min-height: 5px;
+            position: relative;
+            text-align: center;
+            padding: 0 4px;
+            span {
+                display: inline-block;
+                border-radius: 50%;
+            }
+            p {
+                padding-top: 5px;
+            }
+        }
     }
-  }
-
-  .circle-sm {
-    height: 6px;
-    width: 6px;
-    margin: 0 10px 0 0;
-    border-radius: 50%;
-    background: #eee;
-    display: inline-block;
-  }
-
-  .circle-md {
-    height: 9px;
-    width: 9px;
-    margin: 0 10px 0 0;
-    border-radius: 50%;
-    background: #eee;
-    display: inline-block;
-  }
-
-  .circle-lg {
-    height: 12px;
-    width: 12px;
-    margin: 0 10px 0 0;
-    border-radius: 50%;
-    background: #eee;
-    display: inline-block;
-  }
-
-  .triangle-stroked-11 {
-    width: 0;
-    height: 0;
-    margin: 0 10px 0 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-bottom: 8px solid white;
-    display: inline-block;
-  }
-
+    .circle-sm {
+        height: 6px;
+        width: 6px;
+        margin: 0 10px 0 0;
+        border-radius: 50%;
+        background: #eee;
+        display: inline-block;
+    }
+    .circle-md {
+        height: 9px;
+        width: 9px;
+        margin: 0 10px 0 0;
+        border-radius: 50%;
+        background: #eee;
+        display: inline-block;
+    }
+    .circle-lg {
+        height: 12px;
+        width: 12px;
+        margin: 0 10px 0 0;
+        border-radius: 50%;
+        background: #eee;
+        display: inline-block;
+    }
+    .triangle-stroked-11 {
+        width: 0;
+        height: 0;
+        margin: 0 10px 0 0;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-bottom: 8px solid white;
+        display: inline-block;
+    }
 }
 
 .triangle-15 {
-  width: 0;
-  height: 0;
-  margin: 0 10px 0 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-bottom: 12px solid white;
-  display: inline-block;
+    width: 0;
+    height: 0;
+    margin: 0 10px 0 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 12px solid white;
+    display: inline-block;
 }
 
 .orange-water {
-  content: url('/assets/img/orange-water.svg');
-  max-height: 15px;
-  padding-right: 5px;
+    content: url('/assets/img/orange-water.svg');
+    max-height: 15px;
+    padding-right: 5px;
 }
 
 .elec-purple {
-  content: url('/assets/img/elec-purple.svg');
-  max-height: 15px;
-  padding-right: 5px;
+    content: url('/assets/img/elec-purple.svg');
+    max-height: 15px;
+    padding-right: 5px;
 }
 
 .ranger-station-15-black {
-  content: url('/assets/img/ranger-station-15-black.svg');
-  max-height: 15px;
-  padding-right: 5px;
+    content: url('/assets/img/ranger-station-15-black.svg');
+    max-height: 15px;
+    padding-right: 5px;
 }
 
 .irrigate1 {
-  content: url('/assets/img/irrigate1.svg');
-  max-height: 15px;
-  padding-right: 5px;
+    content: url('/assets/img/irrigate1.svg');
+    max-height: 15px;
+    padding-right: 5px;
 }
 
 .bridge2 {
-  content: url('/assets/img/bridge2.svg');
-  max-height: 15px;
-  padding-right: 5px;
+    content: url('/assets/img/bridge2.svg');
+    max-height: 15px;
+    padding-right: 5px;
 }
 
 .govt-off {
-  content: url('/assets/img/govt-off.svg');
-  max-height: 15px;
-  padding-right: 5px;
+    content: url('/assets/img/govt-off.svg');
+    max-height: 15px;
+    padding-right: 5px;
 }
 
 .tank1 {
-  content: url('/assets/img/tank1.svg');
-  max-height: 15px;
-  padding-right: 5px;
+    content: url('/assets/img/tank1.svg');
+    max-height: 15px;
+    padding-right: 5px;
 }
 
 .hospital-15-black {
-  content: url('/assets/img/hospital-15-black.svg');
-  max-height: 15px;
-  padding-right: 5px;
+    content: url('/assets/img/hospital-15-black.svg');
+    max-height: 15px;
+    padding-right: 5px;
 }
 
 .layer-symbols {
-  list-style: none;
-  margin-left: -3em;
-  margin-top: 1em;
+    list-style: none;
+    margin-left: -3em;
+    margin-top: 1em;
 }
+
 .dam3 {
-  content: url('/assets/img/dam3.svg');
-  max-height: 15px;
-  padding-right: 5px;
+    content: url('/assets/img/dam3.svg');
+    max-height: 15px;
+    padding-right: 5px;
+}
+
+.police-station {
+    content: url('/assets/img/police-station.svg');
+    max-height: 15px;
+    padding-right: 5px;
 }
 
 [data-tooltip] {
-  position: relative;
-  z-index: 2;
-  cursor: pointer;
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
 }
 
 [data-tooltip]::before,
 [data-tooltip]::after {
-  visibility: hidden;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-  filter: "progid: DXImageTransform.Microsoft.Alpha(Opacity=0)";
-  opacity: 0;
-  pointer-events: none;
+    visibility: hidden;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    filter: "progid: DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    opacity: 0;
+    pointer-events: none;
 }
 
 [data-tooltip]::before {
-  position: absolute;
-  bottom: 5%;
-  left: 50%;
-  margin-bottom: 6px;
-  margin-left: -82px;
-  padding: 5px;
-  width: 160px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-  background-color: transparent;
-  color: #000;
-  content: attr(data-tooltip);
-  text-align: center;
-  font-size: 12px;
-  line-height: 1.2;
+    position: absolute;
+    bottom: 5%;
+    left: 50%;
+    margin-bottom: 6px;
+    margin-left: -82px;
+    padding: 5px;
+    width: 160px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background-color: transparent;
+    color: #000;
+    content: attr(data-tooltip);
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.2;
 }
 
 [data-tooltip]:hover::before,
 [data-tooltip]:hover::after {
-  visibility: visible;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
-  filter: "progid: DXImageTransform.Microsoft.Alpha(Opacity=100)";
-  opacity: 1;
+    visibility: visible;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+    filter: "progid: DXImageTransform.Microsoft.Alpha(Opacity=100)";
+    opacity: 1;
 }
 
 .swatch {
-  display: inline-block;
-  height: 10px;
-  width: 5px;
+    display: inline-block;
+    height: 10px;
+    width: 5px;
 }
 
 @media screen and (max-width: 795px) {
-  .ona-logo {
-    display: none;
-  }
+    .ona-logo {
+        display: none;
+    }
 }
 
 .legend-row {
-  &:not(.primary) {
-    cursor: pointer;
-
-    & > * {
-      display: none;
+    &:not(.primary) {
+        cursor: pointer;
+        &>* {
+            display: none;
+        }
+        b {
+            display: inline-block;
+            font-weight: normal;
+            color: #999;
+        }
+        &:hover {
+            box-shadow: 0 1px 7px rgba(0, 0, 0, 0.2), inset 0 0 0 1.5px rgba(0, 0, 0, 0.2);
+            b {
+                color: #555;
+            }
+        }
     }
-
-    b {
-      display: inline-block;
-      font-weight: normal;
-      color: #999;
+    &.primary {
+        box-shadow: 0 1px 7px rgba(0, 0, 0, 0.2), inset 0 0 0 1.5px rgba(0, 0, 0, 0.4);
+        min-height: 100px;
     }
-
-    &:hover {
-      box-shadow: 0 1px 7px rgba(0, 0, 0, 0.2), inset 0 0 0 1.5px rgba(0, 0, 0, 0.2);
-
-      b {
-        color: #555;
-      }
-    }
-  }
-
-  &.primary {
-    box-shadow: 0 1px 7px rgba(0, 0, 0, 0.2), inset 0 0 0 1.5px rgba(0, 0, 0, 0.4);
-    min-height: 100px;
-  }
 }
