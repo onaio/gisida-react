@@ -267,13 +267,27 @@ export class Legend extends React.Component {
         if (fillLayerNoBreaks && !layer.parent) {
           let hasShape;
           hasShape = (layer.categories && layer.categories.shape && layer.categories.shape.length);
+          const shapeAndBar = layer.categories && layer.categories.shapeAndBar;
           const fillWidth = (
             100 / layer.categories.color.filter(c => c !== 'transparent').length
           ).toString();
           const textColor = layer.categories && layer.categories['text-color'];
           layer.categories.color.forEach((color, index) => {
+            const showBoth = (shapeAndBar && shapeAndBar.length && shapeAndBar[index] === 'yes');
             if (color !== 'transparent') {
-              if (hasShape) {
+              if (showBoth && hasShape) {
+                background.push(
+                  <li className="layer-symbols" key={index}>
+                    <span className={`${layer.categories.shape[index]}`} />
+                    <ul className="legend bar-color" key={index}>
+                      <li style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
+                        {layer.categories.label[index]}
+                      </li>  
+                    </ul>
+                  </li>
+                );
+              }
+              else if (hasShape && !showBoth) {
                 background.push(
                   <li className="layer-symbols" key={index}>
                     <span className={`${layer.categories.shape[index]}`} />
@@ -534,6 +548,8 @@ export class Legend extends React.Component {
           </div>
         );
       } else if (symbolLayer) {
+        const shapeAndBar = layer.categories && layer.categories.shapeAndBar;
+        const hasShape = (layer.categories && layer.categories.shape && layer.categories.shape.length);
         layer.categories.color.forEach((color, index) => {
           const style =
             layer.categories.shape[index] === 'triangle-stroked-11' ||
@@ -541,12 +557,30 @@ export class Legend extends React.Component {
               ? 'border-bottom-color:'
               : 'background:';
           const styleString = `${style}: ${color}`;
-          background.push(
-            <li className="layer-symbols" key={index}>
-              <span className={`${layer.categories.shape[index]}`} style={{ styleString }} />
-              {layer.categories.label[index]}
-            </li>
-          );
+          const showBoth = (shapeAndBar && shapeAndBar.length && shapeAndBar[index] === 'yes')
+          const fillWidth = (
+            100 / layer.categories.color.filter(c => c !== 'transparent').length
+          ).toString();
+          const textColor = layer.categories && layer.categories['text-color'];
+          if (showBoth && hasShape) {
+            background.push(
+              <li className="layer-symbols" key={index}>
+                <span className={`${layer.categories.shape[index]}`} />
+                <ul className="legend bar-color" key={index}>
+                  <li style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
+                    {layer.categories.label[index]}
+                  </li>  
+                </ul>
+              </li>
+            );
+          } else {
+            background.push(
+              <li className="layer-symbols" key={index}>
+                <span className={`${layer.categories.shape[index]}`} style={{ styleString }} />
+                {layer.categories.label[index]}
+              </li>
+            );
+          }
         });
 
         legendItems.unshift(
