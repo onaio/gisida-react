@@ -16,7 +16,7 @@ import './Filter.scss';
 import 'rc-slider/assets/index.css';
 
 const mapStateToProps = (state, ownProps) => {
-  const { mapId, hasNavbar } = ownProps;
+  const { mapId, hasNavBar } = ownProps;
   const MAP = state[mapId] || { layers: {}, filter: {}, timeseries: {} };
   let timeLayer;
   buildLayersObj(MAP.layers).forEach(layer => {
@@ -40,7 +40,7 @@ const mapStateToProps = (state, ownProps) => {
     showFilterBtn: MAP.filter.layerId && MAP.primaryLayer === MAP.filter.layerId,
     layerData: MAP.layers,
     detailView: MAP.detailView,
-    hasNavbar,
+    hasNavBar,
   };
 };
 
@@ -1118,7 +1118,7 @@ export class Filter extends Component {
             onClick={() => {
               this.handleFilterClick();
             }}
-            style={{ right: sidebarOffset, top: this.props.hasNavbar ? '230px' : '195px' }}
+            style={{ right: sidebarOffset, top: this.props.hasNavBar ? '230px' : '195px' }}
           />
         ) : (
           ''

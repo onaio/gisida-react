@@ -72,7 +72,7 @@ const mapStateToProps = (state, ownProps) => {
     MAP,
     config: APP.mapConfig,
     map: mapId === 'map-1' ? window.maps[0] : window.maps[1],
-    hasNavbar: ownProps.hasNavbar,
+    hasNavBar: ownProps.hasNavBar,
   };
 };
 
@@ -407,7 +407,7 @@ export class Export extends Component {
           }}
           style={{
             right: '10px',
-            top: this.props.hasNavbar ? '195px' : '150px',
+            top: this.props.hasNavBar ? '195px' : '150px',
           }}
         >
           <span className="glyphicon glyphicon-camera" />

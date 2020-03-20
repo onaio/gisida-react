@@ -45,7 +45,7 @@ const mapStateToProps = (state, ownProps) => {
     showFilterPanel: !!MAP.showFilterPanel,
     activeLayers,
     handlers: ownProps.handlers,
-    hasNavbar: ownProps.hasNavbar,
+    hasNavBar: ownProps.hasNavBar,
   };
 };
 
@@ -926,8 +926,8 @@ class Map extends Component {
         ? detailViewProps && typeof detailViewProps !== undefined
         : this.props.showDetailView;
     let mapWidth = '100%';
-    const mapheight = this.props.hasNavbar ? '92%' : '100%';
-    const mapTop = this.props.hasNavbar ? '80px' : 0;
+    const mapheight = this.props.hasNavBar ? '92%' : '100%';
+    const mapTop = this.props.hasNavBar ? '80px' : 0;
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
     }
@@ -964,7 +964,7 @@ class Map extends Component {
               {React.Children.map(this.props.children, child => {
                 return React.cloneElement(child, {
                   mapId: this.props.mapId,
-                  hasNavbar: this.props.hasNavbar,
+                  hasNavBar: this.props.hasNavBar,
                 });
               })}
             </div>
@@ -976,7 +976,7 @@ class Map extends Component {
 }
 
 Map.propTypes = {
-  hasNavbar: PropTypes.bool, // Pass true if app has a navbar
+  hasNavBar: PropTypes.bool, // Pass true if app has a navbar
 };
 
 export default connect(mapStateToProps)(Map);
