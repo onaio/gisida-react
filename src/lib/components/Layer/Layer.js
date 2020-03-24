@@ -8,7 +8,7 @@ const mapStateToProps = (state, ownProps) => {
   const { APP, LOC } = state;
   const MAP = state[ownProps.mapId]
   if (!!!MAP) {
-    debugger
+    throw "MAP not found"
   }
   return {
     APP,
