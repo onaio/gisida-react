@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { useOAuthLogin, AuthorizationGrantType } from '@onaio/gatekeeper/dist/components/login';
+import { useOAuthLogin, AuthorizationGrantType } from '@onaio/gatekeeper';
 
 class OnaOauthLogin extends Component {
   constructor(props) {
