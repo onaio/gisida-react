@@ -1,0 +1,91 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TitleBar TitleBar component renders correctly 1`] = `
+<Connect(TitleBar)
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <TitleBar
+    appConfig={
+      Object {
+        "loaded": true,
+      }
+    }
+    dispatch={[Function]}
+    store={
+      Object {
+        "clearActions": [Function],
+        "dispatch": [Function],
+        "getActions": [Function],
+        "getState": [Function],
+        "replaceReducer": [Function],
+        "subscribe": [Function],
+      }
+    }
+    storeSubscription={
+      Subscription {
+        "listeners": Object {
+          "clear": [Function],
+          "get": [Function],
+          "notify": [Function],
+          "subscribe": [Function],
+        },
+        "onStateChange": [Function],
+        "parentSub": undefined,
+        "store": Object {
+          "clearActions": [Function],
+          "dispatch": [Function],
+          "getActions": [Function],
+          "getState": [Function],
+          "replaceReducer": [Function],
+          "subscribe": [Function],
+        },
+        "unsubscribe": [Function],
+      }
+    }
+  >
+    <div>
+      <div
+        className="menu"
+        id="menu"
+        style={
+          Object {
+            "background": undefined,
+          }
+        }
+      >
+        <div
+          className="brand"
+        >
+          <div
+            className="brand-title"
+          >
+            <span
+              className="white"
+            />
+               
+          </div>
+        </div>
+        <a
+          alt="Powered by ONA"
+          className="ona-logo"
+          href="http://www.ona.io/"
+          rel="noopener noreferrer"
+          target="_blank"
+          title="Powered by ONA"
+        >
+          Powered by
+        </a>
+      </div>
+    </div>
+  </TitleBar>
+</Connect(TitleBar)>
+`;
