@@ -1,28 +1,31 @@
 import React from 'react';
 import TimeSeriesSlider from '../../../../src/lib/components/TimeSeriesSlider/TimeSeriesSlider.js'
-import { mount } from 'enzyme';
+import { mount, shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
 import configureStore from 'redux-mock-store';
 import periodData from '../../../fixtures/periodData.json';
 import { layer1 } from '../../../fixtures/defaultLayers';
-import samplLayer from '../../../fixtures/defaultLayers'
+import sampleLayer from '../../../fixtures/sample-layer.json'
 var gisida = require('gisida')
 
-samplLayer['id'] = 'sample-layer';
+sampleLayer['id'] = 'sample-layer';
+sampleLayer['visible'] = false;
+layer1['visible'] = true;
 
 const initialState = {
 	"map-1": {
-		primaryLayer: "sample-layer",
+		primaryLayer: "education",
 		showFilterPanel: false,
-		layers: {"sample-layer": {...samplLayer}},
+		layers: {"sample-layer": {...sampleLayer}, "education": {...layer1}},
 		timeseries: {}
 	},
 }
 
 const newState = { "education": {
 	...periodData,
-	layer1,
-	layerObj: {...layer1},
+	...layer1,
+  layerObj: layer1,
+  layerId: 'education',
 	colorStops: [[1], [1,2,3,4]]
 	} 
 };
@@ -34,6 +37,16 @@ const updateTimeseriesState = jest.fn();
 
 describe('TimeSeriesSlider', () => {
 
+  it('renders without crashing', () => {
+    shallow(
+      <TimeSeriesSlider 
+        store={store}
+        mapId='map-1'
+        updateTimeseriesState={updateTimeseriesState}
+      />
+    )
+  })
+
 	it('TimeSeriesSlider component renders correctly', () => {
     const wrapper = mount(
       <TimeSeriesSlider 
@@ -43,11 +56,13 @@ describe('TimeSeriesSlider', () => {
       />
     );
 
-		expect(toJson(wrapper)).toMatchSnapshot();
+    expect(toJson(wrapper)).toMatchSnapshot();
+    wrapper.unmount();
 	})
 
-	it('should set props', () => {
-    const propsUpdateMock = jest.spyOn(wrapper.instance(), 'componentWillReceiveProps');
+	it('should update correctly on input change', () => {
+    gisida.generateStops = jest.fn().mockReturnValue([1,2,3,4]);
+    const updateTimeseriesSpy = jest.spyOn(gisida.Actions, 'updateTimeseries');
     const wrapper = mount(
       <TimeSeriesSlider 
         store={store}
@@ -55,15 +70,16 @@ describe('TimeSeriesSlider', () => {
         updateTimeseriesState={updateTimeseriesState}
       />
     );
-		defaultLayer.visible = true;
+    // update props:  
 		initialState["map-1"].timeseries = { ...newState };
-		wrapper.setProps({...initialState});
-		expect(propsUpdateMock).toHaveBeenCalledWith({...initialState});
+    wrapper.setProps({...initialState});
+    wrapper.find('input').simulate('change', {target: {value: 1}});
+    
+    const props = wrapper.props();
+
+    expect(props['map-1'].timeseries).toEqual(newState);
+    expect(updateTimeseriesSpy).toHaveBeenCalledTimes(1);
+    expect(gisida.generateStops).toHaveBeenCalledWith(newState['education'], 'period', store.dispatch, 1);
 	})
 
-	it('should handle input change', () => {
-		gisida.generateStops = jest.fn().mockReturnValue([1,2,3,4]);
-		wrapper.find('input',).simulate('change', {target: {value: 1}})
-		expect(gisida.generateStops).toHaveBeenCalledTimes(1)
-	})
 });

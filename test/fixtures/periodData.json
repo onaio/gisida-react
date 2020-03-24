@@ -1,0 +1,20 @@
+{
+    "period": [
+        "March 1 to March 20",
+        "March 21 to April 3"
+    ],
+    "periodData": {
+        "March 1 to March 20" : {
+            "data": [
+                
+            ]
+        },
+        "March 21 to April 3" : {
+            "data": [
+                
+            ]
+        }
+    },
+    "temporalIndex": 0
+
+}

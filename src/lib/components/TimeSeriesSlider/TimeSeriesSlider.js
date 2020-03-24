@@ -83,6 +83,7 @@ class TimeSeriesSlider extends React.Component {
       field
     } = sliderLayerObj.layerObj.aggregate.timeseries;
     sliderLayerObj.data = sliderLayerObj.periodData[sliderLayerObj.period[nextIndex]].data;
+    console.log(field)
     const activeStops = generateStops(sliderLayerObj, field, this.props.dispatch, nextIndex);
 
     const {
