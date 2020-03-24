@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`/src/lib/components/Login/BasicAuthLogin renders correctly 1`] = `
+<BasicAuthLogin
+  appPassword={
+    Array [
+      "password123",
+    ]
+  }
+>
+  <form
+    className="login-form"
+    onSubmit={[Function]}
+  >
+    <div
+      className="form-group"
+    >
+      <label
+        htmlFor="password"
+      >
+        Enter your Password
+      </label>
+      <input
+        autoFocus={true}
+        className="form-control"
+        type="password"
+      />
+    </div>
+    <button
+      className="btn btn-default center-block"
+      type="submit"
+    >
+      Log In
+    </button>
+  </form>
+</BasicAuthLogin>
+`;
