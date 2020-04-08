@@ -19,6 +19,7 @@ const mapStateToProps = (state, ownProps) => {
   });
 
   MAP.blockLoad = mapId === 'map-1' ? false : !VIEW || !VIEW.splitScreen;
+  const hasDataView = VIEW.hasOwnProperty('activeLayerSupersetLink');
 
   return {
     mapId,
@@ -46,6 +47,7 @@ const mapStateToProps = (state, ownProps) => {
     activeLayers,
     handlers: ownProps.handlers,
     hasNavBar: ownProps.hasNavBar,
+    hasDataView
   };
 };
 
@@ -324,6 +326,25 @@ class Map extends Component {
     }
   }
 
+  dataViewMapReset(mapConfig, map) {
+    if (mapConfig.center) {
+      if (!Array.isArray(mapConfig.center)) {
+        map.easeTo({
+          center: mapConfig.center,
+          zoom: mapConfig.zoom,
+        });
+      } else {
+        map.easeTo({
+          center: {
+            lng: mapConfig.center[0],
+            lat: mapConfig.center[1],
+          },
+          zoom: mapConfig.zoom,
+        });
+      }
+    }
+  }
+
   componentDidMount() {
     const { MAP, APP, mapId } = this.props;
     if (APP && MAP && mapId) {
@@ -361,6 +382,10 @@ class Map extends Component {
     const regions = nextProps.REGIONS;
     const mapId = nextProps.mapId;
     mapConfig.container = mapId;
+
+    if (this.props.hasDataView && this.map) {
+      this.dataViewMapReset(mapConfig, this.map)
+    }
 
     // Check if map is initialized.
     if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
@@ -510,8 +535,13 @@ class Map extends Component {
       } catch (e) {
         console.warn('resize error', e);
       }
+      
+      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj, APP } = this.props;
 
-      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj } = this.props;
+      if (this.props.hasDataView && this.map) {
+        this.dataViewMapReset(APP.mapConfig, this.map)
+      }
+
       if (
         LOC &&
         LOC.doUpdateMap === mapId &&
