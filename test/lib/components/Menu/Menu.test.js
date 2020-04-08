@@ -15,7 +15,10 @@ const initialState = {
         primaryLayer: layer1.id,
         visibleLayerId: layer1.id
     },
-    REGIONS: [ ]
+    REGIONS: [ ],
+    VIEW: {
+        showMap: false,
+    }
 }
 
 const mockStore = configureStore()

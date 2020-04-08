@@ -8,6 +8,7 @@ const webpack = require('webpack');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const paths = require('./paths');
 const Dotenv = require('dotenv-webpack');
+const Uglify = require('uglifyjs-webpack-plugin');
 
 const shouldUseSourceMap = false;
 
@@ -20,7 +21,7 @@ module.exports = {
   output: {
     path: paths.appBuild,
     filename: 'gisida_react.js',
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
   },
   resolve: {
     extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx'],
@@ -82,32 +83,37 @@ module.exports = {
           // in the main CSS file.
           {
             test: /\.(css|scss)$/,
-            use: [{
-              loader: "style-loader" // creates style nodes from JS strings
-            }, {
-              loader: "css-loader" // translates CSS into CommonJS
-            }, {
-              loader: "sass-loader" // compiles Sass to CSS
-            }, {
-              loader: require.resolve('postcss-loader'),
-              options: {
-                // Necessary for external CSS imports to work
-                // https://github.com/facebookincubator/create-react-app/issues/2677
-                ident: 'postcss',
-                plugins: () => [
-                  require('postcss-flexbugs-fixes'),
-                  autoprefixer({
-                    browsers: [
-                      '>1%',
-                      'last 4 versions',
-                      'Firefox ESR',
-                      'not ie < 9', // React doesn't support IE8 anyway
-                    ],
-                    flexbox: 'no-2009',
-                  }),
-                ],
-              }
-            }]
+            use: [
+              {
+                loader: 'style-loader', // creates style nodes from JS strings
+              },
+              {
+                loader: 'css-loader', // translates CSS into CommonJS
+              },
+              {
+                loader: 'sass-loader', // compiles Sass to CSS
+              },
+              {
+                loader: require.resolve('postcss-loader'),
+                options: {
+                  // Necessary for external CSS imports to work
+                  // https://github.com/facebookincubator/create-react-app/issues/2677
+                  ident: 'postcss',
+                  plugins: () => [
+                    require('postcss-flexbugs-fixes'),
+                    autoprefixer({
+                      browsers: [
+                        '>1%',
+                        'last 4 versions',
+                        'Firefox ESR',
+                        'not ie < 9', // React doesn't support IE8 anyway
+                      ],
+                      flexbox: 'no-2009',
+                    }),
+                  ],
+                },
+              },
+            ],
           },
           // "file" loader makes sure assets end up in the `build` folder.
           // When you `import` an asset, you get its filename.
@@ -126,37 +132,21 @@ module.exports = {
           },
           // ** STOP ** Are you adding a new loader?
           // Make sure to add the new loader(s) before the "file" loader.
-        ]
-      }
-    ]
+        ],
+      },
+    ],
   },
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"',
     }),
     // Minify the code.
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false,
-        // Disabled because of an issue with Uglify breaking seemingly valid code:
-        // https://github.com/facebookincubator/create-react-app/issues/2376
-        // Pending further investigation:
-        // https://github.com/mishoo/UglifyJS2/issues/2011
-        comparisons: false,
-      },
-      output: {
-        comments: false,
-        // Turned on because emoji and regex is not minified properly using default
-        // https://github.com/facebookincubator/create-react-app/issues/2488
-        ascii_only: true,
-      },
-      sourceMap: shouldUseSourceMap,
-    }),
+    new Uglify(),
     new Dotenv(),
   ],
   externals: {
-    'react': 'react',
-    'react-dom': 'react-dom'
+    react: 'react',
+    'react-dom': 'react-dom',
   },
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.
@@ -166,4 +156,4 @@ module.exports = {
     net: 'empty',
     tls: 'empty',
   },
-}
+};

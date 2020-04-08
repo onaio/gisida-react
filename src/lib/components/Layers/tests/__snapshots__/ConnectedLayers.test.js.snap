@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Layers component renders correctly 1`] = `
+<Connect(ConnectedLayers)
+  layers={
+    Array [
+      Object {
+        "category": "Boundaries and Place Labels",
+        "id": "sample-layer",
+        "label": "Boundaries",
+        "paint": Object {
+          "line-color": "#444",
+          "line-opacity": 0.6,
+          "line-width": 1,
+        },
+        "source": Object {
+          "layer": "som_adm_2-0j5bly",
+          "type": "vector",
+          "url": "mapbox://ona.6gl2shzi",
+        },
+        "type": "line",
+        "visible": true,
+      },
+    ]
+  }
+  mapId="map-1"
+  preparedLayers={
+    Object {
+      "sample-layer-id": Object {
+        "category": "Boundaries and Place Labels",
+        "id": "sample-layer",
+        "label": "Boundaries",
+        "paint": Object {
+          "line-color": "#444",
+          "line-opacity": 0.6,
+          "line-width": 1,
+        },
+        "source": Object {
+          "layer": "som_adm_2-0j5bly",
+          "type": "vector",
+          "url": "mapbox://ona.6gl2shzi",
+        },
+        "type": "line",
+        "visible": true,
+      },
+    }
+  }
+/>
+`;
