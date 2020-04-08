@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
 import { detectIE, buildLayersObj, orderLayers} from '../../utils';
 import './Map.scss';
@@ -44,6 +45,7 @@ const mapStateToProps = (state, ownProps) => {
     showFilterPanel: !!MAP.showFilterPanel,
     activeLayers,
     handlers: ownProps.handlers,
+    hasNavBar: ownProps.hasNavBar,
   };
 };
 
@@ -186,7 +188,6 @@ class Map extends Component {
     const feature = features[0];
     if (!feature) return false;
     const activeLayerObj = layersObj.find(l => l.id === feature.layer.id);
-
     if (feature && activeLayerObj['detail-view']) {
       const newZoom = this.map.getZoom() < 7.5 ? 7.5 : this.map.getZoom();
       this.map.easeTo({
@@ -334,7 +335,7 @@ class Map extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps){
+  componentWillReceiveProps(nextProps) {
     if (this.map) {
       try {
         this.map.resize();
@@ -925,6 +926,8 @@ class Map extends Component {
         ? detailViewProps && typeof detailViewProps !== undefined
         : this.props.showDetailView;
     let mapWidth = '100%';
+    const mapheight = this.props.hasNavBar ? '92%' : '100%';
+    const mapTop = this.props.hasNavBar ? '80px' : 0;
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
     }
@@ -948,10 +951,12 @@ class Map extends Component {
             }`}
             style={{
               width: mapWidth,
+              height: mapheight,
               display:
                 this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
                   ? 'none'
                   : 'inline',
+              top: mapTop,
             }}
           >
             <div className="widgets">
@@ -959,6 +964,7 @@ class Map extends Component {
               {React.Children.map(this.props.children, child => {
                 return React.cloneElement(child, {
                   mapId: this.props.mapId,
+                  hasNavBar: this.props.hasNavBar,
                 });
               })}
             </div>
@@ -968,5 +974,9 @@ class Map extends Component {
     );
   }
 }
+
+Map.propTypes = {
+  hasNavBar: PropTypes.bool, // Pass true if app has a navbar
+};
 
 export default connect(mapStateToProps)(Map);
