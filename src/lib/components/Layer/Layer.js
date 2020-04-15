@@ -27,6 +27,13 @@ export class Layer extends Component {
     if (!mapId) {
       return null;
     }
+    if (layer && layer.visible === false) {
+      const pageUrl = `${window.location.href}?${layer.id} `
+      history.pushState('', '', pageUrl);
+    } else if (layer && layer.visible === true) {
+      const popedLayer = window.location.href.replace(`?${layer.id}`, '');
+      history.replaceState('', '', popedLayer);
+    }
     this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
     const {center, zoom } = lngLat(LOC, APP);
     if (layer.zoomOnToggle && layer.visible) {
