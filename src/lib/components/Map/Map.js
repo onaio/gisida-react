@@ -376,6 +376,7 @@ class Map extends Component {
     const activeLayerIds = nextProps.activeLayerIds;
     const primaryLayer = nextProps.MAP.primaryLayer;
     const activeLayerId = nextProps.MAP.activeLayerId;
+    const showLayerSuperset = nextProps.VIEW.showLayerSuperset;
 
     const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES || [];
@@ -383,8 +384,12 @@ class Map extends Component {
     const mapId = nextProps.mapId;
     mapConfig.container = mapId;
 
-    if (this.props.hasDataView && this.map) {
-      this.dataViewMapReset(mapConfig, this.map)
+    if (this.props.hasDataView && this.map && showLayerSuperset) {
+      if (layers && layers[primaryLayer] && layers[primaryLayer].location) {
+        this.map.easeTo(layers[primaryLayer].location);
+      } else {
+        this.dataViewMapReset(mapConfig, this.map)
+      }
     }
 
     // Check if map is initialized.
@@ -536,10 +541,16 @@ class Map extends Component {
         console.warn('resize error', e);
       }
       
-      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj, APP } = this.props;
+      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj, APP, VIEW } = this.props;
 
-      if (this.props.hasDataView && this.map) {
-        this.dataViewMapReset(APP.mapConfig, this.map)
+      const layers = this.props.layers;
+      const CurrPrimaryLayer = this.props.primaryLayer;
+      if (this.props.hasDataView && this.map && VIEW.showLayerSuperset) {
+        if (layers && layers[CurrPrimaryLayer] && layers[CurrPrimaryLayer].location) {
+          this.map.easeTo(layers[CurrPrimaryLayer].location);
+        } else {
+          this.dataViewMapReset(APP.mapConfig, this.map)
+        }
       }
 
       if (
