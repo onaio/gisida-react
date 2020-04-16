@@ -549,7 +549,23 @@ class Map extends Component {
       this.removeLabels();
       this.handleLabelsOnMapZoom();
     }
-
+    /**
+     * Render layers from url
+     */
+      let urlparams = window.location.href.split('?');
+      urlparams.shift();
+      if (urlparams.every(param => Object.keys(this.props.layers).includes(param)) &&
+       urlparams.every(layerId => (this.props.layers[layerId] && 
+        this.props.layers[layerId].visible === false))) {
+      if(urlparams.length >= 1) { 
+        urlparams.forEach((layerId) => {
+          if (!this.props.layers[layerId].loaded && !this.props.layers[layerId].isLoading) {
+            this.props.dispatch(Actions.toggleLayer(this.props.mapId, layerId));
+            prepareLayer(this.props.mapId, layerId, this.props.dispatch);
+          }
+        });
+      }
+    }
     // Update Layer Filters
     if (this.map && this.props.layerObj && this.map.getLayer(this.props.layerObj.id)) {
       const { FILTER, primaryLayer } = this.props;
