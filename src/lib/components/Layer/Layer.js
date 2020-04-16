@@ -3,52 +3,80 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Actions, prepareLayer, lngLat } from 'gisida';
 
-
 const mapStateToProps = (state, ownProps) => {
   const { APP, LOC } = state;
-  const MAP = state[ownProps.mapId]
+  const MAP = state[ownProps.mapId];
   if (!!!MAP) {
-    throw "MAP not found"
+    throw 'MAP not found';
   }
   return {
     APP,
     LOC,
     timeSeriesObj: MAP.timeseries[MAP.visibleLayerId],
     timeseries: MAP.timeseries,
-    layers: MAP.layers
-  }
-}
+    layers: MAP.layers,
+  };
+};
 
 export class Layer extends Component {
-
   onLayerToggle = layer => {
     // dispatch toggle layer action
     const { mapId, APP, LOC } = this.props;
     if (!mapId) {
       return null;
     }
+
+    const layerId = layer.id.replace('.json', '');
+    let pageURL = `${window.location.href}`;
+
     if (layer && layer.visible === false) {
-      const pageUrl = `${window.location.href}?${layer.id} `
-      history.pushState('', '', pageUrl);
+      if (!window.location.href.includes('?layers=')) {
+        /**
+         * Query param `layers` does not exist. Have the layerId as the first
+         * value of query param `layers`. The assumption made is that
+         * there exists no other query params
+         */
+        pageURL = `${pageURL}?layers=${layerId}`;
+      } else {
+        /**
+         * Query param `layers` exists. Add to exist list
+         */
+        pageURL = `${pageURL},${layerId}`;
+      }
+
+      history.pushState('', '', pageURL);
     } else if (layer && layer.visible === true) {
-      const popedLayer = window.location.href.replace(`?${layer.id}`, '');
-      history.replaceState('', '', popedLayer);
+      if (window.location.href.includes(`?layers=${layerId}`)) {
+        // If layerId is the first item in the query param list
+        if (window.location.href.includes(`?layers=${layerId},`)) {
+          // If query param list has other layerIds
+          pageURL = window.location.href.replace(`?layers=${layerId},`, '?layers=');
+        } else {
+          // If layer Id is the only item in the query param list
+          pageURL = window.location.href.replace(`?layers=${layerId}`, '');
+        }
+      } else if (window.location.href.includes(`,${layerId}`)) {
+        // If layer Id is not the first item in the query param lit
+        pageURL = window.location.href.replace(`,${layerId}`, '');
+      }
+
+      history.replaceState('', '', pageURL);
     }
     this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
-    const {center, zoom } = lngLat(LOC, APP);
+    const { center, zoom } = lngLat(LOC, APP);
     if (layer.zoomOnToggle && layer.visible) {
-        window.maps.forEach((e) => {
-          e.easeTo({
-            center,
-            zoom,
-          })
-        });  
-      } 
+      window.maps.forEach(e => {
+        e.easeTo({
+          center,
+          zoom,
+        });
+      });
+    }
     // Prepare layer if layer had not been loaded
     if (!layer.loaded && !layer.isLoading) {
       prepareLayer(mapId, layer, this.props.dispatch);
     }
-  }
+  };
 
   render() {
     const layer = this.props.layer;
