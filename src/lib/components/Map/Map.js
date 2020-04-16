@@ -541,13 +541,11 @@ class Map extends Component {
         console.warn('resize error', e);
       }
       
-      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj, APP, VIEW } = this.props;
+      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj, APP, VIEW, layers } = this.props;
 
-      const layers = this.props.layers;
-      const CurrPrimaryLayer = this.props.primaryLayer;
       if (this.props.hasDataView && this.map && VIEW.showLayerSuperset) {
-        if (layers && layers[CurrPrimaryLayer] && layers[CurrPrimaryLayer].location) {
-          this.map.easeTo(layers[CurrPrimaryLayer].location);
+        if (layers && layers[primaryLayer] && layers[primaryLayer].location) {
+          this.map.easeTo(layers[primaryLayer].location);
         } else {
           this.dataViewMapReset(APP.mapConfig, this.map)
         }
