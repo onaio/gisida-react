@@ -149,6 +149,14 @@ class Menu extends Component {
                 );
               }
             });
+          } else {
+            if (layer.visible) {
+              const { openCategories } = this.props;
+              const index = openCategories.indexOf(category);
+              this.props.dispatch(
+                Actions.toggleCategories(this.props.mapId, category.category, index)
+              );
+            }
           }
         });
       });
