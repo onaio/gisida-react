@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
-import { detectIE, buildLayersObj, orderLayers} from '../../utils';
+import { detectIE, buildLayersObj, orderLayers } from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -58,6 +58,7 @@ class Map extends Component {
     super(props);
     this.state = {
       layersObj: this.props.layersObj,
+      URLLayersLoaded: [],
     };
   }
   initMap(accessToken, mapConfig, mapId, mapIcons) {
@@ -154,7 +155,8 @@ class Map extends Component {
           layers: activeLayers.filter(i => this.map.getLayer(i) !== undefined),
         });
         const feature = features.find(
-          f => f.layer.id === layerObj.id || (layerObj.layers && layerObj.layers.includes(f.layer.id))
+          f =>
+            f.layer.id === layerObj.id || (layerObj.layers && layerObj.layers.includes(f.layer.id))
         );
         if (!feature) {
           return false;
@@ -256,7 +258,9 @@ class Map extends Component {
               this.map.moveLayer(sublayers[s]);
             }
           }
-          typeof sortLayers === 'function' ? sortLayers(map, activeLayersData, nextLayerId) : orderLayers(sortLayers, map, nextLayerId);
+          typeof sortLayers === 'function'
+            ? sortLayers(map, activeLayersData, nextLayerId)
+            : orderLayers(sortLayers, map, nextLayerId);
         }
       }
     }
@@ -299,7 +303,9 @@ class Map extends Component {
     // }
     // Order active layers
 
-    typeof sortLayers === 'function' ? sortLayers(map, activeLayersData, nextLayerId) : orderLayers(sortLayers, map, nextLayerId);
+    typeof sortLayers === 'function'
+      ? sortLayers(map, activeLayersData, nextLayerId)
+      : orderLayers(sortLayers, map, nextLayerId);
     const nextlayersObj = activeLayersData.filter(lo => lo.id !== nextLayerId);
     nextlayersObj.push(nextLayerObj);
 
@@ -326,6 +332,7 @@ class Map extends Component {
 
   componentDidMount() {
     const { MAP, APP, mapId } = this.props;
+
     if (APP && MAP && mapId) {
       const { isRendered, accessToken, mapConfig } = APP;
       // Check if map is initialized, use mapId as container value
@@ -501,6 +508,37 @@ class Map extends Component {
     }
     // Assign global variable for debugging purposes.
     // window.GisidaMap = this.map;
+
+    /**
+     * Render layers from url
+     */
+    const splitURL = window.location.href.split('?layers=');
+
+    if (splitURL.length == 2) {
+      const URLLayers = splitURL[1].split(',');
+      const { URLLayersLoaded } = this.state;
+
+      if (URLLayers.length !== URLLayersLoaded.length) {
+        const unloadedURLLayers = URLLayers.filter(l => URLLayersLoaded.indexOf(l) === -1);
+
+        unloadedURLLayers.forEach(layerId => {
+          const completeLayerId = `${layerId}.json`;
+
+          if (layers && layers[completeLayerId]) {
+            const layerFromURL = layers[completeLayerId];
+            this.props.dispatch(Actions.toggleLayer(mapId, completeLayerId));
+
+            if (!layerFromURL.loaded && !layerFromURL.isLoading) {
+              prepareLayer(mapId, layerFromURL, this.props.dispatch);
+            }
+
+            this.setState({
+              URLLayersLoaded: [...URLLayersLoaded, layerId],
+            });
+          }
+        });
+      }
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -549,23 +587,7 @@ class Map extends Component {
       this.removeLabels();
       this.handleLabelsOnMapZoom();
     }
-    /**
-     * Render layers from url
-     */
-      let urlparams = window.location.href.split('?');
-      urlparams.shift();
-      if (urlparams.every(param => Object.keys(this.props.layers).includes(param)) &&
-       urlparams.every(layerId => (this.props.layers[layerId] && 
-        this.props.layers[layerId].visible === false))) {
-      if(urlparams.length >= 1) { 
-        urlparams.forEach((layerId) => {
-          if (!this.props.layers[layerId].loaded && !this.props.layers[layerId].isLoading) {
-            this.props.dispatch(Actions.toggleLayer(this.props.mapId, layerId));
-            prepareLayer(this.props.mapId, layerId, this.props.dispatch);
-          }
-        });
-      }
-    }
+
     // Update Layer Filters
     if (this.map && this.props.layerObj && this.map.getLayer(this.props.layerObj.id)) {
       const { FILTER, primaryLayer } = this.props;
