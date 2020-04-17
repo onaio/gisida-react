@@ -18,12 +18,56 @@ export class Layers extends Component {
     this.state = groups;
   }
 
+  componentDidMount() {
+    Object.keys(this.state).forEach(l => {
+      const children = this.props.layers.filter(obj => obj[l])[0][l].layers;
+      this.handleVisibleLayer(l, children);
+    });
+  }
+
   toggleSubMenu(e, layer) {
     e.preventDefault();
     this.setState({
       ...this.state,
       [layer]: { isOpen: !this.state[layer].isOpen },
     });
+  }
+
+  /**
+   * Open the group if any data layer down the nest is visible
+   * @param {*} groupName Name of the group which we want to target
+   * @param {*} children Children of the group which we want to target
+   */
+  handleVisibleLayer(groupName, children) {
+    const subGroups = children.filter(child => !child.id);
+    let groupIsOpen = false; // Flag to help not to continue checking the siblings if an
+    // open child subgroup is found
+
+    if (subGroups.length) {
+      // If there are subgroups then continue look down
+      // the tree
+      let i = 0;
+
+      while (!groupIsOpen && i < subGroups.length) {
+        const subGroupKey = Object.keys(subGroups[i])[0];
+        groupIsOpen = this.handleVisibleLayer(groupName, subGroups[i][subGroupKey].layers);
+
+        i += 1;
+      }
+    } else {
+      const visible = children.filter(child => child.visible);
+
+      if (visible.length) {
+        this.setState({
+          ...this.state,
+          [groupName]: { isOpen: true },
+        });
+
+        return true;
+      }
+    }
+
+    return false;
   }
 
   render() {
