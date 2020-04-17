@@ -40,12 +40,11 @@ export class Layers extends Component {
    */
   handleVisibleLayer(groupName, children) {
     const subGroups = children.filter(child => !child.id);
-    let groupIsOpen = false; // Flag to help not to continue checking the siblings if an
-    // open child subgroup is found
 
     if (subGroups.length) {
-      // If there are subgroups then continue look down
-      // the tree
+      let groupIsOpen = false; // Flag to help not to continue checking the siblings if an
+      // open child subgroup is found
+
       let i = 0;
 
       while (!groupIsOpen && i < subGroups.length) {
