@@ -514,7 +514,7 @@ class Map extends Component {
      */
     const splitURL = window.location.href.split('?layers=');
 
-    if (splitURL.length == 2) {
+    if (splitURL.length === 2) {
       const URLLayers = splitURL[1].split(',');
       const { URLLayersLoaded } = this.state;
 
@@ -523,8 +523,7 @@ class Map extends Component {
 
         unloadedURLLayers.forEach(layerId => {
           const completeLayerId = `${layerId}.json`;
-
-          if (layers && layers[completeLayerId]) {
+          if (layers && layers[completeLayerId] && !layers[completeLayerId].visible) {
             const layerFromURL = layers[completeLayerId];
             this.props.dispatch(Actions.toggleLayer(mapId, completeLayerId));
 
