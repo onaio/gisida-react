@@ -136,29 +136,33 @@ class Menu extends Component {
   openCategories() {
     if (this.props.categories) {
       this.props.categories.forEach(category => {
-        category.layers.forEach(layer => {
-          if (!layer.id) {
-            Object.keys(layer).forEach(groupName => {
-              const children = layer[groupName].layers;
+        const { openCategories } = this.props;
 
-              if (isMenuLayerVisible(groupName, children)) {
-                const { openCategories } = this.props;
-                const index = openCategories.indexOf(category);
-                this.props.dispatch(
-                  Actions.toggleCategories(this.props.mapId, category.category, index)
-                );
+        if (openCategories) {
+          const index = openCategories.indexOf(category.category);
+
+          if (index < 0) {
+            category.layers.forEach(layer => {
+              if (!layer.id) {
+                Object.keys(layer).forEach(groupName => {
+                  const children = layer[groupName].layers;
+
+                  if (isMenuLayerVisible(groupName, children)) {
+                    this.props.dispatch(
+                      Actions.toggleCategories(this.props.mapId, category.category, index)
+                    );
+                  }
+                });
+              } else {
+                if (layer.visible) {
+                  this.props.dispatch(
+                    Actions.toggleCategories(this.props.mapId, category.category, index)
+                  );
+                }
               }
             });
-          } else {
-            if (layer.visible) {
-              const { openCategories } = this.props;
-              const index = openCategories.indexOf(category);
-              this.props.dispatch(
-                Actions.toggleCategories(this.props.mapId, category.category, index)
-              );
-            }
           }
-        });
+        }
       });
     }
   }
