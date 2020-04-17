@@ -177,52 +177,82 @@ export function deepCopy(x) {
 }
 
 export function orderLayers(activeLayersData, map, nextLayerId) {
-    /**
-     * Rearranges rendered layers and puts selected layer on top. 
-     * @param {Object} filteredLayers - Mapbox layers
-     */
-    const moveLayers = filteredLayers => {
-        Object.keys(filteredLayers).forEach((key) => {
-            if (map.getLayer(filteredLayers[key].id)) {
-                map.moveLayer(filteredLayers[key].id);
-            }
-        });
-        if (
-            filteredLayers.find(d => d.id === nextLayerId) &&
-            map.getLayer(nextLayerId)
-        ) {
-            map.moveLayer(nextLayerId);
-        }
+  /**
+   * Rearranges rendered layers and puts selected layer on top.
+   * @param {Object} filteredLayers - Mapbox layers
+   */
+  const moveLayers = filteredLayers => {
+    Object.keys(filteredLayers).forEach(key => {
+      if (map.getLayer(filteredLayers[key].id)) {
+        map.moveLayer(filteredLayers[key].id);
+      }
+    });
+    if (filteredLayers.find(d => d.id === nextLayerId) && map.getLayer(nextLayerId)) {
+      map.moveLayer(nextLayerId);
+    }
+  };
+
+  const fills = activeLayersData.filter(d => d['type'] === 'fill' && !d['detail-view']);
+  if (fills.length) {
+    moveLayers(fills);
+  }
+
+  const lines = activeLayersData.filter(d => d['type'] === 'line');
+  if (lines.length) {
+    moveLayers(lines);
+  }
+
+  const circles = activeLayersData.filter(d => d['type'] === 'circle');
+  if (circles.length) {
+    moveLayers(circle);
+  }
+
+  const symbols = activeLayersData.filter(d => d['type'] === 'symbol');
+  if (symbols.length) {
+    moveLayers(symbols);
+  }
+
+  const detailViewActive = activeLayersData.filter(d => d['detail-view'] && !d['level-view']);
+  if (detailViewActive.length) {
+    moveLayers(detailViewActive);
+  }
+
+  const isLabelActive = activeLayersData.filter(d => d.isLabel);
+  if (isLabelActive.length) {
+    moveLayers(isLabelActive);
+  }
+}
+
+/**
+ * Check if the if map layer is visible given the menu group
+ * Value can be used to set the state of the menu group open
+ * @param {*} groupName Name of the group which we want to target
+ * @param {*} children Children of the group which we want to target
+ */
+export function isMenuLayerVisible(groupName, children) {
+  const subGroups = children.filter(child => !child.id);
+
+  if (subGroups.length) {
+    let groupIsOpen = false; // Flag to help not to continue checking the siblings if an
+    // open child subgroup is found
+
+    let i = 0;
+
+    while (!groupIsOpen && i < subGroups.length) {
+      const subGroupKey = Object.keys(subGroups[i])[0];
+      groupIsOpen = isMenuLayerVisible(groupName, subGroups[i][subGroupKey].layers);
+
+      i += 1;
     }
 
+    return groupIsOpen;
+  } else {
+    const visible = children.filter(child => child.visible);
 
-    const fills = activeLayersData.filter(d => d['type'] === 'fill' && !d['detail-view']);
-    if (fills.length) {
-        moveLayers(fills);
+    if (visible.length) {
+      return true;
     }
+  }
 
-    const lines = activeLayersData.filter(d => d['type'] === 'line');
-    if (lines.length) {
-        moveLayers(lines);
-    }
-
-    const circles = activeLayersData.filter(d => d['type'] === 'circle');
-    if (circles.length) {
-        moveLayers(circle);
-    }
-
-    const symbols = activeLayersData.filter(d => d['type'] === 'symbol');
-    if (symbols.length) {
-        moveLayers(symbols);
-    }
-
-    const detailViewActive = activeLayersData.filter(d => d['detail-view'] && !d['level-view']);
-    if (detailViewActive.length) {
-        moveLayers(detailViewActive);
-    }
-
-    const isLabelActive = activeLayersData.filter(d => d.isLabel);
-    if (isLabelActive.length) {
-        moveLayers(isLabelActive);
-    }
+  return false;
 }

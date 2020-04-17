@@ -6,7 +6,8 @@ import Layers from '../Layers/Layers';
 import ConnectedLayers from '../Layers/ConnectedLayers';
 import './Menu.scss';
 import _ from 'lodash';
-import memoize from "memoize-one";
+import memoize from 'memoize-one';
+import { isMenuLayerVisible } from '../../utils';
 
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {} };
@@ -93,14 +94,14 @@ class Menu extends Component {
     /**
      * Currently we can load two menus one for superset view at layer level & one for map view
      * The menu menuWrapper references the menu on which to track scroll position.
-     * This ensures we snap back to the exact map scroll position when moving from superset 
-     * layer view to map view 
+     * This ensures we snap back to the exact map scroll position when moving from superset
+     * layer view to map view
      */
     this.menuWrapper = React.createRef();
     /**
      * Gets scroll position after scroll ceases
      */
-    this.delayedMenuScrollCallback = _.debounce(this.persistScrollPosition, 1000)
+    this.delayedMenuScrollCallback = _.debounce(this.persistScrollPosition, 1000);
   }
 
   componentDidMount() {
@@ -114,13 +115,43 @@ class Menu extends Component {
   }
 
   handleScroll = event => {
-    event.persist() // This will ensure that the event is not pooled for more details https://reactjs.org/docs/events.html
-    this.delayedMenuScrollCallback(event)
+    event.persist(); // This will ensure that the event is not pooled for more details https://reactjs.org/docs/events.html
+    this.delayedMenuScrollCallback(event);
   };
 
   componentDidUpdate(prevProps) {
     if (this.props.showMap && this.props.showMap !== prevProps.showMap && this.props.menuScroll) {
       this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop;
+    }
+
+    if (!_.isEqual(prevProps.categories, this.props.categories)) {
+      this.openCategories();
+    }
+  }
+
+  /**
+   * Open any category which has a map layer whose
+   * visible status is true
+   */
+  openCategories() {
+    if (this.props.categories) {
+      this.props.categories.forEach(category => {
+        category.layers.forEach(layer => {
+          if (!layer.id) {
+            Object.keys(layer).forEach(groupName => {
+              const children = layer[groupName].layers;
+
+              if (isMenuLayerVisible(groupName, children)) {
+                const { openCategories } = this.props;
+                const index = openCategories.indexOf(category);
+                this.props.dispatch(
+                  Actions.toggleCategories(this.props.mapId, category.category, index)
+                );
+              }
+            });
+          }
+        });
+      });
     }
   }
 
@@ -150,7 +181,7 @@ class Menu extends Component {
    * this means different menu instances will have groups that have different Ids which we do not
    * want (We would like menu instances under the same map ID to behave the same. If say I open a group in one
    * menu, it should appear open in another other). A contigous int counter is
-   * therefore used to ensure the counter for a group in different menu instances is the same, 
+   * therefore used to ensure the counter for a group in different menu instances is the same,
    * and also, groups in the same menu instances do not share a count.
    * @param {Object} layer Category layer
    * @param {number} groupCounter Group counter (or ID) that will give each group a number
@@ -181,7 +212,7 @@ class Menu extends Component {
    * @param {array} categories Menu categories and their subgroups and layers
    * @returns {array} Extended/Modified categories
    */
-  parseCategories = memoize((categories) => {
+  parseCategories = memoize(categories => {
     let groupCounter = 0;
     categories.forEach(category => {
       category.layers.forEach(layer => {
@@ -195,7 +226,7 @@ class Menu extends Component {
     });
 
     return categories;
-  })
+  });
 
   /**
    * Check if a user has permission to access layer
@@ -271,7 +302,7 @@ class Menu extends Component {
    * permission to view
    * @returns {array} Filtered categories
    */
-  getAccessibleCategories = memoize((categories) => {
+  getAccessibleCategories = memoize(categories => {
     if (!this.props.AUTH) {
       // If no authenitcation, then all categories are accessible.
       return categories;
@@ -307,7 +338,7 @@ class Menu extends Component {
     });
 
     return filteredCategories;
-  })
+  });
 
   render() {
     if (!this.props.categories) return null;
@@ -320,8 +351,16 @@ class Menu extends Component {
       return React.cloneElement(child, { mapId });
     });
     const categories = this.parseCategories(this.getAccessibleCategories(this.props.categories));
-    const { regions, currentRegion, preparedLayers, childrenPosition, 
-      layerItem, hasNavBar, useConnectedLayers, AUTH } = this.props;
+    const {
+      regions,
+      currentRegion,
+      preparedLayers,
+      childrenPosition,
+      layerItem,
+      hasNavBar,
+      useConnectedLayers,
+      AUTH,
+    } = this.props;
     const childrenPositionClass = childrenPosition || 'top';
     const marginTop = hasNavBar ? '-80px' : 0;
 
@@ -407,7 +446,8 @@ class Menu extends Component {
                           />
                         </a>
                         {this.props.openCategories &&
-                        this.props.openCategories.includes(category.category) && !useConnectedLayers ? (
+                        this.props.openCategories.includes(category.category) &&
+                        !useConnectedLayers ? (
                           <Layers
                             mapId={mapId}
                             layers={category.layers}
@@ -416,15 +456,17 @@ class Menu extends Component {
                             auth={AUTH}
                           />
                         ) : this.props.openCategories &&
-                        this.props.openCategories.includes(category.category) && useConnectedLayers ? 
-                        (<ConnectedLayers
+                          this.props.openCategories.includes(category.category) &&
+                          useConnectedLayers ? (
+                          <ConnectedLayers
                             layerItem={layerItem}
                             mapId={mapId}
                             layers={category.layers}
                             currentRegion={currentRegion}
                             preparedLayers={preparedLayers}
                             auth={AUTH}
-                          />) : (
+                          />
+                        ) : (
                           <ul />
                         )}
                       </li>
@@ -452,7 +494,7 @@ Menu.propTypes = {
   categories: PropTypes.arrayOf(PropTypes.any).isRequired,
   hasNavBar: PropTypes.bool, // Pass true if app has a navbar
   layerItem: PropTypes.element, // Custom layer list item. Use in place of components/Layer/Layer
-  useConnectedLayers: PropTypes.bool // If true, use components/Layers/ConnectedLayers
+  useConnectedLayers: PropTypes.bool, // If true, use components/Layers/ConnectedLayers
 };
 
 export default connect(mapStateToProps)(Menu);
