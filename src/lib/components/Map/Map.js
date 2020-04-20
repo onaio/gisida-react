@@ -512,10 +512,11 @@ class Map extends Component {
     /**
      * Render layers from url
      */
-    const splitURL = window.location.href.split('?layers=');
+    const splitURL = window.location.href.split('&')[0].split('?layers=');
 
     if (splitURL.length === 2) {
       const URLLayers = splitURL[1].split(',');
+      ;
       const { URLLayersLoaded } = this.state;
 
       if (URLLayers.length !== URLLayersLoaded.length) {
@@ -764,7 +765,7 @@ class Map extends Component {
             : false;
 
         // if the layer is in the map and has no period match, hide it
-        if (!hasData || pIndex === -1) {
+        if ((!hasData || pIndex === -1) && this.map.getLayer(layerObj.id)) {
           this.map.setLayoutProperty(layerObj.id, 'visibility', 'none');
           // if layer has a highlight layer, update its visibility too
           if (this.map.getLayer(`${layerObj.id}-highlight`)) {
