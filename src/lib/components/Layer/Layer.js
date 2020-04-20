@@ -15,11 +15,13 @@ const mapStateToProps = (state, ownProps) => {
     timeSeriesObj: MAP.timeseries[MAP.visibleLayerId],
     timeseries: MAP.timeseries,
     layers: MAP.layers,
+    primaryLayer: MAP.primaryLayer,
+    activeLayerIds: MAP.activeLayerIds,
   };
 };
 
 export class Layer extends Component {
-  onLayerToggle = layer => {
+  onLayerToggle = (layer, e) => {
     // dispatch toggle layer action
     const { mapId, APP, LOC } = this.props;
     if (!mapId) {
@@ -28,20 +30,25 @@ export class Layer extends Component {
 
     const layerId = layer.id.replace('.json', '');
     let pageURL = `${window.location.href}`;
-
+    /**
+     * Check for visibility. If false it means layer has been selected push to layer id to url
+     * else if visible it means layer has been checked off pop layer from url
+     */
     if (layer && layer.visible === false) {
-      if (!window.location.href.includes('?layers=')) {
+      if (!window.location.href.includes('?layers=') && !window.location.href.includes('&primary=')) {
         /**
          * Query param `layers` does not exist. Have the layerId as the first
          * value of query param `layers`. The assumption made is that
          * there exists no other query params
          */
-        pageURL = `${pageURL}?layers=${layerId}`;
+        pageURL = `${pageURL}?layers=${layerId}&primary=${layerId}`;
       } else {
         /**
          * Query param `layers` exists. Add to exist list
+         * Update primary layer accordingly
          */
-        pageURL = `${pageURL},${layerId}`;
+        pageURL = `${pageURL.split('&')[0]},${layerId}&primary=${layerId}`;
+        // pageURL.splice pageURL.indexOf('&primary');
       }
 
       history.pushState('', '', pageURL);
@@ -53,11 +60,20 @@ export class Layer extends Component {
           pageURL = window.location.href.replace(`?layers=${layerId},`, '?layers=');
         } else {
           // If layer Id is the only item in the query param list
-          pageURL = window.location.href.replace(`?layers=${layerId}`, '');
+          pageURL = window.location.href.replace(`?layers=${layerId}`, '').replace(`&primary=${layerId}`, '');
         }
       } else if (window.location.href.includes(`,${layerId}`)) {
-        // If layer Id is not the first item in the query param lit
+        // If layer Id is not the first item in the query param list
         pageURL = window.location.href.replace(`,${layerId}`, '');
+      }
+      /**
+       * Update primarylayer when user unchecks the layer
+       * activeLayerIds holds active layers in a sorted fashion
+       * By subtracting two we get the next primary layer
+       */
+      if (e.currentTarget.getAttribute("data-layer") === this.props.primaryLayer) {
+        const nextPrimaryLayer = this.props.activeLayerIds[this.props.activeLayerIds.length - 2].replace('.json', '');
+        pageURL = pageURL.replace(`&primary=${layerId}`, `&primary=${nextPrimaryLayer}`);
       }
 
       history.replaceState('', '', pageURL);
@@ -90,7 +106,7 @@ export class Layer extends Component {
           id={`${layer.id}-${mapId}`}
           type="checkbox"
           data-layer={layer.id}
-          onChange={e => this.onLayerToggle(layer)}
+          onChange={e => this.onLayerToggle(layer, e)}
           checked={!!layer.visible}
         />
         <label htmlFor={`${layer.id}-${mapId}`}>{layer.label}</label>
