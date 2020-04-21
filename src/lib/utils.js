@@ -147,6 +147,8 @@ export function isFiltered(options, isOriginal) {
 }
 
 export function buildLayersObj(layers) {
+  const urlPrimaryLayer = window.location.href.split('&') && window.location.href.split('&')[1] &&
+        window.location.href.split('&')[1].split('=')[1];
   const layersObj = [];
   let layerObj;
   Object.keys(layers).forEach(key => {
@@ -156,6 +158,16 @@ export function buildLayersObj(layers) {
       layersObj.push(layerObj);
     }
   });
+
+    /** Move primary layer to the end of the array */
+    // if (!(layersObj[layersObj.length - 1] && layersObj[layersObj.length - 1].id.includes(urlPrimaryLayer))) {
+    //     const indexOfPrimaryLayer = layersObj.findIndex(layer => layer.id.includes(urlPrimaryLayer));
+    //     if (indexOfPrimaryLayer !== -1) {
+    //         var temp = layersObj[indexOfPrimaryLayer];
+    //         layersObj[indexOfPrimaryLayer] = layersObj[layersObj.length - 1];
+    //         layersObj[layersObj.length - 1] = temp;
+    //     }
+    // }
 
   return layersObj;
 }
