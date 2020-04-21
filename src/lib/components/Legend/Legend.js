@@ -19,7 +19,7 @@ const mapStateToProps = (state, ownProps) => {
       : null;
   return {
     timeseries: MAP.timeseries,
-    layerObj: MAP.layers[MAP.activeLayerId],
+    layerObj: MAP.layers[MAP.primaryLayer],
     timeSeriesObj: MAP.timeseries[subLayerCheck || MAP.primaryLayer],
     lastLayerSelected: MAP.layers[MAP.lastLayerSelected],
     layersData: buildLayersObj(MAP.layers),
@@ -42,7 +42,11 @@ export class Legend extends React.Component {
       timeSeriesObj: undefined
     };
   }
-
+  shouldComponentUpdate(nextProps) {
+    const { layerObj, timeSeriesObj } = nextProps;
+    return ((layerObj && layerObj.categories) || 
+      (timeSeriesObj && timeSeriesObj.categories)) ? true : false;
+  }
   componentWillReceiveProps(nextProps) {
     const { layerObj } = nextProps;
     if (
@@ -110,27 +114,39 @@ export class Legend extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
+    const {primaryLayer, layers, mapId, dispatch} = this.props
     if (
-      this.props.primaryLayer !== prevProps.primaryLayer &&
-      this.props.layers &&
-      this.props.layers[this.props.primaryLayer] &&
-      this.props.layers[this.props.primaryLayer].credit
+      primaryLayer !== prevProps.primaryLayer &&
+      layers &&
+      layers[primaryLayer] &&
+      layers[primaryLayer].credit
     ) {
       this.setState({
-        primaryLayer: prevProps.primaryLayer,
+        primaryLayer: primaryLayer,
       });
     }
+    // const urlPrimaryLayer = window.location.href.split('&') && window.location.href.split('&')[1].split('=')[1];
+    // if (primaryLayer !== urlPrimaryLayer) {
+    //   dispatch(Actions.updatePrimaryLayer(mapId, `${urlPrimaryLayer}.json`));
+    // }
   }
   onUpdatePrimaryLayer(e) {
     if (e.target.getAttribute("data-credit") !== "credit") {
       e.preventDefault();
     }
-    const { dispatch, mapId } = this.props;
+    const { dispatch, mapId, primaryLayer } = this.props;
     const targetLayer = e.currentTarget.getAttribute("data-layer");
+    /** Update primary layer based on legend selection */
+    // Move to utils
+    const removeJsonExtensions = (layer) => {
+      return layer.replace('.json', '');
+    }
+    const targetLayerPageUrl = removeJsonExtensions(targetLayer);
+    const pageURL = window.location.href.replace(`&primary=${removeJsonExtensions(primaryLayer)}`,`&primary=${targetLayerPageUrl}`);
+    history.replaceState('', '', pageURL);
     // dispatch primary layer id
     dispatch(Actions.updatePrimaryLayer(mapId, targetLayer));
   }
-
   render() {
     const {
       layerObj,
@@ -139,9 +155,11 @@ export class Legend extends React.Component {
       timeSeriesObj,
       layers,
       primaryLayer,
-      primarySubLayer,
       activeLayerIds,
     } = this.props;
+    /** Get primary layer from url */
+    const urlPrimaryLayer = window.location.href.split('&') && window.location.href.split('&')[1] 
+    && window.location.href.split('&')[1].split('=')[1];
     if (!layerObj) {
       return false;
     }
@@ -177,6 +195,15 @@ export class Legend extends React.Component {
     ) {
       activeLegendLayer = primaryLayer;
     }
+    // if (urlPrimaryLayer) {
+    //   if (this.props.layersData[this.props.layersData.length -1].id.includes(urlPrimaryLayer)) {
+    //     const indexOfPrimaryLayer = this.props.layersData.findIndex(layer => layer.id.includes(urlPrimaryLayer));
+    //     var temp = this.props.layersData[indexOfPrimaryLayer];
+    //     this.props.layersData[indexOfPrimaryLayer] = this.props.layersData[this.props.layersData.length -1];
+    //     this.props.layersData[this.props.layersData.length -1] = temp;
+    //   }
+    // }
+    // this.props.layersData.findIndex(layer => layer.id === urlPrimaryLayer);
 
     for (let l = 0; l < this.props.layersData.length; l += 1) {
       layer = this.props.layersData[l];
@@ -343,8 +370,9 @@ export class Legend extends React.Component {
           const colorLegend = layer &&
             layer.stopsData && [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
-
           const activeColors =
+          timeSeriesObj && timeSeriesObj.layerId.includes(urlPrimaryLayer) &&
+            timeSeriesObj.newColors ? timeSeriesObj.newColors :
             timeSeriesObj &&
             timeSeriesObj.newColors &&
             layerObj.aggregate &&
@@ -545,7 +573,10 @@ export class Legend extends React.Component {
           layer.stopsData && [...new Set(stopsData.map(stop => stop[1]))];
         const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
 
+
         const activeColors =
+        timeSeriesObj && timeSeriesObj.layerId.includes(urlPrimaryLayer) &&
+         timeSeriesObj.newColors ? timeSeriesObj.newColors :
           timeSeriesObj &&
           timeSeriesObj.newColors &&
           layerObj.aggregate &&
