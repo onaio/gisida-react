@@ -129,69 +129,69 @@ class Menu extends Component {
       this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop;
     }
 
-    if (!_.isEqual(prevProps.categories, this.props.categories)) {
-      this.openCategories();
+    const splitURL = window.location.href.split('&')[0].split('?layers=');
+    const URLLayers = splitURL[1] && splitURL[1].split(',');
+
+    if (URLLayers) {
+      const { URLLayersHandled } = this.state;
+
+      if (
+        URLLayers.length !== URLLayersHandled.length &&
+        !_.isEqual(prevProps.categories, this.props.categories)
+      ) {
+        this.openCategoriesFromURL(URLLayers);
+      }
     }
   }
 
   /**
-   * Open a category with a layer which is in URL when component mounts since
-   * we expect that layer to be visible
+   * Open a category with a visible layer which is in the URL when component mounts
    */
-  openCategories() {
-    const splitURL = window.location.href.split('&')[0].split('?layers=');
-
-    if (splitURL.length === 2) {
-      const URLLayers = splitURL[1].split(',');
+  openCategoriesFromURL(URLLayers) {
+    if (URLLayers && this.props.categories) {
       const { URLLayersHandled, openCategoriesFromURL } = this.state;
+      const unHandledURLLayers = URLLayers.filter(l => URLLayersHandled.indexOf(l) === -1);
+      unHandledURLLayers.forEach(unHandledURLLayer => {
+        this.props.categories.forEach(category => {
+          if (openCategoriesFromURL.indexOf(category.category) < 0) {
+            /**
+             * Make sure we do not add a category more than once since multiple
+             * layers from URL can share a category
+             */
+            category.layers.forEach(layer => {
+              if (!layer.id) {
+                /**
+                 * This is a group. So continue checking down the hierarchy
+                 * for visible layers
+                 */
+                Object.keys(layer).forEach(groupName => {
+                  const children = layer[groupName].layers;
+                  const visibleLayers = getMenuGroupVisibleLayers(groupName, children);
 
-      if (URLLayers.length !== URLLayersHandled.length && this.props.categories) {
-        /**
-         * We have some layers from URL whose category is not open
-         */
-        const unHandledURLLayers = URLLayers.filter(l => URLLayersHandled.indexOf(l) === -1);
-        unHandledURLLayers.forEach(unHandledURLLayer => {
-          this.props.categories.forEach(category => {
-            if (openCategoriesFromURL.indexOf(category.category) < 0) {
-              /**
-               * Make sure we do not add a category more than once to the array
-               * of categories considered as open
-               */
-              category.layers.forEach(layer => {
-                if (!layer.id) {
-                  /**
-                   * This is a group. So continue checking down the hierarchy
-                   * for visible layers
-                   */
-                  Object.keys(layer).forEach(groupName => {
-                    const children = layer[groupName].layers;
-                    const visibleLayers = getMenuGroupVisibleLayers(groupName, children);
-
-                    if (visibleLayers.indexOf(`${unHandledURLLayer}.json`) >= 0) {
-                      /**
-                       * If the layer is in URL, open the category
-                       * and mark the unhandled URL layer as handled
-                       */
-                      this.handleURLLayer(category.category, unHandledURLLayer);
-                    }
-                  });
-                } else {
-                  /**This category has one level only */
-                  const layerIdNoExt = layer.id.replace('.json', '');
-
-                  if (layerIdNoExt === unHandledURLLayer && layer.visible) {
+                  if (visibleLayers.indexOf(`${unHandledURLLayer}.json`) >= 0) {
                     /**
                      * If the layer is in URL, open the category
                      * and mark the unhandled URL layer as handled
                      */
                     this.handleURLLayer(category.category, unHandledURLLayer);
                   }
+                });
+              } else {
+                /**This category has one level only */
+                const layerIdNoExt = layer.id.replace('.json', '');
+
+                if (layerIdNoExt === unHandledURLLayer && layer.visible) {
+                  /**
+                   * If the layer is in URL, open the category
+                   * and mark the unhandled URL layer as handled
+                   */
+                  this.handleURLLayer(category.category, unHandledURLLayer);
                 }
-              });
-            }
-          });
+              }
+            });
+          }
         });
-      }
+      });
     }
   }
 
