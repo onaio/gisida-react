@@ -190,6 +190,7 @@ exports[`TimeSeriesSlider TimeSeriesSlider component renders correctly 1`] = `
     mapId="map-1"
     primaryLayer="education"
     showFilterPanel={false}
+    showSinglePeriods={false}
     store={
       Object {
         "clearActions": [Function],

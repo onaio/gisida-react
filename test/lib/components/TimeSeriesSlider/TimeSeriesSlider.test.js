@@ -19,6 +19,9 @@ const initialState = {
     layers: { 'sample-layer': { ...sampleLayer }, education: { ...layer1 } },
     timeseries: {},
   },
+  APP: {
+    showSinglePeriods: false,
+  },
 };
 
 const newState = {
