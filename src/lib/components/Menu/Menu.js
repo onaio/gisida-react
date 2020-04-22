@@ -144,14 +144,14 @@ class Menu extends Component {
    * @param {*} URLLayers
    */
   openCategoriesFromURL(URLLayers) {
-    if (URLLayers && this.props.categories) {
-      const { openCategories } = this.props;
+    const { openCategories, categories } = this.props;
 
+    if (URLLayers && categories && openCategories) {
       URLLayers.forEach(URLLayer => {
         const completeURLLayerName = `${URLLayer}.json`;
 
-        this.props.categories.forEach(category => {
-          if (openCategories && openCategories.indexOf(category.category) < 0) {
+        categories.forEach(category => {
+          if (openCategories.indexOf(category.category) < 0) {
             /**
              * Make sure we do not add a category more than once since multiple
              * layers from URL can share a category
