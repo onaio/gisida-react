@@ -546,18 +546,7 @@ class Map extends Component {
         console.warn('resize error', e);
       }
 
-      const {
-        layersObj,
-        layerObj,
-        primaryLayer,
-        FILTER,
-        LOC,
-        mapId,
-        timeSeriesObj,
-        APP,
-        VIEW,
-        layers,
-      } = this.props;
+      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj, APP, VIEW, layers, } = this.props;
 
       if (this.props.hasDataView && this.map && VIEW.showLayerSuperset) {
         if (layers && layers[primaryLayer] && layers[primaryLayer].location) {
