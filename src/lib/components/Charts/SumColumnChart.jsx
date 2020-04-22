@@ -17,13 +17,14 @@ class SumColumnChart extends React.Component {
     let catCol = '';
     let mapCol = false; // bool for whether or not to use the "locations" map
     let parsedVal;
+    let activeColors;
 
     // deifine which break each datum falls into
     let dataBreaks;
     if (breaks) {
-      dataBreaks = (layerData.features || layerData).map((d) => {
+      dataBreaks = (layerData.features || layerData).map(d => {
         for (let b = 0; b < breaks.length; b += 1) {
-          parsedVal = parseColValue((d.properties || d), column);
+          parsedVal = parseColValue(d.properties || d, column);
           if (parsedVal <= Number(breaks[b])) return b;
         }
         return breaks.length - 1;
@@ -35,7 +36,7 @@ class SumColumnChart extends React.Component {
     if (catCol === 'district_id' && locations && Object.keys(locations).length) mapCol = true;
     const activeData = layerData.features || layerData;
     for (i; i < activeData.length; i += 1) {
-      datum = (activeData[i].properties || activeData[i]);
+      datum = activeData[i].properties || activeData[i];
       if (!dataMap[datum[catCol]]) {
         dataMap[datum[catCol]] = {
           sum: 0,
@@ -46,7 +47,8 @@ class SumColumnChart extends React.Component {
       }
       dataMap[datum[catCol]].count += 1;
       dataMap[datum[catCol]].sum += parseColValue(datum, column);
-      if (dataBreaks) dataMap[datum[catCol]].color = hexToRgbA(colors[dataBreaks[i]], 0.8);
+      activeColors = Array.isArray(colors) ? colors[dataBreaks[i]] : colors;
+      if (dataBreaks) dataMap[datum[catCol]].color = hexToRgbA(activeColors, 0.8);
     }
 
     // Structure the data in a way that highcharts can use
@@ -104,10 +106,14 @@ class SumColumnChart extends React.Component {
       }
       this.d_setChartWidth = debounce(this.setChartWidth, 200);
       $(window).on('toggleSector', this.setChartWidth.bind(this));
-      $(window).on('resize', {
-        mapId: this.props.mapId,
-        sectorsId: `${(this.props.mapId).replace('map-', 'sector-menu-')}-wrapper`,
-      }, this.d_setChartWidth.bind(this));
+      $(window).on(
+        'resize',
+        {
+          mapId: this.props.mapId,
+          sectorsId: `${this.props.mapId.replace('map-', 'sector-menu-')}-wrapper`,
+        },
+        this.d_setChartWidth.bind(this)
+      );
     }
   }
 
@@ -170,7 +176,7 @@ class SumColumnChart extends React.Component {
           bottom: '0px',
         }}
       >
-        {!isPrimary && chartSpec.title ? (<h6>{chartSpec.title}</h6>) : ''}
+        {!isPrimary && chartSpec.title ? <h6>{chartSpec.title}</h6> : ''}
         <ColumnChart
           seriesTitle={chartSpec.title}
           categories={seriesData.categories}

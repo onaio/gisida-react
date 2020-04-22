@@ -72,8 +72,9 @@ const mapStateToProps = (state, ownProps) => {
     MAP,
     config: APP.mapConfig,
     map: mapId === 'map-1' ? window.maps[0] : window.maps[1],
-  }
-}
+    hasNavBar: ownProps.hasNavBar,
+  };
+};
 
 export class Export extends Component {
   constructor(props) {
@@ -85,7 +86,6 @@ export class Export extends Component {
     this.onOptionsChange = this.onOptionsChange.bind(this);
     this.resetMapAfterExport = this.resetMapAfterExport.bind(this);
   }
-
 
   componentWillReceiveProps(nextProps) {
     if (nextProps && nextProps.map) {
@@ -102,8 +102,12 @@ export class Export extends Component {
         screenWidth: innerWidth,
         screenHeight: innerHeight,
         ratio: 'screen',
-        orientation: innerHeight === innerWidth ? 'square'
-          : innerHeight / innerWidth > 1 ? 'portrait' : 'landscape',
+        orientation:
+          innerHeight === innerWidth
+            ? 'square'
+            : innerHeight / innerWidth > 1
+            ? 'portrait'
+            : 'landscape',
         doFitMap: true,
         preset: 'custom',
         ppi: 96 * devicePixelRatio,
@@ -132,7 +136,9 @@ export class Export extends Component {
     };
 
     // resize map container / map
-    $(`#${mapId}.mapboxgl-map`).innerWidth(dimWidth / resValue).innerHeight(dimHeight / resValue);
+    $(`#${mapId}.mapboxgl-map`)
+      .innerWidth(dimWidth / resValue)
+      .innerHeight(dimHeight / resValue);
     if (!config.includeNavControls) {
       map.removeControl(map.controls);
     }
@@ -167,19 +173,18 @@ export class Export extends Component {
         .append('<div class="bottomLeft"></div>')
         .append('<div class="bottomRight"></div>');
       // set the dimensions of the export container
-      $(exportEl).innerWidth(dimWidth / resValue).innerHeight(dimHeight / resValue);
+      $(exportEl)
+        .innerWidth(dimWidth / resValue)
+        .innerHeight(dimHeight / resValue);
 
       // determine which elemtns (other than the actual map) needs to be included
       let selectorsToQuery = config.exportIncludes || [];
-      selectorsToQuery = selectorsToQuery.concat([
-        `.legend.${mapId}`,
-        '.series',
-      ]);
+      selectorsToQuery = selectorsToQuery.concat([`.legend.${mapId}`, '.series']);
 
       // determine intended output dpi of the image (300 for print, 96 for screens)
       const dpi = exportPresetKey[preset] && exportPresetKey[preset].isPrint ? 300 : 96;
       // calculate how much the cloned elements should be scaled
-      const scale = (dpi / ppi) > 1 ? 1 / (dpi / ppi) : 0.75;
+      const scale = dpi / ppi > 1 ? 1 / (dpi / ppi) : 0.75;
 
       let nodeToClone;
       let clonedNode;
@@ -200,14 +205,20 @@ export class Export extends Component {
           // based on calculated offsets of the original element,
           // determine which direction the cloned element should scale,
           // and append the clone to the appropriate scaling container
-          if (parseInt(originalStyles.top, 10) < parseInt(originalStyles.bottom, 10)
-            && parseInt(originalStyles.left, 10) < parseInt(originalStyles.right, 10)) {
+          if (
+            parseInt(originalStyles.top, 10) < parseInt(originalStyles.bottom, 10) &&
+            parseInt(originalStyles.left, 10) < parseInt(originalStyles.right, 10)
+          ) {
             $('.topLeft', exportEl).append(clonedNode);
-          } else if (parseInt(originalStyles.top, 10) < parseInt(originalStyles.bottom, 10)
-            && parseInt(originalStyles.left, 10) > parseInt(originalStyles.right, 10)) {
+          } else if (
+            parseInt(originalStyles.top, 10) < parseInt(originalStyles.bottom, 10) &&
+            parseInt(originalStyles.left, 10) > parseInt(originalStyles.right, 10)
+          ) {
             $('.topRight', exportEl).append(clonedNode);
-          } else if (parseInt(originalStyles.top, 10) > parseInt(originalStyles.bottom, 10)
-            && parseInt(originalStyles.left, 10) < parseInt(originalStyles.right, 10)) {
+          } else if (
+            parseInt(originalStyles.top, 10) > parseInt(originalStyles.bottom, 10) &&
+            parseInt(originalStyles.left, 10) < parseInt(originalStyles.right, 10)
+          ) {
             $('.bottomLeft', exportEl).append(clonedNode);
           } else {
             $('.bottomRight', exportEl).append(clonedNode);
@@ -223,38 +234,43 @@ export class Export extends Component {
       $('#exportEl').prepend($(`#${mapId}.mapboxgl-map .mapboxgl-canvas-container`));
 
       // push export container element into a new canvas
-      window.html2canvas(exportEl, {
-        removeContainer: true, // remove the iframe created by html2canvas
-        scale: resValue, // set the scale / resolution of the resulting canvas
-        logging: false, // this doesn't seem to work even when true...
-      }).then((canvas) => {
-        // convert new canvas element to blob (not toDataUrl due to long base64 urls)
-        canvas.toBlob((blob) => {
-          // restore the map to it's previous state
-          self.resetMapAfterExport(prevMapState);
-          // create download url from blob object
-          downloadA.href = URL.createObjectURL(blob);
-          // trigger actual download of exported image
-          downloadA.click();
-          // delete the export container and it's child clones
-          $('#exportEl').remove();
-        }, 'image/jpg');
-        /**
-         * Hide export modal once map is exported
-         */
-          if (this.props.config["closeExportModal"]){
-            this.setState({
-              isOpen: !this.state.isOpen
-            })
+      window
+        .html2canvas(exportEl, {
+          removeContainer: true, // remove the iframe created by html2canvas
+          scale: resValue, // set the scale / resolution of the resulting canvas
+          logging: false, // this doesn't seem to work even when true...
+        })
+        .then(
+          canvas => {
+            // convert new canvas element to blob (not toDataUrl due to long base64 urls)
+            canvas.toBlob(blob => {
+              // restore the map to it's previous state
+              self.resetMapAfterExport(prevMapState);
+              // create download url from blob object
+              downloadA.href = URL.createObjectURL(blob);
+              // trigger actual download of exported image
+              downloadA.click();
+              // delete the export container and it's child clones
+              $('#exportEl').remove();
+            }, 'image/jpg');
+            /**
+             * Hide export modal once map is exported
+             */
+            if (this.props.config['closeExportModal']) {
+              this.setState({
+                isOpen: !this.state.isOpen,
+              });
+            }
+          },
+          () => {
+            // if the promise is rejected, restore the map to it's previous state
+            self.resetMapAfterExport(prevMapState);
+            // delete the export container and it's child clones
+            $('#exportEl').remove();
+            // indicate that the exprort failed
+            alert('Export Failed - If this issue continues please contact ONA Support.');
           }
-        }, () => {
-        // if the promise is rejected, restore the map to it's previous state
-        self.resetMapAfterExport(prevMapState);
-        // delete the export container and it's child clones
-        $('#exportEl').remove();
-        // indicate that the exprort failed
-        alert('Export Failed - If this issue continues please contact ONA Support.');
-      });
+        );
     }, 100);
   }
 
@@ -269,8 +285,8 @@ export class Export extends Component {
 
     switch (option) {
       case 'resValue':
-        dimHeight = dimHeight / resValue * value;
-        dimWidth = dimWidth / resValue * value;
+        dimHeight = (dimHeight / resValue) * value;
+        dimWidth = (dimWidth / resValue) * value;
         resValue = value;
         break;
       case 'dimHeight':
@@ -306,9 +322,14 @@ export class Export extends Component {
           dimHeight = store.h < store.w ? store.h : store.w;
           dimWidth = dimHeight;
         }
-        resValue = orientation !== 'landscape'
-          ? window.innerHeight < dimHeight ? dimHeight / window.innerHeight : 1
-          : window.innerWidth < dimWidth ? dimWidth / window.innerWidth : 1;
+        resValue =
+          orientation !== 'landscape'
+            ? window.innerHeight < dimHeight
+              ? dimHeight / window.innerHeight
+              : 1
+            : window.innerWidth < dimWidth
+            ? dimWidth / window.innerWidth
+            : 1;
         break;
       case 'fitMap':
         doFitMap = !doFitMap;
@@ -319,9 +340,14 @@ export class Export extends Component {
           dimHeight = exportPresetKey[preset][orientation].h;
           dimWidth = exportPresetKey[preset][orientation].w;
         }
-        resValue = orientation !== 'landscape'
-          ? window.innerHeight < dimHeight ? dimHeight / window.innerHeight : 1
-          : window.innerWidth < dimWidth ? dimWidth / window.innerWidth : 1;
+        resValue =
+          orientation !== 'landscape'
+            ? window.innerHeight < dimHeight
+              ? dimHeight / window.innerHeight
+              : 1
+            : window.innerWidth < dimWidth
+            ? dimWidth / window.innerWidth
+            : 1;
         break;
       default:
         break;
@@ -343,8 +369,7 @@ export class Export extends Component {
     const { mapId } = this.props;
     const { map, config } = this.state;
     // move the map container element back to where it came from
-    $('#exportEl .mapboxgl-canvas-container')
-      .insertBefore(`#${mapId} .mapboxgl-control-container`);
+    $('#exportEl .mapboxgl-canvas-container').insertBefore(`#${mapId} .mapboxgl-control-container`);
     // remove fixed hight and width styling
     $(`#${mapId}.mapboxgl-map`).removeAttr('style');
     // restore the map controls
@@ -360,7 +385,7 @@ export class Export extends Component {
 
   scriptIsLoaded() {
     this.setState({
-      isH2Cloaded: true
+      isH2Cloaded: true,
     });
   }
 
@@ -383,26 +408,31 @@ export class Export extends Component {
         <a
           className={`export-modal-btn export-btn-${this.props.mapId}`}
           href="#"
-          onClick={(e) => { this.onOpenCloseClick(e); }}
+          onClick={e => {
+            this.onOpenCloseClick(e);
+          }}
           style={{
-            right: '10px'
+            right: '10px',
+            top: this.props.hasNavBar ? '195px' : '150px',
           }}
         >
           <span className="glyphicon glyphicon-camera" />
         </a>
 
-        {isOpen ?
+        {isOpen ? (
           isH2Cloaded ? (
             <div id="screenshot-modal">
               <span
                 role="button"
                 className={'glyphicon glyphicon-remove closeBtn'}
-                onClick={(e) => { this.onOpenCloseClick(e); }}
+                onClick={e => {
+                  this.onOpenCloseClick(e);
+                }}
                 tabIndex={-1}
               />
               <form className="exportOptions">
                 <h3>Map Export Options</h3>
-                { /* Resolution Multiplier
+                {/* Resolution Multiplier
                 <div>
                   <h5>Resolution</h5>
                   <input
@@ -425,14 +455,18 @@ export class Export extends Component {
                     value={resValue}
                   />
                 </div>
-                */ }
+                */}
                 <div>
                   <h5>Image Size</h5>
                   <select
                     id={`preset-size-${this.props.mapId}`}
-                    onChange={(e) => { this.onOptionsChange(e, 'preset'); }}
+                    onChange={e => {
+                      this.onOptionsChange(e, 'preset');
+                    }}
                   >
-                    <option value="custom" selected disabled>Select a Size</option>
+                    <option value="custom" selected disabled>
+                      Select a Size
+                    </option>
                     <optgroup label="Web (px)">
                       <option value="small">Small (1280 x 800 px)</option>
                       <option value="medium">Medium (1440 x 900 px)</option>
@@ -458,7 +492,9 @@ export class Export extends Component {
                     id={`dimWidth-${this.props.mapId}`}
                     className={`dimWidth${preset !== 'custom' ? ' disabled' : ''}`}
                     type="number"
-                    onChange={(e) => { this.onOptionsChange(e, 'dimWidth'); }}
+                    onChange={e => {
+                      this.onOptionsChange(e, 'dimWidth');
+                    }}
                     value={Math.round(dimWidth)}
                     disabled={preset !== 'custom'}
                   />
@@ -467,7 +503,9 @@ export class Export extends Component {
                     id={`dimHeight-${this.props.mapId}`}
                     className={`dimHeight${preset !== 'custom' ? ' disabled' : ''}`}
                     type="number"
-                    onChange={(e) => { this.onOptionsChange(e, 'dimHeight'); }}
+                    onChange={e => {
+                      this.onOptionsChange(e, 'dimHeight');
+                    }}
                     value={Math.round(dimHeight)}
                     disabled={preset !== 'custom'}
                   />
@@ -477,12 +515,12 @@ export class Export extends Component {
                   <h5>Orientation</h5>
                   <ul className="ratioOptions">
                     <li>
-                      <label
-                        htmlFor={`ratio-portrait-${this.props.mapId}`}
-                      >Portrait</label>
+                      <label htmlFor={`ratio-portrait-${this.props.mapId}`}>Portrait</label>
                       <div
-                        style={{ width: `${2 / 3 * 100}px` }}
-                        onClick={(e) => { this.onOptionsChange(e, 'orientation'); }}
+                        style={{ width: `${(2 / 3) * 100}px` }}
+                        onClick={e => {
+                          this.onOptionsChange(e, 'orientation');
+                        }}
                         role="button"
                         value="portrait"
                         tabIndex={-1}
@@ -494,18 +532,20 @@ export class Export extends Component {
                           name="ratio"
                           type="radio"
                           value="portrait"
-                          onClick={(e) => { this.onOptionsChange(e, 'orientation'); }}
+                          onClick={e => {
+                            this.onOptionsChange(e, 'orientation');
+                          }}
                           checked={orientation === 'portrait'}
                         />
                       </span>
                     </li>
                     <li>
-                      <label
-                        htmlFor={`ratio-landscape-${this.props.mapId}`}
-                      >Landscape</label>
+                      <label htmlFor={`ratio-landscape-${this.props.mapId}`}>Landscape</label>
                       <div
                         style={{ width: '150px' }}
-                        onClick={(e) => { this.onOptionsChange(e, 'orientation'); }}
+                        onClick={e => {
+                          this.onOptionsChange(e, 'orientation');
+                        }}
                         role="button"
                         value="landscape"
                         tabIndex={-1}
@@ -517,18 +557,20 @@ export class Export extends Component {
                           name="ratio"
                           type="radio"
                           value="landscape"
-                          onClick={(e) => { this.onOptionsChange(e, 'orientation'); }}
+                          onClick={e => {
+                            this.onOptionsChange(e, 'orientation');
+                          }}
                           checked={orientation === 'landscape'}
                         />
                       </span>
                     </li>
                     <li>
-                      <label
-                        htmlFor={`ratio-square-${this.props.mapId}`}
-                      >Square</label>
+                      <label htmlFor={`ratio-square-${this.props.mapId}`}>Square</label>
                       <div
                         style={{ width: '100px' }}
-                        onClick={(e) => { this.onOptionsChange(e, 'orientation'); }}
+                        onClick={e => {
+                          this.onOptionsChange(e, 'orientation');
+                        }}
                         role="button"
                         value="square"
                         tabIndex={-1}
@@ -540,35 +582,38 @@ export class Export extends Component {
                           name="ratio"
                           type="radio"
                           value="square"
-                          onChange={(e) => { this.onOptionsChange(e, 'orientation'); }}
+                          onChange={e => {
+                            this.onOptionsChange(e, 'orientation');
+                          }}
                           checked={orientation === 'square'}
                         />
                       </span>
                     </li>
                   </ul>
-                  {
-                    this.state.config.mapBounds ? (
-                      <div className="toFitToBounds">
-                        <input
-                          id={`do-fit-${this.props.mapId}`}
-                          className="fitMap"
-                          type="checkbox"
-                          checked={doFitMap}
-                          onClick={(e) => { this.onOptionsChange(e, 'fitMap'); }}
-                        />
-                        <label
-                          htmlFor={`do-fit-${this.props.mapId}`}
-                        >Fit map to export size and aspect ratio</label>
-                      </div>
-                    ) : (
-                        // todo - add link to documentation
-                        <span className="boundsNote">
-                          Note: Provide the &apos;mapBounds&apos; configuration
-                        option to enable fitting the map<br />
-                          within the exported image.
-                      </span>
-                      )
-                  }
+                  {this.state.config.mapBounds ? (
+                    <div className="toFitToBounds">
+                      <input
+                        id={`do-fit-${this.props.mapId}`}
+                        className="fitMap"
+                        type="checkbox"
+                        checked={doFitMap}
+                        onClick={e => {
+                          this.onOptionsChange(e, 'fitMap');
+                        }}
+                      />
+                      <label htmlFor={`do-fit-${this.props.mapId}`}>
+                        Fit map to export size and aspect ratio
+                      </label>
+                    </div>
+                  ) : (
+                    // todo - add link to documentation
+                    <span className="boundsNote">
+                      Note: Provide the &apos;mapBounds&apos; configuration option to enable fitting
+                      the map
+                      <br />
+                      within the exported image.
+                    </span>
+                  )}
                 </div>
                 <div>
                   <h5>Title</h5>
@@ -577,7 +622,9 @@ export class Export extends Component {
                     className="titleText"
                     type="text"
                     placeholder="Map Export"
-                    onChange={(e) => { this.onOptionsChange(e, 'titleText'); }}
+                    onChange={e => {
+                      this.onOptionsChange(e, 'titleText');
+                    }}
                   />
                   {
                     // todo - generate and include title element for rendering
@@ -603,18 +650,24 @@ export class Export extends Component {
                 role="button"
                 tabIndex={-1}
                 className="export-btn"
-                onClick={(e) => { this.onCaptureClick(e); }}
+                onClick={e => {
+                  this.onCaptureClick(e);
+                }}
               >
                 Export Map
               </a>
             </div>
           ) : (
-              <Script
-                url="https://html2canvas.hertzen.com/dist/html2canvas.min.js"
-                onLoad={() => { this.scriptIsLoaded(); }}
-              />
-            )
-          : ''}
+            <Script
+              url="https://html2canvas.hertzen.com/dist/html2canvas.min.js"
+              onLoad={() => {
+                this.scriptIsLoaded();
+              }}
+            />
+          )
+        ) : (
+          ''
+        )}
       </div>
     );
   }

@@ -44,7 +44,14 @@ export class Legend extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.timeSeriesObj && this.props.timeSeriesObj !== nextProps.timeSeriesObj) {
+    const { layerObj } = nextProps;
+    if (
+      nextProps.timeSeriesObj &&
+      this.props.timeSeriesObj !== nextProps.timeSeriesObj &&
+      layerObj &&
+      layerObj.type !== 'chart' &&
+      layerObj.property
+    ) {
       const { timeSeriesObj, dispatch } = nextProps;
 
       const stops = generateStops(
@@ -68,8 +75,14 @@ export class Legend extends React.Component {
       }
     }
   }
-  componentWillUpdate(nextProps, nextState) {
-    if (this.props.primaryLayer !== nextProps.primaryLayer) {
+  componentWillUpdate(nextProps) {
+    const { layerObj } = nextProps;
+    if (
+      this.props.primaryLayer !== nextProps.primaryLayer &&
+      layerObj &&
+      layerObj.type !== 'chart' &&
+      layerObj.property
+    ) {
       const { timeSeriesObj } = nextProps;
 
       if (
@@ -96,7 +109,7 @@ export class Legend extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     if (
       this.props.primaryLayer !== prevProps.primaryLayer &&
       this.props.layers &&
@@ -158,7 +171,7 @@ export class Legend extends React.Component {
 
     if (
       this.state.primaryLayer !== primaryLayer &&
-      (layers[primaryLayer] && layers[primaryLayer].credit)
+      layers[primaryLayer] && layers[primaryLayer].credit
     ) {
       activeLegendLayer = primaryLayer;
     }
@@ -194,7 +207,19 @@ export class Legend extends React.Component {
       let uniqueStops;
 
       const quantiles = [];
-
+      const rightListLimitStyle = {
+        position: 'absolute',
+        listStyle: 'none',
+        display: 'inline',
+        right: '3%',
+      };
+      const leftListLimitStyle = {
+        position: 'absolute',
+        listStyle: 'none',
+        display: 'inline',
+        left: '3%',
+      };
+      const legendLimitStyle = { padding: '0% 0% 3% 0%' };
       if (timeSeriesObj) {
         const { temporalIndex } = timeSeriesObj;
         if (circleLayerType && layer.breaks && layer.stops && layer.stops[0][temporalIndex]) {
@@ -206,7 +231,7 @@ export class Legend extends React.Component {
               <span className="circle-container" key={s}>
                 <span
                   style={{
-                    background: `${currentColorStops[i]}`,
+                    background: `${currentColorStops[i] || currentColorStops[0]}`,
                     width: `${s * 2}px`,
                     height: `${s * 2}px`,
                     margin: `0px ${currentRadiusStops[i] / 2}px`,
@@ -235,7 +260,7 @@ export class Legend extends React.Component {
                 style={{
                   background: Array.isArray(layer.categories.color)
                     ? layer.categories.color[i]
-                    : colors[i] || colors[0],
+                    : colors[i] || colors[0] || colors,
                   width: `${s * 2}px`,
                   height: `${s * 2}px`,
                   margin: `0px ${i + 2}px`,
@@ -389,11 +414,11 @@ export class Legend extends React.Component {
               onClick={e => this.onUpdatePrimaryLayer(e)}
             >
               <b>{layer.label}</b>
-              <ul className="legend-limit" style={{ padding: '0% 0% 3% 0%' }}>
+              <ul className="legend-limit" style={legendLimitStyle}>
                 <li
                   id={`first-limit-${layer.id}`}
                   className={`${mapId}`}
-                  style={{ position: 'absolute', listStyle: 'none', display: 'inline', left: '3%' }}
+                  style={leftListLimitStyle}
                 >
                   {0}
                   {legendSuffix}
@@ -401,12 +426,7 @@ export class Legend extends React.Component {
                 <li
                   id={`last-limit-${layer.id}`}
                   className={`${mapId}`}
-                  style={{
-                    position: 'absolute',
-                    listStyle: 'none',
-                    display: 'inline',
-                    right: '3%',
-                  }}
+                  style={rightListLimitStyle}
                 >
                   {typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)}
                   {legendSuffix}
@@ -592,20 +612,12 @@ export class Legend extends React.Component {
             onClick={e => this.onUpdatePrimaryLayer(e)}
           >
             <b>{layer.label}</b>
-            <ul className="legend-limit" style={{ padding: '0% 0% 3% 0%' }}>
-              <li
-                id={`first-limit-${layer.id}`}
-                className={`${mapId}`}
-                style={{ position: 'absolute', listStyle: 'none', display: 'inline', left: '3%' }}
-              >
+            <ul className="legend-limit" style={legendLimitStyle}>
+              <li id={`first-limit-${layer.id}`} className={`${mapId}`} style={leftListLimitStyle}>
                 {0}
                 {legendSuffix}
               </li>
-              <li
-                id={`last-limit-${layer.id}`}
-                className={`${mapId}`}
-                style={{ position: 'absolute', listStyle: 'none', display: 'inline', right: '3%' }}
-              >
+              <li id={`last-limit-${layer.id}`} className={`${mapId}`} style={rightListLimitStyle}>
                 {typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)}
                 {legendSuffix}
               </li>

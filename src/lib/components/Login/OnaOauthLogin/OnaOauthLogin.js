@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { useOAuthLogin } from '@onaio/gatekeeper/dist/components/login';
-import { AuthorizationGrantType } from '@onaio/gatekeeper';
+import { useOAuthLogin, AuthorizationGrantType } from '@onaio/gatekeeper';
 
 class OnaOauthLogin extends Component {
   constructor(props) {
     super(props);
-    const { clientID } = this.props
-    let authorizationUris = {}
+    const { clientID } = this.props;
+    let authorizationUris = {};
 
     if (clientID) {
       const redirectUri = location.protocol + '//' + location.host + '/callback';
@@ -30,13 +29,12 @@ class OnaOauthLogin extends Component {
     }
 
     this.state = {
-      authorizationUris
+      authorizationUris,
     };
   }
 
-
   render() {
-    const { provider } = this.props
+    const { provider } = this.props;
 
     if (!this.props.clientID || !this.state.authorizationUris[provider]) {
       return null;
@@ -50,7 +48,7 @@ class OnaOauthLogin extends Component {
             href={this.state.authorizationUris[provider]}
           >
             Login
-            </a>
+          </a>
         </div>
       </form>
     );
@@ -58,12 +56,12 @@ class OnaOauthLogin extends Component {
 }
 
 OnaOauthLogin.defaultProps = {
-  provider: 'onadata'
-}
+  provider: 'onadata',
+};
 
 OnaOauthLogin.PropTypes = {
   clientID: PropTypes.string.isRequired,
   provider: PropTypes.string,
-}
+};
 
-export default OnaOauthLogin
+export default OnaOauthLogin;

@@ -128,7 +128,9 @@ export class Layers extends Component {
 Layers.propTypes = {
   mapId: PropTypes.string.isRequired,
   layers: PropTypes.arrayOf(PropTypes.any).isRequired,
+  preparedLayers: PropTypes.arrayOf(PropTypes.any),
   currentRegion: PropTypes.string,
+  auth: PropTypes.object,
 };
 
 export default Layers;

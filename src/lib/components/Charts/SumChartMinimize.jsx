@@ -7,9 +7,10 @@ const mapStateToProps = (state, ownProps) => {
   const { detailView } = MAP;
   return {
     showFilterPanel: MAP.showFilterPanel,
-    showDetailView: (detailView && detailView.model && detailView.model.UID),
-  }
-}
+    showDetailView: detailView && detailView.model && detailView.model.UID,
+    layerObj: MAP.layers ? MAP.layers[MAP.activeLayerId] : null,
+  };
+};
 
 class SumChartMinimize extends React.Component {
   constructor(props) {
@@ -33,19 +34,21 @@ class SumChartMinimize extends React.Component {
   }
 
   render() {
-    const { showDetailView, showFilterPanel } = this.props;
-    let chartPos = "35px";
+    const { showDetailView, showFilterPanel, layerObj } = this.props;
+    let chartPos = '35px';
     if (showDetailView) {
-      chartPos = "375px";
-    } else if (showFilterPanel) {
-      chartPos = "286px";
+      chartPos = '375px';
+    } else if (showFilterPanel && !(layerObj.aggregate && layerObj.aggregate.filterIsPrev)) {
+      chartPos = '286px';
     }
     return (
       <a
         className="toggleChart"
         role="button"
         tabIndex="-1"
-        onClick={(e) => { this.handleClick(e); }}
+        onClick={e => {
+          this.handleClick(e);
+        }}
         title={`${this.state.isMin ? 'Show' : 'Hide'} Summary Charts`}
         style={{ bottom: this.state.bottom, right: chartPos, zIndex: 5000 }}
         data-icon-credit="Created by Barracuda from the Noun Project"

@@ -21,6 +21,7 @@ Object {
         Object {
           "Education": Object {
             "category": "Education",
+            "count": 0,
             "layers": Array [
               Object {
                 "aggregate": Object {
@@ -184,6 +185,7 @@ Object {
   "mapTargetId": "",
   "menuId": "sector-menu-1",
   "menuIsOpen": undefined,
+  "menuScroll": undefined,
   "noLayerText": undefined,
   "openCategories": Array [
     "Severity of needs",
@@ -349,6 +351,7 @@ Object {
       "name": "reg2",
     },
   ],
+  "showMap": false,
   "store": Object {
     "clearActions": [Function],
     "dispatch": [Function],
