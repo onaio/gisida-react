@@ -102,11 +102,6 @@ class Menu extends Component {
      * Gets scroll position after scroll ceases
      */
     this.delayedMenuScrollCallback = _.debounce(this.persistScrollPosition, 1000);
-    this.state = {
-      URLLayersHandled: [], // layers from URL that have their category open
-      openCategoriesFromURL: [], // Categories opened when component mounts because
-      // at least one layer under that category is in URL
-    };
   }
 
   componentDidMount() {
@@ -133,11 +128,11 @@ class Menu extends Component {
     const URLLayers = splitURL[1] && splitURL[1].split(',');
 
     if (URLLayers) {
-      const { URLLayersHandled } = this.state;
-
       if (
-        URLLayers.length !== URLLayersHandled.length &&
-        !_.isEqual(prevProps.categories, this.props.categories)
+        !_.isEqual(prevProps.categories, this.props.categories) ||
+        (prevProps.openCategories &&
+          prevProps.openCategories.length !== this.props.openCategories &&
+          this.props.openCategories.length)
       ) {
         this.openCategoriesFromURL(URLLayers);
       }
@@ -145,15 +140,17 @@ class Menu extends Component {
   }
 
   /**
-   * Open a category with a visible layer which is in the URL when component mounts
+   * Open category if a layer from URL is visible and category
+   * is not yet open
+   * @param {*} URLLayers
    */
   openCategoriesFromURL(URLLayers) {
     if (URLLayers && this.props.categories) {
-      const { URLLayersHandled, openCategoriesFromURL } = this.state;
-      const unHandledURLLayers = URLLayers.filter(l => URLLayersHandled.indexOf(l) === -1);
-      unHandledURLLayers.forEach(unHandledURLLayer => {
+      const { openCategories } = this.props;
+
+      URLLayers.forEach(URLLayer => {
         this.props.categories.forEach(category => {
-          if (openCategoriesFromURL.indexOf(category.category) < 0) {
+          if (openCategories && openCategories.indexOf(category.category) < 0) {
             /**
              * Make sure we do not add a category more than once since multiple
              * layers from URL can share a category
@@ -168,18 +165,16 @@ class Menu extends Component {
                   const children = layer[groupName].layers;
                   const visibleLayers = getMenuGroupVisibleLayers(groupName, children);
 
-                  if (visibleLayers.indexOf(`${unHandledURLLayer}.json`) >= 0) {
-                    // Mark the unhandled URL layer as handled
-                    this.handleURLLayer(category.category, unHandledURLLayer);
+                  if (visibleLayers.indexOf(`${URLLayer}.json`) >= 0) {
+                    this.toggleCategory(category.category);
                   }
                 });
               } else {
                 // This category has one level only
                 const layerIdNoExt = layer.id.replace('.json', '');
 
-                if (layerIdNoExt === unHandledURLLayer && layer.visible) {
-                  // Mark the unhandled URL layer as handled
-                  this.handleURLLayer(category.category, unHandledURLLayer);
+                if (layerIdNoExt === URLLayer && layer.visible) {
+                  this.toggleCategory(category.category);
                 }
               }
             });
@@ -190,19 +185,14 @@ class Menu extends Component {
   }
 
   /**
-   * Handle the process of marking a layer from URL as handled
+   * Toggle category
+   * @param {*} categoryName
    */
-  handleURLLayer(categoryName, unHandledURLLayer) {
+  toggleCategory(categoryName) {
     const { openCategories } = this.props;
     const index = openCategories.indexOf(categoryName);
 
     this.props.dispatch(Actions.toggleCategories(this.props.mapId, categoryName, index));
-    this.setState({
-      openCategoriesFromURL: [...this.state.openCategoriesFromURL, categoryName],
-    });
-    this.setState({
-      URLLayersHandled: [...this.state.URLLayersHandled, unHandledURLLayer],
-    });
   }
 
   onToggleMenu = e => {
@@ -213,9 +203,7 @@ class Menu extends Component {
 
   onCategoryClick = (e, category) => {
     e.preventDefault();
-    const { openCategories } = this.props;
-    const index = openCategories.indexOf(category);
-    this.props.dispatch(Actions.toggleCategories(this.props.mapId, category, index));
+    this.toggleCategory(category);
   };
 
   onRegionClick = e => {
