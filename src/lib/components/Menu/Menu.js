@@ -169,22 +169,16 @@ class Menu extends Component {
                   const visibleLayers = getMenuGroupVisibleLayers(groupName, children);
 
                   if (visibleLayers.indexOf(`${unHandledURLLayer}.json`) >= 0) {
-                    /**
-                     * If the layer is in URL, open the category
-                     * and mark the unhandled URL layer as handled
-                     */
+                    // Mark the unhandled URL layer as handled
                     this.handleURLLayer(category.category, unHandledURLLayer);
                   }
                 });
               } else {
-                /**This category has one level only */
+                // This category has one level only
                 const layerIdNoExt = layer.id.replace('.json', '');
 
                 if (layerIdNoExt === unHandledURLLayer && layer.visible) {
-                  /**
-                   * If the layer is in URL, open the category
-                   * and mark the unhandled URL layer as handled
-                   */
+                  // Mark the unhandled URL layer as handled
                   this.handleURLLayer(category.category, unHandledURLLayer);
                 }
               }
