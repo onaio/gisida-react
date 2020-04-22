@@ -148,6 +148,8 @@ class Menu extends Component {
       const { openCategories } = this.props;
 
       URLLayers.forEach(URLLayer => {
+        const completeURLLayerName = `${URLLayer}.json`;
+
         this.props.categories.forEach(category => {
           if (openCategories && openCategories.indexOf(category.category) < 0) {
             /**
@@ -164,15 +166,13 @@ class Menu extends Component {
                   const children = layer[groupName].layers;
                   const visibleLayers = getMenuGroupVisibleLayers(groupName, children);
 
-                  if (visibleLayers.indexOf(`${URLLayer}.json`) >= 0) {
+                  if (visibleLayers.indexOf(completeURLLayerName) >= 0) {
                     this.toggleCategory(category.category);
                   }
                 });
               } else {
                 // This category has one level only
-                const layerIdNoExt = layer.id.replace('.json', '');
-
-                if (layerIdNoExt === URLLayer && layer.visible) {
+                if (layer.id === completeURLLayerName && layer.visible) {
                   this.toggleCategory(category.category);
                 }
               }
