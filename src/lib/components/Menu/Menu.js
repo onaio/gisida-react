@@ -127,15 +127,14 @@ class Menu extends Component {
     const splitURL = window.location.href.split('&')[0].split('?layers=');
     const URLLayers = splitURL[1] && splitURL[1].split(',');
 
-    if (URLLayers) {
-      if (
-        !_.isEqual(prevProps.categories, this.props.categories) ||
+    if (
+      URLLayers &&
+      (!_.isEqual(prevProps.categories, this.props.categories) ||
         (prevProps.openCategories &&
           prevProps.openCategories.length !== this.props.openCategories &&
-          this.props.openCategories.length)
-      ) {
-        this.openCategoriesFromURL(URLLayers);
-      }
+          this.props.openCategories.length))
+    ) {
+      this.openCategoriesFromURL(URLLayers);
     }
   }
 
