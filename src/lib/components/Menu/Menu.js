@@ -7,7 +7,7 @@ import ConnectedLayers from '../Layers/ConnectedLayers';
 import './Menu.scss';
 import _ from 'lodash';
 import memoize from 'memoize-one';
-import { isMenuLayerVisible } from '../../utils';
+import { getMenuGroupVisibleLayers } from '../../utils';
 
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {} };
@@ -102,6 +102,11 @@ class Menu extends Component {
      * Gets scroll position after scroll ceases
      */
     this.delayedMenuScrollCallback = _.debounce(this.persistScrollPosition, 1000);
+    this.state = {
+      URLLayersHandled: [], // layers from URL that have their category open
+      openCategoriesFromURL: [], // Categories opened when component mounts because
+      // at least one layer under that category is in URL
+    };
   }
 
   componentDidMount() {
@@ -130,41 +135,80 @@ class Menu extends Component {
   }
 
   /**
-   * Open any category which has a map layer whose
-   * visible status is true
+   * Open a category with a layer which is in URL when component mounts since
+   * we expect that layer to be visible
    */
   openCategories() {
-    if (this.props.categories) {
-      this.props.categories.forEach(category => {
-        const { openCategories } = this.props;
+    const splitURL = window.location.href.split('&')[0].split('?layers=');
 
-        if (openCategories) {
-          const index = openCategories.indexOf(category.category);
+    if (splitURL.length === 2) {
+      const URLLayers = splitURL[1].split(',');
+      const { URLLayersHandled, openCategoriesFromURL } = this.state;
 
-          if (index < 0) {
-            category.layers.forEach(layer => {
-              if (!layer.id) {
-                Object.keys(layer).forEach(groupName => {
-                  const children = layer[groupName].layers;
+      if (URLLayers.length !== URLLayersHandled.length && this.props.categories) {
+        /**
+         * We have some layers from URL whose category is not open
+         */
+        const unHandledURLLayers = URLLayers.filter(l => URLLayersHandled.indexOf(l) === -1);
+        unHandledURLLayers.forEach(unHandledURLLayer => {
+          this.props.categories.forEach(category => {
+            if (openCategoriesFromURL.indexOf(category.category) < 0) {
+              /**
+               * Make sure we do not add a category more than once to the array
+               * of categories considered as open
+               */
+              category.layers.forEach(layer => {
+                if (!layer.id) {
+                  /**
+                   * This is a group. So continue checking down the hierarchy
+                   * for visible layers
+                   */
+                  Object.keys(layer).forEach(groupName => {
+                    const children = layer[groupName].layers;
+                    const visibleLayers = getMenuGroupVisibleLayers(groupName, children);
 
-                  if (isMenuLayerVisible(groupName, children)) {
-                    this.props.dispatch(
-                      Actions.toggleCategories(this.props.mapId, category.category, index)
-                    );
+                    if (visibleLayers.indexOf(`${unHandledURLLayer}.json`) >= 0) {
+                      /**
+                       * If the layer is in URL, open the category
+                       * and mark the unhandled URL layer as handled
+                       */
+                      this.handleURLLayer(category.category, unHandledURLLayer);
+                    }
+                  });
+                } else {
+                  /**This category has one level only */
+                  const layerIdNoExt = layer.id.replace('.json', '');
+
+                  if (layerIdNoExt === unHandledURLLayer && layer.visible) {
+                    /**
+                     * If the layer is in URL, open the category
+                     * and mark the unhandled URL layer as handled
+                     */
+                    this.handleURLLayer(category.category, unHandledURLLayer);
                   }
-                });
-              } else {
-                if (layer.visible) {
-                  this.props.dispatch(
-                    Actions.toggleCategories(this.props.mapId, category.category, index)
-                  );
                 }
-              }
-            });
-          }
-        }
-      });
+              });
+            }
+          });
+        });
+      }
     }
+  }
+
+  /**
+   * Handle the process of marking a layer from URL as handled
+   */
+  handleURLLayer(categoryName, unHandledURLLayer) {
+    const { openCategories } = this.props;
+    const index = openCategories.indexOf(categoryName);
+
+    this.props.dispatch(Actions.toggleCategories(this.props.mapId, categoryName, index));
+    this.setState({
+      openCategoriesFromURL: [...this.state.openCategoriesFromURL, categoryName],
+    });
+    this.setState({
+      URLLayersHandled: [...this.state.URLLayersHandled, unHandledURLLayer],
+    });
   }
 
   onToggleMenu = e => {

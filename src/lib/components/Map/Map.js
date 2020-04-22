@@ -47,7 +47,7 @@ const mapStateToProps = (state, ownProps) => {
     activeLayers,
     handlers: ownProps.handlers,
     hasNavBar: ownProps.hasNavBar,
-    hasDataView
+    hasDataView,
   };
 };
 
@@ -395,7 +395,7 @@ class Map extends Component {
       if (layers && layers[primaryLayer] && layers[primaryLayer].location) {
         this.map.easeTo(layers[primaryLayer].location);
       } else {
-        this.dataViewMapReset(mapConfig, this.map)
+        this.dataViewMapReset(mapConfig, this.map);
       }
     }
 
@@ -546,7 +546,6 @@ class Map extends Component {
 
     if (splitURL.length === 2) {
       const URLLayers = splitURL[1].split(',');
-      ;
       const { URLLayersLoaded } = this.state;
 
       if (URLLayers.length !== URLLayersLoaded.length) {
@@ -578,14 +577,25 @@ class Map extends Component {
       } catch (e) {
         console.warn('resize error', e);
       }
-      
-      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj, APP, VIEW, layers } = this.props;
+
+      const {
+        layersObj,
+        layerObj,
+        primaryLayer,
+        FILTER,
+        LOC,
+        mapId,
+        timeSeriesObj,
+        APP,
+        VIEW,
+        layers,
+      } = this.props;
 
       if (this.props.hasDataView && this.map && VIEW.showLayerSuperset) {
         if (layers && layers[primaryLayer] && layers[primaryLayer].location) {
           this.map.easeTo(layers[primaryLayer].location);
         } else {
-          this.dataViewMapReset(APP.mapConfig, this.map)
+          this.dataViewMapReset(APP.mapConfig, this.map);
         }
       }
 

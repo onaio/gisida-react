@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
-import { isMenuLayerVisible } from '../../utils';
+import { getMenuGroupVisibleLayers } from '../../utils';
 
 export class Layers extends Component {
   constructor(props) {
@@ -14,7 +14,7 @@ export class Layers extends Component {
             let isOpen = false;
             const children = layer[l].layers;
 
-            if (isMenuLayerVisible(l, children)) {
+            if (getMenuGroupVisibleLayers(l, children).length) {
               isOpen = true;
             }
 

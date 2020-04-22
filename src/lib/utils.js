@@ -147,8 +147,10 @@ export function isFiltered(options, isOriginal) {
 }
 
 export function buildLayersObj(layers) {
-  const urlPrimaryLayer = window.location.href.split('&') && window.location.href.split('&')[1] &&
-        window.location.href.split('&')[1].split('=')[1];
+  const urlPrimaryLayer =
+    window.location.href.split('&') &&
+    window.location.href.split('&')[1] &&
+    window.location.href.split('&')[1].split('=')[1];
   const layersObj = [];
   let layerObj;
   Object.keys(layers).forEach(key => {
@@ -159,15 +161,15 @@ export function buildLayersObj(layers) {
     }
   });
 
-    /** Move primary layer to the end of the array */
-    // if (!(layersObj[layersObj.length - 1] && layersObj[layersObj.length - 1].id.includes(urlPrimaryLayer))) {
-    //     const indexOfPrimaryLayer = layersObj.findIndex(layer => layer.id.includes(urlPrimaryLayer));
-    //     if (indexOfPrimaryLayer !== -1) {
-    //         var temp = layersObj[indexOfPrimaryLayer];
-    //         layersObj[indexOfPrimaryLayer] = layersObj[layersObj.length - 1];
-    //         layersObj[layersObj.length - 1] = temp;
-    //     }
-    // }
+  /** Move primary layer to the end of the array */
+  // if (!(layersObj[layersObj.length - 1] && layersObj[layersObj.length - 1].id.includes(urlPrimaryLayer))) {
+  //     const indexOfPrimaryLayer = layersObj.findIndex(layer => layer.id.includes(urlPrimaryLayer));
+  //     if (indexOfPrimaryLayer !== -1) {
+  //         var temp = layersObj[indexOfPrimaryLayer];
+  //         layersObj[indexOfPrimaryLayer] = layersObj[layersObj.length - 1];
+  //         layersObj[layersObj.length - 1] = temp;
+  //     }
+  // }
 
   return layersObj;
 }
@@ -236,35 +238,32 @@ export function orderLayers(activeLayersData, map, nextLayerId) {
 }
 
 /**
- * Check if the if map layer is visible given the menu group
- * Value can be used to set the state of the menu group open
+ * Get all visible layer Ids of a menu group
  * @param {*} groupName Name of the group which we want to target
  * @param {*} children Children of the group which we want to target
  */
-export function isMenuLayerVisible(groupName, children) {
+export function getMenuGroupVisibleLayers(groupName, children) {
   const subGroups = children.filter(child => !child.id);
 
   if (subGroups.length) {
-    let groupIsOpen = false; // Flag to help not to continue checking the siblings if an
-    // open child subgroup is found
-
+    let visibleLayerIds = [];
     let i = 0;
 
-    while (!groupIsOpen && i < subGroups.length) {
+    while (i < subGroups.length) {
       const subGroupKey = Object.keys(subGroups[i])[0];
-      groupIsOpen = isMenuLayerVisible(groupName, subGroups[i][subGroupKey].layers);
+      const subGroupVisibleLayerIds = getMenuGroupVisibleLayers(
+        groupName,
+        subGroups[i][subGroupKey].layers
+      );
+      visibleLayerIds = [...visibleLayerIds, ...subGroupVisibleLayerIds];
 
       i += 1;
     }
 
-    return groupIsOpen;
+    // Return all visible layer Id of the nested subgroups
+    return visibleLayerIds;
   } else {
-    const visible = children.filter(child => child.visible);
-
-    if (visible.length) {
-      return true;
-    }
+    // Return the Ids of visible layers for the group
+    return children.filter(child => child.visible).map(child => child.id);
   }
-
-  return false;
 }
