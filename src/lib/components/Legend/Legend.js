@@ -39,12 +39,19 @@ export class Legend extends React.Component {
     this.state = {
       setPrimary: false,
       primaryLayer: this.props.primaryLayer,
-      timeSeriesObj: undefined,
+      timeSeriesObj: undefined
     };
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.timeSeriesObj && this.props.timeSeriesObj !== nextProps.timeSeriesObj) {
+    const { layerObj } = nextProps;
+    if (
+      nextProps.timeSeriesObj &&
+      this.props.timeSeriesObj !== nextProps.timeSeriesObj &&
+      layerObj &&
+      layerObj.type !== "chart" &&
+      layerObj.property
+    ) {
       const { timeSeriesObj, dispatch } = nextProps;
 
       const stops = generateStops(
@@ -68,8 +75,14 @@ export class Legend extends React.Component {
       }
     }
   }
-  componentWillUpdate(nextProps, nextState) {
-    if (this.props.primaryLayer !== nextProps.primaryLayer) {
+  componentWillUpdate(nextProps) {
+    const { layerObj } = nextProps;
+    if (
+      this.props.primaryLayer !== nextProps.primaryLayer &&
+      layerObj &&
+      layerObj.type !== "chart" &&
+      layerObj.property
+    ) {
       const { timeSeriesObj } = nextProps;
 
       if (
@@ -96,7 +109,7 @@ export class Legend extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     if (
       this.props.primaryLayer !== prevProps.primaryLayer &&
       this.props.layers &&
@@ -109,11 +122,11 @@ export class Legend extends React.Component {
     }
   }
   onUpdatePrimaryLayer(e) {
-    if (e.target.getAttribute('data-credit') !== 'credit') {
+    if (e.target.getAttribute("data-credit") !== "credit") {
       e.preventDefault();
     }
     const { dispatch, mapId } = this.props;
-    const targetLayer = e.currentTarget.getAttribute('data-layer');
+    const targetLayer = e.currentTarget.getAttribute("data-layer");
     // dispatch primary layer id
     dispatch(Actions.updatePrimaryLayer(mapId, targetLayer));
   }
@@ -144,7 +157,9 @@ export class Legend extends React.Component {
         .reverse()[0];
     }
     const legendItems = [];
-    latestTimestamp = latestTimestamp ? <span>Timestamp: {latestTimestamp}</span> : null;
+    latestTimestamp = latestTimestamp ? (
+      <span>Timestamp: {latestTimestamp}</span>
+    ) : null;
     let primaryLegend;
     let layer;
 
@@ -194,22 +209,44 @@ export class Legend extends React.Component {
       let uniqueStops;
 
       const quantiles = [];
-
+      const rightListLimitStyle = {
+        position: "absolute",
+        listStyle: "none",
+        display: "inline",
+        right: "3%"
+      };
+      const leftListLimitStyle = {
+        position: "absolute",
+        listStyle: "none",
+        display: "inline",
+        left: "3%"
+      }
+      const legendLimitStyle = { padding: '0% 0% 3% 0%' }
       if (timeSeriesObj) {
         const { temporalIndex } = timeSeriesObj;
-        if (circleLayerType && layer.breaks && layer.stops && layer.stops[0][temporalIndex]) {
-          const currentColorStops = [...new Set(layer.stops[0][temporalIndex].map(d => d[1]))];
-          const currentRadiusStops = [...new Set(layer.stops[1][temporalIndex].map(d => d[1]))];
+        if (
+          circleLayerType &&
+          layer.breaks &&
+          layer.stops &&
+          layer.stops[0][temporalIndex]
+        ) {
+          const currentColorStops = [
+            ...new Set(layer.stops[0][temporalIndex].map(d => d[1]))
+          ];
+          const currentRadiusStops = [
+            ...new Set(layer.stops[1][temporalIndex].map(d => d[1]))
+          ];
           const currentBreakStops = [...new Set(layer.stops[6][temporalIndex])];
           currentRadiusStops.forEach((s, i) => {
             quantiles.push(
               <span className="circle-container" key={s}>
                 <span
                   style={{
-                    background: `${currentColorStops[i]}`,
+                    background: `${currentColorStops[i] ||
+                      currentColorStops[0]}`,
                     width: `${s * 2}px`,
                     height: `${s * 2}px`,
-                    margin: `0px ${currentRadiusStops[i] / 2}px`,
+                    margin: `0px ${currentRadiusStops[i] / 2}px`
                   }}
                 ></span>
                 <p>{currentBreakStops[i]}</p>
@@ -235,10 +272,10 @@ export class Legend extends React.Component {
                 style={{
                   background: Array.isArray(layer.categories.color)
                     ? layer.categories.color[i]
-                    : colors[i] || colors[0],
+                    : colors[i] || colors[0] || colors,
                   width: `${s * 2}px`,
                   height: `${s * 2}px`,
-                  margin: `0px ${i + 2}px`,
+                  margin: `0px ${i + 2}px`
                 }}
               ></span>
               <p>{breaks[i]}</p>
@@ -266,20 +303,23 @@ export class Legend extends React.Component {
         }
         if (fillLayerNoBreaks && !layer.parent) {
           const fillWidth = (
-            100 / layer.categories.color.filter(c => c !== 'transparent').length
+            100 / layer.categories.color.filter(c => c !== "transparent").length
           ).toString();
 
           layer.categories.color.forEach((color, index) => {
-            if (color !== 'transparent') {
+            if (color !== "transparent") {
               background.push(
-                <li key={index} style={{ background: color, width: `${fillWidth}%` }}>
+                <li
+                  key={index}
+                  style={{ background: color, width: `${fillWidth}%` }}
+                >
                   {layer.categories.label[index]}
                 </li>
               );
             }
           });
 
-          const legendClass = layer.categories ? 'legend-label' : '';
+          const legendClass = layer.categories ? "legend-label" : "";
 
           primaryLegend = (
             <div
@@ -389,11 +429,11 @@ export class Legend extends React.Component {
               onClick={e => this.onUpdatePrimaryLayer(e)}
             >
               <b>{layer.label}</b>
-              <ul className="legend-limit" style={{ padding: '0% 0% 3% 0%' }}>
+              <ul className="legend-limit" style={legendLimitStyle}>
                 <li
                   id={`first-limit-${layer.id}`}
                   className={`${mapId}`}
-                  style={{ position: 'absolute', listStyle: 'none', display: 'inline', left: '3%' }}
+                  style={leftListLimitStyle}
                 >
                   {0}
                   {legendSuffix}
@@ -401,14 +441,11 @@ export class Legend extends React.Component {
                 <li
                   id={`last-limit-${layer.id}`}
                   className={`${mapId}`}
-                  style={{
-                    position: 'absolute',
-                    listStyle: 'none',
-                    display: 'inline',
-                    right: '3%',
-                  }}
+                  style={rightListLimitStyle}
                 >
-                  {typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)}
+                  {typeof formatNum(lastVal, 1) === "undefined"
+                    ? 0
+                    : formatNum(lastVal, 1)}
                   {legendSuffix}
                 </li>
               </ul>
@@ -484,7 +521,7 @@ export class Legend extends React.Component {
           }
         });
 
-        const legendClass = layer.categories ? 'legend-label' : '';
+        const legendClass = layer.categories ? "legend-label" : "";
 
         legendItems.unshift(
           <div
@@ -542,8 +579,7 @@ export class Legend extends React.Component {
             : layers[primaryLayer].layers
             ? layerObj && layerObj.categories && layerObj.categories.breaks
             : layer.breaks;
-
-        const lastBreaks = Math.max(...stopsBreak);
+        const lastBreaks = stopsBreak && Math.max(...stopsBreak);
         const layerStops =
           timeSeriesObj &&
           timeSeriesObj.stops &&
@@ -558,13 +594,13 @@ export class Legend extends React.Component {
         activeColors.forEach((color, index, activeColors) => {
           const stopsIndex = layerStops ? layerStops.indexOf(color) : -1;
           if (stopsIndex !== -1) {
-            const firstVal = stopsIndex ? stopsBreak[stopsIndex - 1] : 0;
+            const firstVal = stopsIndex ? stopsBreak && stopsBreak[stopsIndex - 1] : 0;
 
             if (Object.is(activeColors.length - 1, index)) {
               // execute last item logic
               lastVal = lastBreaks;
             } else {
-              lastVal = stopsBreak[stopsIndex];
+              lastVal = stopsBreak && stopsBreak[stopsIndex];
             }
             background.push(
               <li
@@ -593,11 +629,11 @@ export class Legend extends React.Component {
             onClick={e => this.onUpdatePrimaryLayer(e)}
           >
             <b>{layer.label}</b>
-            <ul className="legend-limit" style={{ padding: '0% 0% 3% 0%' }}>
+            <ul className="legend-limit" style={legendLimitStyle}>
               <li
                 id={`first-limit-${layer.id}`}
                 className={`${mapId}`}
-                style={{ position: 'absolute', listStyle: 'none', display: 'inline', left: '3%' }}
+                style={leftListLimitStyle}
               >
                 {0}
                 {legendSuffix}
@@ -605,9 +641,11 @@ export class Legend extends React.Component {
               <li
                 id={`last-limit-${layer.id}`}
                 className={`${mapId}`}
-                style={{ position: 'absolute', listStyle: 'none', display: 'inline', right: '3%' }}
+                style={rightListLimitStyle}
               >
-                {typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)}
+                {typeof formatNum(lastVal, 1) === "undefined"
+                  ? 0
+                  : formatNum(lastVal, 1)}
                 {legendSuffix}
               </li>
             </ul>
@@ -642,7 +680,7 @@ Legend.propTypes = {
   layersData: PropTypes.arrayOf(PropTypes.any).isRequired,
   MAP: PropTypes.objectOf(PropTypes.any).isRequired,
   primaryLayer: PropTypes.string.isRequired,
-  timeSeriesObj: PropTypes.objectOf(PropTypes.any),
+  timeSeriesObj: PropTypes.objectOf(PropTypes.any)
 };
 
 export default connect(mapStateToProps)(Legend);

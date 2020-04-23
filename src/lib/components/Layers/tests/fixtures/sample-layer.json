@@ -1,0 +1,16 @@
+{
+    "label": "Boundaries",
+    "source": {
+      "type": "vector",
+      "layer": "som_adm_2-0j5bly",
+      "url": "mapbox://ona.6gl2shzi"
+    },
+    "type": "line",
+    "paint": {
+      "line-width": 1,
+      "line-color": "#444",
+      "line-opacity": 0.6
+    },
+    "visible": true,
+    "category": "Boundaries and Place Labels"
+  }

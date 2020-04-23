@@ -8,6 +8,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     showFilterPanel: MAP.showFilterPanel,
     showDetailView: (detailView && detailView.model && detailView.model.UID),
+    layerObj: MAP.layers ? MAP.layers[MAP.activeLayerId] : null,
   }
 }
 
@@ -33,11 +34,13 @@ class SumChartMinimize extends React.Component {
   }
 
   render() {
-    const { showDetailView, showFilterPanel } = this.props;
+    const { showDetailView, showFilterPanel, layerObj } = this.props;
     let chartPos = "35px";
     if (showDetailView) {
       chartPos = "375px";
-    } else if (showFilterPanel) {
+    } else if (showFilterPanel &&
+      !(layerObj.aggregate &&
+        layerObj.aggregate.filterIsPrev)) {
       chartPos = "286px";
     }
     return (
