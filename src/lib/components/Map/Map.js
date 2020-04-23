@@ -655,12 +655,14 @@ class Map extends Component {
   loadSharedLayers() {
     const { sharedLayers } = this.state;
     const { layers, mapId, dispatch } = this.props;
-
-    sharedLayers
-      .filter(l => !l.isLoaded)
-      .map(l => l.id)
-      .forEach(sharedLayerId => {
-        if (layers && layers[sharedLayerId] && !layers[sharedLayerId].visible) {
+    if (sharedLayers.length) {
+      let sharedLayerId;
+      const sharedLayerIds = sharedLayers.filter(l => !l.isLoaded).map(l => l.id);
+      for (let l = 0; l < sharedLayerIds.length; l+=1) {
+        sharedLayerId = sharedLayerIds[l];
+        if (layers && !layers[sharedLayerId]) {
+          break
+        } else if (layers && layers[sharedLayerId] && !layers[sharedLayerId].visible) {
           dispatch(Actions.toggleLayer(mapId, sharedLayerId));
 
           if (!layers[sharedLayerId].loaded && !layers[sharedLayerId].isLoading) {
@@ -675,9 +677,12 @@ class Map extends Component {
 
               return l;
             }),
+          }, () => {
+            dispatch(Actions.updatePrimaryLayer(mapId, sharedLayerId))
           });
         }
-      });
+      }
+    }
   }
 
   componentWillUnmount() {
