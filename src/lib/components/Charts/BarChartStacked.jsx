@@ -87,7 +87,9 @@ class BarChartStacked extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.chart.destroy();
+    if (this.chart) {
+      this.chart.destroy();
+    }
     const { barSeries, barCategories } = nextProps;
     this.setState({
       series: barSeries.series,
@@ -105,7 +107,9 @@ class BarChartStacked extends React.Component {
   }
 
   componentWillUnmount() {
-    this.chart.destroy();
+    if (this.chart) {
+      this.chart.destroy();
+    }
   }
 
   render() {
