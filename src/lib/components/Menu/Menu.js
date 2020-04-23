@@ -157,10 +157,6 @@ class Menu extends Component {
         .filter(l => !l.isCatOpen)
         .forEach(sharedLayer => {
           categories.forEach(category => {
-            /**
-             * Make sure we do not add a category more than once since multiple
-             * layers from URL can share a category
-             */
             category.layers.forEach(layer => {
               if (!layer.id) {
                 /**
