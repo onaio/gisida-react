@@ -45,7 +45,7 @@ class BarChartStacked extends React.Component {
         pointFormatter: BarChartStacked.tooltipPointFormatter,
       },
       xAxis: {
-        categories: barCategories.categories,
+        categories: (barCategories || {}).categories,
         labels: {
           align: 'right',
         },
@@ -75,7 +75,7 @@ class BarChartStacked extends React.Component {
           },
         },
       },
-      series: barSeries.series,
+      series: (barSeries || {}).series,
       credits: {
         enabled: false,
       },
