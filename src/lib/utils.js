@@ -249,9 +249,11 @@ export function getMenuGroupVisibleLayers(groupName, children) {
     let visibleLayerIds = [];
 
     subGroups.forEach(sg => {
-      const subGroupKey = Object.keys(sg)[0];
-      const subGroupVisibleLayerIds = getMenuGroupVisibleLayers(groupName, sg[subGroupKey].layers);
-      visibleLayerIds = [...visibleLayerIds, ...subGroupVisibleLayerIds];
+      const groupKeys = Object.keys(sg);
+      groupKeys.forEach(key => {
+        const subGroupVisibleLayerIds = getMenuGroupVisibleLayers(groupName, sg[key].layers);
+        visibleLayerIds = [...visibleLayerIds, ...subGroupVisibleLayerIds];
+      });
     });
 
     // Return all visible layer Id of the nested subgroups
