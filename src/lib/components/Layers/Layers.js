@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
-import _ from 'lodash';
 import { getMenuGroupVisibleLayers } from '../../utils';
 
 export class Layers extends Component {
@@ -12,37 +11,36 @@ export class Layers extends Component {
       this.props.layers.forEach(layer => {
         if (!layer.id) {
           Object.keys(layer).forEach(l => {
-            let isOpen = false;
-            const children = layer[l].layers;
-
-            if (getMenuGroupVisibleLayers(l, children).length) {
-              isOpen = true;
-            }
-
-            groups[l] = { isOpen };
+            groups[l] = { isOpen: false };
           });
         }
       });
     }
     this.state = groups;
   }
-  componentDidUpdate(prevProps) {
-    this.props.layers.forEach(layer => {
-      if (!layer.id) {
-        Object.keys(layer).forEach(groupName => {
-          const children = layer[groupName].layers;
 
-          if (
-            getMenuGroupVisibleLayers(groupName, children).length &&
-            !this.state[groupName].isOpen
-          ) {
-            this.setState({
-              [groupName]: { isOpen: true },
-            });
-          }
-        });
-      }
-    });
+  componentDidUpdate() {
+    if (this.props.layers) {
+      /** Check if updated children down the hierarchy have
+       * layers which are a visible. If so open the group
+       */
+      this.props.layers.forEach(layer => {
+        if (!layer.id) {
+          Object.keys(layer).forEach(groupName => {
+            const children = layer[groupName].layers;
+
+            if (
+              getMenuGroupVisibleLayers(groupName, children).length &&
+              !this.state[groupName].isOpen
+            ) {
+              this.setState({
+                [groupName]: { isOpen: true },
+              });
+            }
+          });
+        }
+      });
+    }
   }
 
   toggleSubMenu(e, layer) {
