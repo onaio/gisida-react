@@ -249,8 +249,7 @@ export function getMenuGroupVisibleLayers(groupName, children) {
     let visibleLayerIds = [];
 
     subGroups.forEach(sg => {
-      const groupKeys = Object.keys(sg);
-      groupKeys.forEach(key => {
+      Object.keys(sg).forEach(key => {
         const subGroupVisibleLayerIds = getMenuGroupVisibleLayers(groupName, sg[key].layers);
         visibleLayerIds = [...visibleLayerIds, ...subGroupVisibleLayerIds];
       });

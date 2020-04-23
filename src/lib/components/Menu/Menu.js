@@ -102,6 +102,18 @@ class Menu extends Component {
      * Gets scroll position after scroll ceases
      */
     this.delayedMenuScrollCallback = _.debounce(this.persistScrollPosition, 1000);
+
+    // Get the layers shared via URL if any
+    const splitURL = window.location.href.split('&')[0].split('?layers=');
+    const sharedLayers = splitURL[1] && splitURL[1].split(',');
+
+    this.state = {
+      sharedLayers: sharedLayers
+        ? sharedLayers.map(l => {
+            return { id: `${l}.json`, isCatOpen: false };
+          })
+        : [],
+    };
   }
 
   componentDidMount() {
@@ -123,35 +135,28 @@ class Menu extends Component {
     if (this.props.showMap && this.props.showMap !== prevProps.showMap && this.props.menuScroll) {
       this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop;
     }
+    const { sharedLayers } = this.state;
 
-    const splitURL = window.location.href.split('&')[0].split('?layers=');
-    const URLLayers = splitURL[1] && splitURL[1].split(',');
-
-    if (
-      URLLayers &&
-      (!_.isEqual(prevProps.categories, this.props.categories) ||
-        (prevProps.openCategories &&
-          prevProps.openCategories.length !== this.props.openCategories &&
-          this.props.openCategories.length))
-    ) {
-      this.openCategoriesFromURL(URLLayers);
+    if (sharedLayers.filter(l => !l.isCatOpen).length) {
+      /** If they are any share layers whose category we haven't open,
+       * open them
+       */
+      this.openCategoryForSharedLayers();
     }
   }
 
   /**
-   * Open category if a layer from URL is visible and category
-   * is not yet open
-   * @param {*} URLLayers
+   * Open category for which each of the shared layers falls under
    */
-  openCategoriesFromURL(URLLayers) {
-    const { openCategories, categories } = this.props;
+  openCategoryForSharedLayers() {
+    const { categories } = this.props;
+    const { sharedLayers } = this.state;
 
-    if (URLLayers && categories && openCategories) {
-      URLLayers.forEach(URLLayer => {
-        const completeURLLayerName = `${URLLayer}.json`;
-
-        categories.forEach(category => {
-          if (openCategories.indexOf(category.category) < 0) {
+    if (sharedLayers && categories) {
+      sharedLayers
+        .filter(l => !l.isCatOpen)
+        .forEach(sharedLayer => {
+          categories.forEach(category => {
             /**
              * Make sure we do not add a category more than once since multiple
              * layers from URL can share a category
@@ -166,21 +171,44 @@ class Menu extends Component {
                   const children = layer[groupName].layers;
                   const visibleLayers = getMenuGroupVisibleLayers(groupName, children);
 
-                  if (visibleLayers.indexOf(completeURLLayerName) >= 0) {
-                    this.toggleCategory(category.category);
+                  if (visibleLayers.indexOf(sharedLayer.id) >= 0) {
+                    this.openCategoryForSharedLayer(category.category, sharedLayer.id);
                   }
                 });
               } else {
                 // This category has one level only
-                if (layer.id === completeURLLayerName && layer.visible) {
-                  this.toggleCategory(category.category);
+                if (layer.id === sharedLayer.id && layer.visible) {
+                  this.openCategoryForSharedLayer(category.category, sharedLayer.id);
                 }
               }
             });
-          }
+          });
         });
-      });
     }
+  }
+
+  /**
+   * Toggle a category for a shared layer and update category
+   * status as open
+   * @param {*} categoryName category name of category to be opened
+   * @param {*} id id of shared layer
+   */
+  openCategoryForSharedLayer(categoryName, id) {
+    const { openCategories } = this.props;
+    const { sharedLayers } = this.state;
+
+    if (openCategories.indexOf(categoryName) < 0) {
+      this.toggleCategory(categoryName);
+    }
+    this.setState({
+      sharedLayers: sharedLayers.map(l => {
+        if (l.id == id) {
+          l.isCatOpen = true;
+        }
+
+        return l;
+      }),
+    });
   }
 
   /**
