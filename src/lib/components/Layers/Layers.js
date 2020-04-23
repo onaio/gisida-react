@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
+import _ from 'lodash';
 import { getMenuGroupVisibleLayers } from '../../utils';
 
 export class Layers extends Component {
@@ -24,6 +25,24 @@ export class Layers extends Component {
       });
     }
     this.state = groups;
+  }
+  componentDidUpdate(prevProps) {
+    this.props.layers.forEach(layer => {
+      if (!layer.id) {
+        Object.keys(layer).forEach(groupName => {
+          const children = layer[groupName].layers;
+
+          if (
+            getMenuGroupVisibleLayers(groupName, children).length &&
+            !this.state[groupName].isOpen
+          ) {
+            this.setState({
+              [groupName]: { isOpen: true },
+            });
+          }
+        });
+      }
+    });
   }
 
   toggleSubMenu(e, layer) {
