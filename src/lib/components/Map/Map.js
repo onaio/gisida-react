@@ -58,9 +58,17 @@ window.maps = [];
 class Map extends Component {
   constructor(props) {
     super(props);
+    // Get the layers shared via URL if any
+    const splitURL = window.location.href.split('&')[0].split('?layers=');
+    const sharedLayers = splitURL[1] && splitURL[1].split(',');
+
     this.state = {
       layersObj: this.props.layersObj,
-      URLLayersLoaded: [],
+      sharedLayers: sharedLayers
+        ? sharedLayers.map(l => {
+            return { id: `${l}.json`, isLoaded: false };
+          })
+        : [],
     };
   }
   initMap(accessToken, mapConfig, mapId, mapIcons) {
@@ -538,36 +546,6 @@ class Map extends Component {
     }
     // Assign global variable for debugging purposes.
     // window.GisidaMap = this.map;
-
-    /**
-     * Render layers from url
-     */
-    const splitURL = window.location.href.split('&')[0].split('?layers=');
-
-    if (splitURL.length === 2) {
-      const URLLayers = splitURL[1].split(',');
-      const { URLLayersLoaded } = this.state;
-
-      if (URLLayers.length !== URLLayersLoaded.length) {
-        const unloadedURLLayers = URLLayers.filter(l => URLLayersLoaded.indexOf(l) === -1);
-
-        unloadedURLLayers.forEach(layerId => {
-          const completeLayerId = `${layerId}.json`;
-          if (layers && layers[completeLayerId] && !layers[completeLayerId].visible) {
-            const layerFromURL = layers[completeLayerId];
-            this.props.dispatch(Actions.toggleLayer(mapId, completeLayerId));
-
-            if (!layerFromURL.loaded && !layerFromURL.isLoading) {
-              prepareLayer(mapId, layerFromURL, this.props.dispatch);
-            }
-
-            this.setState({
-              URLLayersLoaded: [...URLLayersLoaded, layerId],
-            });
-          }
-        });
-      }
-    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -663,6 +641,43 @@ class Map extends Component {
         this.map.easeTo(location);
       }
     }
+
+    // Load shared layers
+    const { sharedLayers } = this.state;
+
+    if (sharedLayers.filter(l => !l.isLoaded).length) {
+      /** If they are any shared layers which we haven't loaded**/
+      this.loadSharedLayers();
+    }
+  }
+
+  /**Load shared layers */
+  loadSharedLayers() {
+    const { sharedLayers } = this.state;
+    const { layers, mapId } = this.props;
+
+    sharedLayers
+      .filter(l => !l.isLoaded)
+      .map(l => l.id)
+      .forEach(sharedLayerId => {
+        if (layers && layers[sharedLayerId] && !layers[sharedLayerId].visible) {
+          this.props.dispatch(Actions.toggleLayer(mapId, sharedLayerId));
+
+          if (!layers[sharedLayerId].loaded && !layers[sharedLayerId].isLoading) {
+            prepareLayer(mapId, layers[sharedLayerId], this.props.dispatch);
+          }
+
+          this.setState({
+            sharedLayers: sharedLayers.map(l => {
+              if (l.id == sharedLayerId) {
+                l.isLoaded = true;
+              }
+
+              return l;
+            }),
+          });
+        }
+      });
   }
 
   componentWillUnmount() {
