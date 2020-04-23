@@ -654,17 +654,17 @@ class Map extends Component {
   /**Load shared layers */
   loadSharedLayers() {
     const { sharedLayers } = this.state;
-    const { layers, mapId } = this.props;
+    const { layers, mapId, dispatch } = this.props;
 
     sharedLayers
       .filter(l => !l.isLoaded)
       .map(l => l.id)
       .forEach(sharedLayerId => {
         if (layers && layers[sharedLayerId] && !layers[sharedLayerId].visible) {
-          this.props.dispatch(Actions.toggleLayer(mapId, sharedLayerId));
+          dispatch(Actions.toggleLayer(mapId, sharedLayerId));
 
           if (!layers[sharedLayerId].loaded && !layers[sharedLayerId].isLoading) {
-            prepareLayer(mapId, layers[sharedLayerId], this.props.dispatch);
+            prepareLayer(mapId, layers[sharedLayerId], dispatch);
           }
 
           this.setState({
