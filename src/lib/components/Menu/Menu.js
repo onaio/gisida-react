@@ -194,6 +194,10 @@ class Menu extends Component {
     const { sharedLayers } = this.state;
 
     if (openCategories.indexOf(categoryName) < 0) {
+      /** Shared layers could share a a category so we check to
+       * make sure we do not toggle again as this will close
+       * a category that was already open
+       */
       this.toggleCategory(categoryName);
     }
     this.setState({
