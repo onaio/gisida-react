@@ -196,7 +196,6 @@ class Menu extends Component {
                 if (layer.id === sharedLayer.id && layer.visible) {
                   this.openCategoryForSharedLayer(category.category, sharedLayer.id);
                   catFound = true;
-                  break;
                 }
               }
 
