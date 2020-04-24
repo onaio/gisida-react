@@ -45,7 +45,7 @@ class BarChartStacked extends React.Component {
         pointFormatter: BarChartStacked.tooltipPointFormatter,
       },
       xAxis: {
-        categories: barCategories.categories,
+        categories: (barCategories || {}).categories,
         labels: {
           align: 'right',
         },
@@ -75,7 +75,7 @@ class BarChartStacked extends React.Component {
           },
         },
       },
-      series: barSeries.series,
+      series: (barSeries || {}).series,
       credits: {
         enabled: false,
       },
@@ -87,7 +87,9 @@ class BarChartStacked extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.chart.destroy();
+    if (this.chart) {
+      this.chart.destroy();
+    }
     const { barSeries, barCategories } = nextProps;
     this.setState({
       series: barSeries.series,
@@ -105,7 +107,9 @@ class BarChartStacked extends React.Component {
   }
 
   componentWillUnmount() {
-    this.chart.destroy();
+    if (this.chart) {
+      this.chart.destroy();
+    }
   }
 
   render() {
