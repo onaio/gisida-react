@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
 import { detectIE, buildLayersObj, orderLayers } from '../../utils';
 import './Map.scss';
@@ -19,6 +20,7 @@ const mapStateToProps = (state, ownProps) => {
   });
 
   MAP.blockLoad = mapId === 'map-1' ? false : !VIEW || !VIEW.splitScreen;
+  const hasDataView = VIEW.hasOwnProperty('activeLayerSupersetLink');
 
   return {
     mapId,
@@ -45,6 +47,8 @@ const mapStateToProps = (state, ownProps) => {
     showFilterPanel: !!MAP.showFilterPanel,
     activeLayers,
     handlers: ownProps.handlers,
+    hasNavBar: ownProps.hasNavBar,
+    hasDataView
   };
 };
 
@@ -339,6 +343,25 @@ class Map extends Component {
     }
   }
 
+  dataViewMapReset(mapConfig, map) {
+    if (mapConfig.center) {
+      if (!Array.isArray(mapConfig.center)) {
+        map.easeTo({
+          center: mapConfig.center,
+          zoom: mapConfig.zoom,
+        });
+      } else {
+        map.easeTo({
+          center: {
+            lng: mapConfig.center[0],
+            lat: mapConfig.center[1],
+          },
+          zoom: mapConfig.zoom,
+        });
+      }
+    }
+  }
+
   componentDidMount() {
     const { MAP, APP, mapId } = this.props;
     if (APP && MAP && mapId) {
@@ -350,7 +373,7 @@ class Map extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps){
+  componentWillReceiveProps(nextProps) {
     if (this.map) {
       try {
         this.map.resize();
@@ -370,12 +393,21 @@ class Map extends Component {
     const activeLayerIds = nextProps.activeLayerIds;
     const primaryLayer = nextProps.MAP.primaryLayer;
     const activeLayerId = nextProps.MAP.activeLayerId;
+    const showLayerSuperset = nextProps.VIEW.showLayerSuperset;
 
     const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES || [];
     const regions = nextProps.REGIONS;
     const mapId = nextProps.mapId;
     mapConfig.container = mapId;
+
+    if (this.props.hasDataView && this.map && showLayerSuperset) {
+      if (layers && layers[primaryLayer] && layers[primaryLayer].location) {
+        this.map.easeTo(layers[primaryLayer].location);
+      } else {
+        this.dataViewMapReset(mapConfig, this.map)
+      }
+    }
 
     // Check if map is initialized.
     if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
@@ -543,11 +575,24 @@ class Map extends Component {
         console.warn('resize error', e);
       }
       
-      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj, showDetailView } = this.props;
-      if (LOC && LOC.doUpdateMap === mapId && LOC.location &&
-         ((prevProps.LOC.active !== LOC.active) || (prevProps.layersObj.length !== layersObj.length) ||
-          (this.map.getZoom() !== LOC.location.zoom && LOC.location.doUpdateLOC))) {
-            
+      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj, APP, VIEW, layers } = this.props;
+
+      if (this.props.hasDataView && this.map && VIEW.showLayerSuperset) {
+        if (layers && layers[primaryLayer] && layers[primaryLayer].location) {
+          this.map.easeTo(layers[primaryLayer].location);
+        } else {
+          this.dataViewMapReset(APP.mapConfig, this.map)
+        }
+      }
+
+      if (
+        LOC &&
+        LOC.doUpdateMap === mapId &&
+        LOC.location &&
+        (prevProps.LOC.active !== LOC.active ||
+          prevProps.layersObj.length !== layersObj.length ||
+          (this.map.getZoom() !== LOC.location.zoom && LOC.location.doUpdateLOC))
+      ) {
         const { bounds, boundsPadding, center, zoom } = LOC.location;
         if (bounds) {
           this.map.fitBounds(bounds, {
@@ -974,6 +1019,8 @@ class Map extends Component {
         ? detailViewProps && typeof detailViewProps !== undefined
         : this.props.showDetailView;
     let mapWidth = '100%';
+    const mapheight = this.props.hasNavBar ? '92%' : '100%';
+    const mapTop = this.props.hasNavBar ? '80px' : 0;
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
     }
@@ -997,10 +1044,12 @@ class Map extends Component {
             }`}
             style={{
               width: mapWidth,
+              height: mapheight,
               display:
                 this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
                   ? 'none'
                   : 'inline',
+              top: mapTop,
             }}
           >
             <div className="widgets">
@@ -1008,6 +1057,7 @@ class Map extends Component {
               {React.Children.map(this.props.children, child => {
                 return React.cloneElement(child, {
                   mapId: this.props.mapId,
+                  hasNavBar: this.props.hasNavBar,
                 });
               })}
             </div>
@@ -1017,5 +1067,9 @@ class Map extends Component {
     );
   }
 }
+
+Map.propTypes = {
+  hasNavBar: PropTypes.bool, // Pass true if app has a navbar
+};
 
 export default connect(mapStateToProps)(Map);

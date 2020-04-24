@@ -13,7 +13,7 @@ Update your client project with the following changes:
 In `site-config.json` file, add the `password` property with a value for
 the correct password to be checked against.
 
-```
+```js
 {
     ...
     APP: {
@@ -27,7 +27,8 @@ the correct password to be checked against.
 
 In `index.js` file
 
-```
+```js
+
 import { Login, isBasicAuthLoggedIn } from 'gisida-react'
 ....
 
@@ -81,7 +82,7 @@ REACT_APP_GISIDA_CANOPY_CLIENT_ID=<Your client Id>
 
 In `site-config.json` file, remove the property password if it exists.
 
-```
+```js
 {
     ...
     APP: {
@@ -95,7 +96,8 @@ In `site-config.json` file, remove the property password if it exists.
 
 In `index.js` file
 
-```
+```js
+
 import { Login, Callback, Router } from 'gisida-react'
 import { SupAuth } from 'gisidia'
 ....
@@ -132,7 +134,7 @@ ReactDOM.render(
 Export your client ID as an environmental variable in your production server and restart. There are many
 ways to achieving this and you are not confined to using the one below.
 
-```
+```sh
 export REACT_APP_GISIDA_CANOPY_CLIENT_ID=<Your client id>
 ```
 

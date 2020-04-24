@@ -10,6 +10,7 @@ require('./TimeSeriesSlider.scss');
 
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {}, timeseries: {} };
+  const { APP } = state;
   let timeLayer;
   let timeSubLayer;
   buildLayersObj(MAP.layers).forEach((layer) => {
@@ -26,6 +27,7 @@ const mapStateToProps = (state, ownProps) => {
     primaryLayer: MAP.primaryLayer,
     showFilterPanel: MAP.showFilterPanel,
     timeLayer,
+    showSinglePeriods: APP.showSinglePeriods
   }
 }
 
@@ -74,6 +76,7 @@ class TimeSeriesSlider extends React.Component {
               temporalIndex,
               data: periodData[period[temporalIndex]].data,
               adminFilter: periodData[period[temporalIndex]].adminFilter && [...periodData[period[temporalIndex]].adminFilter],
+              tsFilter: periodData[period[temporalIndex]].tsFilter && [...periodData[period[temporalIndex]].tsFilter],
             },
           );
         }
@@ -83,13 +86,12 @@ class TimeSeriesSlider extends React.Component {
       field
     } = sliderLayerObj.layerObj.aggregate.timeseries;
     sliderLayerObj.data = sliderLayerObj.periodData[sliderLayerObj.period[nextIndex]].data;
-    
-    const {
-      primaryLayer
-    } = this.props;
-    const activeLayer = layers.find(l => l.id === sliderLayerObj.layerId);
-    if (activeLayer.type !== 'chart') {
+    const { layerObj } = sliderLayerObj;
+    if (layerObj.type !== 'chart' && layerObj.property) {
       const activeStops = generateStops(sliderLayerObj, field, this.props.dispatch, nextIndex);
+
+      const { primaryLayer } = this.props;
+
       if (this.props.layers[primaryLayer].layers) {
         this.props.layers[primaryLayer].layers.map(i =>
           nextTimeseries[i].newBreaks = activeStops[3]);
@@ -124,7 +126,8 @@ class TimeSeriesSlider extends React.Component {
   }
 
   render() {
-    return ((this.props.timeSeriesObj) && (this.state && this.state.periods.length > 1)) ? (
+    const {timeSeriesObj, showSinglePeriods} = this.props;
+    return ((timeSeriesObj) && ((this.state && this.state.periods.length) > 1 || showSinglePeriods)) ? (
       <div
         className="series"
         style={{ right: '50px'}}>
