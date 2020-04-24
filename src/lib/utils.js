@@ -271,6 +271,16 @@ export function getMenuGroupVisibleLayers(groupName, children) {
  * @returns {Array} layers from URL for the given map id
  */
 export function getSharedLayersFromURL(mapId) {
-  const splitURL = window.location.href.split('&')[0].split(`?${mapId}-${QUERY_PARAM_LAYERS}=`);
-  return splitURL[1] ? splitURL[1].split(',') : [];
+  const queryParams = window.location.href.split('?');
+
+  if (!queryParams[1]) {
+    return [];
+  }
+
+  const queryParamLayers = queryParams[1].split('&');
+  const mapQueryParamLayers = queryParamLayers.filter(item =>
+    item.includes(`${mapId}-${QUERY_PARAM_LAYERS}`)
+  )[0];
+
+  return mapQueryParamLayers.split('=')[1].split(',');
 }

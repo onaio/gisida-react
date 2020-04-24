@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
 import { detectIE, buildLayersObj, orderLayers, getSharedLayersFromURL } from '../../utils';
-import { QUERY_PARAM_LAYERS } from '../../constants';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
