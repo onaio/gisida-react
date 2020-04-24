@@ -156,29 +156,54 @@ class Menu extends Component {
       sharedLayers
         .filter(l => !l.isCatOpen)
         .forEach(sharedLayer => {
-          categories.forEach(category => {
-            category.layers.forEach(layer => {
+          let i = 0;
+          /**
+           * A layer belongs to only one category. So if we found its
+           * category, use this flag to break from the loop
+           */
+          let catFound = false;
+
+          while (!catFound && i < categories.length) {
+            const category = categories[i];
+            let j = 0;
+
+            while (!catFound && j < category.layers.length) {
+              const layer = category.layers[j];
+
               if (!layer.id) {
                 /**
                  * This is a group. So continue checking down the hierarchy
                  * for visible layers
                  */
-                Object.keys(layer).forEach(groupName => {
+                const groupNames = Object.keys(layer);
+                let k = 0;
+
+                while (!catFound && k < groupNames.length) {
+                  const groupName = groupNames[k];
+
                   const children = layer[groupName].layers;
                   const visibleLayers = getMenuGroupVisibleLayers(groupName, children);
 
                   if (visibleLayers.indexOf(sharedLayer.id) >= 0) {
                     this.openCategoryForSharedLayer(category.category, sharedLayer.id);
+                    catFound = true;
                   }
-                });
+
+                  k += 1;
+                } // group while
               } else {
                 // This category has one level only
                 if (layer.id === sharedLayer.id && layer.visible) {
                   this.openCategoryForSharedLayer(category.category, sharedLayer.id);
+                  catFound = true;
                 }
               }
-            });
-          });
+
+              j += 1;
+            } // category layers while
+
+            i += 1;
+          } // categories while
         });
     }
   }
