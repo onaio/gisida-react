@@ -276,11 +276,20 @@ export function getSharedLayersFromURL(mapId) {
   if (!queryParams[1]) {
     return [];
   }
+  let sharedLayers = [];
 
-  const queryParamLayers = queryParams[1].split('&');
-  const mapQueryParamLayers = queryParamLayers.filter(item =>
-    item.includes(`${mapId}-${QUERY_PARAM_LAYERS}`)
-  )[0];
+  try {
+    const queryParamLayers = queryParams[1].split('&');
+    const mapQueryParamLayers = queryParamLayers.filter(item =>
+      item.includes(`${mapId}-${QUERY_PARAM_LAYERS}`)
+    )[0];
 
-  return mapQueryParamLayers.split('=')[1].split(',');
+    if (mapQueryParamLayers) {
+      sharedLayers = mapQueryParamLayers.split('=')[1].split(',');
+    }
+  } catch (error) {
+    sharedLayers = [];
+  }
+
+  return sharedLayers;
 }
