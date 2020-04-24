@@ -546,13 +546,13 @@ class Map extends Component {
     }
     // Assign global variable for debugging purposes.
     // window.GisidaMap = this.map;
-      // Load shared layers
-      const { sharedLayers } = this.state;
+    // Load shared layers
+    const { sharedLayers } = this.state;
 
-      if (sharedLayers.filter(l => !l.isLoaded).length) {
-        /** If they are any shared layers which we haven't loaded**/
-        this.loadSharedLayers();
-      }
+    if (sharedLayers.filter(l => !l.isLoaded).length) {
+      /** If they are any shared layers which we haven't loaded**/
+      this.loadSharedLayers();
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -648,39 +648,40 @@ class Map extends Component {
         this.map.easeTo(location);
       }
     }
-
-  
   }
 
   /**Load shared layers */
   loadSharedLayers() {
     const { sharedLayers } = this.state;
     const { layers, mapId, dispatch } = this.props;
-    if (sharedLayers.length) {
+    if (sharedLayers.length && layers) {
       let sharedLayerId;
       const sharedLayerIds = sharedLayers.filter(l => !l.isLoaded).map(l => l.id);
-      for (let l = 0; l < sharedLayerIds.length; l+=1) {
+      for (let l = 0; l < sharedLayerIds.length; l += 1) {
         sharedLayerId = sharedLayerIds[l];
-        if (layers && !layers[sharedLayerId]) {
-          break
-        } else if (layers && layers[sharedLayerId] && !layers[sharedLayerId].visible) {
+        if (!layers[sharedLayerId]) {
+          break;
+        } else if (!layers[sharedLayerId].visible) {
           dispatch(Actions.toggleLayer(mapId, sharedLayerId));
 
           if (!layers[sharedLayerId].loaded && !layers[sharedLayerId].isLoading) {
             prepareLayer(mapId, layers[sharedLayerId], dispatch);
           }
 
-          this.setState({
-            sharedLayers: sharedLayers.map(l => {
-              if (l.id == sharedLayerId) {
-                l.isLoaded = true;
-              }
+          this.setState(
+            {
+              sharedLayers: sharedLayers.map(l => {
+                if (l.id == sharedLayerId) {
+                  l.isLoaded = true;
+                }
 
-              return l;
-            }),
-          }, () => {
-            // dispatch(Actions.updatePrimaryLayer(mapId, sharedLayerId))
-          });
+                return l;
+              }),
+            },
+            () => {
+              // dispatch(Actions.updatePrimaryLayer(mapId, sharedLayerId))
+            }
+          );
         }
       }
     }
