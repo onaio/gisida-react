@@ -7,10 +7,11 @@ import ConnectedLayers from '../Layers/ConnectedLayers';
 import './Menu.scss';
 import _ from 'lodash';
 import memoize from 'memoize-one';
-import { getMenuGroupVisibleLayers } from '../../utils';
+import { getMenuGroupVisibleLayers, getSharedLayersFromURL } from '../../utils';
 
 const mapStateToProps = (state, ownProps) => {
-  const MAP = state[ownProps.mapId] || { layers: {} };
+  const { mapId } = ownProps;
+  const MAP = state[mapId] || { layers: {} };
   const { LAYERS, AUTH, APP, VIEW } = state;
   let categories;
   // let layers;
@@ -70,6 +71,7 @@ const mapStateToProps = (state, ownProps) => {
       : '';
 
   return {
+    mapId,
     categories,
     // layers, // todo - support layers without categories
     LAYERS,
@@ -104,15 +106,12 @@ class Menu extends Component {
     this.delayedMenuScrollCallback = _.debounce(this.persistScrollPosition, 1000);
 
     // Get the layers shared via URL if any
-    const splitURL = window.location.href.split('&')[0].split('?layers=');
-    const sharedLayers = splitURL[1] && splitURL[1].split(',');
+    const { mapId } = props;
 
     this.state = {
-      sharedLayers: sharedLayers
-        ? sharedLayers.map(l => {
-            return { id: `${l}.json`, isCatOpen: false };
-          })
-        : [],
+      sharedLayers: getSharedLayersFromURL(mapId).map(l => {
+        return { id: `${l}.json`, isCatOpen: false };
+      }),
     };
   }
 
