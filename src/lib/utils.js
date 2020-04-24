@@ -1,3 +1,5 @@
+import { QUERY_PARAM_LAYERS } from './constants';
+
 export function formatNum(num, decimal) {
   let x = `${num}`.length;
   if (Number.isInteger(num) && x > 3) {
@@ -261,4 +263,14 @@ export function getMenuGroupVisibleLayers(groupName, children) {
     // Return the Ids of visible layers for the group
     return children.filter(child => child.visible).map(child => child.id);
   }
+}
+
+/**
+ * Get shared layers from URL
+ * @param {*} mapId mapId for map to get shared layers for
+ * @returns {Array} layers from URL for the given map id
+ */
+export function getSharedLayersFromURL(mapId) {
+  const splitURL = window.location.href.split('&')[0].split(`?${mapId}-${QUERY_PARAM_LAYERS}=`);
+  return splitURL[1] ? splitURL[1].split(',') : [];
 }

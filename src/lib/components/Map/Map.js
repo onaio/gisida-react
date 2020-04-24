@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
-import { detectIE, buildLayersObj, orderLayers } from '../../utils';
+import { detectIE, buildLayersObj, orderLayers, getSharedLayersFromURL } from '../../utils';
+import { QUERY_PARAM_LAYERS } from '../../constants';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -59,18 +60,16 @@ class Map extends Component {
   constructor(props) {
     super(props);
     // Get the layers shared via URL if any
-    const splitURL = window.location.href.split('&')[0].split('?layers=');
-    const sharedLayers = splitURL[1] && splitURL[1].split(',');
+    const { mapId } = props;
 
     this.state = {
       layersObj: this.props.layersObj,
-      sharedLayers: sharedLayers
-        ? sharedLayers.map(l => {
-            return { id: `${l}.json`, isLoaded: false };
-          })
-        : [],
+      sharedLayers: getSharedLayersFromURL(mapId).map(l => {
+        return { id: `${l}.json`, isLoaded: false };
+      }),
     };
   }
+
   initMap(accessToken, mapConfig, mapId, mapIcons) {
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;

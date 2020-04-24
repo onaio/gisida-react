@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Actions, prepareLayer, lngLat } from 'gisida';
+import { QUERY_PARAM_LAYERS, QUERY_PARAM_PRIMARY } from '../../constants';
 
 const mapStateToProps = (state, ownProps) => {
   const { APP, LOC } = state;
@@ -29,38 +30,49 @@ export class Layer extends Component {
     }
 
     const layerId = layer.id.replace('.json', '');
+    const queryParamLayers = `${mapId}-${QUERY_PARAM_LAYERS}`;
+    const queryParamPrimary = `${mapId}-${QUERY_PARAM_PRIMARY}`;
     let pageURL = `${window.location.href}`;
+
     /**
      * Check for visibility. If false it means layer has been selected push to layer id to url
      * else if visible it means layer has been checked off pop layer from url
      */
     if (layer && layer.visible === false) {
-      if (!window.location.href.includes('?layers=') && !window.location.href.includes('&primary=')) {
+      if (
+        !window.location.href.includes(`?${queryParamLayers}=`) &&
+        !window.location.href.includes(`&${queryParamPrimary}=`)
+      ) {
         /**
          * Query param `layers` does not exist. Have the layerId as the first
          * value of query param `layers`. The assumption made is that
          * there exists no other query params
          */
-        pageURL = `${pageURL}?layers=${layerId}&primary=${layerId}`;
+        pageURL = `${pageURL}?${queryParamLayers}=${layerId}&${queryParamPrimary}=${layerId}`;
       } else {
         /**
          * Query param `layers` exists. Add to exist list
          * Update primary layer accordingly
          */
-        pageURL = `${pageURL.split('&')[0]},${layerId}&primary=${layerId}`;
+        pageURL = `${pageURL.split('&')[0]},${layerId}&${queryParamPrimary}=${layerId}`;
         // pageURL.splice pageURL.indexOf('&primary');
       }
 
       history.pushState('', '', pageURL);
     } else if (layer && layer.visible === true) {
-      if (window.location.href.includes(`?layers=${layerId}`)) {
+      if (window.location.href.includes(`?${queryParamLayers}=${layerId}`)) {
         // If layerId is the first item in the query param list
-        if (window.location.href.includes(`?layers=${layerId},`)) {
+        if (window.location.href.includes(`?${queryParamLayers}=${layerId},`)) {
           // If query param list has other layerIds
-          pageURL = window.location.href.replace(`?layers=${layerId},`, '?layers=');
+          pageURL = window.location.href.replace(
+            `?${queryParamLayers}=${layerId},`,
+            `?${queryParamLayers}=`
+          );
         } else {
           // If layer Id is the only item in the query param list
-          pageURL = window.location.href.replace(`?layers=${layerId}`, '').replace(`&primary=${layerId}`, '');
+          pageURL = window.location.href
+            .replace(`?${queryParamLayers}=${layerId}`, '')
+            .replace(`&${queryParamPrimary}=${layerId}`, '');
         }
       } else if (window.location.href.includes(`,${layerId}`)) {
         // If layer Id is not the first item in the query param list
@@ -71,9 +83,14 @@ export class Layer extends Component {
        * activeLayerIds holds active layers in a sorted fashion
        * By subtracting two we get the next primary layer
        */
-      if (e.currentTarget.getAttribute("data-layer") === this.props.primaryLayer) {
-        const nextPrimaryLayer = this.props.activeLayerIds[this.props.activeLayerIds.length - 2].replace('.json', '');
-        pageURL = pageURL.replace(`&primary=${layerId}`, `&primary=${nextPrimaryLayer}`);
+      if (e.currentTarget.getAttribute('data-layer') === this.props.primaryLayer) {
+        const nextPrimaryLayer = this.props.activeLayerIds[
+          this.props.activeLayerIds.length - 2
+        ].replace('.json', '');
+        pageURL = pageURL.replace(
+          `&${queryParamPrimary}=${layerId}`,
+          `&${queryParamPrimary}=${nextPrimaryLayer}`
+        );
       }
 
       history.replaceState('', '', pageURL);
