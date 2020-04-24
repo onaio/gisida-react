@@ -163,16 +163,6 @@ export function buildLayersObj(layers) {
     }
   });
 
-  /** Move primary layer to the end of the array */
-  // if (!(layersObj[layersObj.length - 1] && layersObj[layersObj.length - 1].id.includes(urlPrimaryLayer))) {
-  //     const indexOfPrimaryLayer = layersObj.findIndex(layer => layer.id.includes(urlPrimaryLayer));
-  //     if (indexOfPrimaryLayer !== -1) {
-  //         var temp = layersObj[indexOfPrimaryLayer];
-  //         layersObj[indexOfPrimaryLayer] = layersObj[layersObj.length - 1];
-  //         layersObj[layersObj.length - 1] = temp;
-  //     }
-  // }
-
   return layersObj;
 }
 
