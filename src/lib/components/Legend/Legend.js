@@ -125,16 +125,12 @@ export class Legend extends React.Component {
         primaryLayer: primaryLayer,
       });
     }
-    // const urlPrimaryLayer = window.location.href.split('&') && window.location.href.split('&')[1].split('=')[1];
-    // if (primaryLayer !== urlPrimaryLayer) {
-    //   dispatch(Actions.updatePrimaryLayer(mapId, `${urlPrimaryLayer}.json`));
-    // }
   }
   onUpdatePrimaryLayer(e) {
     if (e.target.getAttribute("data-credit") !== "credit") {
       e.preventDefault();
     }
-    const { dispatch, mapId, primaryLayer } = this.props;
+    const { dispatch, mapId } = this.props;
     const targetLayer = e.currentTarget.getAttribute("data-layer");
     /** Update primary layer based on legend selection */
     // Move to utils
@@ -142,7 +138,8 @@ export class Legend extends React.Component {
       return layer.replace('.json', '');
     }
     const targetLayerPageUrl = removeJsonExtensions(targetLayer);
-    const pageURL = window.location.href.replace(`&primary=${removeJsonExtensions(primaryLayer)}`,`&primary=${targetLayerPageUrl}`);
+    let pageURL = `${ window.location.href.replace(`${targetLayerPageUrl},`, '')},${targetLayerPageUrl}`;
+    
     history.replaceState('', '', pageURL);
     // dispatch primary layer id
     dispatch(Actions.updatePrimaryLayer(mapId, targetLayer));
@@ -195,15 +192,6 @@ export class Legend extends React.Component {
     ) {
       activeLegendLayer = primaryLayer;
     }
-    // if (urlPrimaryLayer) {
-    //   if (this.props.layersData[this.props.layersData.length -1].id.includes(urlPrimaryLayer)) {
-    //     const indexOfPrimaryLayer = this.props.layersData.findIndex(layer => layer.id.includes(urlPrimaryLayer));
-    //     var temp = this.props.layersData[indexOfPrimaryLayer];
-    //     this.props.layersData[indexOfPrimaryLayer] = this.props.layersData[this.props.layersData.length -1];
-    //     this.props.layersData[this.props.layersData.length -1] = temp;
-    //   }
-    // }
-    // this.props.layersData.findIndex(layer => layer.id === urlPrimaryLayer);
 
     for (let l = 0; l < this.props.layersData.length; l += 1) {
       layer = this.props.layersData[l];

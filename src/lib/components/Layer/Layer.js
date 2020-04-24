@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Actions, prepareLayer, lngLat } from 'gisida';
-import { QUERY_PARAM_LAYERS, QUERY_PARAM_PRIMARY } from '../../constants';
+import { QUERY_PARAM_LAYERS } from '../../constants';
 
 const mapStateToProps = (state, ownProps) => {
   const { APP, LOC } = state;
@@ -31,7 +31,6 @@ export class Layer extends Component {
 
     const layerId = layer.id.replace('.json', '');
     const queryParamLayers = `${mapId}-${QUERY_PARAM_LAYERS}`;
-    const queryParamPrimary = `${mapId}-${QUERY_PARAM_PRIMARY}`;
     let pageURL = `${window.location.href}`;
 
     /**
@@ -40,21 +39,20 @@ export class Layer extends Component {
      */
     if (layer && layer.visible === false) {
       if (
-        !window.location.href.includes(`?${queryParamLayers}=`) &&
-        !window.location.href.includes(`&${queryParamPrimary}=`)
+        !window.location.href.includes(`?${queryParamLayers}=`)
       ) {
         /**
          * Query param `layers` does not exist. Have the layerId as the first
          * value of query param `layers`. The assumption made is that
          * there exists no other query params
          */
-        pageURL = `${pageURL}?${queryParamLayers}=${layerId}&${queryParamPrimary}=${layerId}`;
+        pageURL = `${pageURL}?${queryParamLayers}=${layerId}`;
       } else {
         /**
          * Query param `layers` exists. Add to exist list
          * Update primary layer accordingly
          */
-        pageURL = `${pageURL.split('&')[0]},${layerId}&${queryParamPrimary}=${layerId}`;
+        pageURL = `${pageURL.split('&')[0]},${layerId}`;
         // pageURL.splice pageURL.indexOf('&primary');
       }
 
@@ -71,28 +69,12 @@ export class Layer extends Component {
         } else {
           // If layer Id is the only item in the query param list
           pageURL = window.location.href
-            .replace(`?${queryParamLayers}=${layerId}`, '')
-            .replace(`&${queryParamPrimary}=${layerId}`, '');
+            .replace(`?${queryParamLayers}=${layerId}`, '');
         }
       } else if (window.location.href.includes(`,${layerId}`)) {
         // If layer Id is not the first item in the query param list
         pageURL = window.location.href.replace(`,${layerId}`, '');
-      }
-      /**
-       * Update primarylayer when user unchecks the layer
-       * activeLayerIds holds active layers in a sorted fashion
-       * By subtracting two we get the next primary layer
-       */
-      if (e.currentTarget.getAttribute('data-layer') === this.props.primaryLayer) {
-        const nextPrimaryLayer = this.props.activeLayerIds[
-          this.props.activeLayerIds.length - 2
-        ].replace('.json', '');
-        pageURL = pageURL.replace(
-          `&${queryParamPrimary}=${layerId}`,
-          `&${queryParamPrimary}=${nextPrimaryLayer}`
-        );
-      }
-
+      }   
       history.replaceState('', '', pageURL);
     }
     this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
