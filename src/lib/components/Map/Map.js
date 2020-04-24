@@ -546,6 +546,13 @@ class Map extends Component {
     }
     // Assign global variable for debugging purposes.
     // window.GisidaMap = this.map;
+      // Load shared layers
+      const { sharedLayers } = this.state;
+
+      if (sharedLayers.filter(l => !l.isLoaded).length) {
+        /** If they are any shared layers which we haven't loaded**/
+        this.loadSharedLayers();
+      }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -642,13 +649,7 @@ class Map extends Component {
       }
     }
 
-    // Load shared layers
-    const { sharedLayers } = this.state;
-
-    if (sharedLayers.filter(l => !l.isLoaded).length) {
-      /** If they are any shared layers which we haven't loaded**/
-      this.loadSharedLayers();
-    }
+  
   }
 
   /**Load shared layers */
@@ -678,7 +679,7 @@ class Map extends Component {
               return l;
             }),
           }, () => {
-            dispatch(Actions.updatePrimaryLayer(mapId, sharedLayerId))
+            // dispatch(Actions.updatePrimaryLayer(mapId, sharedLayerId))
           });
         }
       }
