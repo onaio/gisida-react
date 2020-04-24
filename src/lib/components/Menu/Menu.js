@@ -138,7 +138,7 @@ class Menu extends Component {
     const { sharedLayers } = this.state;
 
     if (sharedLayers.filter(l => !l.isCatOpen).length) {
-      /** If they are any share layers whose category we haven't open,
+      /** If there are any shared layers whose category we haven't open,
        * open them
        */
       this.openCategoryForSharedLayers();
