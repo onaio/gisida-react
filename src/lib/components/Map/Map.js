@@ -467,10 +467,10 @@ class Map extends Component {
                 /**	
                  * Set highlight icon opacity to zero when loading the map	
                  * This prevents seeing highlight layer before it's filtered out on initial render 	
-                 */	
-                highlightLayer.paint = {	
-                  ...highlightLayer.paint,	
-                  'icon-opacity': 0	
+                 */
+                highlightLayer.paint = {
+                  ...highlightLayer.paint,
+                  'icon-opacity': 0
                 }
                 this.map.addLayer(highlightLayer);
               }
@@ -484,7 +484,7 @@ class Map extends Component {
               this.map.removeSource(id);
             });
           }
-          
+
           else if (this.map.getLayer(layer.id) && nextProps.MAP.reloadLayerId === layer.id) {
             // 1) remove layer and source
             let doUpdateTsLayer = true;
@@ -574,8 +574,8 @@ class Map extends Component {
       } catch (e) {
         console.warn('resize error', e);
       }
-      
-      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj, APP, VIEW, layers } = this.props;
+
+      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj, APP, VIEW, layers, showDetailView } = this.props;
 
       if (this.props.hasDataView && this.map && VIEW.showLayerSuperset) {
         if (layers && layers[primaryLayer] && layers[primaryLayer].location) {
@@ -652,8 +652,8 @@ class Map extends Component {
         layers && layers[primaryLayer] && layers[primaryLayer].location
           ? layers[primaryLayer].location
           : layersObj &&
-            layersObj.find(layer => layer.location) &&
-            layersObj.find(layer => layer.location).location;
+          layersObj.find(layer => layer.location) &&
+          layersObj.find(layer => layer.location).location;
       if (location) {
         this.map.easeTo(location);
       }
@@ -805,7 +805,7 @@ class Map extends Component {
         hasData =
           pIndex !== -1
             ? (FILTER && FILTER[id] && FILTER[id].isClear) ||
-              timeseries[id].periodData[currPeriod].hasData
+            timeseries[id].periodData[currPeriod].hasData
             : false;
 
         // if the layer is in the map and has no period match, hide it
@@ -826,7 +826,7 @@ class Map extends Component {
               this.map.setLayoutProperty(`${layerObj.id}${HIGHLIGHT}`, 'visibility', 'none');
             }
 
-          // if the layer is not in the map and does have a match, handle it
+            // if the layer is not in the map and does have a match, handle it
           } else if (this.map.getLayer(id) && hasData && pIndex !== -1) {
             // if layer is hidden, reveal it
             if (this.map.getLayoutProperty(id, 'visibility') === 'none') {
@@ -909,8 +909,8 @@ class Map extends Component {
     const labels =
       timeseries && typeof timeseries[layerObj.id] !== 'undefined'
         ? layerObj.labels.labels[
-            timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]
-          ]
+        timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]
+        ]
         : layerObj.labels.labels;
 
     if (!labels) {
@@ -1037,32 +1037,32 @@ class Map extends Component {
             Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
           </div>
         ) : (
-          <div
-            id={this.props.mapId}
-            className={`${
-              this.props.mapId === 'map-2' && this.props.showFilterPanel ? 'splitScreenClass' : ''
-            }`}
-            style={{
-              width: mapWidth,
-              height: mapheight,
-              display:
-                this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
-                  ? 'none'
-                  : 'inline',
-              top: mapTop,
-            }}
-          >
-            <div className="widgets">
-              {/* Render Children elemets with mapId prop added to each child  */}
-              {React.Children.map(this.props.children, child => {
-                return React.cloneElement(child, {
-                  mapId: this.props.mapId,
-                  hasNavBar: this.props.hasNavBar,
-                });
-              })}
+            <div
+              id={this.props.mapId}
+              className={`${
+                this.props.mapId === 'map-2' && this.props.showFilterPanel ? 'splitScreenClass' : ''
+                }`}
+              style={{
+                width: mapWidth,
+                height: mapheight,
+                display:
+                  this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
+                    ? 'none'
+                    : 'inline',
+                top: mapTop,
+              }}
+            >
+              <div className="widgets">
+                {/* Render Children elemets with mapId prop added to each child  */}
+                {React.Children.map(this.props.children, child => {
+                  return React.cloneElement(child, {
+                    mapId: this.props.mapId,
+                    hasNavBar: this.props.hasNavBar,
+                  });
+                })}
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
     );
   }
