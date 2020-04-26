@@ -1,27 +1,21 @@
-import React, { Component } from "react";
-import { buildDetailView, buildParsedBasicDetailItem } from "gisida";
-import { connect } from "react-redux";
-import Parser from "html-react-parser";
-import { buildLayersObj } from "../../utils";
-import "./DetailView.scss";
+import React, { Component } from 'react';
+import { buildDetailView, buildParsedBasicDetailItem } from 'gisida';
+import { connect } from 'react-redux';
+import Parser from 'html-react-parser';
+import { buildLayersObj } from '../../utils';
+import './DetailView.scss';
 
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || {
     layers: {},
     filter: {},
-    timeseries: {}
+    timeseries: {},
   };
   const { detailView } = MAP;
-  const layerObj =
-    detailView && detailView.layerId ? MAP.layers[detailView.layerId] : null;
+  const layerObj = detailView && detailView.layerId ? MAP.layers[detailView.layerId] : null;
   let timeLayer;
   buildLayersObj(MAP.layers).forEach(layer => {
-    if (
-      layer &&
-      layer.visible &&
-      layer.aggregate &&
-      layer.aggregate.timeseries
-    ) {
+    if (layer && layer.visible && layer.aggregate && layer.aggregate.timeseries) {
       timeLayer = layer.id;
     }
   });
@@ -38,7 +32,7 @@ const mapStateToProps = (state, ownProps) => {
     properties: detailView && detailView.properties,
     spec: detailView && detailView.spec,
     children: ownProps.children,
-    profileViewKey: detailView && detailView.model && detailView.model.UID
+    profileViewKey: detailView && detailView.model && detailView.model.UID,
   };
 };
 
@@ -46,21 +40,21 @@ class DetailView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showImageModal: false
+      showImageModal: false,
     };
   }
 
   onFacilityImageClick(e) {
     e.preventDefault();
     this.setState({
-      showImageModal: true
+      showImageModal: true,
     });
   }
 
   closeImageModal(e) {
     e.preventDefault();
     this.setState({
-      showImageModal: false
+      showImageModal: false,
     });
   }
 
@@ -74,23 +68,17 @@ class DetailView extends Component {
       nextProps.timeSeriesObj.layerId === layerObj.id
     ) {
       const { timeSeriesObj, layerObj, spec, properties } = nextProps;
-      const {
-        UID,
-        title,
-        subTitle,
-        basicInfo,
-        "image-url": imageURL
-      } = detailView;
+      const { UID, title, subTitle, basicInfo, 'image-url': imageURL } = detailView;
       const newParsedBasicInfo = [];
       let parsedDet;
-      const join = layerObj["detail-view"].join || layerObj.source.join;
+      const join = layerObj['detail-view'].join || layerObj.source.join;
       const newProps = timeSeriesObj.data.find(
         d => (d.properties || d)[join[1]] === properties[join[0]]
       );
 
       if (!newProps) {
         this.setState({
-          UID: null
+          UID: null,
         });
         return false;
       }
@@ -107,7 +95,7 @@ class DetailView extends Component {
         subTitle,
         layerObj,
         imageURL,
-        parsedBasicInfo: newParsedBasicInfo
+        parsedBasicInfo: newParsedBasicInfo,
       });
     } else {
       const {
@@ -116,7 +104,7 @@ class DetailView extends Component {
         subTitle,
         basicInfo,
         parsedBasicInfo,
-        "image-url": imageURL
+        'image-url': imageURL,
       } = detailView;
       this.setState({
         UID,
@@ -128,7 +116,7 @@ class DetailView extends Component {
         properties,
         basicInfo,
         layerObj,
-        mapId
+        mapId,
       });
     }
   }
@@ -142,50 +130,40 @@ class DetailView extends Component {
      * if layer has no location ease to active LOC
      * else ease into mapconfig levels*/
     if (this.props.MAP.layers[this.props.MAP.primaryLayer].location) {
-      center = this.props.MAP.layers[this.props.MAP.primaryLayer].location
-        .center;
+      center = this.props.MAP.layers[this.props.MAP.primaryLayer].location.center;
       zoom = this.props.MAP.layers[this.props.MAP.primaryLayer].location.zoom;
     } else if (this.props.LOC && this.props.LOC.location) {
       center = Array.isArray(this.props.LOC.location.center)
         ? {
-            lng: this.props.LOC.location.center[0],
-            lat: this.props.LOC.location.center[1]
-          }
+          lng: this.props.LOC.location.center[0],
+          lat: this.props.LOC.location.center[1],
+        }
         : { ...this.props.LOC.location.center };
       zoom = this.props.LOC.location.zoom;
     } else {
       center = Array.isArray(this.props.APP.mapConfig.center)
         ? {
-            lng: this.props.APP.mapConfig.center[0],
-            lat: this.props.APP.mapConfig.center[1]
-          }
+          lng: this.props.APP.mapConfig.center[0],
+          lat: this.props.APP.mapConfig.center[1],
+        }
         : { ...this.props.APP.mapConfig.center };
-      zoom = this.props.LOC.location
-        ? this.props.LOC.location.zoom
-        : this.props.APP.mapConfig.zoom;
+      zoom = this.props.LOC.location ? this.props.LOC.location.zoom : this.props.APP.mapConfig.zoom;
     }
     window.maps[0].easeTo({
       center,
-      zoom: zoom
+      zoom: zoom,
     });
     buildDetailView(this.props.mapId, null, null, this.props.dispatch);
   }
 
   render() {
-    const {
-      UID,
-      spec,
-      title,
-      subTitle,
-      parsedBasicInfo,
-      imageURL
-    } = this.state;
+    const { UID, spec, title, subTitle, parsedBasicInfo, imageURL } = this.state;
     const { mapId, isSplitScreen } = this.props;
     if (this.props.MAP.showFilterPanel || !UID || !spec) {
       return null;
     }
     const detailList = [];
-    if (spec["basic-info"]) {
+    if (spec['basic-info']) {
       let detail;
       for (let i = 0; i < parsedBasicInfo.length; i += 1) {
         detail = parsedBasicInfo[i];
@@ -198,35 +176,33 @@ class DetailView extends Component {
                   style={detail.iconColor ? { color: detail.iconColor } : {}}
                 />
               </i>
-              {typeof detail.value !== "string" && detail.value.parser ? (
+              {typeof detail.value !== 'string' && detail.value.parser ? (
                 Parser(detail.value)
               ) : (
-                <span>{`${
-                  detail.prefix
-                    ? `${detail.prefix}: `
-                    : detail.useAltAsPrefix
-                    ? `${detail.alt}: `
-                    : ""
-                }${detail.value}${
-                  detail.suffix ? `${detail.suffix}` : ""
-                }`}</span>
-              )}
+                  <span>{`${
+                    detail.prefix
+                      ? `${detail.prefix}: `
+                      : detail.useAltAsPrefix
+                        ? `${detail.alt}: `
+                        : ''
+                    }${detail.value}${detail.suffix ? `${detail.suffix}` : ''}`}</span>
+                )}
             </li>
           ) : (
-            <li key={i}>
-              <b> {`${detail.alt}:`} </b>
-              {typeof detail.value !== "string" && detail.value.parser ? (
-                Parser(detail.value)
-              ) : (
-                <span>{detail.value}</span>
-              )}
-            </li>
-          )
+              <li key={i}>
+                <b> {`${detail.alt}:`} </b>
+                {typeof detail.value !== 'string' && detail.value.parser ? (
+                  Parser(detail.value)
+                ) : (
+                    <span>{detail.value}</span>
+                  )}
+              </li>
+            )
         );
       }
     }
 
-    const sidebarRight = mapId === "map-1" && isSplitScreen ? "48%" : "0";
+    const sidebarRight = mapId === 'map-1' && isSplitScreen ? '48%' : '0';
 
     return (
       <div className="detail-view-wrapper" style={{ right: sidebarRight }}>
@@ -240,12 +216,9 @@ class DetailView extends Component {
         </a>
 
         <div className="detail-basic-details">
-          <div
-            className="detail-header"
-            style={!imageURL ? { minHeight: "auto" } : {}}
-          >
+          <div className="detail-header" style={!imageURL ? { minHeight: 'auto' } : {}}>
             <h4>{title}</h4>
-            {!!subTitle && subTitle !== title ? <h6>{subTitle}</h6> : ""}
+            {!!subTitle && subTitle !== title ? <h6>{subTitle}</h6> : ''}
             {imageURL ? (
               <img
                 id="facilityImg"
@@ -265,29 +238,24 @@ class DetailView extends Component {
               React.cloneElement(child, {
                 key: this.props.profileViewKey,
                 parentstate: child.props.parentstate && this.state,
-                parentprops: child.props.parentprops && this.props
+                parentprops: child.props.parentprops && this.props,
               })
             )}
           </div>
         ) : (
-          ""
-        )}
+            ''
+          )}
         {this.state.showImageModal ? (
           <div id="image-modal" className="modal">
             <span className="close" onClick={e => this.closeImageModal(e)}>
               &times;
             </span>
-            <img
-              alt={`${title}`}
-              src={imageURL}
-              className="modal-content"
-              id="facility-image"
-            />
+            <img alt={`${title}`} src={imageURL} className="modal-content" id="facility-image" />
             <div id="caption">{title}</div>
           </div>
         ) : (
-          ""
-        )}
+            ''
+          )}
       </div>
     );
   }
