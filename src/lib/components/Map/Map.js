@@ -223,23 +223,24 @@ class Map extends Component {
     if (feature.layer && feature.layer.id && activeLayerObj[HIGHLIGHT_FILTER_PROPERTY]) {
       /**
        * 1. Filter out the selected feature based on period and facility id 
-       (equal to feature period & not equal to facility_id)
-       * 2. Filter in highlight layer features with simillar facility_id
+       (equal to feature period & not equal to feature id)
+       * 2. Filter in highlight layer features with simillar feature id
        * 3. Set Icon opacity to one for the highlight layer 
        * (This was set to 0 on initial render not to show the icon before it's filtered out)
-       * 4. Filter nutrition-site-live with same reporting_period and different facility_id from selected feature
+       * 4. Filter nutrition-site-live with same reporting_period and different feature from selected feature
        * 5. Move highlight layer to the top (ensure the highlighted layer is not hidden due to mapbox clustering)
        */
-      const { reportingPeriod } = layerObj;
 
+      const { reportingPeriod } = layerObj;
+      const featureId = layerObj[HIGHLIGHT_FILTER_PROPERTY];
       this.map.setFilter(activeLayerObj.id, [
         ALL,
         ['==', reportingPeriod, feature.properties[reportingPeriod]],
-        ['!=', activeLayerObj.source.join[0], feature.properties.facility_id],
+        ['!=', activeLayerObj.source.join[0], feature.properties[featureId]]
       ]);
       this.map.setFilter(`${activeLayerObj.id}${DASH_HIGHLIGHT}`, [
         ALL,
-        ['==', activeLayerObj.source.join[0], feature.properties.facility_id],
+        ['==', activeLayerObj.source.join[0], feature.properties[featureId]]
       ]);
       this.map.setPaintProperty(`${activeLayerObj.id}${DASH_HIGHLIGHT}`, ICON_OPACITY, 1);
       this.map.moveLayer(`${activeLayerObj.id}${DASH_HIGHLIGHT}`);
@@ -514,7 +515,7 @@ class Map extends Component {
                  */
                 highlightLayer.paint = {
                   ...highlightLayer.paint,
-                  ICON_OPACITY: 0,
+                  [ICON_OPACITY]: 0,
                 };
                 this.map.addLayer(highlightLayer);
               }
