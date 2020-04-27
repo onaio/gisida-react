@@ -28,7 +28,29 @@ export class Layer extends Component {
     if (!mapId) {
       return null;
     }
+    this.pushLayerToURL(layer);
+    this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
+    const { center, zoom } = lngLat(LOC, APP);
+    if (layer.zoomOnToggle && layer.visible) {
+      window.maps.forEach(e => {
+        e.easeTo({
+          center,
+          zoom,
+        });
+      });
+    }
+    // Prepare layer if layer had not been loaded
+    if (!layer.loaded && !layer.isLoading) {
+      prepareLayer(mapId, layer, this.props.dispatch);
+    }
+  };
 
+  /**
+   * Push layer to URL which can be used for sharing
+   * @param {*} layer
+   */
+  pushLayerToURL(layer) {
+    const { mapId } = this.props;
     const layerId = layer.id.replace('.json', '');
     const queryParamLayers = `${mapId}-${QUERY_PARAM_LAYERS}`;
     let pageURL = `${window.location.href}`;
@@ -139,21 +161,7 @@ export class Layer extends Component {
       }
       history.replaceState('', '', pageURL);
     }
-    this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
-    const { center, zoom } = lngLat(LOC, APP);
-    if (layer.zoomOnToggle && layer.visible) {
-      window.maps.forEach(e => {
-        e.easeTo({
-          center,
-          zoom,
-        });
-      });
-    }
-    // Prepare layer if layer had not been loaded
-    if (!layer.loaded && !layer.isLoading) {
-      prepareLayer(mapId, layer, this.props.dispatch);
-    }
-  };
+  }
 
   render() {
     const layer = this.props.layer;
