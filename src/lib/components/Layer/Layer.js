@@ -39,21 +39,55 @@ export class Layer extends Component {
      */
     if (layer && layer.visible === false) {
       if (
-        !window.location.href.includes(`?${queryParamLayers}=`)
+        !window.location.href.includes(`?${queryParamLayers}=`) &&
+        !window.location.href.includes(`&${queryParamLayers}=`)
       ) {
         /**
          * Query param `layers` does not exist. Have the layerId as the first
          * value of query param `layers`. The assumption made is that
          * there exists no other query params
          */
-        pageURL = `${pageURL}?${queryParamLayers}=${layerId}`;
+        if (queryParamLayers.includes('map-2')) {
+          if (pageURL.includes('map-1')) {
+            pageURL = `${pageURL}&${queryParamLayers}=${layerId}`;
+          } else {
+            pageURL = `${pageURL}?${queryParamLayers}=${layerId}`;
+          }
+        } else {
+          if (pageURL.includes('map-2')) {
+            pageURL = `${pageURL}&${queryParamLayers}=${layerId}`;
+          } else {
+            pageURL = `${pageURL}?${queryParamLayers}=${layerId}`;
+          }
+        }
       } else {
         /**
          * Query param `layers` exists. Add to exist list
-         * Update primary layer accordingly
+         * Update map-1 map-2 layers based on which map is selected first
          */
-        pageURL = `${pageURL.split('&')[0]},${layerId}`;
-        // pageURL.splice pageURL.indexOf('&primary');
+        // if map-2 was selected first (confirm this by checking the url)
+        // push layers to respective maps
+        if (window.location.href.includes('?map-2-layers')) {
+          if (mapId === 'map-2') {
+            if (window.location.href.includes('&')) {
+              pageURL = `${pageURL.split('&')[0]},${layerId}&${pageURL.split('&')[1]}`;
+            } else {
+              pageURL = `${pageURL},${layerId}`;
+            }
+          } else {
+            pageURL = `${pageURL},${layerId}`;
+          }
+        } else {
+          if (mapId === 'map-2') {
+            pageURL = `${pageURL},${layerId}`;
+          } else {
+            if (window.location.href.includes('&')) {
+              pageURL = `${pageURL.split('&')[0]},${layerId}&${pageURL.split('&')[1]}`;
+            } else {
+              pageURL = `${pageURL},${layerId}`;
+            }
+          }
+        }
       }
 
       history.pushState('', '', pageURL);
@@ -68,13 +102,34 @@ export class Layer extends Component {
           );
         } else {
           // If layer Id is the only item in the query param list
-          pageURL = window.location.href
-            .replace(`?${queryParamLayers}=${layerId}`, '');
+          pageURL = window.location.href.replace(`?${queryParamLayers}=${layerId}`, '');
         }
       } else if (window.location.href.includes(`,${layerId}`)) {
         // If layer Id is not the first item in the query param list
         pageURL = window.location.href.replace(`,${layerId}`, '');
-      }   
+      }
+      /**
+       * Duplication needs refactor
+       * */
+
+      if (window.location.href.includes(`&${queryParamLayers}=${layerId}`)) {
+        // If layerId is the first item in the query param list
+        if (window.location.href.includes(`&${queryParamLayers}=${layerId},`)) {
+          // If query param list has other layerIds
+          pageURL = window.location.href.replace(
+            `&${queryParamLayers}=${layerId},`,
+            `&${queryParamLayers}=`
+          );
+        } else {
+          // If layer Id is the only item in the query param list
+          pageURL = window.location.href.replace(`&${queryParamLayers}=${layerId}`, '');
+        }
+      } else if (window.location.href.includes(`,${layerId}`)) {
+        // If layer Id is not the first item in the query param list
+        pageURL = `${window.location.href.split('&')[0]}&${window.location.href
+          .split('&')[1]
+          .replace(`,${layerId}`, '')}`;
+      }
       history.replaceState('', '', pageURL);
     }
     this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
