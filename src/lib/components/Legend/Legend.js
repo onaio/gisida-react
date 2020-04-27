@@ -672,7 +672,7 @@ export class Legend extends React.Component {
     }
 
     legendItems.unshift(primaryLegend);
-    const showLoader = legendItems.length !== legendLayers.length;
+    const showLoader = legendLayers.length > 0 ? legendItems.length !== legendLayers.length : false;
 
     return (
       <div>
