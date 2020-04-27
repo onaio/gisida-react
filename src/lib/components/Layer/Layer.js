@@ -111,24 +111,31 @@ export class Layer extends Component {
       /**
        * Duplication needs refactor
        * */
-
-      if (window.location.href.includes(`&${queryParamLayers}=${layerId}`)) {
-        // If layerId is the first item in the query param list
-        if (window.location.href.includes(`&${queryParamLayers}=${layerId},`)) {
-          // If query param list has other layerIds
-          pageURL = window.location.href.replace(
-            `&${queryParamLayers}=${layerId},`,
-            `&${queryParamLayers}=`
-          );
-        } else {
-          // If layer Id is the only item in the query param list
-          pageURL = window.location.href.replace(`&${queryParamLayers}=${layerId}`, '');
+      if (window.location.href.includes(`&${queryParamLayers}`)) {
+        if (window.location.href.includes(`&${queryParamLayers}=${layerId}`)) {
+          // If layerId is the first item in the query param list
+          if (window.location.href.includes(`&${queryParamLayers}=${layerId},`)) {
+            // If query param list has other layerIds
+            pageURL = window.location.href.replace(
+              `&${queryParamLayers}=${layerId},`,
+              `&${queryParamLayers}=`
+            );
+          } else {
+            // If layer Id is the only item in the query param list
+            pageURL = window.location.href.replace(`&${queryParamLayers}=${layerId}`, '');
+          }
+        } else if (window.location.href.includes(`,${layerId}`)) {
+          // If layer Id is not the first item in the query param list
+          pageURL = `${window.location.href.split('&')[0]}&${window.location.href
+            .split('&')[1]
+            .replace(`,${layerId}`, '')}`;
         }
-      } else if (window.location.href.includes(`,${layerId}`)) {
-        // If layer Id is not the first item in the query param list
-        pageURL = `${window.location.href.split('&')[0]}&${window.location.href
-          .split('&')[1]
-          .replace(`,${layerId}`, '')}`;
+      }
+      /**
+       * Switch & to ? param when all `?` layers have been poppoed off
+       */
+      if (pageURL.includes('/&')) {
+        pageURL = pageURL.replace('&', '?');
       }
       history.replaceState('', '', pageURL);
     }
