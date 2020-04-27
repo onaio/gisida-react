@@ -1,0 +1,24 @@
+.login {
+    width: 100%;
+    background: #fff;
+    color: #666;
+    height: 100%;
+    position: fixed;
+    .brand-login {
+        display: block;
+        width: 200px;
+        height: 200px;
+        text-align: center;
+        color: #ccc;
+        background-size: 70% !important;
+        text-indent: -9999px;
+        margin: 10% auto 0;
+    }
+    .login-form {
+        width: 200px;
+        margin: 0 auto;
+        .login input {
+            background: rgba(0, 0, 0, 0.8);
+        }
+    }
+}

@@ -48,4 +48,10 @@ class Router {
   }
 }
 
-export default new Router();
+class testRoute extends React.Component {
+  render() {
+    return <RRouter />
+  }
+}
+
+export default new Router;

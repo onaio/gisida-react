@@ -17,6 +17,7 @@ class SumColumnChart extends React.Component {
     let catCol = '';
     let mapCol = false; // bool for whether or not to use the "locations" map
     let parsedVal;
+    let activeColors;
 
     // deifine which break each datum falls into
     let dataBreaks;
@@ -46,7 +47,8 @@ class SumColumnChart extends React.Component {
       }
       dataMap[datum[catCol]].count += 1;
       dataMap[datum[catCol]].sum += parseColValue(datum, column);
-      if (dataBreaks) dataMap[datum[catCol]].color = hexToRgbA(colors[dataBreaks[i]], 0.8);
+      activeColors = Array.isArray(colors) ? colors[dataBreaks[i]] : colors;
+      if (dataBreaks) dataMap[datum[catCol]].color = hexToRgbA(activeColors, 0.8);
     }
 
     // Structure the data in a way that highcharts can use

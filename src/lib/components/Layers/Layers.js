@@ -89,7 +89,7 @@ export class Layers extends Component {
         } else {
           Object.keys(layer).forEach((d, i) => {
             layerItem = layerItem.concat([
-              <li>
+              <li key={i}>
                 <a
                   key={`${d}-${i}-link`}
                   className="sub-category"
@@ -128,7 +128,9 @@ export class Layers extends Component {
 Layers.propTypes = {
   mapId: PropTypes.string.isRequired,
   layers: PropTypes.arrayOf(PropTypes.any).isRequired,
+  preparedLayers: PropTypes.arrayOf(PropTypes.any),
   currentRegion: PropTypes.string,
+  auth: PropTypes.object,
 };
 
 export default Layers;

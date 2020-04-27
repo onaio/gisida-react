@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
-import { detectIE, buildLayersObj, detailViewData, orderLayers } from '../../utils';
+import { detectIE, buildLayersObj, orderLayers} from '../../utils';
 import './Map.scss';
 
 const mapStateToProps = (state, ownProps) => {
@@ -18,6 +19,7 @@ const mapStateToProps = (state, ownProps) => {
   });
 
   MAP.blockLoad = mapId === 'map-1' ? false : !VIEW || !VIEW.splitScreen;
+  const hasDataView = VIEW.hasOwnProperty('activeLayerSupersetLink');
 
   return {
     mapId,
@@ -44,6 +46,8 @@ const mapStateToProps = (state, ownProps) => {
     showFilterPanel: !!MAP.showFilterPanel,
     activeLayers,
     handlers: ownProps.handlers,
+    hasNavBar: ownProps.hasNavBar,
+    hasDataView
   };
 };
 
@@ -186,7 +190,6 @@ class Map extends Component {
     const feature = features[0];
     if (!feature) return false;
     const activeLayerObj = layersObj.find(l => l.id === feature.layer.id);
-
     if (feature && activeLayerObj['detail-view']) {
       const newZoom = this.map.getZoom() < 7.5 ? 7.5 : this.map.getZoom();
       this.map.easeTo({
@@ -255,7 +258,7 @@ class Map extends Component {
               this.map.moveLayer(sublayers[s]);
             }
           }
-          orderLayers(sortedLayers, map, nextLayerId);
+          typeof sortLayers === 'function' ? sortLayers(map, activeLayersData, nextLayerId) : orderLayers(sortLayers, map, nextLayerId);
         }
       }
     }
@@ -298,7 +301,7 @@ class Map extends Component {
     // }
     // Order active layers
 
-    orderLayers(sortedLayers, map, nextLayerId);
+    typeof sortLayers === 'function' ? sortLayers(map, activeLayersData, nextLayerId) : orderLayers(sortLayers, map, nextLayerId);
     const nextlayersObj = activeLayersData.filter(lo => lo.id !== nextLayerId);
     nextlayersObj.push(nextLayerObj);
 
@@ -323,6 +326,25 @@ class Map extends Component {
     }
   }
 
+  dataViewMapReset(mapConfig, map) {
+    if (mapConfig.center) {
+      if (!Array.isArray(mapConfig.center)) {
+        map.easeTo({
+          center: mapConfig.center,
+          zoom: mapConfig.zoom,
+        });
+      } else {
+        map.easeTo({
+          center: {
+            lng: mapConfig.center[0],
+            lat: mapConfig.center[1],
+          },
+          zoom: mapConfig.zoom,
+        });
+      }
+    }
+  }
+
   componentDidMount() {
     const { MAP, APP, mapId } = this.props;
     if (APP && MAP && mapId) {
@@ -334,7 +356,7 @@ class Map extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps){
+  componentWillReceiveProps(nextProps) {
     if (this.map) {
       try {
         this.map.resize();
@@ -354,12 +376,21 @@ class Map extends Component {
     const activeLayerIds = nextProps.activeLayerIds;
     const primaryLayer = nextProps.MAP.primaryLayer;
     const activeLayerId = nextProps.MAP.activeLayerId;
+    const showLayerSuperset = nextProps.VIEW.showLayerSuperset;
 
     const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES || [];
     const regions = nextProps.REGIONS;
     const mapId = nextProps.mapId;
     mapConfig.container = mapId;
+
+    if (this.props.hasDataView && this.map && showLayerSuperset) {
+      if (layers && layers[primaryLayer] && layers[primaryLayer].location) {
+        this.map.easeTo(layers[primaryLayer].location);
+      } else {
+        this.dataViewMapReset(mapConfig, this.map)
+      }
+    }
 
     // Check if map is initialized.
     if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
@@ -509,8 +540,17 @@ class Map extends Component {
       } catch (e) {
         console.warn('resize error', e);
       }
+      
+      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj, APP, VIEW, layers } = this.props;
 
-      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj } = this.props;
+      if (this.props.hasDataView && this.map && VIEW.showLayerSuperset) {
+        if (layers && layers[primaryLayer] && layers[primaryLayer].location) {
+          this.map.easeTo(layers[primaryLayer].location);
+        } else {
+          this.dataViewMapReset(APP.mapConfig, this.map)
+        }
+      }
+
       if (
         LOC &&
         LOC.doUpdateMap === mapId &&
@@ -925,6 +965,8 @@ class Map extends Component {
         ? detailViewProps && typeof detailViewProps !== undefined
         : this.props.showDetailView;
     let mapWidth = '100%';
+    const mapheight = this.props.hasNavBar ? '92%' : '100%';
+    const mapTop = this.props.hasNavBar ? '80px' : 0;
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
     }
@@ -948,10 +990,12 @@ class Map extends Component {
             }`}
             style={{
               width: mapWidth,
+              height: mapheight,
               display:
                 this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
                   ? 'none'
                   : 'inline',
+              top: mapTop,
             }}
           >
             <div className="widgets">
@@ -959,6 +1003,7 @@ class Map extends Component {
               {React.Children.map(this.props.children, child => {
                 return React.cloneElement(child, {
                   mapId: this.props.mapId,
+                  hasNavBar: this.props.hasNavBar,
                 });
               })}
             </div>
@@ -968,5 +1013,9 @@ class Map extends Component {
     );
   }
 }
+
+Map.propTypes = {
+  hasNavBar: PropTypes.bool, // Pass true if app has a navbar
+};
 
 export default connect(mapStateToProps)(Map);
