@@ -33,8 +33,8 @@ Here is an example:
         "text-field": "{facility_names}",
         "text-offset": [0, 2],
         "icon-image": "nutrition-sites-green",
-        "icon-size": 1.25
-
+        "icon-size": 1.25,
+    },
 }
 ```
 
@@ -45,7 +45,9 @@ This property is same as paint property. This should includes supported paint pr
 Here is an example:
 
 ```
-"highlight-paint": {
+{
+    "highlight-paint": {
         "text-color": "#19A447"
     },
+}
 ```
