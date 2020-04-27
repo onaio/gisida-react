@@ -680,8 +680,12 @@ export class Legend extends React.Component {
           className={`legend ${mapId}`}
           style={{ right: this.props.showFilterPanel ? '30px' : '20px' }}
         >
-          {showLoader && <div className="legend-row">Loading...</div>}
-          {legendItems && legendItems.length ? legendItems : <p>Loading...</p>}
+          {showLoader && (
+            <div className="legend-row">
+              <b>Loading...</b>
+            </div>
+          )}
+          {legendItems}
         </div>
       </div>
     );
