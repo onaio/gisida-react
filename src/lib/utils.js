@@ -269,7 +269,7 @@ export function getSharedLayersFromURL(mapId) {
   let sharedLayers = [];
 
   try {
-    const queryParamLayers = queryParams[1].split('&');
+    const queryParamLayers = queryParams[1].replace('#', '').split('&');
     const mapQueryParamLayers = queryParamLayers.filter(item =>
       item.includes(`${mapId}-${QUERY_PARAM_LAYERS}`)
     )[0];
