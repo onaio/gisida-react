@@ -1,10 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Actions, prepareLayer, lngLat } from 'gisida';
 import './SearchBar.scss'
 
 const mapStateToProps = (state, ownProps) => {
-    const { LAYERS, APP } = state;
+    const { LAYERS, APP, LOC } = state;
+    console.log(ownProps.preparedLayers)
     return {
+      APP,
+      LOC,
       LAYERS,
       appColor: APP.appColor,
       searchBarColor: APP.searchBarColor,
@@ -22,9 +26,31 @@ class SearchBar extends Component {
     this.handleCancel = this.handleCancel.bind(this);
     this.handleSearchInput = this.handleSearchInput.bind(this);
   }
+
+  onLayerToggle = (layer) => {
+    // dispatch toggle layer action
+    const { mapId, APP, LOC } = this.props;
+    if (!mapId) {
+      return null;
+    }
+    this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
+    const {center, zoom } = lngLat(LOC, APP);
+    if (layer.zoomOnToggle && layer.visible) {
+        window.maps.forEach((e) => {
+          e.easeTo({
+            center,
+            zoom,
+          })
+        });  
+      } 
+    // Prepare layer if layer had not been loaded
+    if (!layer.loaded && !layer.isLoading) {
+      prepareLayer(mapId, layer, this.props.dispatch);
+    }
+  }
   
 
-  boldQuery(indicator, query){
+  boldQuery(indicator, query, id){
     const indicatorToUpper = indicator.toUpperCase();
     const queryToUpper = query.toUpperCase();
     if (!indicatorToUpper.includes(queryToUpper)) {
@@ -34,7 +60,7 @@ class SearchBar extends Component {
     const querryLen = queryToUpper.length;
 
     return (
-      <a onClick={e => this.OnsearchResultClick(e, indicator)}>
+      <a onClick={e => this.OnsearchResultClick(e, id)}>
         {indicator.substr(0,matchIndex)}<b>{indicator.substr(matchIndex, querryLen)}</b>{indicator.substr(matchIndex+querryLen)}
       </a>
     )
@@ -42,30 +68,31 @@ class SearchBar extends Component {
 
   handleSearchInput(e) {
     this.setState({inputText: e.target.value})
-    const { searchterms, handleSearchInput } = this.props;
+    const { handleSearchInput, preparedLayers } = this.props;
     let input = e.target.value;
     input = input.replace(/\s+/g, ' ')
     input = input.trimStart()
     const searchResults = [];
-    Object.keys(searchterms).forEach(key => {
-        const id = searchterms[key].id;
-        const result = this.boldQuery(key, input)
+    Object.keys(preparedLayers).forEach(key => {
+        const { label } = preparedLayers[key];
+        const result = this.boldQuery(label, input, key)
         if (result) {
           searchResults.push(
-            <li key={id} className="search-sector">{result}</li>
+            <li key={key} className="search-sector">{result}</li>
           )
         }
     })
     handleSearchInput(searchResults, input);
   }
 
-  OnsearchResultClick(e, indicator) {
+  OnsearchResultClick(e, id) {
     e.preventDefault();
-    const { searchterms, getCategoryIndex, onCategoryClick } = this.props;
-    const inidcatorDetails = searchterms[indicator];
+    const { searchterms, getCategoryIndex, onCategoryClick, searchResultClick, preparedLayers } = this.props;
+    const { label } = preparedLayers[id];
+    const inidcatorDetails = searchterms[label];
     const isArray = Array.isArray(inidcatorDetails);
     const parentLayers = isArray ? inidcatorDetails : inidcatorDetails.parentLayers;
-    console.log('parentLayers', parentLayers);
+    this.onLayerToggle(preparedLayers[id])
     parentLayers.forEach((layer, i) => {
       if (i === 0) {
         getCategoryIndex(layer) ?  onCategoryClick(e, layer) : null;
@@ -73,7 +100,7 @@ class SearchBar extends Component {
       }
       
     })
-    this.props.searchResultClick();
+    searchResultClick();
   }
 
   handleCancel(e) {

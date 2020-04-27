@@ -132,6 +132,7 @@ class Menu extends Component {
      * layer view to map view 
      */
     this.menuWrapper = React.createRef();
+    this.LayersWrapper = React.createRef();
     /**
      * Gets scroll position after scroll ceases
      */
@@ -249,6 +250,10 @@ class Menu extends Component {
     } else {
       this.setState({ searching: inputPresent });
     }
+  }
+
+  toggleSubMenu(e, layer) {
+    this.LayersWrapper.current.toggleSubMenu(e,layer);
   }
 
   /**
@@ -449,6 +454,8 @@ class Menu extends Component {
                       searchterms={searchterms}
                       searchResultClick={this.searchResultClick}
                       mapId={mapId}
+                      preparedLayers={preparedLayers}
+                      toggleSubMenu={this.toggleSubMenu}
                     />
                   </div> : null
                 }
@@ -504,6 +511,7 @@ class Menu extends Component {
                           {this.props.openCategories &&
                           this.props.openCategories.includes(category.category) && !useConnectedLayers ? (
                             <Layers
+                              ref={this.LayersWrapper}
                               mapId={mapId}
                               layers={category.layers}
                               currentRegion={currentRegion}

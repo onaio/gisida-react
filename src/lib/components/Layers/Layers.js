@@ -21,7 +21,6 @@ export class Layers extends Component {
   toggleSubMenu(e, layer) {
     e.preventDefault();
     this.setState({
-      ...this.state,
       [layer]: { isOpen: !this.state[layer].isOpen },
     });
   }
