@@ -43,7 +43,6 @@ export class Legend extends React.Component {
     };
   }
   shouldComponentUpdate(nextProps) {
-    debugger
     const { layerObj, timeSeriesObj } = nextProps;
     return ((this.props.layerObj && this.props.layerObj.categories || layerObj && layerObj.categories) && layerObj !== this.props.layerObj) ||
       ((this.props.timeSeriesObj && this.props.timeSeriesObj.categories || timeSeriesObj && timeSeriesObj.categories) && timeSeriesObj !== this.props.timeSeriesObj)
