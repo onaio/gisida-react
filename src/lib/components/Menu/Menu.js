@@ -91,7 +91,6 @@ const mapStateToProps = (state, ownProps) => {
   // Get current region
   const currentRegion = state.REGIONS && state.REGIONS.length ?
     state.REGIONS.filter(region => region.current)[0].name : '';
-
   return {
     categories,
     // layers, // todo - support layers without categories
@@ -317,7 +316,10 @@ class Menu extends Component {
                     searchResults.length ?
                     <ul className="sectors">
                       {searchResults}
-                    </ul> : <li /> 
+                    </ul> :
+                    <ul className="sectors">
+                      <li className="no-search-results"><b>No layer found</b></li> 
+                    </ul> 
                   }
                   
                   {/* Children Elements (top) */}
