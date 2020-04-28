@@ -58,39 +58,6 @@ const mapStateToProps = (state, ownProps) => {
     categories = Object.keys(categories).map(c => categories[c]);
   }
 
-  const searchterms = {};
-  let parentLayers = [];
-  const createSearchItems = (layers, layerdetails, clearParentLayers=true) => {
-    Object.keys(layers).forEach(key => {
-      // clear parent layers if not recussive
-      if (clearParentLayers) {
-        parentLayers = [];
-      }
-      // Add level 2 and above labels to search
-      if (parentLayers.length) {
-      	searchterms[key] = [...parentLayers]
-      }
-      layers[key].forEach(layer => {
-        if (typeof layer === 'string') {
-          const label = layerdetails[layer.trim()] && layerdetails[layer.trim()].label || layer;
-          searchterms[label] = {
-            id: layer,
-            label,
-            parentLayers: [...parentLayers, key]
-          };
-        }
-        if (typeof layer === 'object') {
-          parentLayers.includes(key) ? null : parentLayers.push(key);
-          createSearchItems(layer, layerdetails, false)
-        }
-      })
-    })
-  }
-
-  if (MAP.layers && Object.keys(MAP.layers).length) {
-    createSearchItems(LAYERS.groups, MAP.layers)
-  }
-
   // Get current region
   const currentRegion = state.REGIONS && state.REGIONS.length ?
     state.REGIONS.filter(region => region.current)[0].name : '';
@@ -109,7 +76,6 @@ const mapStateToProps = (state, ownProps) => {
     openCategories: MAP.openCategories,
     noLayerText: NULL_LAYER_TEXT,
     showSearchBar: APP.searchBar,
-    searchterms,
     menuScroll: MAP.menuScroll, // Set's scroll position to zero when loading superset Menu component
     showMap: VIEW.showMap, // A flag to determine map/superset view
     noLayerText: NULL_LAYER_TEXT, // Text to be displayed when a category has no layer pulled from config file
@@ -266,7 +232,8 @@ class Menu extends Component {
   }
 
   toggleCategory(categoryName) {
-    const index = this.getCategoryIndex(categoryName);
+    const { openCategories } = this.props;
+    const index = openCategories.indexOf(categoryName);;
     this.props.dispatch(Actions.toggleCategories(this.props.mapId, categoryName, index));
   }
 
@@ -279,11 +246,6 @@ class Menu extends Component {
   onCategoryClick = (e, category) => {
     e.preventDefault();
     this.toggleCategory(category);
-  }
-
-  getCategoryIndex = (category) => {
-    const { openCategories } = this.props;
-    return openCategories.indexOf(category);
   }
 
   onRegionClick = (e) => {
@@ -500,7 +462,7 @@ class Menu extends Component {
     if (!this.props.categories) return null;
 
     const { searching, searchResults } = this.state;
-    const { disableDefault, showSearchBar, searchterms } = this.props;
+    const { disableDefault, showSearchBar } = this.props;
 
     if (disableDefault) return this.props.children || null;
 
@@ -555,9 +517,6 @@ class Menu extends Component {
                       handleSearchInput={this.handleSearchInput}
                       searching={searching}
                       handleSearchClick={this.handleSearchClick}
-                      getCategoryIndex={this.getCategoryIndex}
-                      onCategoryClick={this.onCategoryClick}
-                      searchterms={searchterms}
                       searchResultClick={this.searchResultClick}
                       mapId={mapId}
                       preparedLayers={preparedLayers}

@@ -16,7 +16,6 @@ const mapStateToProps = (state, ownProps) => {
   };
 
 class SearchBar extends Component {
-  onCategoryClick
   constructor(props) {
     super(props);
     this.state = {
@@ -118,12 +117,8 @@ class SearchBar extends Component {
   }
 
   render() {
-    const { inputText, selectedLayerId } = this.state;
-    const { appColor, searchBarColor, searching, handleSearchClick, preparedLayers } = this.props;
-
-    // if (selectedLayerId && preparedLayers[selectedLayerId].visible) {
-    //   this.openMenu(selectedLayerId);
-    // }
+    const { inputText } = this.state;
+    const { appColor, searchBarColor, searching, handleSearchClick } = this.props;
 
     const searchBtn = {
       border: `1px solid ${ searchBarColor || appColor || '#00B4CC'}`,
