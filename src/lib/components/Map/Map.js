@@ -1,25 +1,52 @@
+/*global mapboxgl */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
-import { detectIE, buildLayersObj, orderLayers} from '../../utils';
+import { detectIE, buildLayersObj, orderLayers } from '../../utils';
 import './Map.scss';
+import {
+  ALL,
+  ICON_OPACITY,
+  HIGHLIGHT_FILTER_PROPERTY,
+  DASH_HIGHLIGHT,
+  MAP_1,
+  ACTIVE_LAYER_SUPERSET_LINK,
+  CHART,
+  METRIC,
+  DETAIL_VIEW,
+  POINTER,
+  VISIBILITY,
+  VISIBLE,
+  NONE,
+  HIGHLIGHT,
+  CIRCLE,
+  CIRCLE_COLOR,
+  CIRCLE_RADIUS,
+  FILL_COLOR,
+  CIRCLE_STROKE_WIDTH,
+  UNDERSCORE_CONTAINER,
+  HIGHLIGHT_LAYOUT,
+  HIGHLIGHT_PAINT,
+  VECTOR_PROP,
+  CATEGORICAL
+} from '../../constants';
 
 const mapStateToProps = (state, ownProps) => {
   const { APP, STYLES, REGIONS, VIEW, FILTER, LOC } = state;
-  const mapId = ownProps.mapId || 'map-1';
+  const mapId = ownProps.mapId || MAP_1;
   const MAP = state[mapId] || { blockLoad: true, layers: {} };
   const { detailView } = MAP;
   const activeLayers = [];
   Object.keys(MAP.layers).forEach(key => {
     const layer = MAP.layers[key];
-    if (layer.visible && layer.type !== 'chart') {
+    if (layer.visible && layer.type !== CHART) {
       activeLayers.push(key);
     }
   });
 
-  MAP.blockLoad = mapId === 'map-1' ? false : !VIEW || !VIEW.splitScreen;
-  const hasDataView = VIEW.hasOwnProperty('activeLayerSupersetLink');
+  MAP.blockLoad = mapId === MAP_1 ? false : !VIEW || !VIEW.splitScreen;
+  const hasDataView = VIEW.hasOwnProperty(ACTIVE_LAYER_SUPERSET_LINK);
 
   return {
     mapId,
@@ -47,7 +74,7 @@ const mapStateToProps = (state, ownProps) => {
     activeLayers,
     handlers: ownProps.handlers,
     hasNavBar: ownProps.hasNavBar,
-    hasDataView
+    hasDataView,
   };
 };
 
@@ -71,7 +98,7 @@ class Map extends Component {
       this.map.addControl(this.map.controls);
       this.map.scale_controls = new mapboxgl.ScaleControl({
         maxWidth: 80,
-        unit: 'metric',
+        unit: METRIC,
       });
       this.map.addControl(this.map.scale_controls);
 
@@ -156,15 +183,14 @@ class Map extends Component {
           layers: activeLayers.filter(i => this.map.getLayer(i) !== undefined),
         });
         const feature = features.find(
-          f => f.layer.id === layerObj.id || (layerObj.layers && layerObj.layers.includes(f.layer.id))
+          f =>
+            f.layer.id === layerObj.id || (layerObj.layers && layerObj.layers.includes(f.layer.id))
         );
         if (!feature) {
           return false;
         }
         this.map.getCanvas().style.cursor =
-          layerObj['detail-view'] || layers[feature && feature.layer.id]['detail-view']
-            ? 'pointer'
-            : '';
+          layerObj[DETAIL_VIEW] || layers[feature && feature.layer.id][DETAIL_VIEW] ? POINTER : '';
         return true;
       });
     }
@@ -181,7 +207,7 @@ class Map extends Component {
   //   }
   // }
   onFeatureClick(e) {
-    const { layerObj, mapId, layersObj, layers } = this.props;
+    const { mapId, layersObj, layers, layerObj } = this.props;
     const activeLayers = layersObj.map(l => l.id);
     const features = this.map.queryRenderedFeatures(e.point, {
       layers: activeLayers.filter(l => this.map.getLayer(l) !== undefined),
@@ -190,9 +216,39 @@ class Map extends Component {
     const feature = features[0];
     if (!feature) return false;
     const activeLayerObj = layersObj.find(l => l.id === feature.layer.id);
-    if (feature && activeLayerObj['detail-view']) {
+    /**
+     * Todo:
+     * Investigate adjusting zoom to show selected feature
+     */
+    if (feature.layer && feature.layer.id && activeLayerObj[HIGHLIGHT_FILTER_PROPERTY]) {
+      /**
+       * 1. Filter out the selected feature based on period and facility id 
+       (equal to feature period & not equal to feature id)
+       * 2. Filter in highlight layer features with simillar feature id
+       * 3. Set Icon opacity to one for the highlight layer 
+       * (This was set to 0 on initial render not to show the icon before it's filtered out)
+       * 4. Filter nutrition-site-live with same reporting_period and different feature from selected feature
+       * 5. Move highlight layer to the top (ensure the highlighted layer is not hidden due to mapbox clustering)
+       */
+
+      const { reportingPeriod } = layerObj;
+      const featureId = layerObj[HIGHLIGHT_FILTER_PROPERTY];
+      this.map.setFilter(activeLayerObj.id, [
+        ALL,
+        ['==', reportingPeriod, feature.properties[reportingPeriod]],
+        ['!=', activeLayerObj.source.join[0], feature.properties[featureId]]
+      ]);
+      this.map.setFilter(`${activeLayerObj.id}${DASH_HIGHLIGHT}`, [
+        ALL,
+        ['==', activeLayerObj.source.join[0], feature.properties[featureId]]
+      ]);
+      this.map.setPaintProperty(`${activeLayerObj.id}${DASH_HIGHLIGHT}`, ICON_OPACITY, 1);
+      this.map.moveLayer(`${activeLayerObj.id}${DASH_HIGHLIGHT}`);
+    }
+
+    if (feature && activeLayerObj[DETAIL_VIEW]) {
       const newZoom = this.map.getZoom() < 7.5 ? 7.5 : this.map.getZoom();
-      this.map.easeTo({
+      this.map.flyTo({
         center: e.lngLat,
         zoom: newZoom,
       });
@@ -258,7 +314,9 @@ class Map extends Component {
               this.map.moveLayer(sublayers[s]);
             }
           }
-          typeof sortLayers === 'function' ? sortLayers(map, activeLayersData, nextLayerId) : orderLayers(sortLayers, map, nextLayerId);
+          typeof sortLayers === 'function'
+            ? sortLayers(map, activeLayersData, nextLayerId)
+            : orderLayers(sortLayers, map, nextLayerId);
         }
       }
     }
@@ -273,10 +331,10 @@ class Map extends Component {
       this.map.moveLayer(nextLayerId);
       //move icon with detail view to top of the map layers wip
       if (
-        activeLayersData.find(d => d['detail-view']) &&
-        this.map.getLayer(activeLayersData.find(d => d['detail-view']).id)
+        activeLayersData.find(d => d[DETAIL_VIEW]) &&
+        this.map.getLayer(activeLayersData.find(d => d[DETAIL_VIEW]).id)
       ) {
-        this.map.moveLayer(activeLayersData.find(d => d['detail-view']).id);
+        this.map.moveLayer(activeLayersData.find(d => d[DETAIL_VIEW]).id);
       }
     }
     // Loop throught all active map layers
@@ -291,9 +349,9 @@ class Map extends Component {
     //       if (this.map.getLayer(layerObj.id)) {
     //         this.map.moveLayer(layerObj.id);
     //       }
-    //       if (activeLayersData.find(d => d['detail-view'])
-    //        && this.map.getLayer(activeLayersData.find(d => d['detail-view']).id)) {
-    //         this.map.moveLayer(activeLayersData.find(d => d['detail-view']).id);
+    //       if (activeLayersData.find(d => d[DETAIL_VIEW])
+    //        && this.map.getLayer(activeLayersData.find(d => d[DETAIL_VIEW]).id)) {
+    //         this.map.moveLayer(activeLayersData.find(d => d[DETAIL_VIEW]).id);
     //       }
 
     //     }
@@ -301,7 +359,9 @@ class Map extends Component {
     // }
     // Order active layers
 
-    typeof sortLayers === 'function' ? sortLayers(map, activeLayersData, nextLayerId) : orderLayers(sortLayers, map, nextLayerId);
+    typeof sortLayers === 'function'
+      ? sortLayers(map, activeLayersData, nextLayerId)
+      : orderLayers(sortLayers, map, nextLayerId);
     const nextlayersObj = activeLayersData.filter(lo => lo.id !== nextLayerId);
     nextlayersObj.push(nextLayerObj);
 
@@ -314,13 +374,13 @@ class Map extends Component {
 
   changeVisibility(layerId, visibility) {
     if (this.map.getLayer(layerId)) {
-      this.map.setLayoutProperty(layerId, 'visibility', visibility ? 'visible' : 'none');
+      this.map.setLayoutProperty(layerId, VISIBILITY, visibility ? VISIBLE : NONE);
       // if layer has a highlight layer, update its visibility too
-      if (this.map.getLayer(`${layerId}-highlight`)) {
+      if (this.map.getLayer(`${layerId}${DASH_HIGHLIGHT}`)) {
         this.map.setLayoutProperty(
-          `${layerId}-highlight`,
-          'visibility',
-          visibility ? 'visible' : 'none'
+          `${layerId}${DASH_HIGHLIGHT}`,
+          VISIBILITY,
+          visibility ? VISIBLE : NONE
         );
       }
     }
@@ -361,6 +421,7 @@ class Map extends Component {
       try {
         this.map.resize();
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.warn('resize error', e);
       }
     }
@@ -388,7 +449,7 @@ class Map extends Component {
       if (layers && layers[primaryLayer] && layers[primaryLayer].location) {
         this.map.easeTo(layers[primaryLayer].location);
       } else {
-        this.dataViewMapReset(mapConfig, this.map)
+        this.dataViewMapReset(mapConfig, this.map);
       }
     }
 
@@ -416,7 +477,6 @@ class Map extends Component {
             });
           }
         });
-
       // Add current layers to map
       if (this.props.MAP.reloadLayers !== reloadLayers) {
         Object.keys(layers).forEach(key => {
@@ -430,27 +490,49 @@ class Map extends Component {
               // create a copy of the layer
               const highlightLayer = Object.assign({}, layer.styleSpec);
               // apply layout and paint properties to the highlight layer
-              if (layer['highlight-layout']) {
+              if (layer[HIGHLIGHT_LAYOUT]) {
                 highlightLayer.layout = Object.assign(
                   {},
                   highlightLayer.layout,
-                  layer['highlight-layout']
+                  layer[HIGHLIGHT_LAYOUT]
                 );
               }
-              if (layer['highlight-paint']) {
+              if (layer[HIGHLIGHT_PAINT]) {
                 highlightLayer.paint = Object.assign(
                   {},
                   highlightLayer.paint,
-                  layer['highlight-paint']
+                  layer[HIGHLIGHT_PAINT]
                 );
               }
+
               // append suffix to highlight layer id
-              highlightLayer.id += '-highlight';
+              highlightLayer.id += DASH_HIGHLIGHT;
               // add the highlight layer to the map
               if (!this.map.getLayer(highlightLayer.id)) {
+                /**
+                 * Set highlight icon opacity to zero when loading the map
+                 * This prevents seeing highlight layer before it's filtered out on initial render
+                 */
+                highlightLayer.paint = {
+                  ...highlightLayer.paint,
+                  [ICON_OPACITY]: 0,
+                };
                 this.map.addLayer(highlightLayer);
               }
             }
+          } else if (
+            this.map.getLayer(layer.id) &&
+            layer.filters &&
+            layer.filters.highlight &&
+            nextProps.primaryLayer !== this.props.primaryLayer
+          ) {
+            /**
+             * Remove Nutrition sites layer & Highlight layer on map
+             */
+            [layer.id, `${layer.id}${DASH_HIGHLIGHT}`].forEach(id => {
+              this.map.removeLayer(id);
+              this.map.removeSource(id);
+            });
           } else if (this.map.getLayer(layer.id) && nextProps.MAP.reloadLayerId === layer.id) {
             // 1) remove layer and source
             let doUpdateTsLayer = true;
@@ -473,14 +555,15 @@ class Map extends Component {
             });
           }
 
-          if (layer.visible && layer.type === 'chart' && typeof layer.source.data !== 'string') {
+          if (layer.visible && layer.type === CHART && typeof layer.source.data !== 'string') {
             const timefield =
               layer.aggregate && layer.aggregate.timeseries ? layer.aggregate.timeseries.field : '';
+            const tsObj = nextProps.timeSeriesObj;
             let { data } = layer.source;
             if (timefield) {
               const period = [...new Set(layer.source.data.map(p => p[timefield]))];
               // newStops = { id: layer.id, period, timefield };
-              data = layer.source.data.filter(d => d[timefield] === period[period.length - 1]);
+              data = layer.source.data.filter(d => d[timefield] === period[tsObj.temporalIndex]);
             }
             addChart(layer, data, this.map, mapId);
           } else {
@@ -533,21 +616,34 @@ class Map extends Component {
     // window.GisidaMap = this.map;
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     if (this.map) {
       try {
         this.map.resize();
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.warn('resize error', e);
       }
-      
-      const { layersObj, layerObj, primaryLayer, FILTER, LOC, mapId, timeSeriesObj, APP, VIEW, layers } = this.props;
+
+      const {
+        layersObj,
+        layerObj,
+        primaryLayer,
+        FILTER,
+        LOC,
+        mapId,
+        timeSeriesObj,
+        APP,
+        VIEW,
+        layers,
+        showDetailView,
+      } = this.props;
 
       if (this.props.hasDataView && this.map && VIEW.showLayerSuperset) {
         if (layers && layers[primaryLayer] && layers[primaryLayer].location) {
           this.map.easeTo(layers[primaryLayer].location);
         } else {
-          this.dataViewMapReset(APP.mapConfig, this.map)
+          this.dataViewMapReset(APP.mapConfig, this.map);
         }
       }
 
@@ -583,6 +679,15 @@ class Map extends Component {
         this.updateTimeseriesLayers();
       }
 
+      // clear highlight filters once detail view is close
+      if (!showDetailView && !!prevProps.showDetailView) {
+        if (layerObj && layerObj[HIGHLIGHT_FILTER_PROPERTY] && this.map.getLayer(layerObj.id)) {
+          layerObj.filters.highlight[2] = '';
+          layerObj.filters.rHighlight[2] = '';
+          this.buildFilters(layerObj);
+        }
+      }
+
       // Update Labels and handle labels visibility at different
       // zoom levels
       this.removeLabels();
@@ -609,8 +714,8 @@ class Map extends Component {
         layers && layers[primaryLayer] && layers[primaryLayer].location
           ? layers[primaryLayer].location
           : layersObj &&
-            layersObj.find(layer => layer.location) &&
-            layersObj.find(layer => layer.location).location;
+          layersObj.find(layer => layer.location) &&
+          layersObj.find(layer => layer.location).location;
       if (location) {
         this.map.easeTo(location);
       }
@@ -619,7 +724,7 @@ class Map extends Component {
 
   componentWillUnmount() {
     const { dispatch, mapId } = this.props;
-    const index = window.maps.map(m => m['_container'].id).indexOf(mapId);
+    const index = window.maps.map(m => m[UNDERSCORE_CONTAINER].id).indexOf(mapId);
     window.maps.splice(index, 1);
     dispatch(Actions.mapRendered(mapId, false));
     dispatch(Actions.mapLoaded(mapId, false));
@@ -636,15 +741,15 @@ class Map extends Component {
 
     const filterKeys = Object.keys(layerObj.filters);
     let filter;
-    const combinedFilters = ['all'];
+    const combinedFilters = [ALL];
 
     // loop through filters object
     for (let f = 0; f < filterKeys.length; f += 1) {
       filter = layerObj.filters[filterKeys[f]];
 
-      if (filterKeys[f] === 'highlight') {
+      if (filterKeys[f] === HIGHLIGHT) {
         // handle highlight filter seperately
-        this.applyFilters(`${layerId}-highlight`, filter);
+        this.applyFilters(`${layerId}${DASH_HIGHLIGHT}`, filter);
       } else if (filter) {
         // build out combined filters
         combinedFilters.push(filter);
@@ -657,7 +762,7 @@ class Map extends Component {
     } else if (combinedFilters.length === 2) {
       // if there is only one filter, apply the only one
       this.applyFilters(layerId, combinedFilters[1]);
-    } else if (combinedFilters.length === 1 && combinedFilters[0] === 'all') {
+    } else if (combinedFilters.length === 1 && combinedFilters[0] === ALL) {
       // if nothing was added to the combined filter array, removal all filters
       this.applyFilters(layerId, null);
     }
@@ -692,7 +797,7 @@ class Map extends Component {
       if (
         layerObj &&
         this.map.getLayer(layerObj.id) &&
-        this.map.getLayoutProperty(layerObj.id, 'visibility') === 'none'
+        this.map.getLayoutProperty(layerObj.id, VISIBILITY) === NONE
       ) {
         return true;
       }
@@ -762,55 +867,66 @@ class Map extends Component {
         hasData =
           pIndex !== -1
             ? (FILTER && FILTER[id] && FILTER[id].isClear) ||
-              timeseries[id].periodData[currPeriod].hasData
+            timeseries[id].periodData[currPeriod].hasData
             : false;
 
         // if the layer is in the map and has no period match, hide it
         if (!hasData || pIndex === -1) {
-          this.map.setLayoutProperty(layerObj.id, 'visibility', 'none');
+          this.map.setLayoutProperty(layerObj.id, VISIBILITY, NONE);
           // if layer has a highlight layer, update its visibility too
-          if (this.map.getLayer(`${layerObj.id}-highlight`)) {
-            this.map.setLayoutProperty(`${layerObj.id}-highlight`, 'visibility', 'none');
+          if (this.map.getLayer(`${layerObj.id}${DASH_HIGHLIGHT}`)) {
+            this.map.setLayoutProperty(`${layerObj.id}${DASH_HIGHLIGHT}`, VISIBILITY, NONE);
           }
 
           // if the layer is not in the map and does have a match, handle it
         } else if (this.map.getLayer(id) && hasData && pIndex !== -1) {
           // if layer is hidden, reveal it
-          if (this.map.getLayoutProperty(id, 'visibility') === 'none') {
-            this.map.setLayoutProperty(layerObj.id, 'visibility', 'visible');
+          if (this.map.getLayoutProperty(id, VISIBILITY) === NONE) {
+            this.map.setLayoutProperty(layerObj.id, VISIBILITY, VISIBLE);
             // if layer has a highlight layer, update its visibility too
-            if (this.map.getLayer(`${layerObj.id}-highlight`)) {
-              this.map.setLayoutProperty(`${layerObj.id}-highlight`, 'visibility', 'visible');
+            if (this.map.getLayer(`${layerObj.id}${DASH_HIGHLIGHT}`)) {
+              this.map.setLayoutProperty(`${layerObj.id}${DASH_HIGHLIGHT}`, VISIBILITY, NONE);
+            }
+
+            // if the layer is not in the map and does have a match, handle it
+          } else if (this.map.getLayer(id) && hasData && pIndex !== -1) {
+            // if layer is hidden, reveal it
+            if (this.map.getLayoutProperty(id, VISIBILITY) === NONE) {
+              this.map.setLayoutProperty(layerObj.id, VISIBILITY, VISIBLE);
+              // if layer has a highlight layer, update its visibility too
+              if (this.map.getLayer(`${layerObj.id}${DASH_HIGHLIGHT}`)) {
+                this.map.setLayoutProperty(`${layerObj.id}${DASH_HIGHLIGHT}`, VISIBILITY, VISIBLE);
+              }
             }
           }
 
           // if layer has stops, update them
           if (stops && stops[index] !== undefined && stops[index][0][0] !== undefined) {
-            defaultValue = layerObj.type === 'circle' ? 0 : 'rgba(0,0,0,0)';
-            paintProperty = layerObj.type === 'circle' ? 'circle-radius' : 'fill-color';
+            defaultValue = layerObj.type === CIRCLE ? 0 : 'rgba(0,0,0,0)';
+            paintProperty = layerObj.type === CIRCLE ? CIRCLE_RADIUS : FILL_COLOR;
             newStops = {
-              property: layerObj.categories['vector-prop'] || layerObj.source.join[0],
+              property: layerObj.categories[VECTOR_PROP] || layerObj.source.join[0],
               stops: stops[index],
-              type: 'categorical',
+              type: CATEGORICAL,
               default: defaultValue,
             };
 
             if (
-              layerObj.type === 'circle' &&
+              layerObj.type === CIRCLE &&
               (layerObj.categories.color instanceof Array || layerObj.colorStops)
             ) {
               newColorStops = {
-                property: layerObj.categories['vector-prop'] || layerObj.source.join[0],
+                property: layerObj.categories[VECTOR_PROP] || layerObj.source.join[0],
                 stops: layerObj.stops[0][index],
-                type: 'categorical',
+                type: CATEGORICAL,
               };
               newStrokeStops = {
-                property: layerObj.categories['vector-prop'] || layerObj.source.join[0],
+                property: layerObj.categories[VECTOR_PROP] || layerObj.source.join[0],
                 stops: strokeWidthStops[index],
-                type: 'categorical',
+                type: CATEGORICAL,
               };
-              this.map.setPaintProperty(id, 'circle-color', newColorStops);
-              this.map.setPaintProperty(id, 'circle-stroke-width', newStrokeStops);
+              this.map.setPaintProperty(id, CIRCLE_COLOR, newColorStops);
+              this.map.setPaintProperty(id, CIRCLE_STROKE_WIDTH, newStrokeStops);
             }
 
             this.map.setPaintProperty(id, paintProperty, newStops);
@@ -855,8 +971,8 @@ class Map extends Component {
     const labels =
       timeseries && typeof timeseries[layerObj.id] !== 'undefined'
         ? layerObj.labels.labels[
-            timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]
-          ]
+        timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]
+        ]
         : layerObj.labels.labels;
 
     if (!labels) {
@@ -950,7 +1066,7 @@ class Map extends Component {
     const { detailView, layerObj, timeSeriesObj, showDetailView } = this.props;
     const join =
       layerObj &&
-      ((layerObj['detail-view'] && layerObj['detail-view'].join) ||
+      ((layerObj[DETAIL_VIEW] && layerObj[DETAIL_VIEW].join) ||
         (layerObj.source && layerObj.source.join));
     let detailViewProps =
       join &&
@@ -968,13 +1084,13 @@ class Map extends Component {
     const mapheight = this.props.hasNavBar ? '92%' : '100%';
     const mapTop = this.props.hasNavBar ? '80px' : 0;
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
-      mapWidth = this.props.mapId === 'map-1' ? '52%' : '48%';
+      mapWidth = this.props.mapId === MAP_1 ? '52%' : '48%';
     }
     if (this.props.showFilterPanel) {
-      mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 250px)` : '48%';
+      mapWidth = this.props.mapId === MAP_1 ? `calc(${mapWidth} - 250px)` : '48%';
     }
     if (showDetailViewBool) {
-      mapWidth = this.props.mapId === 'map-1' ? `calc(${mapWidth} - 345px)` : '48%';
+      mapWidth = this.props.mapId === MAP_1 ? `calc(${mapWidth} - 345px)` : '48%';
     }
     return (
       <div>
@@ -983,39 +1099,65 @@ class Map extends Component {
             Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
           </div>
         ) : (
-          <div
-            id={this.props.mapId}
-            className={`${
-              this.props.mapId === 'map-2' && this.props.showFilterPanel ? 'splitScreenClass' : ''
-            }`}
-            style={{
-              width: mapWidth,
-              height: mapheight,
-              display:
-                this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
-                  ? 'none'
-                  : 'inline',
-              top: mapTop,
-            }}
-          >
-            <div className="widgets">
-              {/* Render Children elemets with mapId prop added to each child  */}
-              {React.Children.map(this.props.children, child => {
-                return React.cloneElement(child, {
-                  mapId: this.props.mapId,
-                  hasNavBar: this.props.hasNavBar,
-                });
-              })}
+            <div
+              id={this.props.mapId}
+              className={`${
+                this.props.mapId === 'map-2' && this.props.showFilterPanel ? 'splitScreenClass' : ''
+                }`}
+              style={{
+                width: mapWidth,
+                height: mapheight,
+                display:
+                  this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
+                    ? NONE
+                    : 'inline',
+                top: mapTop,
+              }}
+            >
+              <div className="widgets">
+                {/* Render Children elemets with mapId prop added to each child  */}
+                {React.Children.map(this.props.children, child => {
+                  return React.cloneElement(child, {
+                    mapId: this.props.mapId,
+                    hasNavBar: this.props.hasNavBar,
+                  });
+                })}
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
     );
   }
 }
 
 Map.propTypes = {
-  hasNavBar: PropTypes.bool, // Pass true if app has a navbar
+  hasNavBar: PropTypes.bool,
+  mapId: PropTypes.string,
+  APP: PropTypes.object,
+  STYLES: PropTypes.array,
+  REGIONS: PropTypes.object,
+  MAP: PropTypes.object,
+  LOC: PropTypes.object,
+  VIEW: PropTypes.object,
+  FILTER: PropTypes.object,
+  layers: PropTypes.object,
+  primarySubLayer: PropTypes.string,
+  activeLayerIds: PropTypes.array,
+  detailView: PropTypes.object,
+  timeSeriesObj: PropTypes.object,
+  timeseries: PropTypes.object,
+  layersObj: PropTypes.array,
+  layerObj: PropTypes.object,
+  primaryLayer: PropTypes.string,
+  oldLayerObj: PropTypes.object,
+  showDetailView: PropTypes.string,
+  showFilterPanel: PropTypes.bool,
+  activeLayers: PropTypes.array,
+  handlers: PropTypes.array,
+  hasDataView: PropTypes.boo,
+  dispatch: PropTypes.func,
+  children: PropTypes.node.isRequired
+  // Pass true if app has a navbar
 };
 
 export default connect(mapStateToProps)(Map);
