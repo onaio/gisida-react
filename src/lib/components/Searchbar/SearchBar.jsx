@@ -11,13 +11,14 @@ import './SearchBar.scss'
 
 
 const mapStateToProps = (state, ownProps) => {
-    const { LAYERS, APP, LOC } = state;
+    const { APP, LOC } = state;
+    const MAP = state[ownProps.mapId] || { layers: {} };
     return {
       APP,
       LOC,
-      LAYERS,
       appColor: APP.appColor,
       searchBarColor: APP.searchBarColor,
+      preparedLayers: MAP.layers,
       ...ownProps
     };
   };
@@ -142,12 +143,12 @@ class SearchBar extends Component {
           />
           { searching ?
             <button type="button" className="searchButton" style={searchBtn}
-            onClick={e => this.handleCancel(e)} >
-            <i className="fa fa-times"></i>
+              onClick={e => this.handleCancel(e)} >
+              <i className="fa fa-times"></i>
             </button> :
             <button type="button" className="searchButton" style={searchBtn}
-            onClick={e => handleSearchClick(e, false, inputText.trim().length)} >
-            <i className="fa fa-search"></i>
+              onClick={e => handleSearchClick(e, false, inputText.trim().length)} >
+              <i className="fa fa-search"></i>
             </button>
           }
       </div>

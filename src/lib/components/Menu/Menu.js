@@ -519,7 +519,6 @@ class Menu extends Component {
                       handleSearchClick={this.handleSearchClick}
                       searchResultClick={this.searchResultClick}
                       mapId={mapId}
-                      preparedLayers={preparedLayers}
                       toggleSubMenu={this.toggleSubMenu}
                       openCategoryForSharedLayers={this.openCategoryForSharedLayers}
                     />
