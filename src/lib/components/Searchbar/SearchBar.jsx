@@ -3,6 +3,13 @@ import { connect } from 'react-redux';
 import { Actions, prepareLayer, lngLat } from 'gisida';
 import './SearchBar.scss'
 
+/**
+ * To activate the search functionality add "searchBar":true and 
+ * To Change search bar color add "searchBarColor": <desired color> 
+ * on client site-config.json APP object
+*/
+
+
 const mapStateToProps = (state, ownProps) => {
     const { LAYERS, APP, LOC } = state;
     return {

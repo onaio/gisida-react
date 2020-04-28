@@ -607,7 +607,7 @@ class Menu extends Component {
                     {searchResults}
                   </ul> :
                   <ul className="sectors">
-                    <li className="no-search-results"><b>No layer found</b></li> 
+                    <li className="no-search-results"><b>No results found</b></li> 
                   </ul> 
 
                 }
