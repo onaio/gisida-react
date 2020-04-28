@@ -5,7 +5,6 @@ import './SearchBar.scss'
 
 const mapStateToProps = (state, ownProps) => {
     const { LAYERS, APP, LOC } = state;
-    console.log(ownProps.preparedLayers)
     return {
       APP,
       LOC,
@@ -22,13 +21,29 @@ class SearchBar extends Component {
     super(props);
     this.state = {
       inputText: '',
+      selectedLayerId: null,
     }
     this.handleCancel = this.handleCancel.bind(this);
     this.handleSearchInput = this.handleSearchInput.bind(this);
   }
 
-  onLayerToggle = (layer) => {
-    // dispatch toggle layer action
+  componentDidUpdate() {
+    const { selectedLayerId } = this.state;
+    const { preparedLayers, openCategoryForSharedLayers } = this.props;
+
+    // open menu when layer is loaded visibility is turned on
+    if (selectedLayerId && preparedLayers[selectedLayerId].visible) {
+      const toOpenLayer = {
+        id: selectedLayerId,
+        isCatOpen: false,
+      };
+      openCategoryForSharedLayers([toOpenLayer]);
+      this.setState({selectedLayerId: null});
+    }
+  }
+
+  // load layer to map
+  toggleLayer = (layer) => {
     const { mapId, APP, LOC } = this.props;
     if (!mapId) {
       return null;
@@ -49,7 +64,7 @@ class SearchBar extends Component {
     }
   }
   
-
+  // make the matching part bold
   boldQuery(indicator, query, id){
     const indicatorToUpper = indicator.toUpperCase();
     const queryToUpper = query.toUpperCase();
@@ -66,6 +81,7 @@ class SearchBar extends Component {
     )
   }
 
+  // find part of layer labels matching querry
   handleSearchInput(e) {
     this.setState({inputText: e.target.value})
     const { handleSearchInput, preparedLayers } = this.props;
@@ -85,33 +101,30 @@ class SearchBar extends Component {
     handleSearchInput(searchResults, input);
   }
 
+  // called when search result is selected
   OnsearchResultClick(e, id) {
     e.preventDefault();
-    const { searchterms, getCategoryIndex, onCategoryClick, searchResultClick, preparedLayers } = this.props;
-    const { label } = preparedLayers[id];
-    const inidcatorDetails = searchterms[label];
-    const isArray = Array.isArray(inidcatorDetails);
-    const parentLayers = isArray ? inidcatorDetails : inidcatorDetails.parentLayers;
-    this.onLayerToggle(preparedLayers[id])
-    parentLayers.forEach((layer, i) => {
-      if (i === 0) {
-        getCategoryIndex(layer) ?  onCategoryClick(e, layer) : null;
-      } else {
-      }
-      
-    })
+    const {searchResultClick, preparedLayers } = this.props;
+    this.toggleLayer(preparedLayers[id]);
     searchResultClick();
+    this.setState({selectedLayerId: id})
   }
 
+  // called cancel button on search bar is selected
   handleCancel(e) {
     e.preventDefault();
-    this.setState({inputText: "", })
-    this.props.handleSearchClick(e, true)
+    this.setState({inputText: "", });
+    this.props.handleSearchClick(e, true);
   }
 
   render() {
-    const { inputText } = this.state;
-    const { appColor, searchBarColor, searching, handleSearchClick } = this.props;
+    const { inputText, selectedLayerId } = this.state;
+    const { appColor, searchBarColor, searching, handleSearchClick, preparedLayers } = this.props;
+
+    // if (selectedLayerId && preparedLayers[selectedLayerId].visible) {
+    //   this.openMenu(selectedLayerId);
+    // }
+
     const searchBtn = {
       border: `1px solid ${ searchBarColor || appColor || '#00B4CC'}`,
       background: `${ searchBarColor || appColor || '#00B4CC'}`,

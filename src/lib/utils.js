@@ -226,3 +226,58 @@ export function orderLayers(activeLayersData, map, nextLayerId) {
         moveLayers(isLabelActive);
     }
 }
+
+/**
+ * Get all visible layer Ids of a menu group
+ * @param {*} groupName Name of the group which we want to target
+ * @param {*} children Children of the group which we want to target
+ */
+export function getMenuGroupVisibleLayers(groupName, children) {
+  const subGroups = children.filter(child => !child.id);
+
+  if (subGroups.length) {
+    let visibleLayerIds = [];
+
+    subGroups.forEach(sg => {
+      Object.keys(sg).forEach(key => {
+        const subGroupVisibleLayerIds = getMenuGroupVisibleLayers(groupName, sg[key].layers);
+        visibleLayerIds = [...visibleLayerIds, ...subGroupVisibleLayerIds];
+      });
+    });
+
+    // Return all visible layer Id of the nested subgroups
+    return visibleLayerIds;
+  } else {
+    // Return the Ids of visible layers for the group
+    return children.filter(child => child.visible).map(child => child.id);
+  }
+}
+
+/**
+ * Get shared layers from URL
+ * @param {*} mapId mapId for map to get shared layers for
+ * @returns {Array} layers from URL for the given map id
+ */
+export function getSharedLayersFromURL(mapId) {
+  const queryParams = window.location.href.split('?');
+
+  if (!queryParams[1]) {
+    return [];
+  }
+  let sharedLayers = [];
+
+  try {
+    const queryParamLayers = queryParams[1].replace('#', '').split('&');
+    const mapQueryParamLayers = queryParamLayers.filter(item =>
+      item.includes(`${mapId}-${QUERY_PARAM_LAYERS}`)
+    )[0];
+
+    if (mapQueryParamLayers) {
+      sharedLayers = mapQueryParamLayers.split('=')[1].split(',');
+    }
+  } catch (error) {
+    sharedLayers = [];
+  }
+
+  return sharedLayers;
+}
