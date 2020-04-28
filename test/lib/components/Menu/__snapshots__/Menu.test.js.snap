@@ -351,19 +351,6 @@ Object {
       "name": "reg2",
     },
   ],
-  "searchterms": Object {
-    "Education": Array [
-      "Severity of needs",
-    ],
-    "RC - Adolescents (15-18 years) enrolled in non-formal/formal education": Object {
-      "id": "education",
-      "label": "RC - Adolescents (15-18 years) enrolled in non-formal/formal education",
-      "parentLayers": Array [
-        "Severity of needs",
-        "Education",
-      ],
-    },
-  },
   "showMap": false,
   "showSearchBar": undefined,
   "store": Object {
