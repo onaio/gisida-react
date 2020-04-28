@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { SupAuth } from 'gisida';
 import './Login.scss';
 import BasicAuthLogin from './BasicAuthLogin/BasicAuthLogin'
 import OnaOauthLogin from './OnaOauthLogin/OnaOauthLogin'
+
+const { defaultUnSupAuthZ: deAuthZ } = SupAuth;
 
 const mapStateToProps = (state, ownProps) => {
     const { APP } = state;
@@ -15,6 +18,22 @@ const mapStateToProps = (state, ownProps) => {
         oauthclientID: ownProps.oauthclientID,
         oauthProvider: ownProps.oauthProvider || 'onadata'
     };
+};
+
+export const killSession = () => {
+    Cookie.remove('dsauth');
+    localStorage.removeItem('expiry_time');
+    deAuthZ();
+}
+  
+export const isLoggedIn = function() {
+    const hasCookie = Cookie.get('dsauth') === "true";
+    const isTokenExpired = isTokenExpired();
+    if (!hasCookie || isTokenExpired) {
+        killSession();
+        return false;
+    }
+    return true;
 };
 
 class Login extends Component {
