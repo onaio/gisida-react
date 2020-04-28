@@ -228,9 +228,11 @@ class DetailView extends Component {
               />
             ) : null}
           </div>
-          <div className="detail-list">
-            <ul>{detailList}</ul>
-          </div>
+          {detailList.length ? (
+            <div className="detail-list">
+              <ul>{detailList}</ul>
+            </div>
+          ) : null}
         </div>
         {this.props.children ? (
           <div className="detail-extension-wrapper">

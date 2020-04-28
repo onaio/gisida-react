@@ -6,7 +6,7 @@ import { isNewSeriesData } from '../../utils';
 class PieChart extends React.Component {
 
   static tootltipPointFormatter() {
-    return `${this.y.toLocaleString()}`;
+    return `<b>${this.point.name}</b>: € ${this.y}`;
   }
 
   static dataLabelFormatter() {
@@ -28,11 +28,39 @@ class PieChart extends React.Component {
       showInLegend,
       chartSpacing,
       titleOptions,
+      doubleChart,
+      chartIcon,                                                                                                                                     
     } = this.props;
-
+    const chartImage = chartIcon === 'Community' ? 'community.png' : 'police.png';
     this.state = {
       chart: {
         type: 'pie',
+        events: doubleChart === 'multipie' ? {
+          load: function(event) {
+            var chart = this,
+              points = chart.series[0].points,
+              len = points.length,
+              total = 0,
+              i = 0;
+  
+            for (; i < len; i++) {
+              total += points[i].y;
+            }
+  
+            chart.setTitle({
+              useHTML: true,
+            text: `${total}<br/><img src="/assets/img/${chartImage}" width="30"/>`,
+              align: 'center',
+              verticalAlign: 'middle',
+              y: -10,
+              style: {
+                fontWeight: 'bold',
+                fontSize: '17px',
+                left: '58px'
+              },
+            });
+          }
+        } : null,
         width: chartWidth,
         height: chartHeight,
         backgroundColor: 'rgba(255,255,255,0)',
@@ -54,7 +82,7 @@ class PieChart extends React.Component {
             },
           },
           dataLabels: dataLabelOptions || {
-            enabled: true,
+            enabled: doubleChart === 'multipie' ? false : true,
             inside: true,
             formatter: function dataLabelFormatter() {
               if (this.y !== 0) {
@@ -102,7 +130,9 @@ class PieChart extends React.Component {
     } = nextProps;
 
     if (isNewSeriesData(this.state.series[0].data, seriesData)) {
-      this.chart.destroy();
+      if (this.chart) {
+        this.chart.destroy();
+      }
 
       this.setState({
         chart: Object.assign({}, this.state.chart, {
@@ -125,7 +155,9 @@ class PieChart extends React.Component {
   }
 
   componentWillUnmount() {
-    this.chart.destroy();
+    if (this.chart) {
+      this.chart.destroy();
+    }
   }
 
   render() {
@@ -135,7 +167,7 @@ class PieChart extends React.Component {
 
 PieChart.propTypes = {
   seriesName: PropTypes.string.isRequired,
-  seriesData: PropTypes.objectOf(PropTypes.any).isRequired,
+  seriesData: PropTypes.arrayOf(PropTypes.any).isRequired,
   seriesTitle: PropTypes.string.isRequired,
   chartWidth: PropTypes.number.isRequired,
   chartHeight: PropTypes.number.isRequired,

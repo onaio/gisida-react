@@ -23,7 +23,7 @@ import Router from './routes/router';
 // Gisida charts
 import PieChart from './components/Charts/PieChart';
 import LineChart from './components/Charts/LineChart';
-import ColumnChart from './components/Charts/BarChartStacked';
+import ColumnChart from './components/Charts/ColumnChart';
 import BarChartStacked from './components/Charts/BarChartStacked';
 
 export {
