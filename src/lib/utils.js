@@ -346,6 +346,19 @@ export function menuGroupHasVisibleLayers(groupName, children) {
 
     return hasVisibleLayers;
   } else {
-    return children.filter(child => child.visible).map(child => child.id).length > 0 ? true : false;
+    let hasVisibleChildren = false;
+    let m = 0;
+
+    while (!hasVisibleChildren && m < children.length) {
+      const child = children[m];
+
+      if (child.visible) {
+        hasVisibleChildren = true;
+      }
+
+      m += 1;
+    }
+
+    return hasVisibleChildren;
   }
 }
