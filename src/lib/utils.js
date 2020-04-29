@@ -283,3 +283,29 @@ export function getSharedLayersFromURL(mapId) {
 
   return sharedLayers;
 }
+
+/**
+ * Get all map layers that fall under a given menu group
+ * @param {*} groupName Name of the group which we want to target
+ * @param {*} children Children of the group which we want to target
+ */
+export function getMenuGroupMapLayers(groupName, children) {
+  const subGroups = children.filter(child => !child.id);
+
+  if (subGroups.length) {
+    let visibleLayerIds = [];
+
+    subGroups.forEach(sg => {
+      Object.keys(sg).forEach(key => {
+        const subGroupVisibleLayerIds = getMenuGroupMapLayers(groupName, sg[key].layers);
+        visibleLayerIds = [...visibleLayerIds, ...subGroupVisibleLayerIds];
+      });
+    });
+
+    // Return all visible layer Id of the nested subgroups
+    return visibleLayerIds;
+  } else {
+    // Return the Ids of visible layers for the group
+    return children.map(child => child.id);
+  }
+}

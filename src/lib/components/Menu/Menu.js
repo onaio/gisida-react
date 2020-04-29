@@ -7,7 +7,11 @@ import ConnectedLayers from '../Layers/ConnectedLayers';
 import './Menu.scss';
 import _ from 'lodash';
 import memoize from 'memoize-one';
-import { getMenuGroupVisibleLayers, getSharedLayersFromURL } from '../../utils';
+import {
+  getMenuGroupVisibleLayers,
+  getSharedLayersFromURL,
+  getMenuGroupMapLayers,
+} from '../../utils';
 
 const mapStateToProps = (state, ownProps) => {
   const { mapId } = ownProps;
@@ -181,7 +185,7 @@ class Menu extends Component {
                   const groupName = groupNames[k];
 
                   const children = layer[groupName].layers;
-                  const visibleLayers = getMenuGroupVisibleLayers(groupName, children);
+                  const visibleLayers = getMenuGroupMapLayers(groupName, children);
 
                   if (visibleLayers.indexOf(sharedLayer.id) >= 0) {
                     this.openCategoryForSharedLayer(category.category, sharedLayer.id);
@@ -192,7 +196,7 @@ class Menu extends Component {
                 } // group while
               } else {
                 // This category has one level only
-                if (layer.id === sharedLayer.id && layer.visible) {
+                if (layer.id === sharedLayer.id) {
                   this.openCategoryForSharedLayer(category.category, sharedLayer.id);
                   catFound = true;
                 }
