@@ -19,11 +19,12 @@ export class Layers extends Component {
     this.state = groups;
   }
 
-  componentDidUpdate() {
-    if (this.props.layers) {
+  componentDidUpdate(prevProps) {
+    // if (this.props.layers) {
       /** Check if updated children down the hierarchy have
        * layers which are a visible. If so open the group
        */
+      if (JSON.stringify(this.props.layers) !== JSON.stringify(prevProps.layers)) {
       this.props.layers.forEach(layer => {
         if (!layer.id) {
           Object.keys(layer).forEach(groupName => {
