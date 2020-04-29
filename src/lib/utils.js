@@ -311,8 +311,10 @@ export function getMenuGroupMapLayers(groupName, children) {
 }
 
 /**
- * Return true if a menu group has any visible map layer, false
- * otherwiise
+ * Return true if a menu group has any visible map layer, false otherwiise.
+ * Useful when you only want to know if a menu group has at least one visible layer and would
+ * probably want to open it. This is useful for performance since it does not continue
+ * checking other children once it finds the first open child.
  * @param {*} groupName Name of the group which we want to target
  * @param {*} children Children of the group which we want to target
  */
