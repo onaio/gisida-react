@@ -627,9 +627,6 @@ export class Filter extends Component {
   setFilterQueries = (filterKey, nextQueries, queriedOptionKeys) => {
     const { layerObj, mapId, dispatch, FILTER } = this.props;
     const { isOr, filterOptions } = this.state;
-    if (FILTER[this.state.layerId] && !FILTER[this.state.layerId].originalLayerObj) {
-      this.buildOriginalObj(this.props, this.state);
-    }
     let prevFilters = Object.assign({}, this.state.filters);
     const nextQuery =
       queriedOptionKeys &&
