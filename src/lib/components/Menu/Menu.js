@@ -181,9 +181,9 @@ class Menu extends Component {
                   const groupName = groupNames[k];
 
                   const children = layer[groupName].layers;
-                  const visibleLayers = getMenuGroupMapLayers(groupName, children);
+                  const groupMapLayerIds = getMenuGroupMapLayers(groupName, children);
 
-                  if (visibleLayers.indexOf(sharedLayer.id) >= 0) {
+                  if (groupMapLayerIds.indexOf(sharedLayer.id) >= 0) {
                     this.openCategoryForSharedLayer(category.category, sharedLayer.id);
                     catFound = true;
                   }
