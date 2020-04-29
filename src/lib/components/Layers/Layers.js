@@ -11,36 +11,16 @@ export class Layers extends Component {
       this.props.layers.forEach(layer => {
         if (!layer.id) {
           Object.keys(layer).forEach(l => {
-            groups[l] = { isOpen: false };
-          });
-        }
-      });
-    }
-    this.state = groups;
-  }
-
-  componentDidUpdate() {
-    if (this.props.layers) {
-      /** Check if updated children down the hierarchy have
-       * layers which are a visible. If so open the group
-       */
-      this.props.layers.forEach(layer => {
-        if (!layer.id) {
-          Object.keys(layer).forEach(groupName => {
-            const children = layer[groupName].layers;
-
-            if (
-              getMenuGroupVisibleLayers(groupName, children).length &&
-              !this.state[groupName].isOpen
-            ) {
-              this.setState({
-                [groupName]: { isOpen: true },
-              });
+            if (layer[l].layers.length) {
+              groups[l] = { isOpen: getMenuGroupVisibleLayers(l, layer[l].layers).length };
+            } else {
+              groups[l] = { isOpen: false }
             }
           });
         }
       });
     }
+    this.state = groups;
   }
 
   toggleSubMenu(e, layer) {
