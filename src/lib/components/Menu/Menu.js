@@ -158,10 +158,6 @@ class Menu extends Component {
         .filter(l => !l.isCatOpen)
         .forEach(sharedLayer => {
           let i = 0;
-          /**
-           * A layer belongs to only one category. So if we found its
-           * category, use this flag to break from the loop
-           */
           let catFound = false;
 
           while (!catFound && i < categories.length) {
