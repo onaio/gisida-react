@@ -43,7 +43,7 @@ class Login extends Component {
         }
 
         const { appPassword, appNameDesc, loginIcon, appIcon,
-            oauthclientID, oauthProvider } = this.props;
+            oauthclientID, oauthProvider, publicPassword, publicUsername } = this.props;
 
         return (
             <div className="login">
@@ -51,7 +51,7 @@ class Login extends Component {
                 {appPassword ?
                     <BasicAuthLogin appPassword={appPassword} />
                     :
-                    <OnaOauthLogin clientID={oauthclientID} provider={oauthProvider} />
+                    <OnaOauthLogin clientID={oauthclientID} provider={oauthProvider} publicPassword= {publicPassword} publicUsername = {publicUsername}/>
                 }
             </div>
         )
