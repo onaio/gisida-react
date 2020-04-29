@@ -285,7 +285,7 @@ export function getSharedLayersFromURL(mapId) {
 }
 
 /**
- * Get all map layers that fall under a given menu group
+ * Get all map layer Ids that fall under a given menu group
  * @param {*} groupName Name of the group which we want to target
  * @param {*} children Children of the group which we want to target
  */
@@ -302,10 +302,10 @@ export function getMenuGroupMapLayers(groupName, children) {
       });
     });
 
-    // Return all visible layer Id of the nested subgroups
+    // Return all layer Ids of the nested subgroups
     return visibleLayerIds;
   } else {
-    // Return the Ids of visible layers for the group
+    // Return the Ids of layers for the group
     return children.map(child => child.id);
   }
 }
