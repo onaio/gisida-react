@@ -12,7 +12,7 @@ const logOut = (e) => {
 };
 
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state) => {
   return {
     appConfig: state.APP,
   }

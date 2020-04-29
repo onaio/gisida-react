@@ -139,7 +139,6 @@ export class Legend extends React.Component {
       timeSeriesObj,
       layers,
       primaryLayer,
-      primarySubLayer,
       activeLayerIds,
     } = this.props;
     if (!layerObj) {
@@ -185,6 +184,7 @@ export class Legend extends React.Component {
         layer.credit &&
         layer.type === 'circle' &&
         !layer.categories.shape &&
+        !Array.isArray(layer.categories) &&
         layer.visible;
       const symbolLayer =
         layer &&
@@ -193,7 +193,8 @@ export class Legend extends React.Component {
         layer.categories.shape &&
         layer.type !== 'circle';
       const fillLayerNoBreaks =
-        layer && layer.credit && layer.categories && layer.categories.breaks === 'no';
+        (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
+      const multipleLegends = (layer && layer.credit && Array.isArray(layer.categories));
       const fillLayerWithBreaks =
         layer &&
         layer.credit &&
@@ -283,7 +284,6 @@ export class Legend extends React.Component {
           );
         });
       }
-
       if (lastLayerSelected && lastLayerSelected.id === layer.id) {
         if (circleLayerType) {
           primaryLegend = (
@@ -302,37 +302,144 @@ export class Legend extends React.Component {
           );
         }
         if (fillLayerNoBreaks && !layer.parent) {
+          let hasShape;
+          hasShape = (layer.categories && layer.categories.shape && layer.categories.shape.length);
+          const shapeAndBar = layer.categories && layer.categories.shapeAndBar;
           const fillWidth = (
             100 / layer.categories.color.filter(c => c !== "transparent").length
           ).toString();
-
+          const textColor = layer.categories && layer.categories['text-color'];
           layer.categories.color.forEach((color, index) => {
-            if (color !== "transparent") {
-              background.push(
-                <li
-                  key={index}
-                  style={{ background: color, width: `${fillWidth}%` }}
-                >
-                  {layer.categories.label[index]}
-                </li>
-              );
+            const showBoth = (shapeAndBar && shapeAndBar.length && shapeAndBar[index] === 'yes');
+            if (color !== 'transparent') {
+              if (showBoth && hasShape) {
+                background.push(
+                  <li className="layer-symbols" key={index}>
+                    <span className={`${layer.categories.shape[index]}`} />
+                    <ul className="legend bar-color" key={index}>
+                      <li style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
+                        {layer.categories.label[index]}
+                      </li>  
+                    </ul>
+                  </li>
+                );
+              }
+              else if (hasShape && !showBoth) {
+                background.push(
+                  <li className="layer-symbols" key={index}>
+                    <span className={`${layer.categories.shape[index]}`} />
+                    {layer.categories.label[index]}
+                  </li>
+                );
+              } else {
+                background.push(
+                  <li key={index} style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
+                    {layer.categories.label[index]}
+                  </li>
+                );
+              }
+              
             }
-          });
-
-          const legendClass = layer.categories ? "legend-label" : "";
-
+          }); 
+          const legendClass = layer.categories ? 'legend-label' : '';
+          const circleQuantiles = quantiles ? <div className="legend-symbols">{quantiles}</div> : null;
+          
           primaryLegend = (
             <div
               id={`legend-${layer.id}-${mapId}`}
-              className={`legend-row ${activeLayerSelected}`}
+              className={`legend-shapes legend-row ${activeLayerSelected}`}
               data-layer={`${layer.id}`}
               onClick={e => this.onUpdatePrimaryLayer(e)}
               key={l}
             >
               <b>{layer.label}</b>
-              <div className={`legend-fill ${legendClass}`}>
+              <div className={`${hasShape ? 'legend-shapes' : 'legend-fill'} ${legendClass}`}>
                 <ul>{background}</ul>
               </div>
+              {circleQuantiles}
+              <span>{Parser(layer.credit)}</span>
+              {latestTimestamp}
+            </div>
+          );
+        }
+        if (multipleLegends && !layer.parent) {
+          /**
+           * This block implements multiple legends on the same layer
+           */
+          /**
+           * fillCredit Builds credit text for fill legends
+           * circleCredit Builds credit text for circle legends
+           * circleTitle Builds Title for the circle legend
+           */
+          let fillCredit = null;
+          let circleCredit = null;
+          let circleTitle;
+          if (Array.isArray(layer.categories)) {
+            layer.categories.forEach((category, key) => {
+              let textColor  = category['text-color'];
+              if (category.type === "fill") {
+                if (category.credit) {
+                fillCredit =Parser(category.credit);
+              }
+                let fillWidth = (
+                  100 / category.color.filter(c => c !== 'transparent').length
+                ).toString();
+                category.color.forEach((color, index) => {
+                      background.push(
+                        <li key={index} style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
+                          {category.label[index]}
+                        </li>
+                      );
+                  });
+              } else if (category.type === "circle") {
+                /** Get this from spec 
+                 * Get the specific radiuses and the right values for the same
+                 */
+                if (category.credit) {
+                  circleCredit = (Parser(category.credit));
+                }
+                if (category.title) {
+                  circleTitle = category.title;
+                }
+                category.radiuses.forEach((s, i) => {
+                  quantiles.push(
+                    <span className="circle-container" key={s}>
+                      <span
+                        style={{
+                          background: Array.isArray(category.color)
+                            ? category.color[i]
+                            : colors[i] || colors[0],
+                          width: `${s * 2}px`,
+                          height: `${s * 2}px`,
+                          margin: `0px ${i + 2}px`,
+                        }}
+                      ></span>
+                      <p style={{ color: textColor ? textColor : '#fff'}}>{category.label[i]}</p>
+                    </span>
+                  );
+                });
+              }
+            });
+          }
+          const legendClass = layer.categories ? 'legend-label' : '';
+          const circleQuantiles = quantiles ? <div className="legend-symbols">{quantiles}</div> : null;
+          
+          primaryLegend = (
+            <div
+              id={`legend-${layer.id}-${mapId}`}
+              className={`legend-shapes legend-row ${activeLayerSelected}`}
+              data-layer={`${layer.id}`}
+              onClick={e => this.onUpdatePrimaryLayer(e)}
+              key={l}
+            >
+              <b>{layer.label}</b>
+              <div className={`${'legend-fill'} ${legendClass}`}>
+                <ul>{background}</ul>
+              </div>
+              {fillCredit}
+              <b>{circleTitle}</b>
+              {circleQuantiles}
+              {circleCredit}
               <span>{Parser(layer.credit)}</span>
               {latestTimestamp}
             </div>
@@ -475,6 +582,8 @@ export class Legend extends React.Component {
           </div>
         );
       } else if (symbolLayer) {
+        const shapeAndBar = layer.categories && layer.categories.shapeAndBar;
+        const hasShape = (layer.categories && layer.categories.shape && layer.categories.shape.length);
         layer.categories.color.forEach((color, index) => {
           const style =
             layer.categories.shape[index] === 'triangle-stroked-11' ||
@@ -482,12 +591,30 @@ export class Legend extends React.Component {
               ? 'border-bottom-color:'
               : 'background:';
           const styleString = `${style}: ${color}`;
-          background += (
-            <li className="layer-symbols" key={index}>
-              <span className={`${layer.categories.shape[index]}`} style={{ styleString }} />
-              {layer.categories.label[index]}
-            </li>
-          );
+          const showBoth = (shapeAndBar && shapeAndBar.length && shapeAndBar[index] === 'yes')
+          const fillWidth = (
+            100 / layer.categories.color.filter(c => c !== 'transparent').length
+          ).toString();
+          const textColor = layer.categories && layer.categories['text-color'];
+          if (showBoth && hasShape) {
+            background.push(
+              <li className="layer-symbols" key={index}>
+                <span className={`${layer.categories.shape[index]}`} />
+                <ul className="legend bar-color" key={index}>
+                  <li style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
+                    {layer.categories.label[index]}
+                  </li>  
+                </ul>
+              </li>
+            );
+          } else {
+            background.push(
+              <li className="layer-symbols" key={index}>
+                <span className={`${layer.categories.shape[index]}`} style={{ styleString }} />
+                {layer.categories.label[index]}
+              </li>
+            );
+          }
         });
 
         legendItems.unshift(
@@ -510,7 +637,7 @@ export class Legend extends React.Component {
         const fillWidth = (
           100 / layer.categories.color.filter(c => c !== 'transparent').length
         ).toString();
-
+          
         layer.categories.color.forEach((color, index) => {
           if (color !== 'transparent') {
             background.push(
@@ -521,8 +648,7 @@ export class Legend extends React.Component {
           }
         });
 
-        const legendClass = layer.categories ? "legend-label" : "";
-
+        const legendClass = layer.categories ? 'legend-label' : '';
         legendItems.unshift(
           <div
             id={`legend-${layer.id}-${mapId}`}
@@ -539,7 +665,83 @@ export class Legend extends React.Component {
             {latestTimestamp}
           </div>
         );
-      } else if (fillLayerWithBreaks && layer.stops && !layer.parent) {
+      } else if (multipleLegends && !layer.parent) {
+        let fillCredit = null;
+        let circleCredit = null;
+        let circleTitle;
+        if (Array.isArray(layer.categories)) {
+          layer.categories.forEach((category, key) => {
+            let textColor  = category['text-color'];
+            if (category.type === "fill") {
+              if (category.credit) {
+              fillCredit =Parser(category.credit);
+            }
+              let fillWidth = (
+                100 / category.color.filter(c => c !== 'transparent').length
+              ).toString();
+              category.color.forEach((color, index) => {
+                    background.push(
+                      <li key={index} style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
+                        {category.label[index]}
+                      </li>
+                    );
+                });
+            } else if (category.type === "circle") {
+              /** Get this from spec 
+               * Get the specific radiuses and the right values for the same
+               */
+              if (category.credit) {
+                circleCredit = (Parser(category.credit));
+              }
+              if (category.title) {
+                circleTitle = category.title;
+              }
+              category.radiuses.forEach((s, i) => {
+                quantiles.push(
+                  <span className="circle-container" key={s}>
+                    <span
+                      style={{
+                        background: Array.isArray(category.color)
+                          ? category.color[i]
+                          : colors[i] || colors[0],
+                        width: `${s * 2}px`,
+                        height: `${s * 2}px`,
+                        margin: `0px ${i + 2}px`,
+                      }}
+                    ></span>
+                    <p style={{ color: textColor ? textColor : '#fff'}}>{category.label[i]}</p>
+                  </span>
+                );
+              });
+            }
+          });
+        }
+        const legendClass = layer.categories ? 'legend-label' : '';
+        const circleQuantiles = quantiles ? <div className="legend-symbols">{quantiles}</div> : null;
+        
+        legendItems.unshift(
+          <div
+            id={`legend-${layer.id}-${mapId}`}
+            className={`legend-shapes legend-row ${activeLayerSelected}`}
+            data-layer={`${layer.id}`}
+            onClick={e => this.onUpdatePrimaryLayer(e)}
+            key={l}
+          >
+            <b>{layer.label}</b>
+            <div className={`${'legend-fill'} ${legendClass}`}>
+                <ul>{background}</ul>
+              </div>
+              {fillCredit}
+              <b>{circleTitle}</b>
+              {circleQuantiles}
+              {circleCredit}
+              <span>{Parser(layer.credit)}</span>
+              {latestTimestamp}
+          </div>
+        );
+      } 
+      
+      else if (fillLayerWithBreaks && layer.stops && !layer.parent) {
         const { stopsData, breaks } = layer;
         const colorLegend = layer &&
           layer.stopsData && [...new Set(stopsData.map(stop => stop[1]))];

@@ -15,7 +15,7 @@ import Export from './components/Export/Export';
 import HorizontalBarChart from './components/Charts/HorizontalBarChart';
 
 import Callback from './components/Callback/Callback';
-import Login from './components/Login/Login';
+import Login, { isLoggedIn, killSession } from './components/Login/Login';
 import { isLoggedIn as isBasicAuthLoggedIn } from './components/Login/BasicAuthLogin/BasicAuthLogin'
 
 import Router from './routes/router';
@@ -23,7 +23,7 @@ import Router from './routes/router';
 // Gisida charts
 import PieChart from './components/Charts/PieChart';
 import LineChart from './components/Charts/LineChart';
-import ColumnChart from './components/Charts/BarChartStacked';
+import ColumnChart from './components/Charts/ColumnChart';
 import BarChartStacked from './components/Charts/BarChartStacked';
 
 export {
@@ -49,5 +49,7 @@ export {
   Router,
   Callback,
   Login,
-  isBasicAuthLoggedIn
+  isBasicAuthLoggedIn,
+  isLoggedIn,
+  killSession,
 };
