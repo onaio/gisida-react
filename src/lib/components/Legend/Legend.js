@@ -76,7 +76,13 @@ export class Legend extends React.Component {
     }
   }
   componentWillUpdate(nextProps) {
-    if (this.props.primaryLayer !== nextProps.primaryLayer) {
+    const { layerObj } = nextProps;
+    if (
+      this.props.primaryLayer !== nextProps.primaryLayer &&
+      layerObj &&
+      layerObj.type !== "chart" &&
+      layerObj.property
+    ) {
       const { timeSeriesObj } = nextProps;
 
       if (

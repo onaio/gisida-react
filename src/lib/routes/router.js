@@ -54,4 +54,11 @@ class Router {
 Router.propTypes = {
   children: PropTypes.node.isRequired
 }
+
+class testRoute extends React.Component {
+  render() {
+    return <RRouter />
+  }
+}
+
 export default new Router;
