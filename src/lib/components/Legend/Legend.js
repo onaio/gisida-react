@@ -76,13 +76,7 @@ export class Legend extends React.Component {
     }
   }
   componentWillUpdate(nextProps) {
-    const { layerObj } = nextProps;
-    if (
-      this.props.primaryLayer !== nextProps.primaryLayer &&
-      layerObj &&
-      layerObj.type !== "chart" &&
-      layerObj.property
-    ) {
+    if (this.props.primaryLayer !== nextProps.primaryLayer) {
       const { timeSeriesObj } = nextProps;
 
       if (
@@ -310,20 +304,40 @@ export class Legend extends React.Component {
           ).toString();
           const textColor = layer.categories && layer.categories['text-color'];
           layer.categories.color.forEach((color, index) => {
-            if (color !== "transparent") {
-              background.push(
-                <li
-                  key={index}
-                  style={{ background: color, width: `${fillWidth}%` }}
-                >
-                  {layer.categories.label[index]}
-                </li>
-              );
+            const showBoth = (shapeAndBar && shapeAndBar.length && shapeAndBar[index] === 'yes');
+            if (color !== 'transparent') {
+              if (showBoth && hasShape) {
+                background.push(
+                  <li className="layer-symbols" key={index}>
+                    <span className={`${layer.categories.shape[index]}`} />
+                    <ul className="legend bar-color" key={index}>
+                      <li style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
+                        {layer.categories.label[index]}
+                      </li>  
+                    </ul>
+                  </li>
+                );
+              }
+              else if (hasShape && !showBoth) {
+                background.push(
+                  <li className="layer-symbols" key={index}>
+                    <span className={`${layer.categories.shape[index]}`} />
+                    {layer.categories.label[index]}
+                  </li>
+                );
+              } else {
+                background.push(
+                  <li key={index} style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
+                    {layer.categories.label[index]}
+                  </li>
+                );
+              }
+              
             }
-          });
-
-          const legendClass = layer.categories ? "legend-label" : "";
-
+          }); 
+          const legendClass = layer.categories ? 'legend-label' : '';
+          const circleQuantiles = quantiles ? <div className="legend-symbols">{quantiles}</div> : null;
+          
           primaryLegend = (
             <div
               id={`legend-${layer.id}-${mapId}`}
@@ -628,8 +642,7 @@ export class Legend extends React.Component {
           }
         });
 
-        const legendClass = layer.categories ? "legend-label" : "";
-
+        const legendClass = layer.categories ? 'legend-label' : '';
         legendItems.unshift(
           <div
             id={`legend-${layer.id}-${mapId}`}
