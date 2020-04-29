@@ -309,3 +309,41 @@ export function getMenuGroupMapLayers(groupName, children) {
     return children.map(child => child.id);
   }
 }
+
+/**
+ * Return true if a menu group has any visible map layer, false
+ * otherwiise
+ * @param {*} groupName Name of the group which we want to target
+ * @param {*} children Children of the group which we want to target
+ */
+export function menuGroupHasVisibleLayers(groupName, children) {
+  const subGroups = children.filter(child => !child.id);
+
+  if (subGroups.length) {
+    let hasVisibleLayers = false; // If we find a subgroup that
+    // has visible layers, we use this flag to stop the loop
+    let i = 0;
+
+    while (!hasVisibleLayers && i < subGroups.length) {
+      const subGroup = subGroups[i];
+      let j = 0;
+      const subGroupKeys = Object.keys(subGroup);
+
+      while (!hasVisibleLayers && j < subGroupKeys.length) {
+        const key = subGroupKeys[j];
+
+        if (menuGroupHasVisibleLayers(groupName, subGroup[key].layers)) {
+          hasVisibleLayers = true;
+        }
+
+        j += 1;
+      }
+
+      i += 1;
+    }
+
+    return hasVisibleLayers;
+  } else {
+    return children.filter(child => child.visible).map(child => child.id).length > 0 ? true : false;
+  }
+}
