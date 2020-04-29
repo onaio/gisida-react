@@ -7,11 +7,7 @@ import ConnectedLayers from '../Layers/ConnectedLayers';
 import './Menu.scss';
 import _ from 'lodash';
 import memoize from 'memoize-one';
-import {
-  getMenuGroupVisibleLayers,
-  getSharedLayersFromURL,
-  getMenuGroupMapLayers,
-} from '../../utils';
+import { getSharedLayersFromURL, getMenuGroupMapLayers } from '../../utils';
 
 const mapStateToProps = (state, ownProps) => {
   const { mapId } = ownProps;
