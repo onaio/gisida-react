@@ -294,4 +294,31 @@ describe('getSharedLayersFromURL', () => {
     expect(window.location.href).toEqual(sharedURL);
     expect(utils.getSharedLayersFromURL('map-1')).toEqual([]);
   });
+
+  it('returns shared layer if url ends with #', () => {
+    const sharedURLMap1 = 'https://test.onalabs.org/?map-1-layers=layer-1,layer-2#';
+    jsdom.reconfigure({
+      url: sharedURLMap1,
+    });
+    expect(window.location.href).toEqual(sharedURLMap1);
+    expect(utils.getSharedLayersFromURL('map-1')).toEqual(['layer-1', 'layer-2']);
+
+    const sharedURLBoth =
+      'https://test.onalabs.org/?map-1-layers=layer-1,layer-2&map-2-layers=layer-3,layer-4#';
+    jsdom.reconfigure({
+      url: sharedURLBoth,
+    });
+    expect(window.location.href).toEqual(sharedURLBoth);
+    expect(utils.getSharedLayersFromURL('map-1')).toEqual(['layer-1', 'layer-2']);
+    expect(utils.getSharedLayersFromURL('map-2')).toEqual(['layer-3', 'layer-4']);
+    // Query param `map-2-layers` is the first
+    const sharedURLMap2First =
+      'https://test.onalabs.org/?map-2-layers=layer-3,layer-4&map-1-layers=layer-1,layer-2#';
+    jsdom.reconfigure({
+      url: sharedURLMap2First,
+    });
+    expect(window.location.href).toEqual(sharedURLMap2First);
+    expect(utils.getSharedLayersFromURL('map-1')).toEqual(['layer-1', 'layer-2']);
+    expect(utils.getSharedLayersFromURL('map-2')).toEqual(['layer-3', 'layer-4']);
+  });
 });
