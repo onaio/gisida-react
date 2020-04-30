@@ -22,13 +22,13 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 export class Layer extends Component {
-  onLayerToggle = (layer, e) => {
+  onLayerToggle = (layer, e, pushLayerToURL) => {
     // dispatch toggle layer action
     const { mapId, APP, LOC } = this.props;
     if (!mapId) {
       return null;
     }
-    this.pushLayerToURL(layer);
+    pushLayerToURL(layer);
     this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
     const { center, zoom } = lngLat(LOC, APP);
     if (layer.zoomOnToggle && layer.visible) {
@@ -49,7 +49,7 @@ export class Layer extends Component {
    * Push layer to URL which can be used for sharing
    * @param {*} layer
    */
-  pushLayerToURL(layer) {
+ pushLayerToURL = (layer) => {
     const { mapId } = this.props;
     const layerId = layer.id.replace('.json', '');
     const queryParamLayers = `${mapId}-${QUERY_PARAM_LAYERS}`;
@@ -175,7 +175,7 @@ export class Layer extends Component {
           id={`${layer.id}-${mapId}`}
           type="checkbox"
           data-layer={layer.id}
-          onChange={e => this.onLayerToggle(layer, e)}
+          onChange={e => this.onLayerToggle(layer, e, this.pushLayerToURL)}
           checked={!!layer.visible}
         />
         <label htmlFor={`${layer.id}-${mapId}`}>{layer.label}</label>
