@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
-import { menuGroupHasVisibleLayers } from '../../utils';
+import { menuGroupHasVisibleLayers, getMenuGroupVisibleLayers } from '../../utils';
 
 export class Layers extends Component {
   constructor(props) {
@@ -29,7 +29,10 @@ export class Layers extends Component {
           Object.keys(layer).forEach(groupName => {
             const children = layer[groupName].layers;
 
-            if (menuGroupHasVisibleLayers(groupName, children) && !this.state[groupName].isOpen) {
+            if (
+              getMenuGroupVisibleLayers(groupName, children).length &&
+              !this.state[groupName].isOpen
+            ) {
               this.setState({
                 [groupName]: { isOpen: true },
               });
