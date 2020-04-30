@@ -1,12 +1,12 @@
 import React from 'react';
-import ConnectedLayer, { Layer }  from '../../../../src/lib/components/Layer/Layer'
-import layerObj from '../../../fixtures/sample-layer.json';
+import ConnectedLayer, { Layer }  from '../Layer'
+import layerObj from '../../../../../test/fixtures/sample-layer.json';
 import { shallow, mount } from 'enzyme';
 import toJson from 'enzyme-to-json';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import APP from '../../../fixtures/appConfig.json';
-var gisida = require('gisida')
+import APP from '../../../../../test/fixtures/appConfig.json';
+var gisida = require('gisida');
 
 layerObj.id = 'sample-layer';
 const mapId = 'map-1';
@@ -29,6 +29,32 @@ describe('Layer', () => {
         mapId={mapId}
       />
     );
+    const wrapper = mount(
+      <Layer mapId={mapId} layer={layerObj} />
+    )
+    expect(toJson(wrapper)).toMatchSnapshot();
+  });
+  it('Pops layers from url', () => {
+    const wrapper = shallow(
+      <Layer mapId={mapId} layer={layerObj} />
+  );
+  window.location.assign('http://localhost/?map-1-layers=sample-layer');
+  const instance = wrapper.instance();
+  jest.spyOn(instance, 'pushLayerToURL');
+  instance.pushLayerToURL(layerObj);
+  expect(window.location.href).toBe('http://localhost/');
+  window.location.href = '';
+  });
+
+  it('Pushes layers to url', () => {
+    const wrapper = shallow(
+        <Layer mapId={mapId} layer={layerObj} />
+    );
+    const instance = wrapper.instance();
+    jest.spyOn(instance, 'pushLayerToURL');
+    layerObj["visible"] = false;
+    instance.pushLayerToURL(layerObj);
+    expect(window.location.href).toBe('http://localhost/?map-1-layers=sample-layer');
   });
 
   it('components functions are called as expected with store', () => {
@@ -39,8 +65,7 @@ describe('Layer', () => {
       <Provider store={store}>
         <ConnectedLayer mapId={mapId} layer={layerObj} />
       </Provider>
-    )
-
+    );
     expect(toJson(wrapper)).toMatchSnapshot();
 
     // test onLayerToggle function
@@ -63,5 +88,5 @@ describe('Layer', () => {
     
     // remove test maps from window
     delete global.window.maps;
-  })
+  });
 });
