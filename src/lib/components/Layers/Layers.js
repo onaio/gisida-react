@@ -40,7 +40,7 @@ export class Layers extends Component {
       return layers.length > 0 ? (
         <p>You don't have permision to view this category</p>
       ) : (
-        <p>{noLayerText ? noLayerText : 'No layers available'}</p>
+        <p>{noLayerText ? noLayerText : 'Data not available'}</p>
       );
     };
 
