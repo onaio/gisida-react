@@ -3,15 +3,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
-import {
-  detectIE,
-  buildLayersObj,
-  orderLayers,
-  getSharedLayersFromURL,
-  pushSearchParamsToURL,
-  getURLSearchParams,
-  getSharedStyleFromURL,
-} from '../../utils';
+import * as utils from '../../utils';
+import { setStyle } from './utils';
 import './Map.scss';
 import {
   ALL,
@@ -38,7 +31,6 @@ import {
   HIGHLIGHT_PAINT,
   VECTOR_PROP,
   CATEGORICAL,
-  QUERY_PARAM_STYLE,
 } from '../../constants';
 
 const mapStateToProps = (state, ownProps) => {
@@ -74,7 +66,7 @@ const mapStateToProps = (state, ownProps) => {
       ? MAP.timeseries[MAP.primarySubLayer || MAP.primaryLayer || MAP.activeLayerId]
       : null,
     timeseries: MAP.timeseries,
-    layersObj: MAP.layers ? buildLayersObj(MAP.layers) : {},
+    layersObj: MAP.layers ? utils.buildLayersObj(MAP.layers) : {},
     layerObj: MAP.layers ? MAP.layers[MAP.primaryLayer || MAP.activeLayerId] : null,
     primaryLayer: MAP.primaryLayer,
     oldLayerObj: MAP.oldLayerObjs ? MAP.oldLayerObjs[MAP.primaryLayer] : {},
@@ -87,7 +79,7 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-const isIE = detectIE();
+const isIE = utils.detectIE();
 
 window.maps = [];
 
@@ -99,7 +91,7 @@ class Map extends Component {
 
     this.state = {
       layersObj: this.props.layersObj,
-      sharedLayers: getSharedLayersFromURL(mapId).map(l => {
+      sharedLayers: utils.getSharedLayersFromURL(mapId).map(l => {
         return { id: `${l}.json`, isLoaded: false };
       }),
     };
@@ -332,7 +324,7 @@ class Map extends Component {
           }
           typeof sortLayers === 'function'
             ? sortLayers(map, activeLayersData, nextLayerId)
-            : orderLayers(sortLayers, map, nextLayerId);
+            : utils.orderLayers(sortLayers, map, nextLayerId);
         }
       }
     }
@@ -477,7 +469,7 @@ class Map extends Component {
     // Check if rendererd map has finished loading
     if (isLoaded) {
       // Set current style (basemap)
-      this.setStyle(styles, this.props.MAP.currentStyle, currentStyle, mapId);
+      setStyle(styles, this.props.MAP.currentStyle, currentStyle, mapId, this.map);
 
       // Zoom to current region (center and zoom)
       regions &&
@@ -634,53 +626,6 @@ class Map extends Component {
       /** If they are any shared layers which we haven't loaded**/
       this.loadSharedLayers();
     }
-  }
-
-  /**
-   * Set the map style
-   * @param {*} styles
-   * @param {*} prevStyle
-   * @param {*} currentStyle
-   * @param {*} mapId
-   */
-  setStyle(styles, prevStyle, currentStyle, mapId) {
-    const sharedStyle = getSharedStyleFromURL(mapId);
-    let styleFound = false;
-    let i = 0;
-
-    while (!styleFound && i < styles.length) {
-      const style = styles[i];
-
-      if (styles.map(styleItem => styleItem.url).indexOf(style.url) === sharedStyle) {
-        // Load the style from  URL
-        this.map.setStyle(style.url);
-        styleFound = true;
-      } else {
-        if (style[mapId] && style[mapId].current && prevStyle !== currentStyle) {
-          // Style has changed, set the style and set the new value in URL
-          this.pushStyleToURL(styles, style, mapId);
-          this.map.setStyle(style.url);
-          styleFound = true;
-        }
-      }
-
-      i++;
-    }
-  }
-
-  /**
-   * Push style to URL by pushing its index
-   * @param {*} styles
-   * @param {*} style
-   * @param {*} mapId
-   */
-  pushStyleToURL(styles, style, mapId) {
-    const urlSearchParams = getURLSearchParams();
-    urlSearchParams.set(
-      `${mapId}-${QUERY_PARAM_STYLE}`,
-      styles.map(styleItem => styleItem.url).indexOf(style.url)
-    );
-    pushSearchParamsToURL(urlSearchParams);
   }
 
   componentDidUpdate(prevProps) {

@@ -360,5 +360,6 @@ export function getURLSearchParams() {
  * @returns {number} style
  */
 export function getSharedStyleFromURL(mapId) {
-  return +getURLSearchParams().get(`${mapId}-${QUERY_PARAM_STYLE}`);
+  const style = getURLSearchParams().get(`${mapId}-${QUERY_PARAM_STYLE}`);
+  return style ? +style : null;
 }
