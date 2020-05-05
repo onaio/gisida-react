@@ -477,22 +477,7 @@ class Map extends Component {
     // Check if rendererd map has finished loading
     if (isLoaded) {
       // Set current style (basemap)
-      const sharedStyle = getSharedStyleFromURL(mapId);
-
-      styles.forEach(style => {
-        if (styles.map(styleItem => styleItem.url).indexOf(style.url) === sharedStyle) {
-          this.map.setStyle(style.url);
-        } else {
-          if (
-            style[mapId] &&
-            style[mapId].current &&
-            this.props.MAP.currentStyle !== currentStyle
-          ) {
-            this.pushStyleToURL(styles, style, mapId);
-            this.map.setStyle(style.url);
-          }
-        }
-      });
+      this.setStyle(styles, this.props.MAP.currentStyle, currentStyle, mapId);
 
       // Zoom to current region (center and zoom)
       regions &&
@@ -651,6 +636,44 @@ class Map extends Component {
     }
   }
 
+  /**
+   * Set the map style
+   * @param {*} styles
+   * @param {*} prevStyle
+   * @param {*} currentStyle
+   * @param {*} mapId
+   */
+  setStyle(styles, prevStyle, currentStyle, mapId) {
+    const sharedStyle = getSharedStyleFromURL(mapId);
+    let styleFound = false;
+    let i = 0;
+
+    while (!styleFound && i < styles.length) {
+      const style = styles[i];
+
+      if (styles.map(styleItem => styleItem.url).indexOf(style.url) === sharedStyle) {
+        // Load the style from  URL
+        this.map.setStyle(style.url);
+        styleFound = true;
+      } else {
+        if (style[mapId] && style[mapId].current && prevStyle !== currentStyle) {
+          // Style has changed, set the style and set the new value in URL
+          this.pushStyleToURL(styles, style, mapId);
+          this.map.setStyle(style.url);
+          styleFound = true;
+        }
+      }
+
+      i++;
+    }
+  }
+
+  /**
+   * Push style to URL by pushing its index
+   * @param {*} styles
+   * @param {*} style
+   * @param {*} mapId
+   */
   pushStyleToURL(styles, style, mapId) {
     const urlSearchParams = getURLSearchParams();
     urlSearchParams.set(
