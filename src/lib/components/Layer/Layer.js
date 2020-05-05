@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Actions, prepareLayer, lngLat } from 'gisida';
 import { QUERY_PARAM_LAYERS } from '../../constants';
+import { pushSearchParamsToURL, getURLSearchParams } from '../../utils';
 
 const mapStateToProps = (state, ownProps) => {
   const { APP, LOC } = state;
@@ -49,131 +50,44 @@ export class Layer extends Component {
    * Push layer to URL which can be used for sharing
    * @param {*} layer
    */
- pushLayerToURL = (layer) => {
+  pushLayerToURL = layer => {
     const { mapId } = this.props;
     const layerId = layer.id.replace('.json', '');
     const queryParamLayers = `${mapId}-${QUERY_PARAM_LAYERS}`;
-    let pageURL = `${window.location.href}`;
-
+    const urlSearchParams = getURLSearchParams();
     /**
      * Check for visibility. If false it means layer has been selected push to layer id to url
      * else if visible it means layer has been checked off pop layer from url
      */
     if (layer && layer.visible === false) {
-      if (
-        !window.location.href.includes(`?${queryParamLayers}=`) &&
-        !window.location.href.includes(`&${queryParamLayers}=`)
-      ) {
+      if (urlSearchParams.has(queryParamLayers)) {
         /**
-         * Query param `layers` does not exist. Have the layerId as the first
-         * value of query param `layers`. The assumption made is that
-         * there exists no other query params
+         * If query param is in URL, append the layer id
          */
-        if (pageURL.includes('?style')) {
-          pageURL = pageURL.split('?style')[0]; 
-        }
-        if (queryParamLayers.includes('map-2')) {
-          if (pageURL.includes('map-1')) {
-            pageURL = `${pageURL}&${queryParamLayers}=${layerId}`;
-          } else {
-            pageURL = `${pageURL}?${queryParamLayers}=${layerId}`;
-          }
-        } else {
-          if (pageURL.includes('map-2')) {
-            pageURL = `${pageURL}&${queryParamLayers}=${layerId}`;
-          } else {
-            pageURL = `${pageURL}?${queryParamLayers}=${layerId}`;
-          }
-        }
-        if(window.location.href.includes('style')) {
-          pageURL = `${pageURL}+style${window.location.href.split('?style')[1]}`;
-        }
+        urlSearchParams.append(queryParamLayers, layerId);
       } else {
-        if(pageURL.includes('+style')) {
-          pageURL = pageURL.split('+')[0];
-        }
         /**
-         * Query param `layers` exists. Add to exist list
-         * Update map-1 map-2 layers based on which map is selected first
+         * If query param is not in URL, set the value as the first
+         * value of the query param
          */
-        // if map-2 was selected first (confirm this by checking the url)
-        // push layers to respective maps
-        if (window.location.href.includes('?map-2-layers')) {
-          if (mapId === 'map-2') {
-            if (window.location.href.includes('&')) {
-              pageURL = `${pageURL.split('&')[0]},${layerId}&${pageURL.split('&')[1]}`;
-            } else {
-              pageURL = `${pageURL},${layerId}`;
-            }
-          } else {
-            pageURL = `${pageURL},${layerId}`;
-          }
-        } else {
-          if (mapId === 'map-2') {
-            pageURL = `${pageURL},${layerId}`;
-          } else {
-            if (window.location.href.includes('&')) {
-              pageURL = `${pageURL.split('&')[0]},${layerId}&${pageURL.split('&')[1]}`;
-            } else {
-              pageURL = `${pageURL},${layerId}`;
-            }
-          }
-        }
-        if(window.location.href.includes('+style')) {
-          pageURL = `${pageURL}+${window.location.href.split('+')[1]}`;
-        }
+        urlSearchParams.set(queryParamLayers, layerId);
       }
-
-      history.pushState('', '', pageURL);
     } else if (layer && layer.visible === true) {
-      if (window.location.href.includes(`?${queryParamLayers}=${layerId}`)) {
-        // If layerId is the first item in the query param list
-        if (window.location.href.includes(`?${queryParamLayers}=${layerId},`)) {
-          // If query param list has other layerIds
-          pageURL = window.location.href.replace(
-            `?${queryParamLayers}=${layerId},`,
-            `?${queryParamLayers}=`
-          );
-        } else {
-          // If layer Id is the only item in the query param list
-          pageURL = window.location.href.replace(`?${queryParamLayers}=${layerId}`, '');
-        }
-      } else if (window.location.href.includes(`,${layerId}`)) {
-        // If layer Id is not the first item in the query param list
-        pageURL = window.location.href.replace(`,${layerId}`, '');
+      if (urlSearchParams.has(queryParamLayers)) {
+        /**
+         * We filter out the layer and reset the query param
+         * with the remainder
+         */
+        const remainingLayers = urlSearchParams.getAll(queryParamLayers).filter(l => l !== layerId);
+        urlSearchParams.delete(queryParamLayers);
+        remainingLayers.forEach(val => {
+          urlSearchParams.append(queryParamLayers, val);
+        });
       }
-      /**
-       * Duplication needs refactor
-       * */
-      if (window.location.href.includes(`&${queryParamLayers}`)) {
-        if (window.location.href.includes(`&${queryParamLayers}=${layerId}`)) {
-          // If layerId is the first item in the query param list
-          if (window.location.href.includes(`&${queryParamLayers}=${layerId},`)) {
-            // If query param list has other layerIds
-            pageURL = window.location.href.replace(
-              `&${queryParamLayers}=${layerId},`,
-              `&${queryParamLayers}=`
-            );
-          } else {
-            // If layer Id is the only item in the query param list
-            pageURL = window.location.href.replace(`&${queryParamLayers}=${layerId}`, '');
-          }
-        } else if (window.location.href.includes(`,${layerId}`)) {
-          // If layer Id is not the first item in the query param list
-          pageURL = `${window.location.href.split('&')[0]}&${window.location.href
-            .split('&')[1]
-            .replace(`,${layerId}`, '')}`;
-        }
-      }
-      /**
-       * Switch & to ? param when all `?` layers have been poppoed off
-       */
-      if (pageURL.includes('/&')) {
-        pageURL = pageURL.replace('&', '?');
-      }
-      history.replaceState('', '', pageURL);
     }
-  }
+
+    pushSearchParamsToURL(urlSearchParams);
+  };
 
   render() {
     const layer = this.props.layer;

@@ -1,4 +1,5 @@
 import { QUERY_PARAM_LAYERS } from './constants';
+import Router from './routes/router';
 
 export function formatNum(num, decimal) {
   let x = `${num}`.length;
@@ -210,7 +211,7 @@ export function orderLayers(activeLayersData, map, nextLayerId) {
 
   const circles = activeLayersData.filter(d => d['type'] === 'circle');
   if (circles.length) {
-    moveLayers(circle);
+    moveLayers(circles);
   }
 
   const symbols = activeLayersData.filter(d => d['type'] === 'symbol');
@@ -361,4 +362,14 @@ export function menuGroupHasVisibleLayers(groupName, children) {
 
     return hasVisibleChildren;
   }
+}
+
+export function pushSearchParamsToURL(urlSearchParams) {
+  Router.history.push({
+    search: urlSearchParams.toString(),
+  });
+}
+
+export function getURLSearchParams() {
+  return new URLSearchParams(window.location.search);
 }

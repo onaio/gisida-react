@@ -3,7 +3,14 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
-import { detectIE, buildLayersObj, orderLayers, getSharedLayersFromURL } from '../../utils';
+import {
+  detectIE,
+  buildLayersObj,
+  orderLayers,
+  getSharedLayersFromURL,
+  pushSearchParamsToURL,
+  getURLSearchParams,
+} from '../../utils';
 import './Map.scss';
 import {
   ALL,
@@ -29,7 +36,8 @@ import {
   HIGHLIGHT_LAYOUT,
   HIGHLIGHT_PAINT,
   VECTOR_PROP,
-  CATEGORICAL
+  CATEGORICAL,
+  QUERY_PARAM_STYLE,
 } from '../../constants';
 
 const mapStateToProps = (state, ownProps) => {
@@ -243,11 +251,11 @@ class Map extends Component {
       this.map.setFilter(activeLayerObj.id, [
         ALL,
         ['==', reportingPeriod, feature.properties[reportingPeriod]],
-        ['!=', activeLayerObj.source.join[0], feature.properties[featureId]]
+        ['!=', activeLayerObj.source.join[0], feature.properties[featureId]],
       ]);
       this.map.setFilter(`${activeLayerObj.id}${DASH_HIGHLIGHT}`, [
         ALL,
-        ['==', activeLayerObj.source.join[0], feature.properties[featureId]]
+        ['==', activeLayerObj.source.join[0], feature.properties[featureId]],
       ]);
       this.map.setPaintProperty(`${activeLayerObj.id}${DASH_HIGHLIGHT}`, ICON_OPACITY, 1);
       this.map.moveLayer(`${activeLayerObj.id}${DASH_HIGHLIGHT}`);
@@ -470,17 +478,7 @@ class Map extends Component {
       // Set current style (basemap)
       styles.forEach(style => {
         if (style[mapId] && style[mapId].current && this.props.MAP.currentStyle !== currentStyle) {
-          let updateStyleOnUrl;
-          if (window.location.href.includes('map-2')) {
-            updateStyleOnUrl = `${window.location.href}+style-${mapId}=${styles.map(styleItem => styleItem.url).indexOf(style.url)}`;
-          }
-          else if(window.location.href.includes('map-1')){
-              updateStyleOnUrl = `${window.location.href.split('+')[0]}+style-${mapId}=${styles.map(styleItem => styleItem.url).indexOf(style.url)}`; 
-            }
-          else {
-              updateStyleOnUrl = `${window.location.href.split('?style')[0]}?style-${mapId}=${styles.map(styleItem => styleItem.url).indexOf(style.url)}`;
-            }
-          history.pushState('', '', updateStyleOnUrl);
+          this.pushStyleToURL(styles, style, mapId);
           this.map.setStyle(style.url);
         }
       });
@@ -642,6 +640,15 @@ class Map extends Component {
     }
   }
 
+  pushStyleToURL(styles, style, mapId) {
+    const urlSearchParams = getURLSearchParams();
+    urlSearchParams.set(
+      `${QUERY_PARAM_STYLE}-${mapId}`,
+      styles.map(styleItem => styleItem.url).indexOf(style.url)
+    );
+    pushSearchParamsToURL(urlSearchParams);
+  }
+
   componentDidUpdate(prevProps) {
     if (this.map) {
       try {
@@ -740,8 +747,8 @@ class Map extends Component {
         layers && layers[primaryLayer] && layers[primaryLayer].location
           ? layers[primaryLayer].location
           : layersObj &&
-          layersObj.find(layer => layer.location) &&
-          layersObj.find(layer => layer.location).location;
+            layersObj.find(layer => layer.location) &&
+            layersObj.find(layer => layer.location).location;
       if (location) {
         this.map.easeTo(location);
       }
@@ -930,7 +937,7 @@ class Map extends Component {
         hasData =
           pIndex !== -1
             ? (FILTER && FILTER[id] && FILTER[id].isClear) ||
-            timeseries[id].periodData[currPeriod].hasData
+              timeseries[id].periodData[currPeriod].hasData
             : false;
 
         // if the layer is in the map and has no period match, hide it
@@ -1034,8 +1041,8 @@ class Map extends Component {
     const labels =
       timeseries && typeof timeseries[layerObj.id] !== 'undefined'
         ? layerObj.labels.labels[
-        timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]
-        ]
+            timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]
+          ]
         : layerObj.labels.labels;
 
     if (!labels) {
@@ -1162,32 +1169,32 @@ class Map extends Component {
             Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
           </div>
         ) : (
-            <div
-              id={this.props.mapId}
-              className={`${
-                this.props.mapId === 'map-2' && this.props.showFilterPanel ? 'splitScreenClass' : ''
-                }`}
-              style={{
-                width: mapWidth,
-                height: mapheight,
-                display:
-                  this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
-                    ? NONE
-                    : 'inline',
-                top: mapTop,
-              }}
-            >
-              <div className="widgets">
-                {/* Render Children elemets with mapId prop added to each child  */}
-                {React.Children.map(this.props.children, child => {
-                  return React.cloneElement(child, {
-                    mapId: this.props.mapId,
-                    hasNavBar: this.props.hasNavBar,
-                  });
-                })}
-              </div>
+          <div
+            id={this.props.mapId}
+            className={`${
+              this.props.mapId === 'map-2' && this.props.showFilterPanel ? 'splitScreenClass' : ''
+            }`}
+            style={{
+              width: mapWidth,
+              height: mapheight,
+              display:
+                this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
+                  ? NONE
+                  : 'inline',
+              top: mapTop,
+            }}
+          >
+            <div className="widgets">
+              {/* Render Children elemets with mapId prop added to each child  */}
+              {React.Children.map(this.props.children, child => {
+                return React.cloneElement(child, {
+                  mapId: this.props.mapId,
+                  hasNavBar: this.props.hasNavBar,
+                });
+              })}
             </div>
-          )}
+          </div>
+        )}
       </div>
     );
   }
@@ -1219,7 +1226,7 @@ Map.propTypes = {
   handlers: PropTypes.array,
   hasDataView: PropTypes.boo,
   dispatch: PropTypes.func,
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
   // Pass true if app has a navbar
 };
 
