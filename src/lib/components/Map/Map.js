@@ -10,6 +10,7 @@ import {
   getSharedLayersFromURL,
   pushSearchParamsToURL,
   getURLSearchParams,
+  getSharedStyleFromURL,
 } from '../../utils';
 import './Map.scss';
 import {
@@ -476,10 +477,20 @@ class Map extends Component {
     // Check if rendererd map has finished loading
     if (isLoaded) {
       // Set current style (basemap)
+      const sharedStyle = getSharedStyleFromURL(mapId);
+
       styles.forEach(style => {
-        if (style[mapId] && style[mapId].current && this.props.MAP.currentStyle !== currentStyle) {
-          this.pushStyleToURL(styles, style, mapId);
+        if (styles.map(styleItem => styleItem.url).indexOf(style.url) === sharedStyle) {
           this.map.setStyle(style.url);
+        } else {
+          if (
+            style[mapId] &&
+            style[mapId].current &&
+            this.props.MAP.currentStyle !== currentStyle
+          ) {
+            this.pushStyleToURL(styles, style, mapId);
+            this.map.setStyle(style.url);
+          }
         }
       });
 
@@ -643,7 +654,7 @@ class Map extends Component {
   pushStyleToURL(styles, style, mapId) {
     const urlSearchParams = getURLSearchParams();
     urlSearchParams.set(
-      `${QUERY_PARAM_STYLE}-${mapId}`,
+      `${mapId}-${QUERY_PARAM_STYLE}`,
       styles.map(styleItem => styleItem.url).indexOf(style.url)
     );
     pushSearchParamsToURL(urlSearchParams);

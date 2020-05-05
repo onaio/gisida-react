@@ -1,4 +1,4 @@
-import { QUERY_PARAM_LAYERS } from './constants';
+import { QUERY_PARAM_LAYERS, QUERY_PARAM_STYLE } from './constants';
 import Router from './routes/router';
 
 export function formatNum(num, decimal) {
@@ -352,4 +352,13 @@ export function pushSearchParamsToURL(urlSearchParams) {
 
 export function getURLSearchParams() {
   return new URLSearchParams(window.location.search);
+}
+
+/**
+ * Get shared style from URL
+ * @param {string} mapId mapId for map to get shared layers for
+ * @returns {number} style
+ */
+export function getSharedStyleFromURL(mapId) {
+  return +getURLSearchParams().get(`${mapId}-${QUERY_PARAM_STYLE}`);
 }
