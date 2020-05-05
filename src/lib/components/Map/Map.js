@@ -470,6 +470,17 @@ class Map extends Component {
       // Set current style (basemap)
       styles.forEach(style => {
         if (style[mapId] && style[mapId].current && this.props.MAP.currentStyle !== currentStyle) {
+          let updateStyleOnUrl;
+          if (window.location.href.includes('map-2')) {
+            updateStyleOnUrl = `${window.location.href}+style-${mapId}=${styles.map(styleItem => styleItem.url).indexOf(style.url)}`;
+          }
+          else if(window.location.href.includes('map-1')){
+              updateStyleOnUrl = `${window.location.href.split('+')[0]}+style-${mapId}=${styles.map(styleItem => styleItem.url).indexOf(style.url)}`; 
+            }
+          else {
+              updateStyleOnUrl = `${window.location.href.split('?style')[0]}?style-${mapId}=${styles.map(styleItem => styleItem.url).indexOf(style.url)}`;
+            }
+          history.pushState('', '', updateStyleOnUrl);
           this.map.setStyle(style.url);
         }
       });

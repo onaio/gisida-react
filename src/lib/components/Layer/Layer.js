@@ -69,6 +69,9 @@ export class Layer extends Component {
          * value of query param `layers`. The assumption made is that
          * there exists no other query params
          */
+        if (pageURL.includes('?style')) {
+          pageURL = pageURL.split('?style')[0]; 
+        }
         if (queryParamLayers.includes('map-2')) {
           if (pageURL.includes('map-1')) {
             pageURL = `${pageURL}&${queryParamLayers}=${layerId}`;
@@ -82,7 +85,13 @@ export class Layer extends Component {
             pageURL = `${pageURL}?${queryParamLayers}=${layerId}`;
           }
         }
+        if(window.location.href.includes('style')) {
+          pageURL = `${pageURL}+style${window.location.href.split('?style')[1]}`;
+        }
       } else {
+        if(pageURL.includes('+style')) {
+          pageURL = pageURL.split('+')[0];
+        }
         /**
          * Query param `layers` exists. Add to exist list
          * Update map-1 map-2 layers based on which map is selected first
@@ -109,6 +118,9 @@ export class Layer extends Component {
               pageURL = `${pageURL},${layerId}`;
             }
           }
+        }
+        if(window.location.href.includes('+style')) {
+          pageURL = `${pageURL}+${window.location.href.split('+')[1]}`;
         }
       }
 
