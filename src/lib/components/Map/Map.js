@@ -420,6 +420,7 @@ class Map extends Component {
       const { isRendered, accessToken, mapConfig } = APP;
       // Check if map is initialized, use mapId as container value
       if (!isRendered && (!isIE || mapboxgl.supported()) && !MAP.blockLoad) {
+        
         this.initMap(accessToken, { ...mapConfig, container: mapId }, mapId);
       }
     }
@@ -464,10 +465,19 @@ class Map extends Component {
 
     // Check if map is initialized.
     if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
-      this.initMap(accessToken, mapConfig, mapId, mapIcons);
+      let urlMapConfig;
+      if (mapId && utils.getSharedLayersFromURL(mapId) && styles[utils.getSharedStyleFromURL(mapId)] ) {
+        
+        urlMapConfig = {
+          ...mapConfig,
+          style: styles[utils.getSharedStyleFromURL(mapId)].url
+        }
+      }
+      
+      this.initMap(accessToken, urlMapConfig || mapConfig, mapId, mapIcons);
     }
     // Check if rendererd map has finished loading
-    if (isLoaded) {
+    if (this.props.MAP.isLoaded) {
       // Set current style (basemap)
       setStyle(styles, this.props.MAP.currentStyle, currentStyle, mapId, this.map);
 
