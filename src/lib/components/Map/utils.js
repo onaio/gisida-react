@@ -15,11 +15,12 @@ export function setStyle(styles, prevStyle, currentStyle, mapId, map) {
   while (!styleFound && i < styles.length) {
     const style = styles[i];
 
-    if (styles.map(styleItem => styleItem.url).indexOf(style.url) === sharedStyle) {
-      // Load the style from  URL
-      map.setStyle(style.url);
-      styleFound = true;
-    } else {
+    // if (styles.map(styleItem => styleItem.url).indexOf(style.url) === sharedStyle && (style.name !== map.getStyle().name)) {
+    //   // Load the style from  URL
+    //   debugger;
+    //   map.setStyle(style.url);
+    //   styleFound = true;
+    // } else {
       if (style[mapId] && style[mapId].current && prevStyle !== currentStyle) {
         // Style has changed, set the style and set the new value in URL
         pushStyleToURL(styles, style, mapId);
@@ -30,7 +31,7 @@ export function setStyle(styles, prevStyle, currentStyle, mapId, map) {
 
     i++;
   }
-}
+// }
 
 /**
  * Push style to URL by pushing its index
