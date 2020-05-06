@@ -325,4 +325,12 @@ describe('getSharedStyleFromURL', () => {
     });
     expect(utils.getSharedStyleFromURL('map-1')).toEqual(null);
   });
+
+  it('it style value must be a number', () => {
+    Router.history.push({
+      pathname: '/',
+      search: '?map-1-layers=layer-1&map-1-style=something',
+    });
+    expect(utils.getSharedStyleFromURL('map-1')).toEqual(NaN);
+  });
 });
