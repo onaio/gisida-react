@@ -293,3 +293,36 @@ describe('getSharedLayersFromURL', () => {
     expect(utils.getSharedLayersFromURL('map-1')).toEqual(['layer-1', 'layer-2']);
   });
 });
+
+describe('getURLSearchParams', () => {
+  it('returns an instance of URLSearchParams', () => {
+    expect(utils.getURLSearchParams() instanceof URLSearchParams).toBe(true);
+  });
+});
+
+describe('pushSearchParamsToURL', () => {
+  it('pushes a query param string from an instance of URLSearchParams', () => {
+    const paramsString = 'q=URLUtils.searchParams&topic=api';
+    const searchParams = new URLSearchParams(paramsString);
+    utils.pushSearchParamsToURL(searchParams);
+    expect(window.location.href).toEqual('http://localhost/?q=URLUtils.searchParams&topic=api');
+  });
+});
+
+describe('getSharedStyleFromURL', () => {
+  it('gets shared map style correctly ', () => {
+    Router.history.push({
+      pathname: '/',
+      search: '?map-1-layers=layer-1&map-1-style=0#',
+    });
+    expect(utils.getSharedStyleFromURL('map-1')).toEqual(0);
+  });
+
+  it('returns null if style not found', () => {
+    Router.history.push({
+      pathname: '/',
+      search: '?map-1-layers=layer-1',
+    });
+    expect(utils.getSharedStyleFromURL('map-1')).toEqual(null);
+  });
+});
