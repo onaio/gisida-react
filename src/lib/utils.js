@@ -344,18 +344,26 @@ export function menuGroupHasVisibleLayers(groupName, children) {
   }
 }
 
+/**
+ * Push an instance of URLSearchParams to URL
+ * @param {*} urlSearchParams
+ */
 export function pushSearchParamsToURL(urlSearchParams) {
   Router.history.push({
     search: urlSearchParams.toString(),
   });
 }
 
+/**
+ * Return an instance of URLSearchParams initiated with
+ * the query param string from window.location.search
+ */
 export function getURLSearchParams() {
   return new URLSearchParams(window.location.search);
 }
 
 /**
- * Get shared style from URL
+ * Get shared style value from the query param `map-<id>-style`
  * @param {string} mapId mapId for map to get shared layers for
  * @returns {number} style
  */
