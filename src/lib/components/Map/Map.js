@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
 import * as utils from '../../utils';
-import { setStyle } from './utils';
+import { pushStyleToURL } from './utils';
 import './Map.scss';
 import {
   ALL,
@@ -420,7 +420,6 @@ class Map extends Component {
       const { isRendered, accessToken, mapConfig } = APP;
       // Check if map is initialized, use mapId as container value
       if (!isRendered && (!isIE || mapboxgl.supported()) && !MAP.blockLoad) {
-        
         this.initMap(accessToken, { ...mapConfig, container: mapId }, mapId);
       }
     }
@@ -464,23 +463,39 @@ class Map extends Component {
     }
 
     // Check if map is initialized.
-    if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
-      let urlMapConfig;
-      if (mapId && utils.getSharedLayersFromURL(mapId) && styles[utils.getSharedStyleFromURL(mapId)] ) {
-        
-        urlMapConfig = {
+    const sharedStyle = utils.getSharedStyleFromURL(mapId);
+    /** If there is a a style from URL, initialize map with that style, else
+     * initialize with the default style
+     */
+    if (
+      sharedStyle !== null &&
+      this.props.STYLES &&
+      this.props.STYLES.length !== styles.length &&
+      (!isIE || mapboxgl.supported()) &&
+      !nextProps.MAP.blockLoad
+    ) {
+      this.initMap(
+        accessToken,
+        {
           ...mapConfig,
-          style: styles[utils.getSharedStyleFromURL(mapId)].url
-        }
-      }
-      
-      this.initMap(accessToken, urlMapConfig || mapConfig, mapId, mapIcons);
+          style: styles[sharedStyle] ? styles[sharedStyle].url : mapConfig.style,
+        },
+        mapId,
+        mapIcons
+      );
+    } else if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
+      this.initMap(accessToken, mapConfig, mapId, mapIcons);
     }
-    // Check if rendererd map has finished loading
-    if (this.props.MAP.isLoaded) {
-      // Set current style (basemap)
-      setStyle(styles, this.props.MAP.currentStyle, currentStyle, mapId, this.map);
 
+    // Check if rendererd map has finished loading
+    if (isLoaded) {
+      // Set current style (basemap)
+      styles.forEach(style => {
+        if (style[mapId] && style[mapId].current && this.props.MAP.currentStyle !== currentStyle) {
+          this.map.setStyle(style.url);
+          pushStyleToURL(styles, style, mapId);
+        }
+      });
       // Zoom to current region (center and zoom)
       regions &&
         regions.forEach(region => {
