@@ -485,7 +485,7 @@ class Map extends Component {
         mapIcons
       );
 
-      this.props.dispatch(Actions.changeStyle(mapId, styles[sharedStyle]));
+      this.props.dispatch(Actions.changeStyle(mapId, styles[sharedStyle].url));
     } else if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
       this.initMap(accessToken, mapConfig, mapId, mapIcons);
     }
