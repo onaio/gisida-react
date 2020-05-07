@@ -8,8 +8,10 @@ The share URL feature enables (re-)initializing a map with a given state based o
 
 The following are steps to be taken and expected behaviour when sharing a URL.
 
-1.  Select layers that you would wish to share. You can also change the map style.
+1.  Select layers that you would wish to share.
     ![alt text](https://raw.githubusercontent.com/onaio/gisida-react/pushlayertoURL/public/assets/img/layer-selection.png)
+
+    You can also change the map style.
     ![alt text](https://raw.githubusercontent.com/onaio/gisida-react/pushlayertoURL/public/assets/img/style-selection.png)
 
         - The layers should be pushed to URL based on selected map instance.
