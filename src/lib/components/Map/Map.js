@@ -469,7 +469,7 @@ class Map extends Component {
      */
 
     if ((!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
-      if (sharedStyle !== null && this.props.STYLES) {
+      if (sharedStyle !== null && styles[sharedStyle] && this.props.STYLES) {
         let doInitMap = false;
 
         if (this.props.STYLES.length !== styles.length) {
