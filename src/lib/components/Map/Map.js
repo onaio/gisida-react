@@ -472,17 +472,20 @@ class Map extends Component {
       this.props.STYLES &&
       this.props.STYLES.length !== styles.length &&
       (!isIE || mapboxgl.supported()) &&
-      !nextProps.MAP.blockLoad
+      !nextProps.MAP.blockLoad &&
+      styles[sharedStyle]
     ) {
       this.initMap(
         accessToken,
         {
           ...mapConfig,
-          style: styles[sharedStyle] ? styles[sharedStyle].url : mapConfig.style,
+          style: styles[sharedStyle].url,
         },
         mapId,
         mapIcons
       );
+
+      this.props.dispatch(Actions.changeStyle(mapId, styles[sharedStyle]));
     } else if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
       this.initMap(accessToken, mapConfig, mapId, mapIcons);
     }
