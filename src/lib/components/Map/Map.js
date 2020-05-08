@@ -92,7 +92,7 @@ class Map extends Component {
     this.state = {
       layersObj: this.props.layersObj,
       sharedLayers: utils.getSharedLayersFromURL(mapId).map(l => {
-        return { id: `${l}.json`, isLoaded: false };
+        return { id: l, isLoaded: false };
       }),
     };
   }
@@ -777,33 +777,30 @@ class Map extends Component {
     const { sharedLayers } = this.state;
     const { layers, mapId, dispatch } = this.props;
     if (sharedLayers.length && layers) {
-      let sharedLayerId;
       const sharedLayerIds = sharedLayers.filter(l => !l.isLoaded).map(l => l.id);
-      for (let l = 0; l < sharedLayerIds.length; l += 1) {
-        sharedLayerId = sharedLayerIds[l];
-        if (!layers[sharedLayerId]) {
-          break;
-        } else if (!layers[sharedLayerId].visible) {
-          dispatch(Actions.toggleLayer(mapId, sharedLayerId));
 
-          if (!layers[sharedLayerId].loaded && !layers[sharedLayerId].isLoading) {
-            prepareLayer(mapId, layers[sharedLayerId], dispatch);
+      for (let l = 0; l < sharedLayerIds.length; l += 1) {
+        const sharedLayerId = sharedLayerIds[l];
+        const layerObj = layers[sharedLayerId] || layers[`${sharedLayerId}.json`];
+
+        if (!layerObj) {
+          break;
+        } else if (!layerObj.visible) {
+          dispatch(Actions.toggleLayer(mapId, layerObj.id));
+
+          if (!layerObj.loaded && !layerObj.isLoading) {
+            prepareLayer(mapId, layerObj, dispatch);
           }
 
-          this.setState(
-            {
-              sharedLayers: sharedLayers.map(l => {
-                if (l.id == sharedLayerId) {
-                  l.isLoaded = true;
-                }
+          this.setState({
+            sharedLayers: sharedLayers.map(l => {
+              if (l.id == sharedLayerId) {
+                l.isLoaded = true;
+              }
 
-                return l;
-              }),
-            },
-            () => {
-              // dispatch(Actions.updatePrimaryLayer(mapId, sharedLayerId))
-            }
-          );
+              return l;
+            }),
+          });
         }
       }
     }

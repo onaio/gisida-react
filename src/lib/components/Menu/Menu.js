@@ -110,7 +110,7 @@ class Menu extends Component {
 
     this.state = {
       sharedLayers: getSharedLayersFromURL(mapId).map(l => {
-        return { id: `${l}.json`, isCatOpen: false };
+        return { id: l, isCatOpen: false };
       }),
     };
   }
@@ -183,7 +183,10 @@ class Menu extends Component {
                   const children = layer[groupName].layers;
                   const groupMapLayerIds = getMenuGroupMapLayers(groupName, children);
 
-                  if (groupMapLayerIds.indexOf(sharedLayer.id) >= 0) {
+                  if (
+                    groupMapLayerIds.indexOf(sharedLayer.id) >= 0 ||
+                    groupMapLayerIds.indexOf(`${sharedLayer.id}.json`) >= 0
+                  ) {
                     this.openCategoryForSharedLayer(category.category, sharedLayer.id);
                     catFound = true;
                   }
@@ -192,7 +195,7 @@ class Menu extends Component {
                 } // group while
               } else {
                 // This category has one level only
-                if (layer.id === sharedLayer.id) {
+                if (layer.id === sharedLayer.id || layer.id === `${sharedLayer.id}.json`) {
                   this.openCategoryForSharedLayer(category.category, sharedLayer.id);
                   catFound = true;
                 }
