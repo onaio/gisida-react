@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, SupAuth, history } from 'gisida';
+import { getURLSearchParams } from '../../utils';
 
 const { defaultUnSupAuthZ: deAuthZ } = SupAuth;
 
@@ -38,7 +39,10 @@ class Callback extends Component {
       dispatch(Actions.getAuthConfigs(authConfig));
     }
 
-    return this.history.push('/');
+    return this.history.push({
+      pathname: '/',
+      search: getURLSearchParams().toString(),
+    });
   }
 
   getParameterByName(name) {

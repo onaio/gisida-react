@@ -26,6 +26,7 @@ import LineChart from './components/Charts/LineChart';
 import ColumnChart from './components/Charts/ColumnChart';
 import BarChartStacked from './components/Charts/BarChartStacked';
 import * as constants from './constants';
+import { pushSearchParamsToURL, getURLSearchParams } from './utils';
 
 export {
   App,
@@ -52,4 +53,6 @@ export {
   Login,
   isBasicAuthLoggedIn,
   constants,
+  pushSearchParamsToURL,
+  getURLSearchParams,
 };

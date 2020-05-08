@@ -94,6 +94,8 @@ class Map extends Component {
       sharedLayers: utils.getSharedLayersFromURL(mapId).map(l => {
         return { id: l, isLoaded: false };
       }),
+      sharedStyleLoaded: false,
+      sharedStyle: utils.getSharedStyleFromURL(mapId),
     };
   }
 
@@ -463,23 +465,21 @@ class Map extends Component {
     }
 
     // Check if map is initialized.
-    const sharedStyle = utils.getSharedStyleFromURL(mapId);
     /** If there is a a style from URL, initialize map with that style, else
      * initialize with the default style
      */
+    const { sharedStyle, sharedStyleLoaded } = this.state;
 
     if ((!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
       if (sharedStyle !== null && styles[sharedStyle] && this.props.STYLES) {
         let doInitMap = false;
 
-        if (this.props.STYLES.length !== styles.length) {
-          /**
-           * If styles props has changed, then the index of our shared style in array
-           * STYLES has changed, we need to re intialize the map with the correct
-           * style
-           */
-          doInitMap = true;
-        } else if (!isRendered) {
+        /**
+         * If styles props has changed, then the index of our shared style in array
+         * STYLES has changed, we need to re intialize the map with the correct
+         * style
+         */
+        if (this.props.STYLES.length !== styles.length || !isRendered || !sharedStyleLoaded) {
           doInitMap = true;
         }
 
@@ -494,6 +494,9 @@ class Map extends Component {
             mapIcons
           );
           this.props.dispatch(Actions.changeStyle(mapId, styles[sharedStyle].url));
+          this.setState({
+            sharedStyleLoaded: true,
+          });
         }
       } else if (!isRendered) {
         this.initMap(accessToken, mapConfig, mapId, mapIcons);
