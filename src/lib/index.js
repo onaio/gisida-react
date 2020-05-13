@@ -27,6 +27,7 @@ import ColumnChart from './components/Charts/ColumnChart';
 import BarChartStacked from './components/Charts/BarChartStacked';
 import * as constants from './constants';
 import { pushSearchParamsToURL, getURLSearchParams } from './utils';
+import Share from './components/TitleBar/Share/Share';
 
 export {
   App,
@@ -55,4 +56,5 @@ export {
   constants,
   pushSearchParamsToURL,
   getURLSearchParams,
+  Share,
 };
