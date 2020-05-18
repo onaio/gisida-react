@@ -26,7 +26,7 @@ describe('pushLayerToURL', () => {
     );
   });
 
-  it('removes layer from URL if layer is deselected', () => {
+  it('pops layer from URL if layer is deselected', () => {
     Router.history.push({
       pathname: '/',
       search: '?map-1-layers=layer-1&map-1-layers=layer-2',
