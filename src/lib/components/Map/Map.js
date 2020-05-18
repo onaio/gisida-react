@@ -79,8 +79,6 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-const isIE = utils.detectIE();
-
 window.maps = [];
 
 class Map extends Component {
@@ -421,7 +419,7 @@ class Map extends Component {
     if (APP && MAP && mapId) {
       const { isRendered, accessToken, mapConfig } = APP;
       // Check if map is initialized, use mapId as container value
-      if (!isRendered && (!isIE || mapboxgl.supported()) && !MAP.blockLoad) {
+      if (!isRendered && (!utils.usesIE() || mapboxgl.supported()) && !MAP.blockLoad) {
         this.initMap(accessToken, { ...mapConfig, container: mapId }, mapId);
       }
     }
@@ -470,7 +468,7 @@ class Map extends Component {
      */
     const { sharedStyle, sharedStyleLoaded } = this.state;
 
-    if ((!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
+    if ((!utils.usesIE() || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
       if (sharedStyle !== null && styles[sharedStyle] && this.props.STYLES) {
         let doInitMap = false;
 
@@ -1181,7 +1179,7 @@ class Map extends Component {
     }
     return (
       <div>
-        {isIE || !mapboxgl.supported() ? (
+        {utils.usesIE() || !mapboxgl.supported() ? (
           <div className="alert alert-info">
             Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
           </div>

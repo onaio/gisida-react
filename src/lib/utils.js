@@ -93,7 +93,7 @@ export const debounce = (func, wait, now) => {
     if (callNow) func.apply(context, args);
   };
 };
-export function detectIE() {
+export function usesIE() {
   var ua = window.navigator.userAgent;
 
   // IE 10
