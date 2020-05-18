@@ -22,7 +22,7 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 export class Layer extends Component {
-  onLayerToggle = (layer, e) => {
+  onLayerToggle = layer => {
     // dispatch toggle layer action
     const { mapId, APP, LOC } = this.props;
     if (!mapId) {
@@ -57,7 +57,7 @@ export class Layer extends Component {
           id={`${layer.id}-${mapId}`}
           type="checkbox"
           data-layer={layer.id}
-          onChange={e => this.onLayerToggle(layer, e)}
+          onChange={e => this.onLayerToggle(layer)}
           checked={!!layer.visible}
         />
         <label htmlFor={`${layer.id}-${mapId}`}>{layer.label}</label>
