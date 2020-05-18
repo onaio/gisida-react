@@ -3,6 +3,7 @@ import { Route, Redirect } from 'react-router-dom';
 import { getURLSearchParams } from '../utils';
 
 export const PrivateRoute = ({ component: Component, ...rest }) => {
+  // Preserve any query params when we redirect to login e.g shared layers and style
   const searchParamsString = getURLSearchParams().toString();
 
   return (
