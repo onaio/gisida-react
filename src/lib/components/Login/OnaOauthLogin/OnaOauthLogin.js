@@ -8,6 +8,7 @@ class OnaOauthLogin extends Component {
     super(props);
     const { clientID } = this.props;
     let authorizationUris = {};
+    // Include and query params in the callback URI if any e.g shared layers and style
     const searchParamsString = getURLSearchParams().toString();
 
     if (clientID) {
