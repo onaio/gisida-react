@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, SupAuth, history } from 'gisida';
 import { getURLSearchParams } from '../../utils';
-
-const { defaultUnSupAuthZ: deAuthZ } = SupAuth;
+import Cookie from 'js-cookie';
 
 class Callback extends Component {
   constructor(props) {
@@ -34,6 +33,7 @@ class Callback extends Component {
 
     if (isAuth && authConfig) {
       localStorage.setItem('expiry_time', this.getExpiryTime());
+      Cookie.set('dsauth', true);
       dispatch(Actions.receiveToken(accessToken));
       dispatch(Actions.receiveLogin(user));
       dispatch(Actions.getAuthConfigs(authConfig));

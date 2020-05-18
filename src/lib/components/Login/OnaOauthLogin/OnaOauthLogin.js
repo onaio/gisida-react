@@ -39,7 +39,7 @@ class OnaOauthLogin extends Component {
   }
 
   render() {
-    const { provider } = this.props;
+    const { provider, publicPassword, publicUsername } = this.props;
 
     if (!this.props.clientID || !this.state.authorizationUris[provider]) {
       return null;
@@ -48,6 +48,13 @@ class OnaOauthLogin extends Component {
     return (
       <form className="login-form">
         <div className="form-group">
+          {publicPassword && publicUsername ? (
+            <div>
+              <small>Username: {publicUsername}</small>
+              <br />
+              <small>Password: {publicPassword}</small>
+            </div>
+          ) : null}
           <a
             className="btn btn-default center-block btn-block"
             href={this.state.authorizationUris[provider]}

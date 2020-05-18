@@ -13,13 +13,10 @@ import Spinner from './components/Spinner/Spinner';
 import ThemeSwitcher from './components/ThemeSwitcher/ThemeSwitcher';
 import Export from './components/Export/Export';
 import HorizontalBarChart from './components/Charts/HorizontalBarChart';
-
 import Callback from './components/Callback/Callback';
-import Login from './components/Login/Login';
+import Login, { isLoggedIn, killSession } from './components/Login/Login';
 import { isLoggedIn as isBasicAuthLoggedIn } from './components/Login/BasicAuthLogin/BasicAuthLogin';
-
 import Router from './routes/router';
-
 // Gisida charts
 import PieChart from './components/Charts/PieChart';
 import LineChart from './components/Charts/LineChart';
@@ -59,4 +56,6 @@ export {
   getURLSearchParams,
   Share,
   pushLayerToURL,
+  isLoggedIn,
+  killSession,
 };
