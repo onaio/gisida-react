@@ -662,7 +662,7 @@ class Map extends Component {
     const { sharedLayers } = this.state;
 
     if (sharedLayers.filter(l => !l.isLoaded).length) {
-      /** If they are any shared layers which we haven't loaded**/
+      /** If there are any shared layers which we haven't loaded**/
       this.loadSharedLayers();
     }
   }
