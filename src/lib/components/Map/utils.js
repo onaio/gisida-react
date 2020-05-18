@@ -9,9 +9,10 @@ import { QUERY_PARAM_STYLE } from '../../constants';
  */
 export function pushStyleToURL(styles, style, mapId) {
   const urlSearchParams = getURLSearchParams();
-  urlSearchParams.set(
-    `${mapId}-${QUERY_PARAM_STYLE}`,
-    styles.map(styleItem => styleItem.url).indexOf(style.url)
-  );
-  pushSearchParamsToURL(urlSearchParams);
+  const index = styles.map(styleItem => styleItem.url).indexOf(style.url);
+
+  if (index >= 0) {
+    urlSearchParams.set(`${mapId}-${QUERY_PARAM_STYLE}`, index);
+    pushSearchParamsToURL(urlSearchParams);
+  }
 }
