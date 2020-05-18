@@ -5,7 +5,7 @@ import { Actions } from 'gisida';
 import Layers from '../Layers/Layers';
 import ConnectedLayers from '../Layers/ConnectedLayers';
 import './Menu.scss';
-import _ from 'lodash';
+import { debounce } from 'lodash';
 import memoize from 'memoize-one';
 import { getSharedLayersFromURL, getMenuGroupMapLayers } from '../../utils';
 
@@ -103,7 +103,7 @@ class Menu extends Component {
     /**
      * Gets scroll position after scroll ceases
      */
-    this.delayedMenuScrollCallback = _.debounce(this.persistScrollPosition, 1000);
+    this.delayedMenuScrollCallback = debounce(this.persistScrollPosition, 1000);
 
     // Get the layers shared via URL if any
     const { mapId } = props;
