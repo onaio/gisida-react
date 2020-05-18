@@ -39,6 +39,7 @@ class Callback extends Component {
       dispatch(Actions.getAuthConfigs(authConfig));
     }
 
+    // Redirect to home and preserve any query params (shared layers and style)
     return this.history.push({
       pathname: '/',
       search: getURLSearchParams().toString(),
