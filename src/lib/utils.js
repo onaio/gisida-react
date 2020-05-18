@@ -321,7 +321,6 @@ export function menuGroupHasVisibleLayers(groupName, children) {
 
       i += 1;
     }
-    let isLabelActive = activeLayersData.filter(d => d.isLabel);
 
     return hasVisibleLayers;
   } else {
