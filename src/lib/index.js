@@ -28,6 +28,7 @@ import BarChartStacked from './components/Charts/BarChartStacked';
 import * as constants from './constants';
 import { pushSearchParamsToURL, getURLSearchParams } from './utils';
 import Share from './components/TitleBar/Share/Share';
+import { pushLayerToURL } from './components/Layer/utils';
 
 export {
   App,
@@ -57,4 +58,5 @@ export {
   pushSearchParamsToURL,
   getURLSearchParams,
   Share,
+  pushLayerToURL,
 };
