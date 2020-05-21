@@ -4,8 +4,10 @@ exports[`Share renders correctly 1`] = `
 <div>
   <li>
     <a
+      alt="Share"
       href="#"
       onClick={[Function]}
+      title="Share"
     >
       <span
         className="glyphicon glyphicon-share"
