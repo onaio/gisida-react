@@ -22,7 +22,7 @@ const Share = () => {
   return (
     <div>
       <li>
-        <a href="#" onClick={() => onCopyToClipBoard()}>
+        <a href="#" title='Share' alt='Share'  onClick={() => onCopyToClipBoard()}>
           <span className="glyphicon glyphicon-share" />
         </a>
       </li>
