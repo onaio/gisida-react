@@ -551,6 +551,5 @@ Object {
   "searchBarColor": undefined,
   "searchResultClick": [Function],
   "searching": false,
-  "toggleSubMenu": [Function],
 }
 `;
