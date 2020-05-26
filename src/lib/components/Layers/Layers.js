@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
-import { getMenuGroupVisibleLayers } from '../../utils';
 import { menuGroupHasVisibleLayers } from '../../utils';
 import { DATA_NOT_AVAILABLE } from '../../constants'
 
@@ -14,7 +13,7 @@ export class Layers extends Component {
         if (!layer.id) {
           Object.keys(layer).forEach(l => {
             if (layer[l].layers.length) {
-              groups[l] = { isOpen: getMenuGroupVisibleLayers(l, layer[l].layers).length };
+              groups[l] = { isOpen: menuGroupHasVisibleLayers(l, layer[l].layers) };
             } else {
               groups[l] = { isOpen: false }
             }

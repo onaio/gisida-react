@@ -300,10 +300,18 @@ class Menu extends Component {
     };
   }
 
+  /**
+   * this update state of searching to false
+   */
   searchResultClick() {
     this.setState({ searching: false });
   }
 
+  /**
+   * receives search results from searchBar components
+   * @param {Array} searchResults - array of search results 
+   * @param {string} input - user search input
+   */
   handleSearchInput(searchResults, input) {
     const { searching } = this.state;
     this.setState({ searchResults: [], })
@@ -316,6 +324,12 @@ class Menu extends Component {
     });
   }
 
+  /**
+   * called when search or cancel button is clicked on searchBar component
+   * @param {MouseEvent} e 
+   * @param {boolean} cancel - indicates if it is search or cancel button clicked
+   * @param {boolean} inputPresent - indicates if search input has any input
+   */
   handleSearchClick(e, cancel, inputPresent) {
     e.preventDefault();
     if (cancel) {

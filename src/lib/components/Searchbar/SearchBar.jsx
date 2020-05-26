@@ -123,7 +123,7 @@ class SearchBar extends Component {
 
   /**
    * this is called when a search result is clicked
-   * @param {ClickEvent} e 
+   * @param {MouseEvent} e 
    * @param {string} id - indicator identifier
    */
   onsearchResultClick(e, id) {
@@ -136,7 +136,7 @@ class SearchBar extends Component {
 
   /**
    * clears search input and displays menu
-   * @param {ClickEvent} e 
+   * @param {MouseEvent} e 
    */
   handleCancel(e) {
     e.preventDefault();
