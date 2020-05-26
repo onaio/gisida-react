@@ -26,3 +26,4 @@ export const FILL_COLOR = 'fill-color';
 export const VECTOR_PROP = 'vector-prop';
 export const CIRCLE_COLOR = 'circle-color';
 export const CIRCLE_STROKE_WIDTH = 'circle-stroke-width';
+export const DATA_NOT_AVAILABLE = 'No data available';

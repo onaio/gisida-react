@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
 import { getMenuGroupVisibleLayers } from '../../utils';
 import { menuGroupHasVisibleLayers } from '../../utils';
+import { DATA_NOT_AVAILABLE } from '../../constants'
 
 export class Layers extends Component {
   constructor(props) {
@@ -62,7 +63,7 @@ export class Layers extends Component {
       return layers.length > 0 ? (
         <p>You don't have permision to view this category</p>
       ) : (
-        <p>{noLayerText ? noLayerText : 'Data not available'}</p>
+        <p>{noLayerText ? noLayerText : DATA_NOT_AVAILABLE}</p>
       );
     };
 
