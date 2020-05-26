@@ -91,7 +91,7 @@ class Menu extends Component {
     // Get the layers shared via URL if any
     const { mapId } = props;
     const sharedLayers = getSharedLayersFromURL(mapId).map(l => {
-      return { id: `${l}.json`, isCatOpen: false };
+      return { id: l, isCatOpen: false };
     })
 
     this.state = {
