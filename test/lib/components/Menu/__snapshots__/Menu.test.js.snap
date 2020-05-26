@@ -396,7 +396,7 @@ Object {
   "handleSearchClick": [Function],
   "handleSearchInput": [Function],
   "mapId": "map-1",
-  "openCategoryForSharedLayers": [Function],
+  "openCategoryForLayers": [Function],
   "preparedLayers": Object {
     "education": Object {
       "aggregate": Object {
