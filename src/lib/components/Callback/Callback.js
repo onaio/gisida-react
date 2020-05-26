@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, SupAuth, history } from 'gisida';
-
-const { defaultUnSupAuthZ: deAuthZ } = SupAuth;
+import { getURLSearchParams } from '../../utils';
+import Cookie from 'js-cookie';
 
 class Callback extends Component {
   constructor(props) {
@@ -33,12 +33,17 @@ class Callback extends Component {
 
     if (isAuth && authConfig) {
       localStorage.setItem('expiry_time', this.getExpiryTime());
+      Cookie.set('dsauth', true);
       dispatch(Actions.receiveToken(accessToken));
       dispatch(Actions.receiveLogin(user));
       dispatch(Actions.getAuthConfigs(authConfig));
     }
 
-    return this.history.push('/');
+    // Redirect to home and preserve any query params (shared layers and style)
+    return this.history.push({
+      pathname: '/',
+      search: getURLSearchParams().toString(),
+    });
   }
 
   getParameterByName(name) {

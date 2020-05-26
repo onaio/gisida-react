@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import Cookie from 'js-cookie';
+import { SupAuth, isTokenExpired } from 'gisida';
 import './Login.scss';
 import BasicAuthLogin from './BasicAuthLogin/BasicAuthLogin'
 import OnaOauthLogin from './OnaOauthLogin/OnaOauthLogin'
+
+const { defaultUnSupAuthZ: deAuthZ } = SupAuth;
 
 const mapStateToProps = (state, ownProps) => {
     const { APP } = state;
@@ -12,9 +16,24 @@ const mapStateToProps = (state, ownProps) => {
         loginIcon: APP.appLoginIcon,
         appPassword: APP.password,
         appNameDesc: APP.appNameDesc,
-        oauthclientID: ownProps.oauthclientID,
         oauthProvider: ownProps.oauthProvider || 'onadata'
     };
+};
+
+export const killSession = () => {
+    Cookie.remove('dsauth');
+    localStorage.removeItem('expiry_time');
+    deAuthZ();
+}
+  
+export const isLoggedIn = function() {
+    const hasCookie = Cookie.get('dsauth') === "true";
+    const tokenIsExpired = isTokenExpired();
+    if (!hasCookie || tokenIsExpired) {
+        killSession();
+        return false;
+    }
+    return true;
 };
 
 class Login extends Component {
@@ -24,7 +43,7 @@ class Login extends Component {
         }
 
         const { appPassword, appNameDesc, loginIcon, appIcon,
-            oauthclientID, oauthProvider } = this.props;
+            oauthclientID, oauthProvider, publicPassword, publicUsername } = this.props;
 
         return (
             <div className="login">
@@ -32,14 +51,14 @@ class Login extends Component {
                 {appPassword ?
                     <BasicAuthLogin appPassword={appPassword} />
                     :
-                    <OnaOauthLogin clientID={oauthclientID} provider={oauthProvider} />
+                    <OnaOauthLogin clientID={oauthclientID} provider={oauthProvider} publicPassword= {publicPassword} publicUsername = {publicUsername}/>
                 }
             </div>
         )
     }
 }
 
-Login.PropTypes = {
+Login.propTypes = {
     clientID: PropTypes.string,
     appIcon: PropTypes.string,
     loginIcon: PropTypes.string,

@@ -7,7 +7,7 @@ class App extends Component {
   render() {
     return (
       <div className="app">
-        {isTokenExpired() ? Router.history.push('/login') : this.props.children}
+        {this.props.children}
       </div>
     );
   }

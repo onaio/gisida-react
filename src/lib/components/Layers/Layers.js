@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
 import { getMenuGroupVisibleLayers } from '../../utils';
+import { menuGroupHasVisibleLayers } from '../../utils';
 
 export class Layers extends Component {
   constructor(props) {
@@ -21,6 +22,27 @@ export class Layers extends Component {
       });
     }
     this.state = groups;
+  }
+
+  componentDidUpdate(prevProps) {
+    if (JSON.stringify(this.props.layers) !== JSON.stringify(prevProps.layers)) {
+      /** Check if updated children down the hierarchy have
+       * layers which are a visible. If so open the group
+       */
+      this.props.layers.forEach(layer => {
+        if (!layer.id) {
+          Object.keys(layer).forEach(groupName => {
+            const children = layer[groupName].layers;
+
+            if (menuGroupHasVisibleLayers(groupName, children) && !this.state[groupName].isOpen) {
+              this.setState({
+                [groupName]: { isOpen: true },
+              });
+            }
+          });
+        }
+      });
+    }
   }
 
   toggleSubMenu(e, layer) {
