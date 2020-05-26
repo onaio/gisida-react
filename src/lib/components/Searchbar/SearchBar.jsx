@@ -37,7 +37,7 @@ class SearchBar extends Component {
 
   componentDidUpdate() {
     const { selectedLayerId } = this.state;
-    const { preparedLayers, openCategoryForSharedLayers } = this.props;
+    const { preparedLayers, openCategoryForLayers } = this.props;
 
     // open menu when layer is loaded visibility is turned on
     if (selectedLayerId && preparedLayers[selectedLayerId].visible) {
@@ -45,7 +45,7 @@ class SearchBar extends Component {
         id: selectedLayerId,
         isCatOpen: false,
       };
-      openCategoryForSharedLayers([toOpenLayer]);
+      openCategoryForLayers([toOpenLayer]);
       this.setState({selectedLayerId: null});
     }
   }

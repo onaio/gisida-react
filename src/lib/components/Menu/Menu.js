@@ -113,7 +113,7 @@ class Menu extends Component {
     this.delayedMenuScrollCallback = debounce(this.persistScrollPosition, 1000);
 
     this.searchResultClick = this.searchResultClick.bind(this);
-    this.openCategoryForSharedLayers = this.openCategoryForSharedLayers.bind(this);
+    this.openCategoryForLayers = this.openCategoryForLayers.bind(this);
   }
 
   componentDidMount() {
@@ -143,18 +143,18 @@ class Menu extends Component {
       /** If there are any shared layers whose category we haven't open,
        * open them
        */
-      this.openCategoryForSharedLayers(sharedLayers);
+      this.openCategoryForLayers(sharedLayers);
     }
   }
 
   /**
    * Open category for which each of the shared layers falls under
    */
-  openCategoryForSharedLayers(sharedLayers) {
+  openCategoryForLayers(layersToOpenCategory) {
     const { categories } = this.props;
 
-    if (sharedLayers && categories) {
-      sharedLayers
+    if (layersToOpenCategory && categories) {
+      layersToOpenCategory
         .filter(l => !l.isCatOpen)
         .forEach(sharedLayer => {
           let i = 0;
@@ -531,7 +531,7 @@ class Menu extends Component {
                       handleSearchClick={this.handleSearchClick}
                       searchResultClick={this.searchResultClick}
                       mapId={mapId}
-                      openCategoryForSharedLayers={this.openCategoryForSharedLayers}
+                      openCategoryForLayers={this.openCategoryForLayers}
                     />
                   </div> : null
                 }
