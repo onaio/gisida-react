@@ -50,7 +50,10 @@ class SearchBar extends Component {
     }
   }
 
-  // load layer to map
+  /**
+   * dispatches action to open layer
+   * @param(Object) layer
+   */
   toggleLayer = (layer) => {
     const { mapId, APP, LOC } = this.props;
     if (!mapId) {
@@ -73,7 +76,12 @@ class SearchBar extends Component {
     }
   }
   
-  // make the matching part bold
+  /**
+   * make part of indicator matching user querry bold
+   * @param {string} indicator - indicator label
+   * @param {string} query - user search input
+   * @param {string} id - indicator identifier
+   */
   boldQuery(indicator, query, id){
     const indicatorToUpper = indicator.toUpperCase();
     const queryToUpper = query.toUpperCase();
@@ -84,13 +92,16 @@ class SearchBar extends Component {
     const querryLen = queryToUpper.length;
 
     return (
-      <a onClick={e => this.OnsearchResultClick(e, id)}>
+      <a onClick={e => this.onsearchResultClick(e, id)}>
         {indicator.substr(0,matchIndex)}<b>{indicator.substr(matchIndex, querryLen)}</b>{indicator.substr(matchIndex+querryLen)}
       </a>
     )
   }
 
-  // find part of layer labels matching querry
+  /**
+   * handle user search input
+   * @param {ChangeEvent} e - change event
+   */
   handleSearchInput(e) {
     this.setState({inputText: e.target.value})
     const { handleSearchInput, preparedLayers } = this.props;
@@ -110,8 +121,12 @@ class SearchBar extends Component {
     handleSearchInput(searchResults, input);
   }
 
-  // called when search result is selected
-  OnsearchResultClick(e, id) {
+  /**
+   * this is called when a search result is clicked
+   * @param {ClickEvent} e 
+   * @param {string} id - indicator identifier
+   */
+  onsearchResultClick(e, id) {
     e.preventDefault();
     const {searchResultClick, preparedLayers } = this.props;
     this.toggleLayer(preparedLayers[id]);
@@ -119,7 +134,10 @@ class SearchBar extends Component {
     this.setState({selectedLayerId: id})
   }
 
-  // called cancel button on search bar is selected
+  /**
+   * clears search input and displays menu
+   * @param {ClickEvent} e 
+   */
   handleCancel(e) {
     e.preventDefault();
     this.setState({inputText: "", });
