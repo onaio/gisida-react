@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, prepareLayer, lngLat } from 'gisida';
+import { pushLayerToURL } from '../Layer/utils'
 import './SearchBar.scss'
 
 /**
@@ -55,6 +56,7 @@ class SearchBar extends Component {
     if (!mapId) {
       return null;
     }
+    pushLayerToURL(layer, mapId);
     this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
     const {center, zoom } = lngLat(LOC, APP);
     if (layer.zoomOnToggle && layer.visible) {
