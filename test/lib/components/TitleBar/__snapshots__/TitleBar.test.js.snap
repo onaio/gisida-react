@@ -16,6 +16,7 @@ exports[`TitleBar TitleBar component renders correctly 1`] = `
   <TitleBar
     appConfig={
       Object {
+        "appNameDesc": "Test application",
         "loaded": true,
       }
     }
@@ -71,7 +72,9 @@ exports[`TitleBar TitleBar component renders correctly 1`] = `
             <span
               className="white"
             />
-               
+              
+             
+            Test application
           </div>
         </div>
         <a
