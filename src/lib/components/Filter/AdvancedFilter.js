@@ -7,15 +7,14 @@ import 'rc-slider/assets/index.css';
 import Slider, { Range } from 'rc-slider';
 
 const mapStateToProps = (state, ownProps) => {
-  return {
-  }
-}
+  return {};
+};
 
 export class AdvancedFilter extends React.Component {
   // helper funciton for finding AND intersection
   // todo - move to includes file?
   getObectIntersect(n, m) {
-    return [...new Set(n.filter((x) => m.indexOf(x) !== -1))];
+    return [...new Set(n.filter(x => m.indexOf(x) !== -1))];
   }
 
   constructor(props) {
@@ -24,14 +23,21 @@ export class AdvancedFilter extends React.Component {
     const { filterKey, options, queries, dataType } = this.props;
     const isQuant = dataType === 'quantitative';
     this.state = {
-      queries: queries && queries.length ? queries : [{
-        isOR: true,
-        val: isQuant ? {
-          min: Math.min(...options),
-          max: Math.max(...options),
-        } : '',
-        control: isQuant ? 'between' : 'contains',
-      }],
+      queries:
+        queries && queries.length
+          ? queries
+          : [
+              {
+                isOR: true,
+                val: isQuant
+                  ? {
+                      min: Math.min(...options),
+                      max: Math.max(...options),
+                    }
+                  : '',
+                control: isQuant ? 'between' : 'contains',
+              },
+            ],
       isQuant,
       filterKey,
       prevOptions: options,
@@ -53,11 +59,12 @@ export class AdvancedFilter extends React.Component {
     const qContr = query.control;
     const qValue = query.val;
     const isOR = q ? query.isOR : false;
-    const options = !q || isOR
-      ? isQuant
-        ? [...new Set(prevOptions)]
-        : Object.keys(prevOptions)
-      : queries[q - 1].matches;
+    const options =
+      !q || isOR
+        ? isQuant
+          ? [...new Set(prevOptions)]
+          : Object.keys(prevOptions)
+        : queries[q - 1].matches;
 
     const isEmpty = !isQuant
       ? query.val === ''
@@ -80,14 +87,14 @@ export class AdvancedFilter extends React.Component {
         case 'less than':
           isMatched = options[i] < qValue.max;
           break;
-        case 'greater than': 
+        case 'greater than':
           isMatched = options[i] > qValue.min;
           break;
 
         case 'contains':
         case 'does not contain': {
           isMatched = hasCount
-            ? (optionKey.toLowerCase()).indexOf(qValue.toLowerCase()) !== -1
+            ? optionKey.toLowerCase().indexOf(qValue.toLowerCase()) !== -1
             : false;
           if (hasCount && qContr !== 'contains') isMatched = !isMatched;
           break;
@@ -95,15 +102,13 @@ export class AdvancedFilter extends React.Component {
         case 'starts with':
         case 'does not start with':
           isMatched = hasCount
-            ? (optionKey.toLowerCase()).indexOf(qValue.toLowerCase()) === 0
+            ? optionKey.toLowerCase().indexOf(qValue.toLowerCase()) === 0
             : false;
           if (hasCount && qContr !== 'starts with') isMatched = !isMatched;
           break;
         case 'is':
         case 'is not': {
-          isMatched = hasCount
-            ? optionKey.toLowerCase() === qValue.toLowerCase()
-            : false;
+          isMatched = hasCount ? optionKey.toLowerCase() === qValue.toLowerCase() : false;
           if (hasCount && qContr !== 'is') isMatched = !isMatched;
           break;
         }
@@ -154,12 +159,13 @@ export class AdvancedFilter extends React.Component {
 
     return reducedMatches.length // check for matches
       ? reducedMatches // return matches
-      : queries.length === 1 && (!isQuant // check for first and empty
-        ? query.val === ''
-        : query.val.min === Math.min(...prevOptions) && query.val.max === Math.max(...prevOptions))
+      : queries.length === 1 &&
+        (!isQuant // check for first and empty
+          ? query.val === ''
+          : query.val.min === Math.min(...prevOptions) &&
+            query.val.max === Math.max(...prevOptions))
       ? null // if first and empty, return null
-      : []
-    ;
+      : [];
   }
 
   onInputChange(e, q) {
@@ -170,20 +176,20 @@ export class AdvancedFilter extends React.Component {
     for (let i = 0; i < queries.length; i += 1) {
       query = queries[i];
       if (q === i) {
-        nextQueries.push(Object.assign(
-          {},
-          query,
-          {
-            val: !isQuant ? e.target.value : {
-              min: e[0], // isMin ? Number(e.target.value) : queries[i].val.min,
-              max: e[1] // isMin ? queries[i].val.max : Number(e.target.value),
-            },
-          },
-        ));
+        nextQueries.push(
+          Object.assign({}, query, {
+            val: !isQuant
+              ? e.target.value
+              : {
+                  min: e[0], // isMin ? Number(e.target.value) : queries[i].val.min,
+                  max: e[1], // isMin ? queries[i].val.max : Number(e.target.value),
+                },
+          })
+        );
       } else {
         nextQueries.push(query);
       }
-      nextQueries[i].matches = nextQueries[i].val.length ? this.getQueryMatches(nextQueries, i) : [];
+      nextQueries[i].matches = this.getQueryMatches(nextQueries, i);
     }
 
     const queriedOptionKeys = this.reduceQueryMatches(nextQueries);
@@ -199,17 +205,15 @@ export class AdvancedFilter extends React.Component {
     for (let i = 0; i < queries.length; i += 1) {
       query = queries[i];
       if (q === i) {
-        nextQueries.push(Object.assign(
-          {},
-          query,
-          {
+        nextQueries.push(
+          Object.assign({}, query, {
             control: e.target.value,
-          },
-        ));
+          })
+        );
       } else {
         nextQueries.push(query);
       }
-      nextQueries[i].matches = nextQueries[i].val.length ? this.getQueryMatches(nextQueries, i) : [];
+      nextQueries[i].matches = this.getQueryMatches(nextQueries, i);
     }
 
     const queriedOptionKeys = this.reduceQueryMatches(nextQueries);
@@ -226,10 +230,12 @@ export class AdvancedFilter extends React.Component {
     if (doAdd) {
       nextQueries.splice(q + 1, 0, {
         isOR: false,
-        val: isQuant ? {
-          min: Math.min(...options),
-          max: Math.max(...options),
-        } : '',
+        val: isQuant
+          ? {
+              min: Math.min(...options),
+              max: Math.max(...options),
+            }
+          : '',
         control: isQuant ? 'between' : 'contains',
       });
     } else {
@@ -239,10 +245,12 @@ export class AdvancedFilter extends React.Component {
     if (!nextQueries.length) {
       nextQueries.push({
         isOR: false,
-        val: isQuant ? {
-          min: Math.min(...options),
-          max: Math.max(...options),
-        } : '',
+        val: isQuant
+          ? {
+              min: Math.min(...options),
+              max: Math.max(...options),
+            }
+          : '',
         control: isQuant ? 'between' : 'contains',
       });
     }
@@ -260,13 +268,11 @@ export class AdvancedFilter extends React.Component {
 
     for (let i = 0; i < queries.length; i += 1) {
       if (q === i) {
-        nextQueries.push(Object.assign(
-          {},
-          queries[i],
-          {
+        nextQueries.push(
+          Object.assign({}, queries[i], {
             isOR: !queries[i].isOR,
-          }
-        ));
+          })
+        );
       } else {
         nextQueries.push(queries[i]);
       }
@@ -283,27 +289,25 @@ export class AdvancedFilter extends React.Component {
     const min = Math.min(...options);
     const max = Math.max(...options);
 
-    const containerClass = control === 'less than'
-      ? 'inputLessThan'
-      : control === 'greater than'
-      ? 'inputGreaterThan'
-      : 'inputBetween';
+    const containerClass =
+      control === 'less than'
+        ? 'inputLessThan'
+        : control === 'greater than'
+        ? 'inputGreaterThan'
+        : 'inputBetween';
 
     return (
       <div className={containerClass}>
-
         {control === 'between' || control === 'not between' ? (
           <Range
             min={min}
             max={max}
-            marks={
-              {
-                [val.min]: val.min.toString(),
-                [val.max]: val.max.toString()
-              }
-            }
+            marks={{
+              [val.min]: val.min.toString(),
+              [val.max]: val.max.toString(),
+            }}
             defaultValue={[val.min, val.max]}
-            onChange={(e) => {
+            onChange={e => {
               this.onInputChange(e, q);
             }}
           />
@@ -312,35 +316,37 @@ export class AdvancedFilter extends React.Component {
             min={min}
             max={max}
             defaultValue={control === 'less than' ? val.max : val.min}
-            marks={
-              {
-                [val.min]: val.min.toString(),
-                [val.max]: val.max.toString()
-              }
-            }
-            onChange={(e) => {
+            marks={{
+              [val.min]: val.min.toString(),
+              [val.max]: val.max.toString(),
+            }}
+            onChange={e => {
               this.onInputChange(control === 'less than' ? [val.min, e] : [e, val.max], q);
             }}
           />
         )}
 
-        <div className="texttip min" style={{right: '100%'}}>
+        <div className="texttip min" style={{ right: '100%' }}>
           <span>{min}</span>
         </div>
 
         {control !== 'less than' ? (
-          <div className="texttip low" style={{right: `${(1 - (val.min / max)) * 100}%`}}>
+          <div className="texttip low" style={{ right: `${(1 - val.min / max) * 100}%` }}>
             <span>{val.min}</span>
           </div>
-        ) : ''}
+        ) : (
+          ''
+        )}
 
         {control !== 'greater than' ? (
-          <div className="texttip high" style={{right: `${(1 - (val.max / max)) * 100}%`}}>
+          <div className="texttip high" style={{ right: `${(1 - val.max / max) * 100}%` }}>
             <span>{val.max}</span>
           </div>
-        ) : ''}
+        ) : (
+          ''
+        )}
 
-        <div className="texttip max" style={{right: '0%'}}>
+        <div className="texttip max" style={{ right: '0%' }}>
           <span>{max}</span>
         </div>
       </div>
@@ -364,15 +370,29 @@ export class AdvancedFilter extends React.Component {
 
       // Control Selector
       controlSelectorEl = isQuant ? (
-        <select onChange={(e) => { this.onControlChange(e, q); }} role="button">
-          <option label="between" selected="selected">between</option>
-          <option label="not between" >not between</option>
+        <select
+          onChange={e => {
+            this.onControlChange(e, q);
+          }}
+          role="button"
+        >
+          <option label="between" selected="selected">
+            between
+          </option>
+          <option label="not between">not between</option>
           <option label="less than">less than</option>
           <option label="greater than">greater than</option>
         </select>
       ) : (
-        <select onChange={(e) => { this.onControlChange(e, q); }} role="button">
-          <option label="contains" selected="selected">contains</option>
+        <select
+          onChange={e => {
+            this.onControlChange(e, q);
+          }}
+          role="button"
+        >
+          <option label="contains" selected="selected">
+            contains
+          </option>
           <option label="does not contain">does not contain</option>
           <option label="starts with">starts with</option>
           <option label="does not start with">does not start with</option>
@@ -389,29 +409,30 @@ export class AdvancedFilter extends React.Component {
           data-type="advanced-filter"
           value={query.val}
           // ref={(el) => { this[`searchEl`] = el; }}
-          onChange={(e) => this.onInputChange(e, q)}
+          onChange={e => this.onInputChange(e, q)}
         />
-      ) : this.buildQuantInputEl(query, q);
+      ) : (
+        this.buildQuantInputEl(query, q)
+      );
 
       queryEl = (
         <div className="advanced-controls" key={q}>
-          { /* Logical Operator toggle */ }
+          {/* Logical Operator toggle */}
           {q ? (
             <table>
               <tbody>
                 <tr>
                   <td>And</td>
                   <td>
-                    <label
-                      className="switch"
-                      htmlFor="operator-toggle"
-                    >
+                    <label className="switch" htmlFor="operator-toggle">
                       <input
                         type="checkbox"
                         id="operator-toggle"
                         className="operator-toggle"
                         checked={query.isOR}
-                        onChange={(e) => { this.toggleLogicalOperators(e, q); }}
+                        onChange={e => {
+                          this.toggleLogicalOperators(e, q);
+                        }}
                       />
                       <span className="slider" />
                     </label>
@@ -420,29 +441,39 @@ export class AdvancedFilter extends React.Component {
                 </tr>
               </tbody>
             </table>
-            ) : ''}
+          ) : (
+            ''
+          )}
           {controlSelectorEl}
           {inputEl}
           <div>
-            { /* Add / Remove buttons */ }
-            {q || queries.length > 1 ?
+            {/* Add / Remove buttons */}
+            {q || queries.length > 1 ? (
               <span
                 // key={q}
                 role="button"
                 tabIndex="0"
                 className="glyphicon glyphicon-minus"
-                onClick={(e) => { this.onAddRemoveClick(e, q, false); }}
+                onClick={e => {
+                  this.onAddRemoveClick(e, q, false);
+                }}
               />
-            : ''}
-            {!q || !isClear ?
+            ) : (
+              ''
+            )}
+            {!q || !isClear ? (
               <span
                 // key={q}
                 role="button"
                 tabIndex="0"
                 className="glyphicon glyphicon-plus"
-                onClick={(e) => { this.onAddRemoveClick(e, q, true); }}
+                onClick={e => {
+                  this.onAddRemoveClick(e, q, true);
+                }}
               />
-            : ''}
+            ) : (
+              ''
+            )}
           </div>
         </div>
       );

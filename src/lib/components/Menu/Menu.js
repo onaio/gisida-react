@@ -5,11 +5,13 @@ import { Actions } from 'gisida';
 import Layers from '../Layers/Layers';
 import ConnectedLayers from '../Layers/ConnectedLayers';
 import './Menu.scss';
-import _ from 'lodash';
+import { debounce } from 'lodash';
 import memoize from 'memoize-one';
+import { getSharedLayersFromURL, getMenuGroupMapLayers } from '../../utils';
 
 const mapStateToProps = (state, ownProps) => {
-  const MAP = state[ownProps.mapId] || { layers: {} };
+  const { mapId } = ownProps;
+  const MAP = state[mapId] || { layers: {} };
   const { LAYERS, AUTH, APP, VIEW } = state;
   let categories;
   // let layers;
@@ -69,6 +71,7 @@ const mapStateToProps = (state, ownProps) => {
       : '';
 
   return {
+    mapId,
     categories,
     // layers, // todo - support layers without categories
     LAYERS,
@@ -100,7 +103,16 @@ class Menu extends Component {
     /**
      * Gets scroll position after scroll ceases
      */
-    this.delayedMenuScrollCallback = _.debounce(this.persistScrollPosition, 1000);
+    this.delayedMenuScrollCallback = debounce(this.persistScrollPosition, 1000);
+
+    // Get the layers shared via URL if any
+    const { mapId } = props;
+
+    this.state = {
+      sharedLayers: getSharedLayersFromURL(mapId).map(l => {
+        return { id: l, isCatOpen: false };
+      }),
+    };
   }
 
   componentDidMount() {
@@ -122,6 +134,119 @@ class Menu extends Component {
     if (this.props.showMap && this.props.showMap !== prevProps.showMap && this.props.menuScroll) {
       this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop;
     }
+    const { sharedLayers } = this.state;
+
+    if (sharedLayers.filter(l => !l.isCatOpen).length) {
+      /** If there are any shared layers whose category we haven't open,
+       * open them
+       */
+      this.openCategoryForSharedLayers();
+    }
+  }
+
+  /**
+   * Open category for which each of the shared layers falls under
+   */
+  openCategoryForSharedLayers() {
+    const { categories } = this.props;
+    const { sharedLayers } = this.state;
+
+    if (sharedLayers && categories) {
+      sharedLayers
+        .filter(l => !l.isCatOpen)
+        .forEach(sharedLayer => {
+          let i = 0;
+          /**
+           * A layer belongs to only one category. So if we found its
+           * category, use this flag to break from the loop
+           */
+          let catFound = false;
+
+          while (!catFound && i < categories.length) {
+            const category = categories[i];
+            let j = 0;
+
+            while (!catFound && j < category.layers.length) {
+              const layer = category.layers[j];
+
+              if (!layer.id) {
+                /**
+                 * This is a group. So continue checking down the hierarchy
+                 * for visible layers
+                 */
+                const groupNames = Object.keys(layer);
+                let k = 0;
+
+                while (!catFound && k < groupNames.length) {
+                  const groupName = groupNames[k];
+
+                  const children = layer[groupName].layers;
+                  const groupMapLayerIds = getMenuGroupMapLayers(groupName, children);
+
+                  if (
+                    groupMapLayerIds.indexOf(sharedLayer.id) >= 0 ||
+                    groupMapLayerIds.indexOf(`${sharedLayer.id}.json`) >= 0
+                  ) {
+                    this.openCategoryForSharedLayer(category.category, sharedLayer.id);
+                    catFound = true;
+                  }
+
+                  k += 1;
+                } // group while
+              } else {
+                // This category has one level only
+                if (layer.id === sharedLayer.id || layer.id === `${sharedLayer.id}.json`) {
+                  this.openCategoryForSharedLayer(category.category, sharedLayer.id);
+                  catFound = true;
+                }
+              }
+
+              j += 1;
+            } // category layers while
+
+            i += 1;
+          } // categories while
+        });
+    }
+  }
+
+  /**
+   * Toggle a category for a shared layer and update category
+   * status as open
+   * @param {*} categoryName category name of category to be opened
+   * @param {*} id id of shared layer
+   */
+  openCategoryForSharedLayer(categoryName, id) {
+    const { openCategories } = this.props;
+    const { sharedLayers } = this.state;
+
+    if (openCategories.indexOf(categoryName) < 0) {
+      /** Shared layers could share a a category so we check to
+       * make sure we do not toggle again as this will close
+       * a category that was already open
+       */
+      this.toggleCategory(categoryName);
+    }
+    this.setState({
+      sharedLayers: sharedLayers.map(l => {
+        if (l.id == id) {
+          l.isCatOpen = true;
+        }
+
+        return l;
+      }),
+    });
+  }
+
+  /**
+   * Toggle category
+   * @param {*} categoryName
+   */
+  toggleCategory(categoryName) {
+    const { openCategories } = this.props;
+    const index = openCategories.indexOf(categoryName);
+
+    this.props.dispatch(Actions.toggleCategories(this.props.mapId, categoryName, index));
   }
 
   onToggleMenu = e => {
@@ -132,9 +257,7 @@ class Menu extends Component {
 
   onCategoryClick = (e, category) => {
     e.preventDefault();
-    const { openCategories } = this.props;
-    const index = openCategories.indexOf(category);
-    this.props.dispatch(Actions.toggleCategories(this.props.mapId, category, index));
+    this.toggleCategory(category);
   };
 
   onRegionClick = e => {

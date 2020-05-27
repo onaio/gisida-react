@@ -1,15 +1,20 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { useOAuthLogin, AuthorizationGrantType } from '@onaio/gatekeeper';
+import { getURLSearchParams } from '../../../utils';
 
 class OnaOauthLogin extends Component {
   constructor(props) {
     super(props);
     const { clientID } = this.props;
     let authorizationUris = {};
+    // Include and query params in the callback URI if any e.g shared layers and style
+    const searchParamsString = getURLSearchParams().toString();
 
     if (clientID) {
-      const redirectUri = location.protocol + '//' + location.host + '/callback';
+      const redirectUri = `${location.protocol}//${location.host}/callback${
+        searchParamsString ? '?' + searchParamsString : ''
+      }`;
       const providers = {
         onadata: {
           accessTokenUri: '',
@@ -34,7 +39,7 @@ class OnaOauthLogin extends Component {
   }
 
   render() {
-    const { provider } = this.props;
+    const { provider, publicPassword, publicUsername } = this.props;
 
     if (!this.props.clientID || !this.state.authorizationUris[provider]) {
       return null;
@@ -43,6 +48,13 @@ class OnaOauthLogin extends Component {
     return (
       <form className="login-form">
         <div className="form-group">
+          {publicPassword && publicUsername ? (
+            <div>
+              <small>Username: {publicUsername}</small>
+              <br />
+              <small>Password: {publicPassword}</small>
+            </div>
+          ) : null}
           <a
             className="btn btn-default center-block btn-block"
             href={this.state.authorizationUris[provider]}

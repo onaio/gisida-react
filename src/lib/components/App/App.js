@@ -5,11 +5,7 @@ import Router from '../../routes/router';
 
 class App extends Component {
   render() {
-    return (
-      <div className="app">
-        {isTokenExpired() ? Router.history.push('/login') : this.props.children}
-      </div>
-    );
+    return <div className="app">{this.props.children}</div>;
   }
 }
 

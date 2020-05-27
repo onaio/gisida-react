@@ -1,8 +1,13 @@
+/* eslint-disable react/prop-types */
+/**
+ * Todo: add proptype for children
+ */
 import React from 'react';
 import { Router as RRouter, Redirect as RRedirect, Link as RLink } from 'react-router-dom';
 import { history } from 'gisida';
 import PrivateRoute from './privateRoute';
 import PublicRoute from './publicRoute';
+import PropTypes from 'prop-types';
 
 // Router Builder Functions
 const Redirect = to => <RRedirect to={to || '/'} />;
@@ -23,7 +28,6 @@ const Wrapper = history => {
     }
   };
 };
-
 // Gisida React Router Module
 class Router {
   static instance; // define Singleton Instance - move this to const outside of class?
@@ -46,6 +50,9 @@ class Router {
     this.instance = this;
   }
 }
+Router.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 class testRoute extends React.Component {
   render() {
