@@ -1,7 +1,7 @@
 /**
  * Handle display of submenu and layer items by utilizing redux state.
  * Keeps track of open submenus in redux state
- * 
+ *
  */
 
 import React, { Component } from 'react';
@@ -97,7 +97,7 @@ export class ConnectedLayers extends Component {
           const LocalAuthConfig = JSON.parse(localStorage.getItem('authConfig'));
           users = authConfigs.LAYERS && authConfigs.LAYERS[activeId]; // list of users with access to the layer
           authConfigs.LAYERS = authConfigs.LAYERS || LocalAuthConfig.LAYERS;
-          users = authConfigs.LAYERS[activeId]; 
+          users = authConfigs.LAYERS[activeId];
           // list of users with access to the layer
           // check if logged in user exists in the list of users
           // who have access to the layer
@@ -158,6 +158,6 @@ ConnectedLayers.propTypes = {
   layers: PropTypes.arrayOf(PropTypes.any).isRequired,
   preparedLayers: PropTypes.arrayOf(PropTypes.any),
   currentRegion: PropTypes.string,
-  auth: PropTypes.object
+  auth: PropTypes.object,
 };
 export default connect(mapStateToProps)(ConnectedLayers);

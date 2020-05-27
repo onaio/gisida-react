@@ -12,16 +12,16 @@ class FilterSelectorPrev extends React.Component {
       const optVal = {};
       optVal[opt] = true;
       return optVal;
-    }
+    };
     let filterOptions = {};
 
     if (layerObj && layerObj.filterOptions) {
       filterOptions = Array.isArray(layerObj.filterOptions)
-        ? layerObj.filterOptions.map((opt) => {
-          const optVal = {};
-          optVal[opt] = true;
-          return optVal;
-        })
+        ? layerObj.filterOptions.map(opt => {
+            const optVal = {};
+            optVal[opt] = true;
+            return optVal;
+          })
         : Object.assign({}, layerObj.filterOptions);
 
       if (Array.isArray(layerObj.filterOptions)) {
@@ -44,11 +44,11 @@ class FilterSelectorPrev extends React.Component {
 
     if (layerObj && layerObj.filterOptions) {
       filterOptions = Array.isArray(layerObj.filterOptions)
-        ? layerObj.filterOptions.map((opt) => {
-          const optVal = {};
-          optVal[opt] = true;
-          return optVal;
-        })
+        ? layerObj.filterOptions.map(opt => {
+            const optVal = {};
+            optVal[opt] = true;
+            return optVal;
+          })
         : Object.assign({}, layerObj.filterOptions);
 
       if (Array.isArray(layerObj.filterOptions)) {
@@ -85,7 +85,7 @@ class FilterSelectorPrev extends React.Component {
                   id={val}
                   key={`input_${val}`}
                   value={val}
-                  onChange={(e) => {
+                  onChange={e => {
                     this.updateOptions(e.target.value);
                   }}
                   checked={this.state.options[val]}
@@ -95,12 +95,11 @@ class FilterSelectorPrev extends React.Component {
                 </label>
               </span>
             );
-            })
-          }
+          })}
         </nav>
       );
     }
-    return (<nav />);
+    return <nav />;
   }
 }
 

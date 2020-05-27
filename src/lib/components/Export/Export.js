@@ -87,7 +87,6 @@ export class Export extends Component {
     this.resetMapAfterExport = this.resetMapAfterExport.bind(this);
   }
 
-
   componentWillReceiveProps(nextProps) {
     if (nextProps && nextProps.map) {
       const { html2canvas, devicePixelRatio, innerHeight, innerWidth } = window;
@@ -137,7 +136,9 @@ export class Export extends Component {
     };
 
     // resize map container / map
-    $(`#${mapId}.mapboxgl-map`).innerWidth(dimWidth / resValue).innerHeight(dimHeight / resValue);
+    $(`#${mapId}.mapboxgl-map`)
+      .innerWidth(dimWidth / resValue)
+      .innerHeight(dimHeight / resValue);
     if (!config.includeNavControls) {
       map.removeControl(map.controls);
     }
@@ -233,38 +234,43 @@ export class Export extends Component {
       $('#exportEl').prepend($(`#${mapId}.mapboxgl-map .mapboxgl-canvas-container`));
 
       // push export container element into a new canvas
-      window.html2canvas(exportEl, {
-        removeContainer: true, // remove the iframe created by html2canvas
-        scale: resValue, // set the scale / resolution of the resulting canvas
-        logging: false, // this doesn't seem to work even when true...
-      }).then((canvas) => {
-        // convert new canvas element to blob (not toDataUrl due to long base64 urls)
-        canvas.toBlob((blob) => {
-          // restore the map to it's previous state
-          self.resetMapAfterExport(prevMapState);
-          // create download url from blob object
-          downloadA.href = URL.createObjectURL(blob);
-          // trigger actual download of exported image
-          downloadA.click();
-          // delete the export container and it's child clones
-          $('#exportEl').remove();
-        }, 'image/jpg');
-        /**
-         * Hide export modal once map is exported
-         */
-          if (this.props.config["closeExportModal"]){
-            this.setState({
-              isOpen: !this.state.isOpen
-            })
+      window
+        .html2canvas(exportEl, {
+          removeContainer: true, // remove the iframe created by html2canvas
+          scale: resValue, // set the scale / resolution of the resulting canvas
+          logging: false, // this doesn't seem to work even when true...
+        })
+        .then(
+          canvas => {
+            // convert new canvas element to blob (not toDataUrl due to long base64 urls)
+            canvas.toBlob(blob => {
+              // restore the map to it's previous state
+              self.resetMapAfterExport(prevMapState);
+              // create download url from blob object
+              downloadA.href = URL.createObjectURL(blob);
+              // trigger actual download of exported image
+              downloadA.click();
+              // delete the export container and it's child clones
+              $('#exportEl').remove();
+            }, 'image/jpg');
+            /**
+             * Hide export modal once map is exported
+             */
+            if (this.props.config['closeExportModal']) {
+              this.setState({
+                isOpen: !this.state.isOpen,
+              });
+            }
+          },
+          () => {
+            // if the promise is rejected, restore the map to it's previous state
+            self.resetMapAfterExport(prevMapState);
+            // delete the export container and it's child clones
+            $('#exportEl').remove();
+            // indicate that the exprort failed
+            alert('Export Failed - If this issue continues please contact ONA Support.');
           }
-        }, () => {
-        // if the promise is rejected, restore the map to it's previous state
-        self.resetMapAfterExport(prevMapState);
-        // delete the export container and it's child clones
-        $('#exportEl').remove();
-        // indicate that the exprort failed
-        alert('Export Failed - If this issue continues please contact ONA Support.');
-      });
+        );
     }, 100);
   }
 
@@ -379,7 +385,7 @@ export class Export extends Component {
 
   scriptIsLoaded() {
     this.setState({
-      isH2Cloaded: true
+      isH2Cloaded: true,
     });
   }
 
@@ -584,29 +590,30 @@ export class Export extends Component {
                       </span>
                     </li>
                   </ul>
-                  {
-                    this.state.config.mapBounds ? (
-                      <div className="toFitToBounds">
-                        <input
-                          id={`do-fit-${this.props.mapId}`}
-                          className="fitMap"
-                          type="checkbox"
-                          checked={doFitMap}
-                          onClick={(e) => { this.onOptionsChange(e, 'fitMap'); }}
-                        />
-                        <label
-                          htmlFor={`do-fit-${this.props.mapId}`}
-                        >Fit map to export size and aspect ratio</label>
-                      </div>
-                    ) : (
-                        // todo - add link to documentation
-                        <span className="boundsNote">
-                          Note: Provide the &apos;mapBounds&apos; configuration
-                        option to enable fitting the map<br />
-                          within the exported image.
-                      </span>
-                      )
-                  }
+                  {this.state.config.mapBounds ? (
+                    <div className="toFitToBounds">
+                      <input
+                        id={`do-fit-${this.props.mapId}`}
+                        className="fitMap"
+                        type="checkbox"
+                        checked={doFitMap}
+                        onClick={e => {
+                          this.onOptionsChange(e, 'fitMap');
+                        }}
+                      />
+                      <label htmlFor={`do-fit-${this.props.mapId}`}>
+                        Fit map to export size and aspect ratio
+                      </label>
+                    </div>
+                  ) : (
+                    // todo - add link to documentation
+                    <span className="boundsNote">
+                      Note: Provide the &apos;mapBounds&apos; configuration option to enable fitting
+                      the map
+                      <br />
+                      within the exported image.
+                    </span>
+                  )}
                 </div>
                 <div>
                   <h5>Title</h5>

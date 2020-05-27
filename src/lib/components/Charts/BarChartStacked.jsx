@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import Highcharts from 'highcharts';
 
 class BarChartStacked extends React.Component {
-
   static tooltipPointFormatter() {
     return `<b>${this.series.name}:</b> ${this.y.toLocaleString()}`;
   }
@@ -98,7 +97,7 @@ class BarChartStacked extends React.Component {
         labels: {
           align: 'right',
         },
-      }
+      },
     });
   }
 
@@ -113,7 +112,13 @@ class BarChartStacked extends React.Component {
   }
 
   render() {
-    return <div ref={(el) => { this.chartEl = el; }} />;
+    return (
+      <div
+        ref={el => {
+          this.chartEl = el;
+        }}
+      />
+    );
   }
 }
 

@@ -17,7 +17,8 @@
     "build": "node scripts/build.js",
     "develop": "node scripts/develop.js",
     "start": "node scripts/start.js",
-    "test": "node scripts/test.js --env=jsdom"
+    "test": "node scripts/test.js --env=jsdom",
+    "lint": "eslint 'src/**/*.{js,jsx}'"
   },
   "babel": {
     "presets": [
@@ -28,6 +29,17 @@
     "plugins": [
       "transform-class-properties",
       "transform-object-rest-spread"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "prettier --write",
+      "eslint --fix"
     ]
   },
   "eslintConfig": {
@@ -80,10 +92,12 @@
     "colorbrewer": "^1.1.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.1.1",
+    "eslint-plugin-jest": "^23.8.2",
     "gisida": "^1.4.0",
     "highcharts": "^6.0.6",
     "html-react-parser": "^0.4.2",
     "jquery": "^3.3.1",
+    "lint-staged": "10.0.0",
     "lodash": "^4.17.15",
     "memoize-one": "^5.1.1",
     "rc-slider": "^8.7.1",
@@ -126,6 +140,7 @@
     "file-loader": "^0.11.2",
     "fs-extra": "3.0.1",
     "html-webpack-plugin": "2.29.0",
+    "husky": "3.0.8",
     "jest": "^22.4.2",
     "loader-utils": "^1.1.0",
     "node-sass": "^4.5.3",
