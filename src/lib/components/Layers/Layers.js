@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
 import { menuGroupHasVisibleLayers } from '../../utils';
+import { DATA_NOT_AVAILABLE } from '../../constants'
 
 export class Layers extends Component {
   constructor(props) {
@@ -11,7 +12,11 @@ export class Layers extends Component {
       this.props.layers.forEach(layer => {
         if (!layer.id) {
           Object.keys(layer).forEach(l => {
-            groups[l] = { isOpen: false };
+            if (layer[l].layers.length) {
+              groups[l] = { isOpen: menuGroupHasVisibleLayers(l, layer[l].layers) };
+            } else {
+              groups[l] = { isOpen: false }
+            }
           });
         }
       });
@@ -43,7 +48,6 @@ export class Layers extends Component {
   toggleSubMenu(e, layer) {
     e.preventDefault();
     this.setState({
-      ...this.state,
       [layer]: { isOpen: !this.state[layer].isOpen },
     });
   }
@@ -58,7 +62,7 @@ export class Layers extends Component {
       return layers.length > 0 ? (
         <p>You don't have permision to view this category</p>
       ) : (
-        <p>{noLayerText ? noLayerText : 'No layers available'}</p>
+        <p>{noLayerText ? noLayerText : DATA_NOT_AVAILABLE}</p>
       );
     };
 
@@ -111,7 +115,7 @@ export class Layers extends Component {
         } else {
           Object.keys(layer).forEach((d, i) => {
             layerItem = layerItem.concat([
-              <li>
+              <li key={i}>
                 <a
                   key={`${d}-${i}-link`}
                   className="sub-category"
