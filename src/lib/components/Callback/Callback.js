@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, SupAuth, history } from 'gisida';
+import { getURLSearchParams } from '../../utils';
 import Cookie from 'js-cookie';
-
-const { defaultUnSupAuthZ: deAuthZ } = SupAuth;
 
 class Callback extends Component {
   constructor(props) {
@@ -40,7 +39,11 @@ class Callback extends Component {
       dispatch(Actions.getAuthConfigs(authConfig));
     }
 
-    return this.history.push('/');
+    // Redirect to home and preserve any query params (shared layers and style)
+    return this.history.push({
+      pathname: '/',
+      search: getURLSearchParams().toString(),
+    });
   }
 
   getParameterByName(name) {

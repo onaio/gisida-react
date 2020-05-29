@@ -4,6 +4,7 @@ import { shallow, mount } from 'enzyme';
 import configureStore from 'redux-mock-store';
 import { layer1 } from '../../../fixtures/defaultLayers.js';
 import { Actions } from 'gisida';
+import { Provider } from 'react-redux';
 
 const initialState = {
     LAYERS: {groups: {} },
@@ -74,5 +75,24 @@ describe('Menu Component', () => {
         expect(changeRegionAction).toHaveBeenCalledWith('reg1');
         expect(changeRegionAction).toHaveBeenCalledTimes(1); 
     })
+
+    it('Renders correctly when search bar is active', () => {
+      initialState.APP['searchBar'] = true;
+      initialState.APP = {
+        ...initialState.APP,
+        'searchBar': true,
+        'appColor': 'red'
+      }
+      const store = mockStore(initialState);
+      const wrapper = mount(
+        <Provider store={store}>
+          <Menu {...props} />      
+        </Provider>
+          
+      );
+
+      expect(wrapper.find('SearchBar').length).toEqual(1);
+      expect(wrapper.find('SearchBar').props()).toMatchSnapshot('search bar on');
+    });
 
 });

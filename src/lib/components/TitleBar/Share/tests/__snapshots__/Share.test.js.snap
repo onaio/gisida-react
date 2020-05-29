@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Share renders correctly 1`] = `
+<div>
+  <li>
+    <a
+      alt="Share"
+      href="#"
+      onClick={[Function]}
+      title="Share"
+    >
+      <span
+        className="glyphicon glyphicon-share"
+      />
+    </a>
+  </li>
+</div>
+`;

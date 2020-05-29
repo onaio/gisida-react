@@ -3,7 +3,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Actions, addPopUp, sortLayers, addChart, buildDetailView, prepareLayer } from 'gisida';
-import { detectIE, buildLayersObj, orderLayers } from '../../utils';
+import * as utils from '../../utils';
+import { pushStyleToURL } from './utils';
 import './Map.scss';
 import {
   ALL,
@@ -29,7 +30,7 @@ import {
   HIGHLIGHT_LAYOUT,
   HIGHLIGHT_PAINT,
   VECTOR_PROP,
-  CATEGORICAL
+  CATEGORICAL,
 } from '../../constants';
 
 const mapStateToProps = (state, ownProps) => {
@@ -65,7 +66,7 @@ const mapStateToProps = (state, ownProps) => {
       ? MAP.timeseries[MAP.primarySubLayer || MAP.primaryLayer || MAP.activeLayerId]
       : null,
     timeseries: MAP.timeseries,
-    layersObj: MAP.layers ? buildLayersObj(MAP.layers) : {},
+    layersObj: MAP.layers ? utils.buildLayersObj(MAP.layers) : {},
     layerObj: MAP.layers ? MAP.layers[MAP.primaryLayer || MAP.activeLayerId] : null,
     primaryLayer: MAP.primaryLayer,
     oldLayerObj: MAP.oldLayerObjs ? MAP.oldLayerObjs[MAP.primaryLayer] : {},
@@ -78,17 +79,24 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-const isIE = detectIE();
-
 window.maps = [];
 
 class Map extends Component {
   constructor(props) {
     super(props);
+    // Get the layers shared via URL if any
+    const { mapId } = props;
+
     this.state = {
       layersObj: this.props.layersObj,
+      sharedLayers: utils.getSharedLayersFromURL(mapId).map(l => {
+        return { id: l, isLoaded: false };
+      }),
+      sharedStyleLoaded: false,
+      sharedStyle: utils.getSharedStyleFromURL(mapId),
     };
   }
+
   initMap(accessToken, mapConfig, mapId, mapIcons) {
     if (accessToken && mapConfig) {
       mapboxgl.accessToken = accessToken;
@@ -236,11 +244,11 @@ class Map extends Component {
       this.map.setFilter(activeLayerObj.id, [
         ALL,
         ['==', reportingPeriod, feature.properties[reportingPeriod]],
-        ['!=', activeLayerObj.source.join[0], feature.properties[featureId]]
+        ['!=', activeLayerObj.source.join[0], feature.properties[featureId]],
       ]);
       this.map.setFilter(`${activeLayerObj.id}${DASH_HIGHLIGHT}`, [
         ALL,
-        ['==', activeLayerObj.source.join[0], feature.properties[featureId]]
+        ['==', activeLayerObj.source.join[0], feature.properties[featureId]],
       ]);
       this.map.setPaintProperty(`${activeLayerObj.id}${DASH_HIGHLIGHT}`, ICON_OPACITY, 1);
       this.map.moveLayer(`${activeLayerObj.id}${DASH_HIGHLIGHT}`);
@@ -316,7 +324,7 @@ class Map extends Component {
           }
           typeof sortLayers === 'function'
             ? sortLayers(map, activeLayersData, nextLayerId)
-            : orderLayers(sortLayers, map, nextLayerId);
+            : utils.orderLayers(sortLayers, map, nextLayerId);
         }
       }
     }
@@ -407,10 +415,11 @@ class Map extends Component {
 
   componentDidMount() {
     const { MAP, APP, mapId } = this.props;
+
     if (APP && MAP && mapId) {
       const { isRendered, accessToken, mapConfig } = APP;
       // Check if map is initialized, use mapId as container value
-      if (!isRendered && (!isIE || mapboxgl.supported()) && !MAP.blockLoad) {
+      if (!isRendered && (!utils.usesIE() || mapboxgl.supported()) && !MAP.blockLoad) {
         this.initMap(accessToken, { ...mapConfig, container: mapId }, mapId);
       }
     }
@@ -454,18 +463,53 @@ class Map extends Component {
     }
 
     // Check if map is initialized.
-    if (!isRendered && (!isIE || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
-      this.initMap(accessToken, mapConfig, mapId, mapIcons);
+    /** If there is a a style from URL, initialize map with that style, else
+     * initialize with the default style
+     */
+    const { sharedStyle, sharedStyleLoaded } = this.state;
+
+    if ((!utils.usesIE() || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
+      if (sharedStyle !== null && styles[sharedStyle] && this.props.STYLES) {
+        let doInitMap = false;
+
+        /**
+         * If styles props has changed, then the index of our shared style in array
+         * STYLES has changed, we need to re intialize the map with the correct
+         * style
+         */
+        if (this.props.STYLES.length !== styles.length || !isRendered || !sharedStyleLoaded) {
+          doInitMap = true;
+        }
+
+        if (doInitMap) {
+          this.initMap(
+            accessToken,
+            {
+              ...mapConfig,
+              style: styles[sharedStyle].url,
+            },
+            mapId,
+            mapIcons
+          );
+          this.props.dispatch(Actions.changeStyle(mapId, styles[sharedStyle].url));
+          this.setState({
+            sharedStyleLoaded: true,
+          });
+        }
+      } else if (!isRendered) {
+        this.initMap(accessToken, mapConfig, mapId, mapIcons);
+      }
     }
+
     // Check if rendererd map has finished loading
     if (isLoaded) {
       // Set current style (basemap)
       styles.forEach(style => {
         if (style[mapId] && style[mapId].current && this.props.MAP.currentStyle !== currentStyle) {
           this.map.setStyle(style.url);
+          pushStyleToURL(styles, style, mapId);
         }
       });
-
       // Zoom to current region (center and zoom)
       regions &&
         regions.forEach(region => {
@@ -614,6 +658,13 @@ class Map extends Component {
     }
     // Assign global variable for debugging purposes.
     // window.GisidaMap = this.map;
+    // Load shared layers
+    const { sharedLayers } = this.state;
+
+    if (sharedLayers.filter(l => !l.isLoaded).length) {
+      /** If there are any shared layers which we haven't loaded**/
+      this.loadSharedLayers();
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -714,10 +765,44 @@ class Map extends Component {
         layers && layers[primaryLayer] && layers[primaryLayer].location
           ? layers[primaryLayer].location
           : layersObj &&
-          layersObj.find(layer => layer.location) &&
-          layersObj.find(layer => layer.location).location;
+            layersObj.find(layer => layer.location) &&
+            layersObj.find(layer => layer.location).location;
       if (location) {
         this.map.easeTo(location);
+      }
+    }
+  }
+
+  /**Load shared layers */
+  loadSharedLayers() {
+    const { sharedLayers } = this.state;
+    const { layers, mapId, dispatch } = this.props;
+    if (sharedLayers.length && layers) {
+      const sharedLayerIds = sharedLayers.filter(l => !l.isLoaded).map(l => l.id);
+
+      for (let l = 0; l < sharedLayerIds.length; l += 1) {
+        const sharedLayerId = sharedLayerIds[l];
+        const layerObj = layers[sharedLayerId] || layers[`${sharedLayerId}.json`];
+
+        if (!layerObj) {
+          break;
+        } else if (!layerObj.visible) {
+          dispatch(Actions.toggleLayer(mapId, layerObj.id));
+
+          if (!layerObj.loaded && !layerObj.isLoading) {
+            prepareLayer(mapId, layerObj, dispatch);
+          }
+
+          this.setState({
+            sharedLayers: sharedLayers.map(l => {
+              if (l.id == sharedLayerId) {
+                l.isLoaded = true;
+              }
+
+              return l;
+            }),
+          });
+        }
       }
     }
   }
@@ -867,12 +952,12 @@ class Map extends Component {
         hasData =
           pIndex !== -1
             ? (FILTER && FILTER[id] && FILTER[id].isClear) ||
-            timeseries[id].periodData[currPeriod].hasData
+              timeseries[id].periodData[currPeriod].hasData
             : false;
 
         // if the layer is in the map and has no period match, hide it
-        if (!hasData || pIndex === -1) {
-          this.map.setLayoutProperty(layerObj.id, VISIBILITY, NONE);
+        if ((!hasData || pIndex === -1) && this.map.getLayer(layerObj.id)) {
+          this.map.setLayoutProperty(layerObj.id, 'visibility', 'none');
           // if layer has a highlight layer, update its visibility too
           if (this.map.getLayer(`${layerObj.id}${DASH_HIGHLIGHT}`)) {
             this.map.setLayoutProperty(`${layerObj.id}${DASH_HIGHLIGHT}`, VISIBILITY, NONE);
@@ -971,8 +1056,8 @@ class Map extends Component {
     const labels =
       timeseries && typeof timeseries[layerObj.id] !== 'undefined'
         ? layerObj.labels.labels[
-        timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]
-        ]
+            timeseries[layerObj.id].period[timeseries[layerObj.id].temporalIndex]
+          ]
         : layerObj.labels.labels;
 
     if (!labels) {
@@ -1094,37 +1179,37 @@ class Map extends Component {
     }
     return (
       <div>
-        {isIE || !mapboxgl.supported() ? (
+        {utils.usesIE() || !mapboxgl.supported() ? (
           <div className="alert alert-info">
             Your browser is not supported. Please open link in another browser e.g Chrome or Firefox
           </div>
         ) : (
-            <div
-              id={this.props.mapId}
-              className={`${
-                this.props.mapId === 'map-2' && this.props.showFilterPanel ? 'splitScreenClass' : ''
-                }`}
-              style={{
-                width: mapWidth,
-                height: mapheight,
-                display:
-                  this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
-                    ? NONE
-                    : 'inline',
-                top: mapTop,
-              }}
-            >
-              <div className="widgets">
-                {/* Render Children elemets with mapId prop added to each child  */}
-                {React.Children.map(this.props.children, child => {
-                  return React.cloneElement(child, {
-                    mapId: this.props.mapId,
-                    hasNavBar: this.props.hasNavBar,
-                  });
-                })}
-              </div>
+          <div
+            id={this.props.mapId}
+            className={`${
+              this.props.mapId === 'map-2' && this.props.showFilterPanel ? 'splitScreenClass' : ''
+            }`}
+            style={{
+              width: mapWidth,
+              height: mapheight,
+              display:
+                this.props.MAP.blockLoad || (this.props.VIEW && !this.props.VIEW.showMap)
+                  ? NONE
+                  : 'inline',
+              top: mapTop,
+            }}
+          >
+            <div className="widgets">
+              {/* Render Children elemets with mapId prop added to each child  */}
+              {React.Children.map(this.props.children, child => {
+                return React.cloneElement(child, {
+                  mapId: this.props.mapId,
+                  hasNavBar: this.props.hasNavBar,
+                });
+              })}
             </div>
-          )}
+          </div>
+        )}
       </div>
     );
   }
@@ -1156,7 +1241,7 @@ Map.propTypes = {
   handlers: PropTypes.array,
   hasDataView: PropTypes.boo,
   dispatch: PropTypes.func,
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
   // Pass true if app has a navbar
 };
 

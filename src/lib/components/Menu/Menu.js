@@ -3,13 +3,16 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Actions } from 'gisida';
 import Layers from '../Layers/Layers';
+import SearchBar from '../Searchbar/SearchBar';
 import ConnectedLayers from '../Layers/ConnectedLayers';
 import './Menu.scss';
-import _ from 'lodash';
 import memoize from "memoize-one";
+import { debounce } from 'lodash';
+import { getSharedLayersFromURL, getMenuGroupMapLayers } from '../../utils';
 
 const mapStateToProps = (state, ownProps) => {
-  const MAP = state[ownProps.mapId] || { layers: {} };
+  const { mapId } = ownProps;
+  const MAP = state[mapId] || { layers: {} };
   const { LAYERS, AUTH, APP, VIEW } = state;
   let categories;
   // let layers;
@@ -56,19 +59,11 @@ const mapStateToProps = (state, ownProps) => {
     categories = Object.keys(categories).map(c => categories[c]);
   }
 
-  // todo - support layers without categories
-  // if (!Object.keys(categories).length) {
-  //   categories = null;
-  //   layers = Object.keys(MAP.layers).map(l => MAP.layers[l]);
-  // }
-
   // Get current region
-  const currentRegion =
-    state.REGIONS && state.REGIONS.length
-      ? state.REGIONS.filter(region => region.current)[0].name
-      : '';
-
+  const currentRegion = state.REGIONS && state.REGIONS.length ?
+    state.REGIONS.filter(region => region.current)[0].name : '';
   return {
+    mapId,
     categories,
     // layers, // todo - support layers without categories
     LAYERS,
@@ -81,6 +76,8 @@ const mapStateToProps = (state, ownProps) => {
     preparedLayers: MAP.layers,
     menuIsOpen: MAP.menuIsOpen,
     openCategories: MAP.openCategories,
+    noLayerText: NULL_LAYER_TEXT,
+    showSearchBar: APP.searchBar,
     menuScroll: MAP.menuScroll, // Set's scroll position to zero when loading superset Menu component
     showMap: VIEW.showMap, // A flag to determine map/superset view
     noLayerText: NULL_LAYER_TEXT, // Text to be displayed when a category has no layer pulled from config file
@@ -89,24 +86,42 @@ const mapStateToProps = (state, ownProps) => {
 
 class Menu extends Component {
   constructor(props) {
-    super(props);
+    super(props)
+
+    // Get the layers shared via URL if any
+    const { mapId } = props;
+    const sharedLayers = getSharedLayersFromURL(mapId).map(l => {
+      return { id: l, isCatOpen: false };
+    })
+
+    this.state = {
+      searching: false,
+      searchResults: [],
+      sharedLayers,
+    }
+
     /**
      * Currently we can load two menus one for superset view at layer level & one for map view
      * The menu menuWrapper references the menu on which to track scroll position.
-     * This ensures we snap back to the exact map scroll position when moving from superset 
-     * layer view to map view 
+     * This ensures we snap back to the exact map scroll position when moving from superset
+     * layer view to map view
      */
     this.menuWrapper = React.createRef();
     /**
      * Gets scroll position after scroll ceases
      */
-    this.delayedMenuScrollCallback = _.debounce(this.persistScrollPosition, 1000)
+    this.delayedMenuScrollCallback = debounce(this.persistScrollPosition, 1000);
+
+    this.searchResultClick = this.searchResultClick.bind(this);
+    this.openCategoryForLayers = this.openCategoryForLayers.bind(this);
   }
 
   componentDidMount() {
     if (this.menuWrapper && this.menuWrapper.current && this.props.menuScroll) {
       this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop;
     }
+    this.handleSearchInput = this.handleSearchInput.bind(this);
+    this.handleSearchClick = this.handleSearchClick.bind(this);
   }
   persistScrollPosition(event) {
     let element = event.target;
@@ -114,14 +129,126 @@ class Menu extends Component {
   }
 
   handleScroll = event => {
-    event.persist() // This will ensure that the event is not pooled for more details https://reactjs.org/docs/events.html
-    this.delayedMenuScrollCallback(event)
+    event.persist(); // This will ensure that the event is not pooled for more details https://reactjs.org/docs/events.html
+    this.delayedMenuScrollCallback(event);
   };
 
   componentDidUpdate(prevProps) {
     if (this.props.showMap && this.props.showMap !== prevProps.showMap && this.props.menuScroll) {
       this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop;
     }
+    const { sharedLayers } = this.state;
+
+    if (sharedLayers.filter(l => !l.isCatOpen).length) {
+      /** If there are any shared layers whose category we haven't open,
+       * open them
+       */
+      this.openCategoryForLayers(sharedLayers);
+    }
+  }
+
+  /**
+   * Open category for which each of the shared layers falls under
+   */
+  openCategoryForLayers(layersToOpenCategory) {
+    const { categories } = this.props;
+
+    if (layersToOpenCategory && categories) {
+      layersToOpenCategory
+        .filter(l => !l.isCatOpen)
+        .forEach(sharedLayer => {
+          let i = 0;
+          /**
+           * A layer belongs to only one category. So if we found its
+           * category, use this flag to break from the loop
+           */
+          let catFound = false;
+
+          while (!catFound && i < categories.length) {
+            const category = categories[i];
+            let j = 0;
+
+            while (!catFound && j < category.layers.length) {
+              const layer = category.layers[j];
+
+              if (!layer.id) {
+                /**
+                 * This is a group. So continue checking down the hierarchy
+                 * for visible layers
+                 */
+                const groupNames = Object.keys(layer);
+                let k = 0;
+
+                while (!catFound && k < groupNames.length) {
+                  const groupName = groupNames[k];
+
+                  const children = layer[groupName].layers;
+                  const groupMapLayerIds = getMenuGroupMapLayers(groupName, children);
+
+                  if (
+                    groupMapLayerIds.indexOf(sharedLayer.id) >= 0 ||
+                    groupMapLayerIds.indexOf(`${sharedLayer.id}.json`) >= 0
+                  ) {
+                    this.openCategoryForSharedLayer(category.category, sharedLayer.id);
+                    catFound = true;
+                  }
+
+                  k += 1;
+                } // group while
+              } else {
+                // This category has one level only
+                if (layer.id === sharedLayer.id || layer.id === `${sharedLayer.id}.json`) {
+                  this.openCategoryForSharedLayer(category.category, sharedLayer.id);
+                  catFound = true;
+                }
+              }
+
+              j += 1;
+            } // category layers while
+
+            i += 1;
+          } // categories while
+        });
+    }
+  }
+
+  /**
+   * Toggle a category for a shared layer and update category
+   * status as open
+   * @param {*} categoryName category name of category to be opened
+   * @param {*} id id of shared layer
+   */
+  openCategoryForSharedLayer(categoryName, id) {
+    const { openCategories } = this.props;
+    const { sharedLayers } = this.state;
+
+    if (openCategories.indexOf(categoryName) < 0) {
+      /** Shared layers could share a a category so we check to
+       * make sure we do not toggle again as this will close
+       * a category that was already open
+       */
+      this.toggleCategory(categoryName);
+    }
+    this.setState({
+      sharedLayers: sharedLayers.map(l => {
+        if (l.id == id) {
+          l.isCatOpen = true;
+        }
+
+        return l;
+      }),
+    });
+  }
+
+  /**
+   * Toggle category
+   * @param {*} categoryName
+   */
+  toggleCategory(categoryName) {
+    const { openCategories } = this.props;
+    const index = openCategories.indexOf(categoryName);
+
+    this.props.dispatch(Actions.toggleCategories(this.props.mapId, categoryName, index));
   }
 
   onToggleMenu = e => {
@@ -132,9 +259,7 @@ class Menu extends Component {
 
   onCategoryClick = (e, category) => {
     e.preventDefault();
-    const { openCategories } = this.props;
-    const index = openCategories.indexOf(category);
-    this.props.dispatch(Actions.toggleCategories(this.props.mapId, category, index));
+    this.toggleCategory(category);
   };
 
   onRegionClick = e => {
@@ -150,7 +275,7 @@ class Menu extends Component {
    * this means different menu instances will have groups that have different Ids which we do not
    * want (We would like menu instances under the same map ID to behave the same. If say I open a group in one
    * menu, it should appear open in another other). A contigous int counter is
-   * therefore used to ensure the counter for a group in different menu instances is the same, 
+   * therefore used to ensure the counter for a group in different menu instances is the same,
    * and also, groups in the same menu instances do not share a count.
    * @param {Object} layer Category layer
    * @param {number} groupCounter Group counter (or ID) that will give each group a number
@@ -176,12 +301,54 @@ class Menu extends Component {
   }
 
   /**
+   * this update state of searching to false
+   */
+  searchResultClick() {
+    this.setState({ searching: false });
+  }
+
+  /**
+   * receives search results from searchBar components
+   * @param {Array} searchResults - array of search results 
+   * @param {string} input - user search input
+   */
+  handleSearchInput(searchResults, input) {
+    const { searching } = this.state;
+    this.setState({ searchResults: [], })
+    if (!input) {
+      return searching ? this.setState({ searching: false}) : null; 
+    }
+    this.setState({
+      searchResults,
+      searching: true
+    });
+  }
+
+  /**
+   * called when search or cancel button is clicked on searchBar component
+   * @param {MouseEvent} e 
+   * @param {boolean} cancel - indicates if it is search or cancel button clicked
+   * @param {boolean} inputPresent - indicates if search input has any input
+   */
+  handleSearchClick(e, cancel, inputPresent) {
+    e.preventDefault();
+    if (cancel) {
+      this.setState({
+        searchResults: [],
+        searching: false
+      });
+    } else {
+      this.setState({ searching: inputPresent });
+    }
+  }
+
+  /**
    * Generic function to modify categories. If you need to modify/extend categories,
    * do it here
    * @param {array} categories Menu categories and their subgroups and layers
    * @returns {array} Extended/Modified categories
    */
-  parseCategories = memoize((categories) => {
+  parseCategories = memoize(categories => {
     let groupCounter = 0;
     categories.forEach(category => {
       category.layers.forEach(layer => {
@@ -195,7 +362,7 @@ class Menu extends Component {
     });
 
     return categories;
-  })
+  });
 
   /**
    * Check if a user has permission to access layer
@@ -271,7 +438,7 @@ class Menu extends Component {
    * permission to view
    * @returns {array} Filtered categories
    */
-  getAccessibleCategories = memoize((categories) => {
+  getAccessibleCategories = memoize(categories => {
     if (!this.props.AUTH) {
       // If no authenitcation, then all categories are accessible.
       return categories;
@@ -307,11 +474,13 @@ class Menu extends Component {
     });
 
     return filteredCategories;
-  })
+  });
 
   render() {
     if (!this.props.categories) return null;
-    const { disableDefault } = this.props;
+
+    const { searching, searchResults } = this.state;
+    const { disableDefault, showSearchBar } = this.props;
 
     if (disableDefault) return this.props.children || null;
 
@@ -320,8 +489,16 @@ class Menu extends Component {
       return React.cloneElement(child, { mapId });
     });
     const categories = this.parseCategories(this.getAccessibleCategories(this.props.categories));
-    const { regions, currentRegion, preparedLayers, childrenPosition, 
-      layerItem, hasNavBar, useConnectedLayers, AUTH } = this.props;
+    const {
+      regions,
+      currentRegion,
+      preparedLayers,
+      childrenPosition,
+      layerItem,
+      hasNavBar,
+      useConnectedLayers,
+      AUTH,
+    } = this.props;
     const childrenPositionClass = childrenPosition || 'top';
     const marginTop = hasNavBar ? '-80px' : 0;
 
@@ -359,8 +536,23 @@ class Menu extends Component {
                 {/* Children Elements (top) */}
                 {children && childrenPosition !== 'bottom' ? children : ''}
 
+                {/* search bar */}
+                {showSearchBar ?
+                  <div style={{"height":"70px"}}>
+                    <SearchBar 
+                      handleSearchInput={this.handleSearchInput}
+                      searching={searching}
+                      handleSearchClick={this.handleSearchClick}
+                      searchResultClick={this.searchResultClick}
+                      mapId={mapId}
+                      openCategoryForLayers={this.openCategoryForLayers}
+                    />
+                  </div> : null
+                }
+
                 {/* Menu List*/}
-                <ul className="sectors">
+                { !searching ?
+                  <ul className="sectors">
                   {regions && regions.length ? (
                     <li className="sector">
                       <a onClick={e => this.onCategoryClick(e, 'Regions')}>
@@ -407,7 +599,8 @@ class Menu extends Component {
                           />
                         </a>
                         {this.props.openCategories &&
-                        this.props.openCategories.includes(category.category) && !useConnectedLayers ? (
+                        this.props.openCategories.includes(category.category) &&
+                        !useConnectedLayers ? (
                           <Layers
                             mapId={mapId}
                             layers={category.layers}
@@ -416,15 +609,17 @@ class Menu extends Component {
                             auth={AUTH}
                           />
                         ) : this.props.openCategories &&
-                        this.props.openCategories.includes(category.category) && useConnectedLayers ? 
-                        (<ConnectedLayers
+                          this.props.openCategories.includes(category.category) &&
+                          useConnectedLayers ? (
+                          <ConnectedLayers
                             layerItem={layerItem}
                             mapId={mapId}
                             layers={category.layers}
                             currentRegion={currentRegion}
                             preparedLayers={preparedLayers}
                             auth={AUTH}
-                          />) : (
+                          />
+                        ) : (
                           <ul />
                         )}
                       </li>
@@ -432,7 +627,16 @@ class Menu extends Component {
                   ) : (
                     <li></li>
                   )}
-                </ul>
+                </ul> :
+                  searchResults.length ?
+                  <ul className="sectors">
+                    {searchResults}
+                  </ul> :
+                  <ul className="sectors">
+                    <li className="no-search-results"><b>No results found</b></li> 
+                  </ul> 
+
+                }
 
                 {/* Children Elements (top) */}
                 {children && childrenPosition === 'bottom' ? children : ''}
@@ -452,7 +656,7 @@ Menu.propTypes = {
   categories: PropTypes.arrayOf(PropTypes.any).isRequired,
   hasNavBar: PropTypes.bool, // Pass true if app has a navbar
   layerItem: PropTypes.element, // Custom layer list item. Use in place of components/Layer/Layer
-  useConnectedLayers: PropTypes.bool // If true, use components/Layers/ConnectedLayers
+  useConnectedLayers: PropTypes.bool, // If true, use components/Layers/ConnectedLayers
 };
 
 export default connect(mapStateToProps)(Menu);

@@ -19,7 +19,7 @@ const mapStateToProps = (state, ownProps) => {
       : null;
   return {
     timeseries: MAP.timeseries,
-    layerObj: MAP.layers[MAP.activeLayerId],
+    layerObj: MAP.layers[MAP.primaryLayer],
     timeSeriesObj: MAP.timeseries[subLayerCheck || MAP.primaryLayer],
     lastLayerSelected: MAP.layers[MAP.lastLayerSelected],
     layersData: buildLayersObj(MAP.layers),
@@ -39,17 +39,27 @@ export class Legend extends React.Component {
     this.state = {
       setPrimary: false,
       primaryLayer: this.props.primaryLayer,
-      timeSeriesObj: undefined
+      timeSeriesObj: undefined,
     };
   }
-
+  shouldComponentUpdate(nextProps) {
+    const { layerObj, timeSeriesObj } = nextProps;
+    return (((this.props.layerObj && this.props.layerObj.categories) ||
+      (layerObj && layerObj.categories)) &&
+      layerObj !== this.props.layerObj) ||
+      (((this.props.timeSeriesObj && this.props.timeSeriesObj.categories) ||
+        (timeSeriesObj && timeSeriesObj.categories)) &&
+        timeSeriesObj !== this.props.timeSeriesObj)
+      ? true
+      : false;
+  }
   componentWillReceiveProps(nextProps) {
     const { layerObj } = nextProps;
     if (
       nextProps.timeSeriesObj &&
       this.props.timeSeriesObj !== nextProps.timeSeriesObj &&
       layerObj &&
-      layerObj.type !== "chart" &&
+      layerObj.type !== 'chart' &&
       layerObj.property
     ) {
       const { timeSeriesObj, dispatch } = nextProps;
@@ -80,7 +90,7 @@ export class Legend extends React.Component {
     if (
       this.props.primaryLayer !== nextProps.primaryLayer &&
       layerObj &&
-      layerObj.type !== "chart" &&
+      layerObj.type !== 'chart' &&
       layerObj.property
     ) {
       const { timeSeriesObj } = nextProps;
@@ -110,27 +120,67 @@ export class Legend extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
+    const { primaryLayer, layers, mapId, dispatch } = this.props;
     if (
-      this.props.primaryLayer !== prevProps.primaryLayer &&
-      this.props.layers &&
-      this.props.layers[this.props.primaryLayer] &&
-      this.props.layers[this.props.primaryLayer].credit
+      primaryLayer !== prevProps.primaryLayer &&
+      layers &&
+      layers[primaryLayer] &&
+      layers[primaryLayer].credit
     ) {
       this.setState({
-        primaryLayer: prevProps.primaryLayer,
+        primaryLayer: primaryLayer,
       });
     }
   }
+
   onUpdatePrimaryLayer(e) {
-    if (e.target.getAttribute("data-credit") !== "credit") {
+    if (e.target.getAttribute('data-credit') !== 'credit') {
       e.preventDefault();
     }
     const { dispatch, mapId } = this.props;
-    const targetLayer = e.currentTarget.getAttribute("data-layer");
+    const targetLayer = e.currentTarget.getAttribute('data-layer');
+    /** Update primary layer based on legend selection */
+    // Move to utils
+    const removeJsonExtensions = layer => {
+      return layer.replace('.json', '');
+    };
+    const targetLayerPageUrl = removeJsonExtensions(targetLayer);
+    let pageURL = `${window.location.href.replace(
+      `${targetLayerPageUrl},`,
+      ''
+    )},${targetLayerPageUrl}`;
+
+    history.replaceState('', '', pageURL);
     // dispatch primary layer id
     dispatch(Actions.updatePrimaryLayer(mapId, targetLayer));
   }
 
+  isCircleLayer(layer) {
+    return (
+      layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible
+    );
+  }
+
+  isSymboLayer(layer) {
+    return (
+      layer && layer.credit && layer.categories && layer.categories.shape && layer.type !== 'circle'
+    );
+  }
+
+  isFillLayerNoBreaks(layer) {
+    return layer && layer.credit && layer.categories && layer.categories.breaks === 'no';
+  }
+
+  isFillLayerWithBreaks(layer) {
+    return (
+      layer &&
+      layer.credit &&
+      layer.type !== 'chart' &&
+      layer.type !== 'circle' &&
+      layer.categories &&
+      layer.categories.breaks === 'yes'
+    );
+  }
   render() {
     const {
       layerObj,
@@ -141,6 +191,7 @@ export class Legend extends React.Component {
       primaryLayer,
       activeLayerIds,
     } = this.props;
+
     if (!layerObj) {
       return false;
     }
@@ -156,9 +207,7 @@ export class Legend extends React.Component {
         .reverse()[0];
     }
     const legendItems = [];
-    latestTimestamp = latestTimestamp ? (
-      <span>Timestamp: {latestTimestamp}</span>
-    ) : null;
+    latestTimestamp = latestTimestamp ? <span>Timestamp: {latestTimestamp}</span> : null;
     let primaryLegend;
     let layer;
 
@@ -172,37 +221,26 @@ export class Legend extends React.Component {
 
     if (
       this.state.primaryLayer !== primaryLayer &&
-      (layers[primaryLayer] && layers[primaryLayer].credit)
+      layers[primaryLayer] &&
+      layers[primaryLayer].credit
     ) {
       activeLegendLayer = primaryLayer;
     }
+    const legendLayers = this.props.layersData.filter(
+      layer =>
+        this.isCircleLayer(layer) ||
+        this.isSymboLayer(layer) ||
+        this.isFillLayerNoBreaks(layer) ||
+        this.isFillLayerWithBreaks(layer)
+    );
 
     for (let l = 0; l < this.props.layersData.length; l += 1) {
       layer = this.props.layersData[l];
-      const circleLayerType =
-        layer &&
-        layer.credit &&
-        layer.type === 'circle' &&
-        !layer.categories.shape &&
-        !Array.isArray(layer.categories) &&
-        layer.visible;
-      const symbolLayer =
-        layer &&
-        layer.credit &&
-        layer.categories &&
-        layer.categories.shape &&
-        layer.type !== 'circle';
-      const fillLayerNoBreaks =
-        (layer && layer.credit && layer.categories && layer.categories.breaks === 'no');
-      const multipleLegends = (layer && layer.credit && Array.isArray(layer.categories));
-      const fillLayerWithBreaks =
-        layer &&
-        layer.credit &&
-        layer.type !== 'chart' &&
-        layer.type !== 'circle' &&
-        layer.categories &&
-        layer.categories.breaks === 'yes';
-
+      const circleLayerType = this.isCircleLayer(layer);
+      const symbolLayer = this.isSymboLayer(layer);
+      const fillLayerNoBreaks = this.isFillLayerNoBreaks(layer);
+      const fillLayerWithBreaks = this.isFillLayerWithBreaks(layer);
+      const multipleLegends = layer && layer.credit && Array.isArray(layer.categories);
       const activeLayerSelected = activeLegendLayer === layer.id ? 'primary' : '';
 
       let background = [];
@@ -211,43 +249,33 @@ export class Legend extends React.Component {
 
       const quantiles = [];
       const rightListLimitStyle = {
-        position: "absolute",
-        listStyle: "none",
-        display: "inline",
-        right: "3%"
+        position: 'absolute',
+        listStyle: 'none',
+        display: 'inline',
+        right: '3%',
       };
       const leftListLimitStyle = {
-        position: "absolute",
-        listStyle: "none",
-        display: "inline",
-        left: "3%"
-      }
-      const legendLimitStyle = { padding: '0% 0% 3% 0%' }
+        position: 'absolute',
+        listStyle: 'none',
+        display: 'inline',
+        left: '3%',
+      };
+      const legendLimitStyle = { padding: '0% 0% 3% 0%' };
       if (timeSeriesObj) {
         const { temporalIndex } = timeSeriesObj;
-        if (
-          circleLayerType &&
-          layer.breaks &&
-          layer.stops &&
-          layer.stops[0][temporalIndex]
-        ) {
-          const currentColorStops = [
-            ...new Set(layer.stops[0][temporalIndex].map(d => d[1]))
-          ];
-          const currentRadiusStops = [
-            ...new Set(layer.stops[1][temporalIndex].map(d => d[1]))
-          ];
+        if (circleLayerType && layer.breaks && layer.stops && layer.stops[0][temporalIndex]) {
+          const currentColorStops = [...new Set(layer.stops[0][temporalIndex].map(d => d[1]))];
+          const currentRadiusStops = [...new Set(layer.stops[1][temporalIndex].map(d => d[1]))];
           const currentBreakStops = [...new Set(layer.stops[6][temporalIndex])];
           currentRadiusStops.forEach((s, i) => {
             quantiles.push(
               <span className="circle-container" key={s}>
                 <span
                   style={{
-                    background: `${currentColorStops[i] ||
-                      currentColorStops[0]}`,
+                    background: `${currentColorStops[i] || currentColorStops[0]}`,
                     width: `${s * 2}px`,
                     height: `${s * 2}px`,
-                    margin: `0px ${currentRadiusStops[i] / 2}px`
+                    margin: `0px ${currentRadiusStops[i] / 2}px`,
                   }}
                 ></span>
                 <p>{currentBreakStops[i]}</p>
@@ -276,7 +304,7 @@ export class Legend extends React.Component {
                     : colors[i] || colors[0] || colors,
                   width: `${s * 2}px`,
                   height: `${s * 2}px`,
-                  margin: `0px ${i + 2}px`
+                  margin: `0px ${i + 2}px`,
                 }}
               ></span>
               <p>{breaks[i]}</p>
@@ -303,28 +331,33 @@ export class Legend extends React.Component {
         }
         if (fillLayerNoBreaks && !layer.parent) {
           let hasShape;
-          hasShape = (layer.categories && layer.categories.shape && layer.categories.shape.length);
+          hasShape = layer.categories && layer.categories.shape && layer.categories.shape.length;
           const shapeAndBar = layer.categories && layer.categories.shapeAndBar;
           const fillWidth = (
-            100 / layer.categories.color.filter(c => c !== "transparent").length
+            100 / layer.categories.color.filter(c => c !== 'transparent').length
           ).toString();
           const textColor = layer.categories && layer.categories['text-color'];
           layer.categories.color.forEach((color, index) => {
-            const showBoth = (shapeAndBar && shapeAndBar.length && shapeAndBar[index] === 'yes');
+            const showBoth = shapeAndBar && shapeAndBar.length && shapeAndBar[index] === 'yes';
             if (color !== 'transparent') {
               if (showBoth && hasShape) {
                 background.push(
                   <li className="layer-symbols" key={index}>
                     <span className={`${layer.categories.shape[index]}`} />
                     <ul className="legend bar-color" key={index}>
-                      <li style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
+                      <li
+                        style={{
+                          background: color,
+                          color: textColor ? textColor : '#fff',
+                          width: `${fillWidth}%`,
+                        }}
+                      >
                         {layer.categories.label[index]}
-                      </li>  
+                      </li>
                     </ul>
                   </li>
                 );
-              }
-              else if (hasShape && !showBoth) {
+              } else if (hasShape && !showBoth) {
                 background.push(
                   <li className="layer-symbols" key={index}>
                     <span className={`${layer.categories.shape[index]}`} />
@@ -333,17 +366,25 @@ export class Legend extends React.Component {
                 );
               } else {
                 background.push(
-                  <li key={index} style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
+                  <li
+                    key={index}
+                    style={{
+                      background: color,
+                      color: textColor ? textColor : '#fff',
+                      width: `${fillWidth}%`,
+                    }}
+                  >
                     {layer.categories.label[index]}
                   </li>
                 );
               }
-              
             }
-          }); 
+          });
           const legendClass = layer.categories ? 'legend-label' : '';
-          const circleQuantiles = quantiles ? <div className="legend-symbols">{quantiles}</div> : null;
-          
+          const circleQuantiles = quantiles ? (
+            <div className="legend-symbols">{quantiles}</div>
+          ) : null;
+
           primaryLegend = (
             <div
               id={`legend-${layer.id}-${mapId}`}
@@ -376,27 +417,34 @@ export class Legend extends React.Component {
           let circleTitle;
           if (Array.isArray(layer.categories)) {
             layer.categories.forEach((category, key) => {
-              let textColor  = category['text-color'];
-              if (category.type === "fill") {
+              let textColor = category['text-color'];
+              if (category.type === 'fill') {
                 if (category.credit) {
-                fillCredit =Parser(category.credit);
-              }
+                  fillCredit = Parser(category.credit);
+                }
                 let fillWidth = (
                   100 / category.color.filter(c => c !== 'transparent').length
                 ).toString();
                 category.color.forEach((color, index) => {
-                      background.push(
-                        <li key={index} style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
-                          {category.label[index]}
-                        </li>
-                      );
-                  });
-              } else if (category.type === "circle") {
-                /** Get this from spec 
+                  background.push(
+                    <li
+                      key={index}
+                      style={{
+                        background: color,
+                        color: textColor ? textColor : '#fff',
+                        width: `${fillWidth}%`,
+                      }}
+                    >
+                      {category.label[index]}
+                    </li>
+                  );
+                });
+              } else if (category.type === 'circle') {
+                /** Get this from spec
                  * Get the specific radiuses and the right values for the same
                  */
                 if (category.credit) {
-                  circleCredit = (Parser(category.credit));
+                  circleCredit = Parser(category.credit);
                 }
                 if (category.title) {
                   circleTitle = category.title;
@@ -414,7 +462,7 @@ export class Legend extends React.Component {
                           margin: `0px ${i + 2}px`,
                         }}
                       ></span>
-                      <p style={{ color: textColor ? textColor : '#fff'}}>{category.label[i]}</p>
+                      <p style={{ color: textColor ? textColor : '#fff' }}>{category.label[i]}</p>
                     </span>
                   );
                 });
@@ -422,8 +470,10 @@ export class Legend extends React.Component {
             });
           }
           const legendClass = layer.categories ? 'legend-label' : '';
-          const circleQuantiles = quantiles ? <div className="legend-symbols">{quantiles}</div> : null;
-          
+          const circleQuantiles = quantiles ? (
+            <div className="legend-symbols">{quantiles}</div>
+          ) : null;
+
           primaryLegend = (
             <div
               id={`legend-${layer.id}-${mapId}`}
@@ -450,12 +500,13 @@ export class Legend extends React.Component {
           const colorLegend = layer &&
             layer.stopsData && [...new Set(stopsData.map(stop => stop[1]))];
           const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
-
           const activeColors =
-            timeSeriesObj &&
-            timeSeriesObj.newColors &&
-            layerObj.aggregate &&
-            layerObj.aggregate.timeseries
+            timeSeriesObj && timeSeriesObj.newColors
+              ? timeSeriesObj.newColors
+              : timeSeriesObj &&
+                timeSeriesObj.newColors &&
+                layerObj.aggregate &&
+                layerObj.aggregate.timeseries
               ? timeSeriesObj.newColors
               : this.state &&
                 this.state.timeSeriesObj &&
@@ -550,9 +601,7 @@ export class Legend extends React.Component {
                   className={`${mapId}`}
                   style={rightListLimitStyle}
                 >
-                  {typeof formatNum(lastVal, 1) === "undefined"
-                    ? 0
-                    : formatNum(lastVal, 1)}
+                  {typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)}
                   {legendSuffix}
                 </li>
               </ul>
@@ -583,7 +632,8 @@ export class Legend extends React.Component {
         );
       } else if (symbolLayer) {
         const shapeAndBar = layer.categories && layer.categories.shapeAndBar;
-        const hasShape = (layer.categories && layer.categories.shape && layer.categories.shape.length);
+        const hasShape =
+          layer.categories && layer.categories.shape && layer.categories.shape.length;
         layer.categories.color.forEach((color, index) => {
           const style =
             layer.categories.shape[index] === 'triangle-stroked-11' ||
@@ -591,7 +641,7 @@ export class Legend extends React.Component {
               ? 'border-bottom-color:'
               : 'background:';
           const styleString = `${style}: ${color}`;
-          const showBoth = (shapeAndBar && shapeAndBar.length && shapeAndBar[index] === 'yes')
+          const showBoth = shapeAndBar && shapeAndBar.length && shapeAndBar[index] === 'yes';
           const fillWidth = (
             100 / layer.categories.color.filter(c => c !== 'transparent').length
           ).toString();
@@ -601,9 +651,15 @@ export class Legend extends React.Component {
               <li className="layer-symbols" key={index}>
                 <span className={`${layer.categories.shape[index]}`} />
                 <ul className="legend bar-color" key={index}>
-                  <li style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
+                  <li
+                    style={{
+                      background: color,
+                      color: textColor ? textColor : '#fff',
+                      width: `${fillWidth}%`,
+                    }}
+                  >
                     {layer.categories.label[index]}
-                  </li>  
+                  </li>
                 </ul>
               </li>
             );
@@ -637,7 +693,7 @@ export class Legend extends React.Component {
         const fillWidth = (
           100 / layer.categories.color.filter(c => c !== 'transparent').length
         ).toString();
-          
+
         layer.categories.color.forEach((color, index) => {
           if (color !== 'transparent') {
             background.push(
@@ -671,27 +727,34 @@ export class Legend extends React.Component {
         let circleTitle;
         if (Array.isArray(layer.categories)) {
           layer.categories.forEach((category, key) => {
-            let textColor  = category['text-color'];
-            if (category.type === "fill") {
+            let textColor = category['text-color'];
+            if (category.type === 'fill') {
               if (category.credit) {
-              fillCredit =Parser(category.credit);
-            }
+                fillCredit = Parser(category.credit);
+              }
               let fillWidth = (
                 100 / category.color.filter(c => c !== 'transparent').length
               ).toString();
               category.color.forEach((color, index) => {
-                    background.push(
-                      <li key={index} style={{ background: color, color: textColor ? textColor : '#fff', width: `${fillWidth}%` }}>
-                        {category.label[index]}
-                      </li>
-                    );
-                });
-            } else if (category.type === "circle") {
-              /** Get this from spec 
+                background.push(
+                  <li
+                    key={index}
+                    style={{
+                      background: color,
+                      color: textColor ? textColor : '#fff',
+                      width: `${fillWidth}%`,
+                    }}
+                  >
+                    {category.label[index]}
+                  </li>
+                );
+              });
+            } else if (category.type === 'circle') {
+              /** Get this from spec
                * Get the specific radiuses and the right values for the same
                */
               if (category.credit) {
-                circleCredit = (Parser(category.credit));
+                circleCredit = Parser(category.credit);
               }
               if (category.title) {
                 circleTitle = category.title;
@@ -709,7 +772,7 @@ export class Legend extends React.Component {
                         margin: `0px ${i + 2}px`,
                       }}
                     ></span>
-                    <p style={{ color: textColor ? textColor : '#fff'}}>{category.label[i]}</p>
+                    <p style={{ color: textColor ? textColor : '#fff' }}>{category.label[i]}</p>
                   </span>
                 );
               });
@@ -717,8 +780,10 @@ export class Legend extends React.Component {
           });
         }
         const legendClass = layer.categories ? 'legend-label' : '';
-        const circleQuantiles = quantiles ? <div className="legend-symbols">{quantiles}</div> : null;
-        
+        const circleQuantiles = quantiles ? (
+          <div className="legend-symbols">{quantiles}</div>
+        ) : null;
+
         legendItems.unshift(
           <div
             id={`legend-${layer.id}-${mapId}`}
@@ -729,29 +794,29 @@ export class Legend extends React.Component {
           >
             <b>{layer.label}</b>
             <div className={`${'legend-fill'} ${legendClass}`}>
-                <ul>{background}</ul>
-              </div>
-              {fillCredit}
-              <b>{circleTitle}</b>
-              {circleQuantiles}
-              {circleCredit}
-              <span>{Parser(layer.credit)}</span>
-              {latestTimestamp}
+              <ul>{background}</ul>
+            </div>
+            {fillCredit}
+            <b>{circleTitle}</b>
+            {circleQuantiles}
+            {circleCredit}
+            <span>{Parser(layer.credit)}</span>
+            {latestTimestamp}
           </div>
         );
-      } 
-      
-      else if (fillLayerWithBreaks && layer.stops && !layer.parent) {
+      } else if (fillLayerWithBreaks && layer.stops && !layer.parent) {
         const { stopsData, breaks } = layer;
         const colorLegend = layer &&
           layer.stopsData && [...new Set(stopsData.map(stop => stop[1]))];
         const legendSuffix = layer.categories.suffix ? layer.categories.suffix : '';
 
         const activeColors =
-          timeSeriesObj &&
-          timeSeriesObj.newColors &&
-          layerObj.aggregate &&
-          layerObj.aggregate.timeseries
+          timeSeriesObj && timeSeriesObj.newColors
+            ? timeSeriesObj.newColors
+            : timeSeriesObj &&
+              timeSeriesObj.newColors &&
+              layerObj.aggregate &&
+              layerObj.aggregate.timeseries
             ? timeSeriesObj.newColors
             : this.state &&
               this.state.timeSeriesObj &&
@@ -832,22 +897,12 @@ export class Legend extends React.Component {
           >
             <b>{layer.label}</b>
             <ul className="legend-limit" style={legendLimitStyle}>
-              <li
-                id={`first-limit-${layer.id}`}
-                className={`${mapId}`}
-                style={leftListLimitStyle}
-              >
+              <li id={`first-limit-${layer.id}`} className={`${mapId}`} style={leftListLimitStyle}>
                 {0}
                 {legendSuffix}
               </li>
-              <li
-                id={`last-limit-${layer.id}`}
-                className={`${mapId}`}
-                style={rightListLimitStyle}
-              >
-                {typeof formatNum(lastVal, 1) === "undefined"
-                  ? 0
-                  : formatNum(lastVal, 1)}
+              <li id={`last-limit-${layer.id}`} className={`${mapId}`} style={rightListLimitStyle}>
+                {typeof formatNum(lastVal, 1) === 'undefined' ? 0 : formatNum(lastVal, 1)}
                 {legendSuffix}
               </li>
             </ul>
@@ -863,6 +918,7 @@ export class Legend extends React.Component {
     }
 
     legendItems.unshift(primaryLegend);
+    const showLoader = legendLayers.length > 0 ? legendItems.length !== legendLayers.length : false;
 
     return (
       <div>
@@ -870,6 +926,11 @@ export class Legend extends React.Component {
           className={`legend ${mapId}`}
           style={{ right: this.props.showFilterPanel ? '30px' : '20px' }}
         >
+          {showLoader && (
+            <div className="legend-row">
+              <b>Loading...</b>
+            </div>
+          )}
           {legendItems}
         </div>
       </div>
@@ -882,7 +943,7 @@ Legend.propTypes = {
   layersData: PropTypes.arrayOf(PropTypes.any).isRequired,
   MAP: PropTypes.objectOf(PropTypes.any).isRequired,
   primaryLayer: PropTypes.string.isRequired,
-  timeSeriesObj: PropTypes.objectOf(PropTypes.any)
+  timeSeriesObj: PropTypes.objectOf(PropTypes.any),
 };
 
 export default connect(mapStateToProps)(Legend);
