@@ -10,6 +10,7 @@ require('./TimeSeriesSlider.scss');
 
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId] || { layers: {}, timeseries: {} };
+  const { APP } = state;
   let timeLayer;
   let timeSubLayer;
   buildLayersObj(MAP.layers).forEach((layer) => {
@@ -26,6 +27,7 @@ const mapStateToProps = (state, ownProps) => {
     primaryLayer: MAP.primaryLayer,
     showFilterPanel: MAP.showFilterPanel,
     timeLayer,
+    showSinglePeriods: APP.showSinglePeriods
   }
 }
 
@@ -41,9 +43,7 @@ class TimeSeriesSlider extends React.Component {
     let temporalIndex;
     let period;
     const nextTimeseries = Object.assign({}, this.props.timeseries);
-
     const timeSeriesLayers = getSliderLayers(this.props.layers);
-
     const activeLayers = [];
     const layers = [];
     const loadedlayers = this.props.layers;
@@ -76,6 +76,7 @@ class TimeSeriesSlider extends React.Component {
               temporalIndex,
               data: periodData[period[temporalIndex]].data,
               adminFilter: periodData[period[temporalIndex]].adminFilter && [...periodData[period[temporalIndex]].adminFilter],
+              tsFilter: periodData[period[temporalIndex]].tsFilter && [...periodData[period[temporalIndex]].tsFilter],
             },
           );
         }
@@ -85,28 +86,27 @@ class TimeSeriesSlider extends React.Component {
       field
     } = sliderLayerObj.layerObj.aggregate.timeseries;
     sliderLayerObj.data = sliderLayerObj.periodData[sliderLayerObj.period[nextIndex]].data;
-    const activeStops = generateStops(sliderLayerObj, field, this.props.dispatch, nextIndex);
+    const { layerObj } = sliderLayerObj;
+    if (layerObj.type !== 'chart' && layerObj.property) {
+      const activeStops = generateStops(sliderLayerObj, field, this.props.dispatch, nextIndex);
 
-    const {
-      primaryLayer
-    } = this.props;
-    if (this.props.layers[primaryLayer].layers) {
-      this.props.layers[primaryLayer].layers.map(i =>
-        nextTimeseries[i].newBreaks = activeStops[3]);
-      this.props.layers[primaryLayer].layers.map(i =>
-        nextTimeseries[i].newColors = [...new Set(sliderLayerObj.colorStops[nextIndex].map(d =>
-          d[1]))]);
+      const { primaryLayer } = this.props;
 
-      this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, this.props.timeLayer));
-    } else {
-      nextTimeseries[sliderLayerObj.layerId].newBreaks = activeStops[3];
-      nextTimeseries[sliderLayerObj.layerId].newColors = [...new Set(sliderLayerObj.colorStops[nextIndex].map(d => d[1]))];
-      this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, this.props.timeLayer));
+      if (this.props.layers[primaryLayer].layers) {
+        this.props.layers[primaryLayer].layers.map(i =>
+          nextTimeseries[i].newBreaks = activeStops[3]);
+        this.props.layers[primaryLayer].layers.map(i =>
+          nextTimeseries[i].newColors = [...new Set(sliderLayerObj.colorStops[nextIndex].map(d =>
+            d[1]))]);
+      } else {
+        nextTimeseries[sliderLayerObj.layerId].newBreaks = activeStops[3];
+        nextTimeseries[sliderLayerObj.layerId].newColors = [...new Set(sliderLayerObj.colorStops[nextIndex].map(d => d[1]))];
+      }
     }
+    this.props.dispatch(Actions.updateTimeseries(this.props.mapId, nextTimeseries, this.props.timeLayer));
   }
 
   componentWillReceiveProps(nextProps) {
-    
     if (nextProps.timeSeriesObj && nextProps.timeSeriesObj.periodData) {
       const { period, temporalIndex } = nextProps.timeSeriesObj;
       this.setState({
@@ -126,15 +126,21 @@ class TimeSeriesSlider extends React.Component {
   }
 
   render() {
-    return ((this.props.timeSeriesObj) && (this.state && this.state.periods.length > 1)) ? (
+    const {timeSeriesObj, showSinglePeriods} = this.props;
+    return ((timeSeriesObj) && ((this.state && this.state.periods.length) > 1 || showSinglePeriods)) ? (
       <div
         className="series"
         style={{ right: '50px'}}>
         <label
-          id={`${this.props.mapId}-label`}
-          className="label"
-          htmlFor="slider"
-        >{this.state.period}</label>
+            id={`${this.props.mapId}-label`}
+            className="label"
+            htmlFor="slider"
+          >{
+               /** Render this based of a config at layer level */
+               this.props.timeSeriesObj && this.props.timeSeriesObj.textDateFormat ?  
+               new Date(this.state.period).toString().split(' ').slice(0, 4).join(' ') : this.state.period
+          }
+        </label>
         {this.state.periods.length > 1 ?
           <input
             id={`${this.props.mapId}-slider`}

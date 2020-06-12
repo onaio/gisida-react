@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import { SupAuth, Actions } from 'gisida';
-import { connect } from 'react-redux';
+import { isTokenExpired } from 'gisida';
 import './App.scss';
+import Router from '../../routes/router';
 
 class App extends Component {
-
   render() {
     return (
       <div className="app">

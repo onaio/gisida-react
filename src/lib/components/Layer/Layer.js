@@ -2,46 +2,48 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Actions, prepareLayer, lngLat } from 'gisida';
-
+import { pushLayerToURL } from './utils';
 
 const mapStateToProps = (state, ownProps) => {
   const { APP, LOC } = state;
-  const MAP = state[ownProps.mapId]
+  const MAP = state[ownProps.mapId];
   if (!!!MAP) {
-    debugger
+    throw 'MAP not found';
   }
   return {
     APP,
     LOC,
     timeSeriesObj: MAP.timeseries[MAP.visibleLayerId],
     timeseries: MAP.timeseries,
-    layers: MAP.layers
-  }
-}
+    layers: MAP.layers,
+    primaryLayer: MAP.primaryLayer,
+    activeLayerIds: MAP.activeLayerIds,
+  };
+};
 
 export class Layer extends Component {
-
   onLayerToggle = layer => {
     // dispatch toggle layer action
     const { mapId, APP, LOC } = this.props;
     if (!mapId) {
       return null;
     }
+    pushLayerToURL(layer, mapId);
     this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
-    const {center, zoom } = lngLat(LOC, APP);
+    const { center, zoom } = lngLat(LOC, APP);
     if (layer.zoomOnToggle && layer.visible) {
-        window.maps.forEach((e) => {
-          e.easeTo({
-            center,
-            zoom,
-          })
-        });  
-      } 
+      window.maps.forEach(e => {
+        e.easeTo({
+          center,
+          zoom,
+        });
+      });
+    }
     // Prepare layer if layer had not been loaded
     if (!layer.loaded && !layer.isLoading) {
       prepareLayer(mapId, layer, this.props.dispatch);
     }
-  }
+  };
 
   render() {
     const layer = this.props.layer;

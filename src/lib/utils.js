@@ -1,9 +1,12 @@
+import { QUERY_PARAM_LAYERS, QUERY_PARAM_STYLE } from './constants';
+import Router from './routes/router';
+
 export function formatNum(num, decimal) {
-  let x = (`${num}`).length;
+  let x = `${num}`.length;
   if (Number.isInteger(num) && x > 3) {
     const pow = 10 ** decimal;
     x -= x % 3;
-    return Math.round(num * pow / (10 ** x)) / pow + ' kMGTPE'[x / 3];
+    return Math.round((num * pow) / 10 ** x) / pow + ' kMGTPE'[x / 3];
   }
   return num;
 }
@@ -12,20 +15,23 @@ export function getLastIndex(arr, item) {
   const indices = [];
 
   for (let i = 0; i < arr.length; i += 1) {
-    if (arr[i] === item) { indices.push(i); }
+    if (arr[i] === item) {
+      indices.push(i);
+    }
   }
   return indices[indices.length - 1];
 }
 
-
 export function groupBy(collection, property) {
-  var i = 0, val, index,
-    values = [], result = [];
+  var i = 0,
+    val,
+    index,
+    values = [],
+    result = [];
   for (; i < collection.length; i++) {
     val = collection[i][property];
     index = values.indexOf(val);
-    if (index > -1)
-      result[index].push(collection[i]);
+    if (index > -1) result[index].push(collection[i]);
     else {
       values.push(val);
       result.push([collection[i]]);
@@ -87,7 +93,8 @@ export const debounce = (func, wait, now) => {
     if (callNow) func.apply(context, args);
   };
 };
-export function detectIE() {
+
+export function usesIE() {
   var ua = window.navigator.userAgent;
 
   // IE 10
@@ -146,8 +153,8 @@ export function isFiltered(options, isOriginal) {
 export function buildLayersObj(layers) {
   const layersObj = [];
   let layerObj;
-  Object.keys(layers).forEach((key) => {
-    const layer = { ...layers[key]};
+  Object.keys(layers).forEach(key => {
+    const layer = { ...layers[key] };
     if (layer.visible) {
       layerObj = layer;
       layersObj.push(layerObj);
@@ -167,84 +174,198 @@ export const parseColValue = (datum, col) => {
     val = Number(datum[col]);
   }
   return val;
-}
+};
 
 export function deepCopy(x) {
   return JSON.parse(JSON.stringify(x));
-};
+}
 
 export function orderLayers(activeLayersData, map, nextLayerId) {
-  let fill = activeLayersData.filter(d => d['type'] === 'fill'
-     && !d['detail-view']);
-     if (fill.length) {
-       Object.keys(fill).forEach((key) => {
-         if (map.getLayer(fill[key].id)) {
-           map.moveLayer(fill[key].id);
-         }
-       });
-       if (fill.find(c => c.id === nextLayerId) && map.getLayer(nextLayerId)) {
-          map.moveLayer(nextLayerId);
-       }
-     }
-
-  let circles = activeLayersData.filter(d => d['type'] === 'circle');
-     if (circles.length) {
-       Object.keys(circles).forEach((key) => {
-         if (map.getLayer(circles[key].id)) {
-           map.moveLayer(circles[key].id);
-         }
-       });
-       if (circles.find(c => c.id === nextLayerId) && map.getLayer(nextLayerId)) {
-          map.moveLayer(nextLayerId);
-       }
-     }
-
-    let symbols = activeLayersData.filter(d => d['type'] === 'symbol');
-    if (symbols.length) {
-      Object.keys(symbols).forEach((key) => {
-        if (map.getLayer(symbols[key].id)) {
-          map.moveLayer(symbols[key].id)
-        }
-      });
-      if (symbols.find(s => s.id === nextLayerId) && map.getLayer(nextLayerId)) {
-        map.moveLayer(nextLayerId);
+  /**
+   * Rearranges rendered layers and puts selected layer on top.
+   * @param {Object} filteredLayers - Mapbox layers
+   */
+  const moveLayers = filteredLayers => {
+    Object.keys(filteredLayers).forEach(key => {
+      if (map.getLayer(filteredLayers[key].id)) {
+        map.moveLayer(filteredLayers[key].id);
       }
+    });
+    if (filteredLayers.find(d => d.id === nextLayerId) && map.getLayer(nextLayerId)) {
+      map.moveLayer(nextLayerId);
+    }
+  };
+
+  const fills = activeLayersData.filter(d => d['type'] === 'fill' && !d['detail-view']);
+  if (fills.length) {
+    moveLayers(fills);
+  }
+
+  const lines = activeLayersData.filter(d => d['type'] === 'line');
+  if (lines.length) {
+    moveLayers(lines);
+  }
+
+  const circles = activeLayersData.filter(d => d['type'] === 'circle');
+  if (circles.length) {
+    moveLayers(circles);
+  }
+
+  const symbols = activeLayersData.filter(d => d['type'] === 'symbol');
+  if (symbols.length) {
+    moveLayers(symbols);
+  }
+
+  const detailViewActive = activeLayersData.filter(d => d['detail-view'] && !d['level-view']);
+  if (detailViewActive.length) {
+    moveLayers(detailViewActive);
+  }
+
+  const isLabelActive = activeLayersData.filter(d => d.isLabel);
+  if (isLabelActive.length) {
+    moveLayers(isLabelActive);
+  }
+}
+
+/**
+ * Get all visible layer Ids of a menu group
+ * @param {*} groupName Name of the group which we want to target
+ * @param {*} children Children of the group which we want to target
+ */
+export function getMenuGroupVisibleLayers(groupName, children) {
+  const subGroups = children.filter(child => !child.id);
+
+  if (subGroups.length) {
+    let visibleLayerIds = [];
+
+    subGroups.forEach(sg => {
+      Object.keys(sg).forEach(key => {
+        const subGroupVisibleLayerIds = getMenuGroupVisibleLayers(groupName, sg[key].layers);
+        visibleLayerIds = [...visibleLayerIds, ...subGroupVisibleLayerIds];
+      });
+    });
+
+    // Return all visible layer Id of the nested subgroups
+    return visibleLayerIds;
+  } else {
+    // Return the Ids of visible layers for the group
+    return children.filter(child => child.visible).map(child => child.id);
+  }
+}
+
+/**
+ * Get shared layers from URL
+ * @param {*} mapId mapId for map to get shared layers for
+ * @returns {Array} layers from URL for the given map id
+ */
+export function getSharedLayersFromURL(mapId) {
+  return getURLSearchParams().getAll(`${mapId}-${QUERY_PARAM_LAYERS}`);
+}
+
+/**
+ * Get all map layer Ids that fall under a given menu group
+ * @param {*} groupName Name of the group which we want to target
+ * @param {*} children Children of the group which we want to target
+ */
+export function getMenuGroupMapLayers(groupName, children) {
+  const subGroups = children.filter(child => !child.id);
+
+  if (subGroups.length) {
+    let visibleLayerIds = [];
+
+    subGroups.forEach(sg => {
+      Object.keys(sg).forEach(key => {
+        const subGroupVisibleLayerIds = getMenuGroupMapLayers(groupName, sg[key].layers);
+        visibleLayerIds = [...visibleLayerIds, ...subGroupVisibleLayerIds];
+      });
+    });
+
+    // Return all layer Ids of the nested subgroups
+    return visibleLayerIds;
+  } else {
+    // Return the Ids of layers for the group
+    return children.map(child => child.id);
+  }
+}
+
+/**
+ * Return true if a menu group has any visible map layer, false otherwiise.
+ * Useful when you only want to know if a menu group has at least one visible layer and would
+ * probably want to open it. This is useful for performance since it does not continue
+ * checking other children once it finds the first open child.
+ * @param {*} groupName Name of the group which we want to target
+ * @param {*} children Children of the group which we want to target
+ */
+export function menuGroupHasVisibleLayers(groupName, children) {
+  const subGroups = children.filter(child => !child.id);
+
+  if (subGroups.length) {
+    let hasVisibleLayers = false; // If we find a subgroup that
+    // has visible layers, we use this flag to stop the loop
+    let i = 0;
+
+    while (!hasVisibleLayers && i < subGroups.length) {
+      const subGroup = subGroups[i];
+      let j = 0;
+      const subGroupKeys = Object.keys(subGroup);
+
+      while (!hasVisibleLayers && j < subGroupKeys.length) {
+        const key = subGroupKeys[j];
+
+        if (menuGroupHasVisibleLayers(groupName, subGroup[key].layers)) {
+          hasVisibleLayers = true;
+        }
+
+        j += 1;
+      }
+
+      i += 1;
     }
 
-    let line = activeLayersData.filter(d => d['type'] === 'line');
-     if (line.length) {
-       Object.keys(line).forEach((key) => {
-         if (map.getLayer(line[key].id)) {
-           map.moveLayer(line[key].id);
-         }
-       });
-       if (line.find(c => c.id === nextLayerId) && map.getLayer(nextLayerId)) {
-          map.moveLayer(nextLayerId);
-       }
-     }
+    return hasVisibleLayers;
+  } else {
+    let hasVisibleChildren = false;
+    let m = 0;
 
-    let detailViewActive = activeLayersData.filter(d => d['detail-view']);
-    if (detailViewActive.length) {
-      Object.keys(detailViewActive).forEach((key) => {
-        if (map.getLayer(detailViewActive[key].id)) {
-          map.moveLayer(detailViewActive[key].id);
-        }
-      });
-      if (detailViewActive.find(d => d.id === nextLayerId) && map.getLayer(nextLayerId)) {
-        map.moveLayer(nextLayerId);
-      }
-    }
-    let isLabelActive = activeLayersData.filter(d => d.isLabel);
+    while (!hasVisibleChildren && m < children.length) {
+      const child = children[m];
 
-    if (isLabelActive.length) {
-      Object.keys(isLabelActive).forEach((key) => {
-        if (map.getLayer(isLabelActive[key].id)) {
-          map.moveLayer(isLabelActive[key].id);
-        }
-      });
-      if (isLabelActive.find(d => d.id === nextLayerId) && map.getLayer(nextLayerId)) {
-        map.moveLayer(nextLayerId);
+      if (child.visible) {
+        hasVisibleChildren = true;
       }
+
+      m += 1;
     }
 
+    return hasVisibleChildren;
+  }
+}
+
+/**
+ * Push an instance of URLSearchParams to URL
+ * @param {*} urlSearchParams
+ */
+export function pushSearchParamsToURL(urlSearchParams) {
+  Router.history.push({
+    search: urlSearchParams.toString(),
+  });
+}
+
+/**
+ * Return an instance of URLSearchParams initiated with
+ * the query param string from window.location.search
+ */
+export function getURLSearchParams() {
+  return new URLSearchParams(window.location.search);
+}
+
+/**
+ * Get shared style value from the query param `map-<id>-style`
+ * @param {string} mapId mapId for map to get shared layers for
+ * @returns {number} style
+ */
+export function getSharedStyleFromURL(mapId) {
+  const style = getURLSearchParams().get(`${mapId}-${QUERY_PARAM_STYLE}`);
+
+  return style ? +style : null;
 }

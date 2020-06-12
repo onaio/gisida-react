@@ -1,0 +1,261 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Menu Component SearchBar component renders correctly 1`] = `
+<Connect(SearchBar)
+  handleSearchClick={[MockFunction]}
+  handleSearchInput={[MockFunction]}
+  mapId="map-1"
+  openCategoryForSharedLayers={[MockFunction]}
+  searchResultClick={[MockFunction]}
+  searching={false}
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+  toggleSubMenu={[MockFunction]}
+>
+  <SearchBar
+    APP={
+      Object {
+        "appColor": "blue",
+      }
+    }
+    LOC={Object {}}
+    appColor="blue"
+    dispatch={[Function]}
+    handleSearchClick={[MockFunction]}
+    handleSearchInput={[MockFunction]}
+    mapId="map-1"
+    openCategoryForSharedLayers={[MockFunction]}
+    preparedLayers={
+      Object {
+        "education": Object {
+          "aggregate": Object {
+            "accepted-filter-values": Array [
+              "all",
+              "all",
+            ],
+            "date-by": "submission/reporting_period",
+            "date-parse": Object {
+              "chunk": 0,
+              "split": " to ",
+            },
+            "extraProps": Array [
+              "total_15_18_adolscent",
+              "total_15_18_adolscent_girls",
+              "total_15_18_adolscent_boys",
+              "rc_rep/rc_boys_cal3",
+              "rc_rep/rc_girls_cal3",
+              "rc_rep/total3",
+              "submission/location_type",
+              "reporter/reporter_org",
+              "Settlement",
+              "submission/reporting_period",
+              "New_Camp_S",
+              "New_Camp_N",
+              "Upazila",
+            ],
+            "filter": Array [
+              "reporter/reporter_org",
+              "Upazila",
+            ],
+            "filter-label": Array [
+              "Partner",
+              "Upazila",
+            ],
+            "filter-type": Array [
+              "stops",
+              "stops",
+            ],
+            "group-by": "submission/rc_loc",
+            "timeseries": Object {
+              "field": "period",
+              "type": "cumulative",
+            },
+            "type": "sum",
+          },
+          "categories": Object {
+            "breaks": "yes",
+            "clusters": 7,
+            "color": "RdPu",
+          },
+          "category": "Education",
+          "credit": "Adolescents (15-18 years) enrolled in non-formal/formal education.",
+          "data-parse": Object {
+            "submission/rc_loc": Object {
+              "key": Object {
+                "CXB-201": "Camp 1E",
+                "CXB-202": "Camp 1W",
+              },
+              "new-prop-name": "parsedUID",
+            },
+            "submission/reporting_period": Object {
+              "key": Object {
+                "t_A17-F18": "August 2017 to February 2018",
+                "t_jan": "January 1 to January 31",
+              },
+              "type": "single",
+            },
+          },
+          "detail-view": Object {
+            "UID": "SSID",
+            "basic-info": Array [
+              Object {
+                "alt": "GPS coordinates",
+                "icon": "screenshot",
+                "value": Object {
+                  "join": ", ",
+                  "prop": Array [
+                    "longitude",
+                    "latitude",
+                  ],
+                },
+              },
+              Object {
+                "alt": "Reporter Org",
+                "icon": "user",
+                "value": "reporter/reporter_org",
+              },
+            ],
+            "sub-title": Object {
+              "prop": "New_Camp_N",
+            },
+            "title": Object {
+              "prop": "Site_name",
+            },
+          },
+          "id": "education",
+          "label": "RC - Adolescents (15-18 years) enrolled in non-formal/formal education",
+          "labels": Object {
+            "coordinates": Array [
+              "longitude",
+              "latitude",
+            ],
+            "data": "data/180320_Outline_Rohingya_refugee_camps_sites_centroids.csv",
+            "height": 30,
+            "join": Array [
+              "New_Camp_S",
+              "submission/rc_loc",
+            ],
+            "label": "<b> {{total_15_18_adolscent}} </b>",
+            "minZoom": 4.5,
+            "width": 30,
+          },
+          "loaded": true,
+          "popup": Object {
+            "body": "<p style=text-align:left;> <b>Girls:</b> {{total_15_18_adolscent_girls}} <br> <b>Boys:</b> {{total_15_18_adolscent_boys}}<span style=float:right;>",
+            "header": "parsedUID",
+          },
+          "property": "total_15_18_adolscent",
+          "rohingyaIndicators": Object {
+            "location_type": "submission/location_type",
+            "rc_boys": "rc_rep/rc_boys_cal3",
+            "rc_girls": "rc_rep/rc_girls_cal3",
+            "rc_total": "rc_rep/total3",
+          },
+          "source": Object {
+            "data": Array [
+              315361,
+              "/data/180320_Outline_Rohingya_refugee_camps_sites_centroids.csv",
+            ],
+            "join": Array [
+              "SSID",
+              "submission/rc_loc",
+              "New_Camp_S",
+            ],
+            "layer": "180528_outline_rohingya_refug-c2ep2k",
+            "relation": Object {
+              "key": Array [
+                "vector",
+                "many",
+                "one",
+              ],
+              "type": "one-to-many",
+            },
+            "type": "vector",
+            "url": "mapbox://ona.5t6fsdlt",
+          },
+          "type": "fill",
+          "visible": false,
+        },
+      }
+    }
+    searchResultClick={[MockFunction]}
+    searching={false}
+    store={
+      Object {
+        "clearActions": [Function],
+        "dispatch": [Function],
+        "getActions": [Function],
+        "getState": [Function],
+        "replaceReducer": [Function],
+        "subscribe": [Function],
+      }
+    }
+    storeSubscription={
+      Subscription {
+        "listeners": Object {
+          "clear": [Function],
+          "get": [Function],
+          "notify": [Function],
+          "subscribe": [Function],
+        },
+        "onStateChange": [Function],
+        "parentSub": undefined,
+        "store": Object {
+          "clearActions": [Function],
+          "dispatch": [Function],
+          "getActions": [Function],
+          "getState": [Function],
+          "replaceReducer": [Function],
+          "subscribe": [Function],
+        },
+        "unsubscribe": [Function],
+      }
+    }
+    toggleSubMenu={[MockFunction]}
+  >
+    <div
+      className="search-wrapper"
+    >
+      <div
+        className="search"
+      >
+        <input
+          className="searchTerm"
+          onChange={[Function]}
+          placeholder="Search..."
+          style={
+            Object {
+              "border": "2px solid blue",
+            }
+          }
+          type="text"
+          value=""
+        />
+        <button
+          className="searchButton"
+          onClick={[Function]}
+          style={
+            Object {
+              "background": "blue",
+              "border": "1px solid blue",
+            }
+          }
+          type="button"
+        >
+          <i
+            className="fa fa-search"
+          />
+        </button>
+      </div>
+    </div>
+  </SearchBar>
+</Connect(SearchBar)>
+`;
