@@ -50,8 +50,6 @@ class DoughnutChart extends React.Component {
                     crop: true,
                     overflow: 'none',
                     formatter() {
-
-                    console.log(this.point)
                       if (this.point.scoreLabel !== undefined) {
                         return `<b>${this.point.label}</b>`;
                       }
