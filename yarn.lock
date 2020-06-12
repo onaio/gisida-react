@@ -50,6 +50,21 @@
     client-oauth2 "^4.2.3"
     query-string "^6.4.2"
 
+"@onaio/google-analytics@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@onaio/google-analytics/-/google-analytics-0.0.2.tgz#8c723e788a4d3d2506d8e9fa58a080e056ee6dda"
+  integrity sha512-CB5YSrFTT+7VP8VlIRbHmkuqdlT562hDEK+IpBSpJoahEoAEtsZDKUv1e8g12GtUJy1z/DF9DkM4DIZZMruqJA==
+  dependencies:
+    "@onaio/react-utils" "^0.0.1"
+    "@onaio/utils" "^0.0.1"
+    memoize-one "^5.1.1"
+    react-ga "^2.7.0"
+
+"@onaio/react-utils@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@onaio/react-utils/-/react-utils-0.0.1.tgz#506df861bdc947ac63973d3b3f821836af39ad08"
+  integrity sha512-Bpwvgq2js2kn0KA8c3y3ClRTO3EYxGXNGipILuLUPiXua/lm7BGZ1PP1T4D8EXTDgwc4ELpL/aNM2n9NxbJ6Gw==
+
 "@onaio/session-reducer@^0.0.11":
   version "0.0.11"
   resolved "https://registry.yarnpkg.com/@onaio/session-reducer/-/session-reducer-0.0.11.tgz#4e8384ef3fc48d0bb697d698b115e8fc541100ed"
@@ -62,6 +77,11 @@
   dependencies:
     "@types/papaparse" "^4.5.11"
     papaparse "^4.6.3"
+
+"@onaio/utils@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@onaio/utils/-/utils-0.0.1.tgz#c4b6b0afb3b7ad6e2b6135a160d3d79e53e286af"
+  integrity sha512-JybtApO1LqxidE+avNdu6Qq+EOvywn92/h++HIMvA5DIKMZ6e1OGdG2ZMbFkylmx8JpvVcFypSIomPzKUYvL7w==
 
 "@servie/events@^1.0.0":
   version "1.0.0"
@@ -8878,6 +8898,11 @@ react-error-overlay@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-3.0.0.tgz#c2bc8f4d91f1375b3dad6d75265d51cd5eeaf655"
   integrity sha512-XzgvowFrwDo6TWcpJ/WTiarb9UI6lhA4PMzS7n1joK3sHfBBBOQHUc0U4u57D6DWO9vHv6lVSWx2Q/Ymfyv4hw==
+
+react-ga@^2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/react-ga/-/react-ga-2.7.0.tgz#24328f157f31e8cffbf4de74a3396536679d8d7c"
+  integrity sha512-AjC7UOZMvygrWTc2hKxTDvlMXEtbmA0IgJjmkhgmQQ3RkXrWR11xEagLGFGaNyaPnmg24oaIiaNPnEoftUhfXA==
 
 react-is@^16.12.0, react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.1, react-is@^16.8.6, react-is@^16.9.0:
   version "16.13.1"
