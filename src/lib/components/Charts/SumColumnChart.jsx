@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ColumnChart from './ColumnChart';
-import { debounce, hexToRgbA } from '../../utils';
+import { debounce, hexToRgbA, parseColValue } from '../../utils';
 
 class SumColumnChart extends React.Component {
   static buildColData(layerData, chartSpec, layer, locations) {
@@ -16,13 +16,16 @@ class SumColumnChart extends React.Component {
     const column = chartSpec.column; // column name definied by host
     let catCol = '';
     let mapCol = false; // bool for whether or not to use the "locations" map
+    let parsedVal;
+    let activeColors;
 
     // deifine which break each datum falls into
     let dataBreaks;
     if (breaks) {
-      dataBreaks = layerData.map((d) => {
+      dataBreaks = (layerData.features || layerData).map((d) => {
         for (let b = 0; b < breaks.length; b += 1) {
-          if (Number(d[column]) <= Number(breaks[b])) return b;
+          parsedVal = parseColValue((d.properties || d), column);
+          if (parsedVal <= Number(breaks[b])) return b;
         }
         return breaks.length - 1;
       });
@@ -31,8 +34,9 @@ class SumColumnChart extends React.Component {
     // Push the data into categorical buckets
     catCol = chartSpec.level;
     if (catCol === 'district_id' && locations && Object.keys(locations).length) mapCol = true;
-    for (i; i < layerData.length; i += 1) {
-      datum = layerData[i];
+    const activeData = layerData.features || layerData;
+    for (i; i < activeData.length; i += 1) {
+      datum = (activeData[i].properties || activeData[i]);
       if (!dataMap[datum[catCol]]) {
         dataMap[datum[catCol]] = {
           sum: 0,
@@ -42,8 +46,9 @@ class SumColumnChart extends React.Component {
         };
       }
       dataMap[datum[catCol]].count += 1;
-      dataMap[datum[catCol]].sum += Number(datum[column]);
-      if (dataBreaks) dataMap[datum[catCol]].color = hexToRgbA(colors[dataBreaks[i]], 0.8);
+      dataMap[datum[catCol]].sum += parseColValue(datum, column);
+      activeColors = Array.isArray(colors) ? colors[dataBreaks[i]] : colors;
+      if (dataBreaks) dataMap[datum[catCol]].color = hexToRgbA(activeColors, 0.8);
     }
 
     // Structure the data in a way that highcharts can use

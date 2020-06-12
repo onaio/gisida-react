@@ -3,44 +3,40 @@ import PropTypes from 'prop-types';
 import SumPieChart from './SumPieChart';
 import SumColumnChart from './SumColumnChart';
 import SumChartMinimize from './SumChartMinimize';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 
 require('./SummaryChart.scss');
 
-
 const mapStateToProps = (state, ownProps) => {
-  const MAP = state[ownProps.mapId] || { layers: {}};
+  const MAP = state[ownProps.mapId] || { layers: {} };
   const layers = MAP.layers;
-  let layerObj
-  let layersObj = []
-  let currentRegion
+  let layerObj;
+  let layersObj = [];
+  let currentRegion;
   let sumChartObj;
   let isChartMin;
-  let legendBottom;  
-  // Get visible layer 
-  Object.keys(layers).forEach((key) => {
+  let legendBottom;
+  // Get visible layer
+  Object.keys(layers).forEach(key => {
     const layer = layers[key];
     if (layer.charts && layer.visible) {
-      layerObj = layer;
-      layersObj.push(layerObj);
-    } 
+      layersObj.push(layer);
+    }
   });
-
+  layerObj = MAP.layers[MAP.primaryLayer || MAP.activeLayerId];
   // Set layer to undefined of layer is from diffrent region
   currentRegion = state.REGIONS.filter(region => region.current)[0];
   if (currentRegion) {
-    layerObj = (layerObj && layerObj.region === currentRegion.name) ? layerObj : undefined;
-  } 
-  const isTimeseries = layerObj && layerObj.aggregate
-    && typeof layerObj.aggregate.timeseries !== 'undefined';
-  if (layerObj && layerObj.charts ) {
-   
+    layerObj = layerObj && layerObj.region === currentRegion.name ? layerObj : undefined;
+  }
+  const isTimeseries =
+    layerObj && layerObj.aggregate && typeof layerObj.aggregate.timeseries !== 'undefined';
+  if (layerObj && layerObj.charts) {
     sumChartObj = !isTimeseries
       ? layerObj
       : MAP.timeseries[layerObj.id]
       ? MAP.timeseries[layerObj.id]
       : null;
-
     if (typeof layerObj.isChartMin === 'undefined') {
       isChartMin = true;
       legendBottom = 40;
@@ -59,10 +55,11 @@ const mapStateToProps = (state, ownProps) => {
       legendBottom: legendBottom,
       locations: {},
       showMinimize: true,
+      primaryLayer: MAP.primaryLayer,
       menuIsOpen: MAP.menuIsOpen,
-    }
-  } else return { showMinimize: false}
-}
+    };
+  } else return { showMinimize: false };
+};
 
 class SummaryChart extends React.Component {
   static defineCharts(chartSpec) {
@@ -97,8 +94,10 @@ class SummaryChart extends React.Component {
     const windowWidth = $(window).outerWidth();
     const $sectors = $(`#${mapId}-menu-wrapper .sectors-menu`);
     const sectorsMenuWidth = menuIsOpen ? $sectors.outerWidth() : 0;
-    const menuIsFixedLeft = $(window).outerHeight() === $('#menu').outerHeight() &&
-      !$('#menu').offset().top && !$('#menu').offset().left;
+    const menuIsFixedLeft =
+      $(window).outerHeight() === $('#menu').outerHeight() &&
+      !$('#menu').offset().top &&
+      !$('#menu').offset().left;
     const menuWidth = (menuIsFixedLeft ? $('#menu').outerWidth() : 0) + 20;
     const availbleWidth = windowWidth - sectorsMenuWidth - menuWidth;
     const minChartWidth = 650;
@@ -126,14 +125,19 @@ class SummaryChart extends React.Component {
     const newLayersObj = [];
     let doUpdateLayersObj = false;
 
+    if (!this.props.primaryLayer) {
+      return false;
+    }
+
     if (layerObj.id === layerId && layerObj.isChartMin !== isChartMin) {
       layerObj.isChartMin = isChartMin;
       layerObj.legendBottom = legendBottom;
-      layersObj[layersObj.length - 1].isChartMin = isChartMin;
-      layersObj[layersObj.length - 1].legendBottom = legendBottom;
+      const activeObj = layersObj.find(d => d.id === this.props.primaryLayer);
+      activeObj.isChartMin = isChartMin;
+      activeObj.legendBottom = legendBottom;
 
       this.setState({
-        layerObj,
+        layerObj: activeObj,
         layersObj,
       });
     } else {
@@ -165,7 +169,7 @@ class SummaryChart extends React.Component {
       }
 
       $(`.legend.${this.props.mapId}`).css('bottom', legendBottom);
-  
+
       this.state = {
         layerId,
         layer,
@@ -177,10 +181,10 @@ class SummaryChart extends React.Component {
       };
     }
 
-      this.moveMapLedgend = this.moveMapLedgend.bind(this);
-      this.onOpenModalClick = this.onOpenModalClick.bind(this);
-      this.onCloseModalClick = this.onCloseModalClick.bind(this);
-      this.toggleChart = this.toggleChart.bind(this);
+    this.moveMapLedgend = this.moveMapLedgend.bind(this);
+    this.onOpenModalClick = this.onOpenModalClick.bind(this);
+    this.onCloseModalClick = this.onCloseModalClick.bind(this);
+    this.toggleChart = this.toggleChart.bind(this);
   }
 
   componentDidMount() {
@@ -194,27 +198,34 @@ class SummaryChart extends React.Component {
       const { layerId, layer, mapId, isChartMin, legendBottom, menuIsOpen } = nextProps;
       const legendPosition = SummaryChart.calcLegendPosition(mapId);
       const chartSpecs = SummaryChart.defineCharts(layer.charts);
-      const primaryChartPosition = chartSpecs && !chartSpecs.primaryChart
-        ? { chartWidth: 0, isFullBleed: false }
-        : SummaryChart.calcChartWidth(mapId, menuIsOpen);
+      const primaryChartPosition =
+        chartSpecs && !chartSpecs.primaryChart
+          ? { chartWidth: 0, isFullBleed: false }
+          : SummaryChart.calcChartWidth(mapId, menuIsOpen);
 
       $(`.legend.${mapId}`).css('bottom', legendBottom);
-      this.setState({
-        layersObj: nextProps.layersObj,
-        layerObj: layer,
-        layerId,
-        layer,
-        chartHeight: legendPosition.height,
-        buttonBottom: legendPosition.bottom,
-        layerData: layer.layerObj ? layer.data : layer.mergedData,
-        charts: chartSpecs.charts,
-        primaryChart: chartSpecs.primaryChart,
-        isChartMin,
-        menuIsOpen,
-        doShowModal: layerId === this.state && this.state.layerId ? this.state.doShowModal : false,
-        chartWidth: primaryChartPosition.chartWidth,
-        isFullBleed: primaryChartPosition.isFullBleed,
-      });
+      this.setState(
+        {
+          layersObj: nextProps.layersObj,
+          layerObj: layer,
+          layerId,
+          layer,
+          chartHeight: legendPosition.height,
+          buttonBottom: legendPosition.bottom,
+          layerData: layer.layerObj ? layer.data : layer.mergedData,
+          charts: chartSpecs.charts,
+          primaryChart: chartSpecs.primaryChart,
+          isChartMin,
+          menuIsOpen,
+          doShowModal:
+            layerId === this.state && this.state.layerId ? this.state.doShowModal : false,
+          chartWidth: primaryChartPosition.chartWidth,
+          isFullBleed: primaryChartPosition.isFullBleed,
+        },
+        () => {
+          this.moveMapLedgend();
+        }
+      );
     }
   }
 
@@ -233,10 +244,16 @@ class SummaryChart extends React.Component {
   }
 
   moveMapLedgend(chartHeight) {
-    const { isChartMin, layerId } = this.state;
+    const { layerId } = this.state;
     const { mapId, menuIsOpen } = this.props;
     const { chartWidth, isFullBleed } = SummaryChart.calcChartWidth(mapId, menuIsOpen);
     const legendPosition = SummaryChart.calcLegendPosition(mapId);
+    let isChartMin;
+    if (this.props.layersObj && typeof this.state.isChartMin === 'undefined') {
+      isChartMin = this.props.layersObj.find(l => l.id === layerId).isChartMin;
+    } else {
+      isChartMin = this.state.isChartMin;
+    }
     const legendBottom = isChartMin
       ? 40
       : isFullBleed
@@ -249,38 +266,58 @@ class SummaryChart extends React.Component {
       ? $(window).innerHeight() - ($primaryRow.offset().top + $primaryRow.innerHeight()) + 12
       : legendBottom + 12;
 
-    this.setState({
-      buttonBottom,
-      chartWidth: chartWidth,
-      isFullBleed: isFullBleed,
-    }, () => {
-      this.saveChartState(layerId, this.state.isChartMin, legendBottom);
-    });
+    this.setState(
+      {
+        buttonBottom,
+        chartWidth: chartWidth,
+        isFullBleed: isFullBleed,
+      },
+      () => {
+        this.saveChartState(layerId, isChartMin, legendBottom);
+      }
+    );
   }
 
   toggleChart() {
     const { isChartMin, primaryChart } = this.state;
     if (primaryChart) {
-      this.setState({
-        isChartMin: !isChartMin,
-        doShowModal: false,
-      }, () => {
-        this.moveMapLedgend();
-      });
+      this.setState(
+        {
+          isChartMin: !isChartMin,
+          doShowModal: false,
+        },
+        () => {
+          this.moveMapLedgend();
+        }
+      );
     } else {
       this.onOpenModalClick();
     }
   }
 
   render() {
-    if (!this.state
-      || Object.keys(this.state).length < 2
-      || !this.props.showMinimize
-      || this.props.activeLayerId !== this.props.layerId) {
+    if (
+      !this.state ||
+      Object.keys(this.state).length < 2 ||
+      !this.props.showMinimize ||
+      this.props.activeLayerId !== this.props.layerId
+    ) {
       return null;
     }
 
-    const { layerId, layerData, layer, charts, primaryChart, locations } = this.state;
+    const { layerId, layerData, layer, primaryChart, locations } = this.state;
+
+    let charts = this.state.charts;
+    if (!charts) {
+      /**
+       * Work around to solve an undefined charts bug that occurs when a user loads a layer with
+       * a summary chart, uses react router to navigate to another component, then navigates
+       * back to the map component
+       */
+      const chartSpecs = SummaryChart.defineCharts(this.props.layer.charts);
+      charts = chartSpecs && chartSpecs.charts;
+    }
+
     const { doShowModal, chartHeight, buttonBottom, isFullBleed, chartWidth } = this.state;
     let chartKey = '';
     const sumCharts = [];
@@ -291,7 +328,7 @@ class SummaryChart extends React.Component {
       chartKey = `${charts[c].type}-${c}`;
       switch (charts[c].type) {
         case 'pie':
-          sumCharts.push((
+          sumCharts.push(
             <SumPieChart
               key={chartKey}
               layerId={layerId}
@@ -300,19 +337,21 @@ class SummaryChart extends React.Component {
               chartSpec={charts[c].spec}
               mapId={this.props.mapId}
             />
-          ));
+          );
           break;
         case 'column':
-          sumCharts.push((<SumColumnChart
-            key={chartKey}
-            layer={layer}
-            layerId={layerId}
-            layerData={layerData}
-            mapId={this.props.mapId}
-            chartSpec={charts[c].spec}
-            isPrimary={false}
-            locations={locations}
-          />));
+          sumCharts.push(
+            <SumColumnChart
+              key={chartKey}
+              layer={layer}
+              layerId={layerId}
+              layerData={layerData}
+              mapId={this.props.mapId}
+              chartSpec={charts[c].spec}
+              isPrimary={false}
+              locations={locations}
+            />
+          );
           break;
         default:
           console.error(`Unexpected type of summary chart: ${charts[c].type}`);
@@ -348,8 +387,11 @@ class SummaryChart extends React.Component {
               {sumCharts.length ? (
                 <button
                   className={`toggleBtn glyphicon glyphicon-${
-                    doShowModal ? 'resize-small isOpen' : 'option-horizontal'}`}
-                  onClick={(e) => { this.onOpenModalClick(e); }}
+                    doShowModal ? 'resize-small isOpen' : 'option-horizontal'
+                  }`}
+                  onClick={e => {
+                    this.onOpenModalClick(e);
+                  }}
                   alt="More Summary Charts"
                   title="More Summary Charts"
                 />
@@ -366,7 +408,8 @@ class SummaryChart extends React.Component {
         <SumChartMinimize
           toggleChart={this.toggleChart}
           bottom={buttonBottom}
-          mapId={this.props.mapId}/>
+          mapId={this.props.mapId}
+        />
         {!this.state.isChartMin && primarySumChart ? primarySumChart : ''}
         {doShowModal && sumCharts.length ? (
           <div className={`sumChartModal ${this.props.mapId}`}>
@@ -375,23 +418,29 @@ class SummaryChart extends React.Component {
               <span
                 role="button"
                 className={'glyphicon glyphicon-remove closeBtn'}
-                onClick={(e) => { this.onCloseModalClick(e); }}
+                onClick={e => {
+                  this.onCloseModalClick(e);
+                }}
                 tabIndex={-1}
               />
             </div>
-            <div className="sumChartModalBody">
-              {sumCharts}
-            </div>
+            <div className="sumChartModalBody">{sumCharts}</div>
           </div>
-        ) : ''}
-        {doShowModal && sumCharts.length ?
+        ) : (
+          ''
+        )}
+        {doShowModal && sumCharts.length ? (
           <div
             className="sumChartsOverlay"
             role="button"
-            onClick={(e) => { this.onCloseModalClick(e); }}
+            onClick={e => {
+              this.onCloseModalClick(e);
+            }}
             tabIndex={-1}
           />
-          : ''}
+        ) : (
+          ''
+        )}
       </div>
     );
   }
@@ -408,4 +457,3 @@ SummaryChart.propTypes = {
 };
 
 export default connect(mapStateToProps)(SummaryChart);
-

@@ -13,6 +13,7 @@
   "property": "Heath_Spending_Per_Person_",
   "properties": ["County", "OBJECTID"],
   "aggregate": {
+      "joinKey": ["Adm1Name"],
       "filter": ["County"],
       "sub-filter": [""],
       "accepted-filter-values": ["all"],

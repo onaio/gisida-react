@@ -236,8 +236,32 @@
         margin-top: 15px !important;
         margin-bottom: 15px !important;
       }
-    }
+      .advanced-controls  {
+        position: absolute;
+        width: 100%;
+        top: 0;
 
+        button {
+          position: absolute;
+          top: 14px;
+          right: 90px;
+          width: 18px;
+          height:20px;
+          border: none;
+          background-repeat: no-repeat !important;
+
+          &.And {
+            background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASBAMAAACk4JNkAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAADBQTFRFAAAAmZmZmZmZmZmZmZmZmZmZmZmZzMzM3d3d8PDw////////////ysrKsLCwiIiI4TylDQAAABB0Uk5TAJn/qsbjVeP/xqpx/////wK9mOIAAABrSURBVHicY2BgYFQCAwYGBmYVYyAIArHUgASDEVaWsLF556pVG4AsJSWNM2fOLACyVNIyz767A2IpM3Cd+/8GgwWUnZbmBGIBdTQBbVNm4F61akaxsSGQBQRJBkACG0sV5CQnEAviTAEGBgCT2CR2h+EOYQAAAABJRU5ErkJggg==');
+          }
+          &.Or {
+            background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASBAMAAACk4JNkAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAACFQTFRFAAAA////////////5eXl19fX8vLysLCwiIiI////lZWVcnwzEAAAAAt0Uk5TAJn/qv//////4/9aPqkdAAAAU0lEQVR4nGNgYGBUAgMGBgZmlVAgSAKx1DuAIAgrS9jYEsoC6oKyVMrLqyAs1Q4IwGAtLy93grCKQLZBWJONDaEsA6AN2FhqICc5gVgQZwowMAAArzAzVg2hULEAAAAASUVORK5CYII=');
+          }
+          &:focus {
+            outline:0 !important;
+          }
+        }
+      }
+    }
     .search-column {
       position: relative;
       width: 100%;
@@ -291,6 +315,17 @@
     background: none;
     border: none;
   }
+}
+
+.filter-or-and {
+  background-repeat: no-repeat !important;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASBAMAAACk4JNkAAAAAXNSR…QBbVNm4F61akaxsSGQBQRJBkACG0sV5CQnEAviTAEGBgCT2CR2h+EOYQAAAABJRU5ErkJggg==);
+  margin-bottom: 20px;
+  display: block;
+  border: none;
+  position: absolute;
+  right: 60px;
+  top: 14px;
 }
 
 .filterSearch {
@@ -359,7 +394,7 @@
     &:hover {
       cursor: pointer;
     }
-
+    
     div.search-column,
     div.advanced-controls {
       position: relative;
@@ -699,6 +734,10 @@ html .filter-section-options .filter-item div.advanced-controls table {
   top: -42px;
   left: 30px;
 }
-
-
-
+.filter-footer .filter-footer-section
+.filter-footer-content table.filter-footer-controls
+ td button.enabled {
+ color: #ffffff;
+ border-color: #ccc;
+ cursor: default;
+}

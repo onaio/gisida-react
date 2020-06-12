@@ -3,9 +3,12 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 const mapStateToProps = (state, ownProps) => {
-  const MAP = state[ownProps.mapId];
+  const MAP = state[ownProps.mapId] || { timeseries: {}, layers: {} };
+  const { detailView } = MAP;
   return {
     showFilterPanel: MAP.showFilterPanel,
+    showDetailView: (detailView && detailView.model && detailView.model.UID),
+    layerObj: MAP.layers ? MAP.layers[MAP.activeLayerId] : null,
   }
 }
 
@@ -31,6 +34,15 @@ class SumChartMinimize extends React.Component {
   }
 
   render() {
+    const { showDetailView, showFilterPanel, layerObj } = this.props;
+    let chartPos = "35px";
+    if (showDetailView) {
+      chartPos = "375px";
+    } else if (showFilterPanel &&
+      !(layerObj.aggregate &&
+        layerObj.aggregate.filterIsPrev)) {
+      chartPos = "286px";
+    }
     return (
       <a
         className="toggleChart"
@@ -38,7 +50,7 @@ class SumChartMinimize extends React.Component {
         tabIndex="-1"
         onClick={(e) => { this.handleClick(e); }}
         title={`${this.state.isMin ? 'Show' : 'Hide'} Summary Charts`}
-        style={{ bottom: this.state.bottom, right: this.props.showFilterPanel ? '286px' : '35px' }}
+        style={{ bottom: this.state.bottom, right: chartPos, zIndex: 5000 }}
         data-icon-credit="Created by Barracuda from the Noun Project"
         data-icon-credit-url="https://thenounproject.com/barracuda/collection/chart/?i=1217547"
       >
