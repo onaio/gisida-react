@@ -12,12 +12,16 @@ import TimeSeriesSlider from './components/TimeSeriesSlider/TimeSeriesSlider';
 import Spinner from './components/Spinner/Spinner';
 import ThemeSwitcher from './components/ThemeSwitcher/ThemeSwitcher';
 import Export from './components/Export/Export';
-import HorizontalBarChart from './components/Charts/HorizontalBarChart';
+
+
+
 import Callback from './components/Callback/Callback';
 import Login, { isLoggedIn, killSession } from './components/Login/Login';
 import { isLoggedIn as isBasicAuthLoggedIn } from './components/Login/BasicAuthLogin/BasicAuthLogin';
 import Router from './routes/router';
 // Gisida charts
+import HorizontalBarChart from './components/Charts/HorizontalBarChart';
+import DoughnutChart from './components/Charts/doughnutChart'
 import PieChart from './components/Charts/PieChart';
 import LineChart from './components/Charts/LineChart';
 import ColumnChart from './components/Charts/ColumnChart';
@@ -49,6 +53,7 @@ export {
   Export,
   Router,
   Callback,
+  DoughnutChart,
   Login,
   isBasicAuthLoggedIn,
   constants,
