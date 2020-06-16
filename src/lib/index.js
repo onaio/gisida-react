@@ -17,6 +17,7 @@ import Callback from './components/Callback/Callback';
 import Login, { isLoggedIn, killSession } from './components/Login/Login';
 import { isLoggedIn as isBasicAuthLoggedIn } from './components/Login/BasicAuthLogin/BasicAuthLogin';
 import Router from './routes/router';
+import { RouteTracker, WithGATracker, initGoogleAnalytics, setDimensions } from '@onaio/google-analytics'
 // Gisida charts
 import PieChart from './components/Charts/PieChart';
 import LineChart from './components/Charts/LineChart';
@@ -58,4 +59,8 @@ export {
   pushLayerToURL,
   isLoggedIn,
   killSession,
+  RouteTracker,
+  WithGATracker,
+  setDimensions,
+  initGoogleAnalytics,
 };
