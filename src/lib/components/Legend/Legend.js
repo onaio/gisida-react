@@ -671,7 +671,10 @@ export class Legend extends React.Component {
           if (showBoth && hasShape) {
             background.push(
               <li className="layer-symbols" key={index}>
-                <span className={`${layer.categories.shape[index]}`} />
+                <img
+                  className="legend-icon"
+                  src={`/assets/img/${layer.categories.shape[index]}.svg`}
+                />
                 <ul className="legend bar-color" key={index}>
                   <li
                     style={{
@@ -688,7 +691,11 @@ export class Legend extends React.Component {
           } else {
             background.push(
               <li className="layer-symbols" key={index}>
-                <span className={`${layer.categories.shape[index]}`} style={{ styleString }} />
+                <img
+                  className="legend-icon"
+                  src={`/assets/img/${layer.categories.shape[index]}.svg`}
+                  style={{ styleString }}
+                />
                 {layer.categories.label[index]}
               </li>
             );
