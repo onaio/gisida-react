@@ -135,8 +135,8 @@ export class Legend extends React.Component {
 
   onUpdatePrimaryLayer(e) {
     if (e.target.getAttribute('data-download') !== 'download') {
-       e.preventDefault();
-      }
+      e.preventDefault();
+    }
     if (e.target.getAttribute('data-credit') !== 'credit') {
       e.preventDefault();
     }
@@ -213,7 +213,15 @@ export class Legend extends React.Component {
     latestTimestamp = latestTimestamp ? <span>Timestamp: {latestTimestamp}</span> : null;
     let primaryLegend;
     let layer;
-    let exportLink = (<a className="glyphicon glyphicon-download-alt" data-download="download" target="_blank" href={layerObj.exportLink} download></a>);
+    let exportLink = (
+      <a
+        className="glyphicon glyphicon-download-alt"
+        data-download="download"
+        target="_blank"
+        href={layerObj.exportLink}
+        download
+      ></a>
+    );
 
     let activeLegendLayer;
     for (let a = activeLayerIds.length - 1; a >= 0; a -= 1) {
@@ -329,9 +337,7 @@ export class Legend extends React.Component {
               <b>{layer.label}</b>
               <div className="legend-symbols">{quantiles}</div>
               <span>{Parser(layer.credit)}</span>
-              {layerObj.exportLink ?
-                exportLink : ''
-                    }
+              {layerObj.exportLink ? exportLink : ''}
               {latestTimestamp}
             </div>
           );
@@ -350,7 +356,10 @@ export class Legend extends React.Component {
               if (showBoth && hasShape) {
                 background.push(
                   <li className="layer-symbols" key={index}>
-                    <span className={`${layer.categories.shape[index]}`} />
+                    <img
+                      className="legend-icon"
+                      src={`/assets/img/${layer.categories.shape[index]}.svg`}
+                    />
                     <ul className="legend bar-color" key={index}>
                       <li
                         style={{
@@ -367,7 +376,10 @@ export class Legend extends React.Component {
               } else if (hasShape && !showBoth) {
                 background.push(
                   <li className="layer-symbols" key={index}>
-                    <span className={`${layer.categories.shape[index]}`} />
+                    <img
+                      className="legend-icon"
+                      src={`/assets/img/${layer.categories.shape[index]}.svg`}
+                    />
                     {layer.categories.label[index]}
                   </li>
                 );
@@ -498,9 +510,7 @@ export class Legend extends React.Component {
               {circleQuantiles}
               {circleCredit}
               <span>{Parser(layer.credit)}</span>
-              {layerObj.exportLink ?
-                exportLink : ''
-                    }
+              {layerObj.exportLink ? exportLink : ''}
               {latestTimestamp}
             </div>
           );
@@ -619,9 +629,7 @@ export class Legend extends React.Component {
                 <ul id="legend-background">{background}</ul>
               </div>
               <span>{Parser(layer.credit)}</span>
-              {this.props.layerObj.exportLink ?
-                exportLink : ''
-                    }
+              {this.props.layerObj.exportLink ? exportLink : ''}
               {latestTimestamp}
             </div>
           );
@@ -640,9 +648,7 @@ export class Legend extends React.Component {
             <b>{layer.label}</b>
             <div className="legend-symbols">{quantiles}</div>
             <span>{Parser(layer.credit)}</span>
-            {layerObj.exportLink ?
-                exportLink : ''
-                    }
+            {layerObj.exportLink ? exportLink : ''}
             {latestTimestamp}
           </div>
         );
@@ -702,9 +708,7 @@ export class Legend extends React.Component {
               <ul style={{ left: '0' }}>{background}</ul>
             </div>
             <span>{Parser(layer.credit)}</span>
-            {layerObj.exportLink ?
-                exportLink : ''
-                    }
+            {layerObj.exportLink ? exportLink : ''}
             {latestTimestamp}
           </div>
         );
@@ -737,9 +741,7 @@ export class Legend extends React.Component {
               <ul>{background}</ul>
             </div>
             <span>{Parser(layer.credit)}</span>
-            {layerObj.exportLink ?
-                exportLink : ''
-                    }
+            {layerObj.exportLink ? exportLink : ''}
             {latestTimestamp}
           </div>
         );
@@ -932,9 +934,7 @@ export class Legend extends React.Component {
               <ul id="legend-background">{background}</ul>
             </div>
             <span>{Parser(layer.credit)}</span>
-            {layerObj.exportLink ?
-                exportLink : ''
-                    }
+            {layerObj.exportLink ? exportLink : ''}
             {latestTimestamp}
           </div>
         );
@@ -957,7 +957,7 @@ export class Legend extends React.Component {
             </div>
           )}
           {legendItems}
-          </div>
+        </div>
       </div>
     );
   }
