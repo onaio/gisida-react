@@ -28,7 +28,10 @@ export class Layer extends Component {
     if (!mapId) {
       return null;
     }
+    // mapstatetorurl is being set on the site config
+    if (APP.mapStateToUrl) {
     pushLayerToURL(layer, mapId);
+  }
     this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
     const { center, zoom } = lngLat(LOC, APP);
     if (layer.zoomOnToggle && layer.visible) {
