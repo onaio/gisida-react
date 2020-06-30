@@ -3,6 +3,9 @@ The chart components in Gisida are meant to be modular and reusable components w
 # Summary Charts
 This use case is an open source feature across Gisida projects and are an additional way to visualize the layer data being represented on the map. These components are initialized by the `charts` property in the project's `MapSpec` object, using a few properties to define which data to visualize and if/how to aggregate it, each chart having `type` and a `spec` properties.
 
+### List of Supported Charts
+* [ColumnChart](https://github.com/onaio/gisida-react/tree/staging/src/lib/components/Charts/README.md) 
+
 ### Primary Chart
 Each layer can have one `Primary` chart which is displayed along the bottom of the screen, outside of the modal. This is defined with the "primary" property within the layer.chart config.
 
