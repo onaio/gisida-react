@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from 'highcharts';
-import { isNewSeriesData } from './../../utils';
+import { isNewSeriesData } from '../../../utils';
 
-const isNumber = (x) => !Number.isNaN(Number(x));
+export const isNumber = (x) => !Number.isNaN(Number(x));
 
 class ColumnChart extends React.Component {
   static pointFormatterFunc() {
@@ -30,7 +30,7 @@ class ColumnChart extends React.Component {
       tooltip,
       showLegend
     } = this.props;
-
+    debugger;
     const { spacingTop, spacingRight, spacingBottom, spacingLeft } = (chartSpacing || {});
     const { marginTop, marginRight, marginBottom, marginLeft } = (chartMargin || {});
     this.state = {
@@ -224,5 +224,5 @@ ColumnChart.propTypes = {
   categories: PropTypes.arrayOf(PropTypes.string).isRequired,
   yAxisLabel: PropTypes.string.isRequired,
 };
-
+export const pointFormatterFunc = ColumnChart.pointFormatterFunc;
 export default ColumnChart;
