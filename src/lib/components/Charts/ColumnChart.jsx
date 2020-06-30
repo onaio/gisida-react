@@ -9,7 +9,6 @@ class ColumnChart extends React.Component {
   static pointFormatterFunc() {
     return `<span>${this.y}%</span>`;
   }
-
   constructor(props) {
     super(props);
     const {
@@ -29,11 +28,11 @@ class ColumnChart extends React.Component {
       legendOptions,
       series,
       tooltip,
+      showLegend
     } = this.props;
 
     const { spacingTop, spacingRight, spacingBottom, spacingLeft } = (chartSpacing || {});
     const { marginTop, marginRight, marginBottom, marginLeft } = (chartMargin || {});
-
     this.state = {
       chart: {
         type: 'column',
@@ -42,14 +41,14 @@ class ColumnChart extends React.Component {
         backgroundColor: 'rgba(255,255,255,0)',
         alignTicks: false,
         left:0,
-        marginTop: isNumber(marginTop) ? marginTop : 1,
-        marginRight: isNumber(marginRight) ? marginRight : 2,
-        marginBottom: isNumber(marginBottom) ? marginBottom : 20,
-        marginLeft: isNumber(marginLeft) ? marginLeft : 1,
-        spacingTop: isNumber(spacingTop) ? spacingTop : 10,
+        marginTop: isNumber(marginTop) ? marginTop : null,
+        marginRight: isNumber(marginRight) ? marginRight : null,
+        marginBottom: isNumber(marginBottom) ? marginBottom : null,
+        marginLeft: isNumber(marginLeft) ? marginLeft : null,
+        spacingTop: isNumber(spacingTop) ? spacingTop : 15,
         spacingRight: isNumber(spacingRight) ? spacingRight : 10,
-        spacingBottom: isNumber(spacingBottom) ? spacingBottom : 8,
-        spacingLeft: isNumber(spacingLeft) ? spacingLeft : 10,
+        spacingBottom: isNumber(spacingBottom) ? spacingBottom : null,
+        spacingLeft: isNumber(spacingLeft) ? spacingLeft : null,
         borderWidth: 0,
         borderRadius:0
       },
@@ -86,7 +85,7 @@ class ColumnChart extends React.Component {
                 endOnTick: false,
               },
               /** The code shows the second label which in some cases maybe undesiarable */
-              /**{
+              {
                 linkedTo: 0,
                 opposite: true,
                 title: {
@@ -94,23 +93,23 @@ class ColumnChart extends React.Component {
                   y: 10,
                   x: -10,
                },
-            }, **/
+            },
             ],
       tooltip: tooltip || {
         useHTML: true,
         shared: true,
-        headerFormat: '<b>Range: </b> {point.key} <br/>',
+        headerFormat: doubleChart ?  '<b>Range: </b> {point.key} <br/>' : '<b>{point.key}: </b>',
         pointFormat: chartType ? '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-        '<td style="padding:0"><b>{point.y:.1f}</b><br/></td></tr>' : null,
+        '<td style="padding:0"><b>{point.y:.1f}</b><br/></td></tr>' : '',
         pointFormatter: chartType ? null : pointFormatterFunc ||
           function pointFormatterFunc() {
             return  chartType ? `<tr><td style="color:${this.color};padding:0">${this.name}: </td>' +
             '<td style="padding:0"><b>${this.y}</b></td></tr>` : `<span>${this.y.toLocaleString()}</span>`;
           },
-        //shadow: false,
-        //backgroundColor: 'transparent',
-        //borderWidth: 0,
-        //padding: 0,
+        shadow: doubleChart ? false : true,
+        backgroundColor: doubleChart ? 'transparent' : undefined,
+        borderWidth: doubleChart ? 0 : 1,
+        padding: doubleChart ? 0 : 8,
       },
       title: {
         text: seriesTitle || null,
@@ -119,25 +118,14 @@ class ColumnChart extends React.Component {
         enabled: false,
       },
       legend: legendOptions || {
-        enabled: true,
+        enabled: showLegend ? showLegend : true,
       },
       plotOptions: {
         column: {
-          showInLegend: legendOptions && typeof legendOptions.enabled !== 'undefined' ? legendOptions.enabled : true,
+          showInLegend: legendOptions && typeof legendOptions.enabled !== 'undefined' ? legendOptions.enabled : false,
           pointPadding: doubleChart || chartType === 'multi' ? 0 : 0.2,
-          groupPadding: doubleChart || chartType === 'multi' ? 0.1 : 0,
-          borderWidth: 0,
-          /*tooltip: {
-            distance: 0,
-            padding: 0,
-            pointFormatter: pointFormatterFunc || function pointFormatterFunc() {
-              if (isPercent) {
-                return `<span>${this.y}%</span>`;
-              } else {
-                return `<span>${this.y}</span>`;
-              }
-            },
-          },*/
+          groupPadding: doubleChart || chartType === 'multi' ? 0.1 : 0.2,
+          borderWidth: 0
         },
       },
       series: series || (chartType === 'multi' ? seriesData : 
@@ -186,23 +174,21 @@ class ColumnChart extends React.Component {
             minorTickLength: 0,
             tickLength: 0
            } : typeof xAxis !== 'undefined' ? xAxis || null : {
-             categories
+             categories,
+             labels: {
+              style: {
+                fontSize: 9,
+              },
+            },
            },
-            // typeof xAxis !== 'undefined'
-            //   ? xAxis || null
-            //   : {
-            //       categories,
-            //       labels: {
-            //         style: {
-            //           fontSize: 9,
-            //         },
-            //       },
-            //     },
           series: series || chartType === 'multi' ? seriesData : 
           [
             {	
               name: seriesTitle,	
               data: seriesData,	
+              animation: {
+                duration: 0,
+              },
             },	
           ],
         },

@@ -182,6 +182,7 @@ class SumColumnChart extends React.Component {
           chartWidth={chartWidth}
           chartHeight={chartHeight}
           yAxisLabel={chartSpec['y-axis-label']}
+          showLegend={false}
         />
         {!isPrimary ? '' : this.props.children}
       </div>
