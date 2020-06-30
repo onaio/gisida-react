@@ -30,9 +30,8 @@ const props = {
 }
 <ColumnChart {...props} />
 ```
-Will show this output
-image ---- add image [] ()
-
+The above implementation will render this chart
+![ColumnChart Image](https://raw.githubusercontent.com/onaio/gisida-react/staging/public/assets/Screenshot%20from%202020-06-30%2014-22-40.png)
 
 ### Props
 ColumnChart component takes these props:
