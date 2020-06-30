@@ -30,7 +30,6 @@ class ColumnChart extends React.Component {
       tooltip,
       showLegend
     } = this.props;
-    debugger;
     const { spacingTop, spacingRight, spacingBottom, spacingLeft } = (chartSpacing || {});
     const { marginTop, marginRight, marginBottom, marginLeft } = (chartMargin || {});
     this.state = {
