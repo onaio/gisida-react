@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ColumnChart component component renderes correctly 1`] = `<div />`;
+
+exports[`ColumnChart component renders and passes props correctly: columnchart props 1`] = `
+Object {
+  "categories": Array [
+    "Bay",
+    "Nugaal",
+  ],
+  "chartHeight": 145,
+  "chartWidth": 1115,
+  "isPercent": false,
+  "seriesData": Array [
+    Object {
+      "color": "rgba(0, 90, 50, 0.8)",
+      "name": "Bay",
+      "y": 326,
+    },
+    Object {
+      "color": "rgba(35, 139, 69, 0.8)",
+      "name": "Nugaal",
+      "y": 147,
+    },
+  ],
+  "showLegend": false,
+  "yAxisLabel": "Children treated",
+}
+`;
