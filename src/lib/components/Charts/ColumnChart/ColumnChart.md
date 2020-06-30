@@ -60,9 +60,9 @@ pointFormatterFunc() => {
   } 
 ```
 
-**chartType** -
+**chartType** - Optional custom prop used to Determines number of charts we are building if 'multi' multiple charts styles are used otherwise picks highcharts defaults 
       
-**doubleChart** - Optional Custom prop used to identify if we are building double/ single chart. Defaults to single chart. boolean value true/false
+**doubleChart** - Optional Custom prop used to identify if we are building double/ single bar chart. Defaults to single chart. boolean value true/false
       
 **legendOptions** - Optional prop that override the symbol creator function and creates custom legend symbols check various options you can tweak on the [legend api](https://api.highcharts.com/highcharts/legend)
 
