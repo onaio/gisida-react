@@ -48,7 +48,7 @@ jobs:
           command: npm publish
 workflows:
   version: 2
-  tagged-test:
+  test-publish:
     jobs:
       - test
       - publish:
