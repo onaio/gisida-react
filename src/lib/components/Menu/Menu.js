@@ -662,4 +662,8 @@ Menu.propTypes = {
   useConnectedLayers: PropTypes.bool, // If true, use components/Layers/ConnectedLayers
 };
 
+Menu.defaultProps = {
+  hasNavBar: false,
+};
+
 export default connect(mapStateToProps)(Menu);
