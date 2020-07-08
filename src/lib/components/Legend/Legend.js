@@ -63,11 +63,11 @@ export class Legend extends React.Component {
       layerObj.property
     ) {
       const { timeSeriesObj, dispatch } = nextProps;
-
       const stops = generateStops(
         timeSeriesObj,
         timeSeriesObj.layerObj.aggregate.timeseries.field,
-        dispatch
+        dispatch,
+        timeSeriesObj.temporalIndex
       );
       if (
         timeSeriesObj &&
@@ -104,7 +104,8 @@ export class Legend extends React.Component {
         const stops = generateStops(
           timeSeriesObj,
           timeSeriesObj.layerObj.aggregate.timeseries.field,
-          this.props.dispatch
+          this.props.dispatch,
+          timeSeriesObj.temporalIndex
         );
 
         timeSeriesObj.newBreaks = stops[3];
@@ -568,12 +569,10 @@ export class Legend extends React.Component {
               : layerObj && layerObj.stops && layerObj.stops[0][0]
               ? [...new Set(layerObj.stops[0][0].map(d => d[1]))]
               : [...new Set(layer.colorStops.map(d => d[1]))];
-
           activeColors.forEach((color, index, activeColors) => {
             const stopsIndex = layerStops ? layerStops.indexOf(color) : -1;
             if (stopsIndex !== -1) {
               const firstVal = stopsIndex ? stopsBreak[stopsIndex - 1] : 0;
-
               if (Object.is(activeColors.length - 1, index)) {
                 // execute last item logic
                 lastVal = lastBreaks;
@@ -888,12 +887,10 @@ export class Legend extends React.Component {
             : layerObj && layerObj.stops && layerObj.stops[0][0]
             ? [...new Set(layerObj.stops[0][0].map(d => d[1]))]
             : [...new Set(layer.colorStops.map(d => d[1]))];
-
         activeColors.forEach((color, index, activeColors) => {
           const stopsIndex = layerStops ? layerStops.indexOf(color) : -1;
           if (stopsIndex !== -1) {
             const firstVal = stopsIndex ? stopsBreak && stopsBreak[stopsIndex - 1] : 0;
-
             if (Object.is(activeColors.length - 1, index)) {
               // execute last item logic
               lastVal = lastBreaks;
