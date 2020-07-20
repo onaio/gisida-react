@@ -579,7 +579,7 @@ class Map extends Component {
             });
           } else if (this.map.getLayer(layer.id) && nextProps.MAP.reloadLayerId === layer.id) {
             // 1) remove layer and source
-            let doUpdateTsLayer = true;
+            let doUpdateTsLayer = nextProps.layerObj.aggregate && nextProps.layerObj.aggregate.timeseries ? true : false;
             let filterOptions = false;
             this.map.removeLayer(layer.id);
             this.map.removeSource(layer.id);
