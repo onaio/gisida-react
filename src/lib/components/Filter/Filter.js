@@ -279,10 +279,19 @@ export class Filter extends Component {
         });
       }
     });
-    dispatch(Actions.toggleFilter(mapId, layerId));
+    dispatch(Actions.toggleFilter(mapId, layerId ? layerId : layerObj.id));
   }
 
   componentWillReceiveProps(nextProps) {
+    if (
+      nextProps.layerObj &&
+      nextProps.layerObj.aggregate.filter &&
+      !Object.keys(nextProps.FILTER).length
+    ) {
+      this.props.dispatch(
+        Actions.filtersUpdated(nextProps.mapId, nextProps.layerObj && nextProps.layerObj.id)
+      );
+    }
     if (
       !nextProps.layerObj ||
       (nextProps.layerObj &&
@@ -330,6 +339,10 @@ export class Filter extends Component {
     // determine whether to update the compnent state
     const doUpdate =
       (layerId !== this.state.layerId && filterOptions && Object.keys(filterOptions).length > 0) ||
+      (nextProps.layerObj &&
+        nextProps.layerObj.aggregate &&
+        nextProps.layerObj.aggregate.filter &&
+        !this.state.filters) ||
       (filterState && filterState.doUpdate) ||
       (timeseriesObj &&
         timeseriesObj.temporalIndex !==
@@ -387,7 +400,6 @@ export class Filter extends Component {
     updateFilters[filterKey].toggleAllOn = Object.keys(nextOptions).some(
       obj => nextOptions[obj].enabled === false
     );
-
     const { isFiltered, nextFilters } = this.buildNextFilters(
       nextOptions,
       updateFilters,
@@ -412,7 +424,6 @@ export class Filter extends Component {
       nextOptions[optionKeys[o]].enabled = option.count && !option.hidden ? toggleAllOn : false;
     }
     const { isFiltered, nextFilters } = this.buildNextFilters(nextOptions, filters, filterKey);
-
     this.setState({
       filters: nextFilters,
       isFiltered,
@@ -709,7 +720,6 @@ export class Filter extends Component {
       }),
       // queries: null,
     });
-
     this.setState({
       filters: {
         ...this.state.filters,
@@ -759,7 +769,6 @@ export class Filter extends Component {
         });
       }
     }
-
     this.setState({
       filters: nextFilters,
     });
@@ -1005,7 +1014,6 @@ export class Filter extends Component {
     const filterItems = [];
     let filter;
     let isFilterable = false;
-
     for (let f = 0; f < filterKeys.length; f += 1) {
       filter = filters[filterKeys[f]];
       const { isFiltered, toggleAllOn, queries, queriedOptionKeys } = filter;
