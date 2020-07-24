@@ -56,7 +56,7 @@ export class ConnectedLayers extends Component {
     );
   }
   render() {
-    const { mapId, layers, currentRegion, preparedLayers, auth } = this.props;
+    const { mapId, layers, currentRegion, preparedLayers, auth, hyperLink, sector } = this.props;
     let layerKeys;
     let layerObj;
     let layerItem = [];
@@ -124,6 +124,16 @@ export class ConnectedLayers extends Component {
                   onClick={e => this.toggleSubMenu(e, d, layer[d].count)}
                 >
                   {d}
+                  {hyperLink &&
+                  sector &&
+                  hyperLink[d] && hyperLink[d].parentCategory &&
+                  hyperLink[d] && hyperLink[d].parentCategory === sector ? (
+                    <a
+                      href={hyperLink[d] && hyperLink[d].link}
+                      target="_blank"
+                      className="glyphicon glyphicon-info-sign hyperlink"
+                    ></a>
+                  ) : null}
                   <span
                     className={`category glyphicon glyphicon-chevron-${
                       this.isGroupOpen(layer[d].count, d) ? 'down' : 'right'
