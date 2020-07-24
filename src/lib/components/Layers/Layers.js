@@ -53,7 +53,7 @@ export class Layers extends Component {
   }
 
   render() {
-    const { mapId, layers, currentRegion, preparedLayers, auth, noLayerText } = this.props;
+    const { mapId, hyperLink, sector, layers, currentRegion, preparedLayers, auth, noLayerText } = this.props;
     let layerKeys;
     let layerObj;
     let layerItem = [];
@@ -122,6 +122,16 @@ export class Layers extends Component {
                   onClick={e => this.toggleSubMenu(e, d)}
                 >
                   {d}
+                  {hyperLink &&
+                  sector &&
+                  hyperLink[d].parentCategory &&
+                  hyperLink[d].parentCategory === sector ? (
+                    <a
+                      href={hyperLink[d].link}
+                      target="_blank"
+                      className="glyphicon glyphicon-info-sign hyperlink"
+                    ></a>
+                  ) : null}
                   <span
                     className={`category glyphicon glyphicon-chevron-${
                       this.state[d].isOpen ? 'down' : 'right'
