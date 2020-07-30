@@ -27,18 +27,17 @@
 
   .sectors {
     padding: 0;
-    li.sector {
-      background: rgba(255, 255, 255, 0.4);
-      border-bottom: 1px solid #eee;
-    }
+
     li.sector a {
       color: #555;
-      display: inline-block;
+      display: block;
       font-weight: 600;
       padding: 25px 15px;
+      background: rgba(255, 255, 255, 0.4);
+      border-bottom: 1px solid #eee;
       text-decoration: none;
 
-      &:hover, 
+      &:hover,
       &:focus {
         text-decoration: none;
         color: #555;
@@ -54,7 +53,6 @@
     background: rgba(255, 255, 255, 0.4);
     border-bottom: 1px solid #eee;
     text-decoration: none;
-    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
     cursor: pointer;
 
     &:hover,
