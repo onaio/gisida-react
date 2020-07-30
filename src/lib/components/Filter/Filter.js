@@ -283,15 +283,15 @@ export class Filter extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (
-      nextProps.layerObj &&
-      nextProps.layerObj.aggregate.filter &&
-      !Object.keys(nextProps.FILTER).length
-    ) {
-      this.props.dispatch(
-        Actions.filtersUpdated(nextProps.mapId, nextProps.layerObj && nextProps.layerObj.id)
-      );
-    }
+    // if (
+    //   nextProps.layerObj &&
+    //   nextProps.layerObj.aggregate.filter &&
+    //   !Object.keys(nextProps.FILTER).length
+    // ) {
+    //   this.props.dispatch(
+    //     Actions.filtersUpdated(nextProps.mapId, nextProps.layerObj && nextProps.layerObj.id)
+    //   );
+    // }
     if (
       !nextProps.layerObj ||
       (nextProps.layerObj &&
@@ -339,10 +339,10 @@ export class Filter extends Component {
     // determine whether to update the compnent state
     const doUpdate =
       (layerId !== this.state.layerId && filterOptions && Object.keys(filterOptions).length > 0) ||
-      (nextProps.layerObj &&
-        nextProps.layerObj.aggregate &&
-        nextProps.layerObj.aggregate.filter &&
-        !this.state.filters) ||
+      // (nextProps.layerObj &&
+      //   nextProps.layerObj.aggregate &&
+      //   nextProps.layerObj.aggregate.filter &&
+      //   !this.state.filters) ||
       (filterState && filterState.doUpdate) ||
       (timeseriesObj &&
         timeseriesObj.temporalIndex !==
