@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Legend component renderes correctly 1`] = `
+<div>
+  <div
+    className="legend map-1"
+    style={
+      Object {
+        "right": "20px",
+      }
+    }
+  />
+</div>
+`;
