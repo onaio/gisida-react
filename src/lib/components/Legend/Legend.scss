@@ -25,6 +25,65 @@
   [data-visible='false'] {
     display: none;
   }
+  .combinedLinks {
+    a {
+      color: grey;
+      font-size: 18px;
+      h5 {
+        text-decoration: none;
+        display: inline-block;
+      }
+      &:hover {
+        color: #2d2d2d
+      }
+    }
+    .description {
+      display: inline-block;
+      top: 4px;
+      right: 5px;
+      font-size: 18px;
+      text-align: right;
+      color: #ccc;
+
+      span {
+        cursor: pointer;
+        top: 3px;
+      }
+
+      p {
+        display: none;
+        position: absolute;
+        right: 26em;
+        text-align: left;
+        padding: 6px 10px;
+        background-color: #333;
+        margin-top: 12px;
+        color: #eee;
+        font-size: 11px;
+        line-height: 1.5;
+        width: 250px;
+
+        &:before {
+          content: '';
+          height: 0;
+          width: 0;
+          position: absolute;
+          top: -11px;
+          right: 0;
+          border-left: 7px solid transparent;
+          border-right: 7px solid transparent;
+          border-bottom: 11px solid #333;
+        }
+      }
+
+      &:hover {
+        color: #333;
+        p {
+          display: block;
+        }
+      }
+    }
+  }
 }
 
 .circle-legend {
