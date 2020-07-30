@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Actions, formatNum, hexToRgbA, generateStops } from 'gisida';
 import { buildLayersObj } from '../../utils';
+import { buildTimestamp, buildHyperLink, buildDescription, combinedLinks } from '../Legend/Utils';
 import Parser from 'html-react-parser';
 import './Legend.scss';
 
@@ -200,18 +201,14 @@ export class Legend extends React.Component {
       return false;
     }
     let latestTimestamp;
-    if (
-      layerObj['timestamp'] &&
-      Array.isArray(layerObj.source.data.features || layerObj.source.data) &&
-      (layerObj.source.data.features || layerObj.source.data).length > 1
-    ) {
-      latestTimestamp = (layerObj.source.data.features || layerObj.source.data)
-        .map(d => (d.properties && d.properties[layerObj['timestamp']]) || d[layerObj['timestamp']])
-        .sort()
-        .reverse()[0];
-    }
+    
+    /** Build timestamp */
+    latestTimestamp = buildTimestamp(layerObj);
+    const legendHyperlink = layerObj['legendHyperlink'] ? buildHyperLink(layerObj) : null;
+    const legendDescription = layerObj['legendDescription'] ? buildDescription(layerObj) : null;
     const legendItems = [];
     latestTimestamp = latestTimestamp ? <span>Timestamp: {latestTimestamp}</span> : null;
+    const legendLink = combinedLinks(legendDescription, legendHyperlink);
     let primaryLegend;
     let layer;
     let exportLink = (
@@ -339,6 +336,7 @@ export class Legend extends React.Component {
               <div className="legend-symbols">{quantiles}</div>
               <span>{Parser(layer.credit)}</span>
               {layerObj.exportLink ? exportLink : ''}
+              {legendLink}
               {latestTimestamp}
             </div>
           );
@@ -419,6 +417,7 @@ export class Legend extends React.Component {
               </div>
               {circleQuantiles}
               <span>{Parser(layer.credit)}</span>
+              {legendLink}
               {latestTimestamp}
             </div>
           );
@@ -512,6 +511,7 @@ export class Legend extends React.Component {
               {circleCredit}
               <span>{Parser(layer.credit)}</span>
               {layerObj.exportLink ? exportLink : ''}
+              {legendLink}
               {latestTimestamp}
             </div>
           );
@@ -629,6 +629,7 @@ export class Legend extends React.Component {
               </div>
               <span>{Parser(layer.credit)}</span>
               {this.props.layerObj.exportLink ? exportLink : ''}
+              {legendLink}
               {latestTimestamp}
             </div>
           );
@@ -648,6 +649,7 @@ export class Legend extends React.Component {
             <div className="legend-symbols">{quantiles}</div>
             <span>{Parser(layer.credit)}</span>
             {layerObj.exportLink ? exportLink : ''}
+            {legendLink}
             {latestTimestamp}
           </div>
         );
@@ -715,6 +717,7 @@ export class Legend extends React.Component {
             </div>
             <span>{Parser(layer.credit)}</span>
             {layerObj.exportLink ? exportLink : ''}
+            {legendLink}
             {latestTimestamp}
           </div>
         );
@@ -748,6 +751,7 @@ export class Legend extends React.Component {
             </div>
             <span>{Parser(layer.credit)}</span>
             {layerObj.exportLink ? exportLink : ''}
+            {legendLink}
             {latestTimestamp}
           </div>
         );
@@ -831,6 +835,7 @@ export class Legend extends React.Component {
             {circleQuantiles}
             {circleCredit}
             <span>{Parser(layer.credit)}</span>
+            {legendLink}
             {latestTimestamp}
           </div>
         );
@@ -939,6 +944,7 @@ export class Legend extends React.Component {
             </div>
             <span>{Parser(layer.credit)}</span>
             {layerObj.exportLink ? exportLink : ''}
+            {legendLink}
             {latestTimestamp}
           </div>
         );
