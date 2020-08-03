@@ -590,11 +590,24 @@ class Menu extends Component {
                     )}
                     {(categories && categories.length) > 0 ? (
                       categories.map((category, i) => (
-                        <li className="sector" 
-                            key={i}
+                        <li
+                          className={`${
+                            hyperLink &&
+                            hyperLink[category.category] &&
+                            hyperLink[category.category].link
+                              ? 'sector hyperlink'
+                              : 'sector'
+                          }`}
+                          key={i}
                         >
                           <a
-                            className="sector"
+                            className={`${
+                              hyperLink &&
+                              hyperLink[category.category] &&
+                              hyperLink[category.category].link
+                                ? 'sector hyperlink'
+                                : 'sector'
+                            }`}
                             onClick={e => this.onCategoryClick(e, category.category)}
                           >
                             {category.category}
@@ -606,20 +619,33 @@ class Menu extends Component {
                                   ? 'glyphicon-chevron-down'
                                   : 'glyphicon-chevron-right')
                               }
-                            /> &nbsp;&nbsp;
-                            {/* <br /> */}
-                            {hyperLink &&
-                            hyperLink[category.category] &&
-                            hyperLink[category.category].link ? (
-                              // <span className="glyphicon glyphicon-info-sign">
-                                <object><a
-                                  href={hyperLink[category.category].link}
-                                  target="_blank"
-                                  className="glyphicon glyphicon-info-sign hyperlink"
-                                ></a></object>
-                              // </span>
-                            ) : null}
+                            />{' '}
+                            &nbsp;&nbsp;
                           </a>
+                          {hyperLink &&
+                          hyperLink[category.category] &&
+                          hyperLink[category.category].link ? (
+                            <span className="links">
+                              <a
+                                href={hyperLink[category.category].link}
+                                target="_blank"
+                                className="glyphicon glyphicon-list-alt hyperlink"
+                              ></a>
+                              {hyperLink[category.category].description ? (
+                                //    <a
+                                //    href={hyperLink[category.category].description}
+                                //    target="_blank"
+                                //    className="glyphicon glyphicon-file hyperlink"
+                                //  ></a>
+                                <div className="description">
+                                  <span className="glyphicon glyphicon-info-sign" />
+                                  <p>{hyperLink[category.category].description}</p>
+                                </div>
+                              ) : (
+                                ''
+                              )}
+                            </span>
+                          ) : null}
                           {this.props.openCategories &&
                           this.props.openCategories.includes(category.category) &&
                           !useConnectedLayers ? (
