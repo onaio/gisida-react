@@ -120,26 +120,39 @@ export class ConnectedLayers extends Component {
               <li>
                 <a
                   key={`${d}-${i}-link`}
-                  className="sub-category"
+                  className={ hyperLink &&
+                    sector &&
+                    hyperLink[d] && hyperLink[d].parentCategory &&
+                    hyperLink[d] && hyperLink[d].parentCategory === sector ? `sub-category hyperlink`: 'sub-category'}
                   onClick={e => this.toggleSubMenu(e, d, layer[d].count)}
                 >
                   {d}
-                  {hyperLink &&
-                  sector &&
-                  hyperLink[d] && hyperLink[d].parentCategory &&
-                  hyperLink[d] && hyperLink[d].parentCategory === sector ? (
-                    <a
-                      href={hyperLink[d] && hyperLink[d].link}
-                      target="_blank"
-                      className="glyphicon glyphicon-info-sign hyperlink"
-                    ></a>
-                  ) : null}
                   <span
                     className={`category glyphicon glyphicon-chevron-${
                       this.isGroupOpen(layer[d].count, d) ? 'down' : 'right'
                     }`}
                   />
                 </a>
+                {hyperLink &&
+                  sector &&
+                  hyperLink[d] && hyperLink[d].parentCategory &&
+                  hyperLink[d] && hyperLink[d].parentCategory === sector ? (
+                  <span className="sub-category-links">
+                    <a
+                      href={hyperLink[d] && hyperLink[d].link}
+                      target="_blank"
+                      className="glyphicon glyphicon-list-alt hyperlink"
+                    ></a>
+                    {
+                    hyperLink[d] && hyperLink[d].description ? (
+                      <div className="description">
+                                  <span className="glyphicon glyphicon-info-sign" />
+                      <p>{hyperLink[d] && hyperLink[d].description }</p>
+                      </div>
+                    ) : ''
+                    }
+                  </span>
+                  ) : null}
               </li>,
               this.isGroupOpen(layer[d].count, d) ? (
                 <ConnectedLayers
