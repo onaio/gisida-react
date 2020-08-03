@@ -15,9 +15,9 @@ export const buildTimestamp = (layerObj) => {
 
 
 export const buildHyperLink = (layerObj) => {
-    return (<a href={layerObj['legendHyperlink']}>
-                {layerObj['legendHyperlinkText'] ?  <h5>{layerObj['legendHyperlinkText']}</h5> : null}
-                <span className='glyphicon glyphicon-file' />
+    return (<a href={layerObj['legendHyperlink']} target="_blank" data-link="resourceLink">
+                {layerObj['legendHyperlinkText'] ?  <h5 data-link="resourceLink">{layerObj['legendHyperlinkText']}</h5> : null}
+                <span data-link="resourceLink" className='glyphicon glyphicon-file' />
             </a>);
 }
 
