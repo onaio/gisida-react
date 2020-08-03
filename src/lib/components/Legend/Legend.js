@@ -11,7 +11,7 @@ import './Legend.scss';
 const mapStateToProps = (state, ownProps) => {
   const mapId = ownProps.mapId || 'map-1';
   const MAP = state[ownProps.mapId] || { layers: {}, timeseries: {} };
-
+  const APP = state['APP'];
   let subLayerCheck =
     MAP.primaryLayer === MAP.layers &&
     MAP.layers[MAP.primarySubLayer] &&
@@ -31,6 +31,7 @@ const mapStateToProps = (state, ownProps) => {
     primaryLayer: MAP.primaryLayer,
     showFilterPanel: MAP.showFilterPanel,
     primarySubLayer: MAP.primarySubLayer,
+    mapStateToUrl: APP.mapStateToUrl,
   };
 };
 
@@ -136,10 +137,11 @@ export class Legend extends React.Component {
   }
 
   onUpdatePrimaryLayer(e) {
-    if (e.target.getAttribute('data-download') !== 'download') {
-      e.preventDefault();
-    }
-    if (e.target.getAttribute('data-credit') !== 'credit') {
+    if (
+      e.target.getAttribute('data-download') !== 'download' &&
+      e.target.getAttribute('data-link') !== 'resourceLink' &&
+      e.target.getAttribute('data-credit') !== 'credit'
+    ) {
       e.preventDefault();
     }
     const { dispatch, mapId } = this.props;
@@ -150,12 +152,14 @@ export class Legend extends React.Component {
       return layer.replace('.json', '');
     };
     const targetLayerPageUrl = removeJsonExtensions(targetLayer);
-    let pageURL = `${window.location.href.replace(
-      `${targetLayerPageUrl},`,
-      ''
-    )},${targetLayerPageUrl}`;
+    if (this.props.mapStateToUrl) {
+      let pageURL = `${window.location.href.replace(
+        `${targetLayerPageUrl},`,
+        ''
+      )},${targetLayerPageUrl}`;
 
-    history.replaceState('', '', pageURL);
+      history.replaceState('', '', pageURL);
+    }
     // dispatch primary layer id
     dispatch(Actions.updatePrimaryLayer(mapId, targetLayer));
   }
