@@ -26,3 +26,11 @@ The `parentCategory` is used to identify the sub-sector based on what sector the
         "description": "desc"
       }
 ```
+#### Legend (layer level) spec
+The following specification should drive information and  icons.
+
+```
+    "legendHyperlink": "https://www.com",
+    "legendDescription": "desc",
+    "legendHyperlinkText": "report"
+```
