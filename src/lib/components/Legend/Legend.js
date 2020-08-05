@@ -18,7 +18,10 @@ const mapStateToProps = (state, ownProps) => {
     MAP.layers[MAP.primarySubLayer].parent
       ? MAP.primarySubLayer
       : null;
+      
   return {
+    LOC: state.LOC,
+    APP,
     timeseries: MAP.timeseries,
     layerObj: MAP.layers[MAP.primaryLayer],
     timeSeriesObj: MAP.timeseries[subLayerCheck || MAP.primaryLayer],
@@ -32,6 +35,7 @@ const mapStateToProps = (state, ownProps) => {
     showFilterPanel: MAP.showFilterPanel,
     primarySubLayer: MAP.primarySubLayer,
     mapStateToUrl: APP.mapStateToUrl,
+    closedLegendLayerId: MAP.closedLegendLayerId,
   };
 };
 
@@ -42,16 +46,30 @@ export class Legend extends React.Component {
       setPrimary: false,
       primaryLayer: this.props.primaryLayer,
       timeSeriesObj: undefined,
+      closedLayer: false,
     };
   }
   shouldComponentUpdate(nextProps) {
-    const { layerObj, timeSeriesObj } = nextProps;
+    const { layerObj, timeSeriesObj, closedLegendLayerId } = nextProps;
+    if (this.props.closedLegendLayerId !== closedLegendLayerId) {
+      this.setState({
+        closedLayer: true,
+      });
+    } else if (
+      (this.props.closedLegendLayerId === closedLegendLayerId || !closedLegendLayerId) &&
+      this.state.closedLayer
+    ) {
+      this.setState({
+        closedLayer: false,
+      });
+    }
     return (((this.props.layerObj && this.props.layerObj.categories) ||
       (layerObj && layerObj.categories)) &&
       layerObj !== this.props.layerObj) ||
       (((this.props.timeSeriesObj && this.props.timeSeriesObj.categories) ||
         (timeSeriesObj && timeSeriesObj.categories)) &&
-        timeSeriesObj !== this.props.timeSeriesObj)
+        timeSeriesObj !== this.props.timeSeriesObj) ||
+        (closedLegendLayerId !== this.props.closedLegendLayerId)
       ? true
       : false;
   }
@@ -123,7 +141,7 @@ export class Legend extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { primaryLayer, layers, mapId, dispatch } = this.props;
+    const { primaryLayer, layers, mapId, dispatch, closedLegendLayerId } = this.props;
     if (
       primaryLayer !== prevProps.primaryLayer &&
       layers &&
@@ -135,7 +153,13 @@ export class Legend extends React.Component {
       });
     }
   }
-
+  onCloseClick(e) {
+    e.stopPropagation();
+    const targetLayer = e.target.getAttribute('data-close-layer');
+    const { mapId, layer, layerObj } = this.props;
+    this.props.dispatch(Actions.toggleLayer(mapId, targetLayer || layerObj.id || layer.id));
+    this.props.dispatch(Actions.setClosedLegendLayer(mapId, targetLayer));
+  }
   onUpdatePrimaryLayer(e) {
     if (
       e.target.getAttribute('data-download') !== 'download' &&
@@ -205,7 +229,7 @@ export class Legend extends React.Component {
       return false;
     }
     let latestTimestamp;
-    
+
     /** Build timestamp */
     latestTimestamp = buildTimestamp(layerObj);
     const legendHyperlink = layerObj['legendHyperlink'] ? buildHyperLink(layerObj) : null;
@@ -213,6 +237,7 @@ export class Legend extends React.Component {
     const legendItems = [];
     latestTimestamp = latestTimestamp ? <span>Timestamp: {latestTimestamp}</span> : null;
     const legendLink = combinedLinks(legendDescription, legendHyperlink);
+    let closeLegendStatus = false;
     let primaryLegend;
     let layer;
     let exportLink = (
@@ -224,7 +249,6 @@ export class Legend extends React.Component {
         download
       ></a>
     );
-
     let activeLegendLayer;
     for (let a = activeLayerIds.length - 1; a >= 0; a -= 1) {
       if (layers[activeLayerIds[a]] && layers[activeLayerIds[a]].credit) {
@@ -336,6 +360,11 @@ export class Legend extends React.Component {
               key={l}
               onClick={e => this.onUpdatePrimaryLayer(e)}
             >
+              <span
+                onClick={e => this.onCloseClick(e)}
+                data-close-layer={`${layer.id}`}
+                className="glyphicon glyphicon-remove close"
+              ></span>
               <b>{layer.label}</b>
               <div className="legend-symbols">{quantiles}</div>
               <span>{Parser(layer.credit)}</span>
@@ -415,6 +444,11 @@ export class Legend extends React.Component {
               onClick={e => this.onUpdatePrimaryLayer(e)}
               key={l}
             >
+              <span
+                onClick={e => this.onCloseClick(e)}
+                data-close-layer={`${layer.id}`}
+                className="glyphicon glyphicon-remove close">
+              </span>
               <b>{layer.label}</b>
               <div className={`${hasShape ? 'legend-shapes' : 'legend-fill'} ${legendClass}`}>
                 <ul>{background}</ul>
@@ -505,6 +539,11 @@ export class Legend extends React.Component {
               onClick={e => this.onUpdatePrimaryLayer(e)}
               key={l}
             >
+               <span
+                onClick={e => this.onCloseClick(e)}
+                data-close-layer={`${layer.id}`}
+                className="glyphicon glyphicon-remove close">
+               </span>
               <b>{layer.label}</b>
               <div className={`${'legend-fill'} ${legendClass}`}>
                 <ul>{background}</ul>
@@ -609,6 +648,11 @@ export class Legend extends React.Component {
               key={l}
               onClick={e => this.onUpdatePrimaryLayer(e)}
             >
+               <span
+                onClick={e => this.onCloseClick(e)}
+                data-close-layer={`${layer.id}`}
+                className="glyphicon glyphicon-remove close">
+              </span>
               <b>{layer.label}</b>
               <ul className="legend-limit" style={legendLimitStyle}>
                 <li
@@ -649,6 +693,11 @@ export class Legend extends React.Component {
             key={l}
             onClick={e => this.onUpdatePrimaryLayer(e)}
           >
+             <span
+              onClick={e => this.onCloseClick(e)}
+              data-close-layer={`${layer.id}`}
+              className="glyphicon glyphicon-remove close">
+             </span>
             <b>{layer.label}</b>
             <div className="legend-symbols">{quantiles}</div>
             <span>{Parser(layer.credit)}</span>
@@ -714,6 +763,11 @@ export class Legend extends React.Component {
             onClick={e => this.onUpdatePrimaryLayer(e)}
             key={l}
           >
+            <span
+              onClick={e => this.onCloseClick(e)}
+              data-close-layer={`${layer.id}`}
+              className="glyphicon glyphicon-remove close">
+            </span>
             <b>{layer.label}</b>
             <div className="legend-shapes">
               <ul style={{ left: '0' }}>{background}</ul>
@@ -740,6 +794,7 @@ export class Legend extends React.Component {
         });
 
         const legendClass = layer.categories ? 'legend-label' : '';
+        
         legendItems.unshift(
           <div
             id={`legend-${layer.id}-${mapId}`}
@@ -748,6 +803,11 @@ export class Legend extends React.Component {
             onClick={e => this.onUpdatePrimaryLayer(e)}
             key={l}
           >
+             <span
+              onClick={e => this.onCloseClick(e)}
+              data-close-layer={`${layer.id}`}
+              className="glyphicon glyphicon-remove close">
+            </span>
             <b>{layer.label}</b>
             <div className={`legend-fill ${legendClass}`}>
               <ul>{background}</ul>
@@ -829,6 +889,11 @@ export class Legend extends React.Component {
             onClick={e => this.onUpdatePrimaryLayer(e)}
             key={l}
           >
+            <span
+              onClick={e => this.onCloseClick(e)}
+              data-close-layer={`${layer.id}`}
+              className="glyphicon glyphicon-remove close">
+            </span>
             <b>{layer.label}</b>
             <div className={`${'legend-fill'} ${legendClass}`}>
               <ul>{background}</ul>
@@ -931,6 +996,11 @@ export class Legend extends React.Component {
             key={l}
             onClick={e => this.onUpdatePrimaryLayer(e)}
           >
+             <span
+              onClick={e => this.onCloseClick(e)}
+              data-close-layer={`${layer.id}`}
+              className="glyphicon glyphicon-remove close">
+             </span>
             <b>{layer.label}</b>
             <ul className="legend-limit" style={legendLimitStyle}>
               <li id={`first-limit-${layer.id}`} className={`${mapId}`} style={leftListLimitStyle}>
@@ -957,7 +1027,16 @@ export class Legend extends React.Component {
 
     legendItems.unshift(primaryLegend);
     const showLoader = legendLayers.length > 0 ? legendItems.length !== legendLayers.length : false;
-
+    let poppedLegendItemList;
+    if (
+      this.props.closedLegendLayerId &&
+      this.state.closedLayer &&
+      Object.keys(legendItems).length > 1
+    ) {
+      poppedLegendItemList = legendItems.filter(
+        d => d.props['data-layer'] !== this.props.closedLegendLayerId
+      );
+    }
     return (
       <div>
         <div
@@ -969,7 +1048,7 @@ export class Legend extends React.Component {
               <b>Loading...</b>
             </div>
           )}
-          {legendItems}
+          {poppedLegendItemList || legendItems}
         </div>
       </div>
     );
