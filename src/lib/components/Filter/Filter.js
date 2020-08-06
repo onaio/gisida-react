@@ -16,8 +16,7 @@ import './Filter.scss';
 import 'rc-slider/assets/index.css';
 
 const mapStateToProps = (state, ownProps) => {
-  const { mapId } = ownProps;
-  const { APP, VIEW, FILTER } = state;
+  const { mapId, hasNavBar } = ownProps;
   const MAP = state[mapId] || { layers: {}, filter: {}, timeseries: {} };
   let timeLayer;
   buildLayersObj(MAP.layers).forEach(layer => {
@@ -27,12 +26,12 @@ const mapStateToProps = (state, ownProps) => {
   });
   timeLayer = MAP.timeseries[MAP.primaryLayer] ? MAP.primaryLayer : timeLayer;
   return {
-    APP,
+    APP: state.APP,
     MAP,
     mapId,
     oldLayerObj: MAP.oldLayerObjs ? MAP.oldLayerObjs[MAP.primaryLayer] : {},
-    isSplitScreen: VIEW && VIEW.splitScreen,
-    FILTER,
+    isSplitScreen: state.VIEW && state.VIEW.splitScreen,
+    FILTER: state.FILTER,
     layerObj: MAP.layers[MAP.filter.layerId],
     timeseriesObj: MAP.timeseries[timeLayer],
     doShowProfile: MAP.showProfile,
@@ -41,6 +40,7 @@ const mapStateToProps = (state, ownProps) => {
     showFilterBtn: MAP.filter.layerId && MAP.primaryLayer === MAP.filter.layerId,
     layerData: MAP.layers,
     detailView: MAP.detailView,
+    hasNavBar,
   };
 };
 
@@ -998,7 +998,7 @@ export class Filter extends Component {
     });
   };
   render() {
-    const { isSplitScreen, mapId, layerObj, APP } = this.props;
+    const { isSplitScreen, mapId, layerObj } = this.props;
     const { filters, isMac, globalSearchField } = this.state;
     const filterIsPrev = layerObj && layerObj.aggregate && layerObj.aggregate.filterIsPrev;
     const filterKeys = filters ? Object.keys(filters) : {};
@@ -1115,7 +1115,7 @@ export class Filter extends Component {
             onClick={() => {
               this.handleFilterClick();
             }}
-            style={{ right: sidebarOffset, top: APP.hasNavBar ? '230px' : '195px' }}
+            style={{ right: sidebarOffset, top: this.props.hasNavBar ? '230px' : '195px' }}
           />
         ) : (
           ''

@@ -74,6 +74,7 @@ const mapStateToProps = (state, ownProps) => {
     showFilterPanel: !!MAP.showFilterPanel,
     activeLayers,
     handlers: ownProps.handlers,
+    hasNavBar: ownProps.hasNavBar,
     hasDataView,
   };
 };
@@ -1147,7 +1148,7 @@ class Map extends Component {
 
   render() {
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
-    const { detailView, layerObj, timeSeriesObj, showDetailView, APP } = this.props;
+    const { detailView, layerObj, timeSeriesObj, showDetailView } = this.props;
     const join =
       layerObj &&
       ((layerObj[DETAIL_VIEW] && layerObj[DETAIL_VIEW].join) ||
@@ -1165,8 +1166,8 @@ class Map extends Component {
         ? detailViewProps && typeof detailViewProps !== undefined
         : this.props.showDetailView;
     let mapWidth = '100%';
-    const mapheight = APP.hasNavBar ? '92%' : '100%';
-    const mapTop = APP.hasNavBar ? '80px' : 0;
+    const mapheight = this.props.hasNavBar ? '92%' : '100%';
+    const mapTop = this.props.hasNavBar ? '80px' : 0;
     if (this.props.VIEW && this.props.VIEW.splitScreen) {
       mapWidth = this.props.mapId === MAP_1 ? '52%' : '48%';
     }
@@ -1203,6 +1204,7 @@ class Map extends Component {
               {React.Children.map(this.props.children, child => {
                 return React.cloneElement(child, {
                   mapId: this.props.mapId,
+                  hasNavBar: this.props.hasNavBar,
                 });
               })}
             </div>
@@ -1214,6 +1216,7 @@ class Map extends Component {
 }
 
 Map.propTypes = {
+  hasNavBar: PropTypes.bool,
   mapId: PropTypes.string,
   APP: PropTypes.object,
   STYLES: PropTypes.array,

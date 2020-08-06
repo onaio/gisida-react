@@ -180,7 +180,6 @@ Object {
   ],
   "currentRegion": "reg2",
   "dispatch": [Function],
-  "hasNavBar": false,
   "loaded": true,
   "mapId": "map-1",
   "mapTargetId": "",
