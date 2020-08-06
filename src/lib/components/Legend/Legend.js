@@ -359,10 +359,10 @@ export class Legend extends React.Component {
               if (showBoth && hasShape) {
                 background.push(
                   <li className="layer-symbols" key={index}>
-                    <img
-                      className="legend-icon"
-                      src={`/assets/img/${layer.categories.shape[index]}.svg`}
-                    />
+                    {layer.categories.img ? <img
+                    className="legend-icon"
+                    src={`/assets/img/${layer.categories.shape[index]}.svg`}
+                  /> : null }
                     <ul className="legend bar-color" key={index}>
                       <li
                         style={{
@@ -379,10 +379,10 @@ export class Legend extends React.Component {
               } else if (hasShape && !showBoth) {
                 background.push(
                   <li className="layer-symbols" key={index}>
-                    <img
+                    {layer.categories.img ? <img
                       className="legend-icon"
                       src={`/assets/img/${layer.categories.shape[index]}.svg`}
-                    />
+                /> : null }
                     {layer.categories.label[index]}
                   </li>
                 );
@@ -676,10 +676,10 @@ export class Legend extends React.Component {
           if (showBoth && hasShape) {
             background.push(
               <li className="layer-symbols" key={index}>
-                <img
+               {layer.categories.img ? <img
                   className="legend-icon"
                   src={`/assets/img/${layer.categories.shape[index]}.svg`}
-                />
+                /> : null }
                 <ul className="legend bar-color" key={index}>
                   <li
                     style={{
@@ -696,11 +696,10 @@ export class Legend extends React.Component {
           } else {
             background.push(
               <li className="layer-symbols" key={index}>
-                <img
+                {layer.categories.img ? <img
                   className="legend-icon"
                   src={`/assets/img/${layer.categories.shape[index]}.svg`}
-                  style={{ styleString }}
-                />
+                /> : null }
                 {layer.categories.label[index]}
               </li>
             );

@@ -607,7 +607,9 @@ class Map extends Component {
             if (timefield) {
               const period = [...new Set(layer.source.data.map(p => p[timefield]))];
               // newStops = { id: layer.id, period, timefield };
-              data = layer.source.data.filter(d => d[timefield] === period[tsObj.temporalIndex]);
+              if (tsObj) {
+                data = layer.source.data.filter(d => d[timefield] === period[tsObj.temporalIndex]);
+              }
             }
             addChart(layer, data, this.map, mapId);
           } else {
