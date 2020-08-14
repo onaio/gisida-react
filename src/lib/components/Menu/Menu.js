@@ -18,7 +18,7 @@ const mapStateToProps = (state, ownProps) => {
   // let layers;
   const { NULL_LAYER_TEXT } = APP;
   if (Object.keys(LAYERS.groups).length) {
-    const groupMapper = layer => {
+    const groupMapper = (layer, group) => {
       if (typeof layer === 'string') {
         return MAP.layers[layer];
       }
@@ -27,7 +27,8 @@ const mapStateToProps = (state, ownProps) => {
       Object.keys(layer).forEach(l => {
         subGroup[l] = {
           category: l,
-          layers: layer[l].map(groupMapper).filter(l => typeof l !== 'undefined'),
+          layers: layer[l].map((groupObjects) => groupMapper(groupObjects, l)).filter(l => typeof l !== 'undefined'),
+          parent: group
         };
       });
       return subGroup;
@@ -36,7 +37,7 @@ const mapStateToProps = (state, ownProps) => {
     categories = Object.keys(LAYERS.groups).map(group => {
       return {
         category: group,
-        layers: LAYERS.groups[group].map(groupMapper).filter(l => typeof l !== 'undefined'),
+        layers: LAYERS.groups[group].map((groupObjects) => groupMapper(groupObjects, group)).filter(l => typeof l !== 'undefined'),
       };
     });
   } else if (Object.keys(MAP.layers).length) {
@@ -55,7 +56,6 @@ const mapStateToProps = (state, ownProps) => {
         categories[category].layers.push(MAP.layers[l]);
       }
     });
-
     categories = Object.keys(categories).map(c => categories[c]);
   }
 
@@ -486,7 +486,6 @@ class Menu extends Component {
 
     const { searching, searchResults } = this.state;
     const { disableDefault, showSearchBar, hyperLink } = this.props;
-
     if (disableDefault) return this.props.children || null;
 
     const { mapId } = this.props;
@@ -506,7 +505,6 @@ class Menu extends Component {
     } = this.props;
     const childrenPositionClass = childrenPosition || 'top';
     const marginTop = hasNavBar ? '-80px' : 0;
-
     return (
       <div>
         <div>
