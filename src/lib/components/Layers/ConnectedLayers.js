@@ -1,7 +1,7 @@
 /**
  * Handle display of submenu and layer items by utilizing redux state.
  * Keeps track of open submenus in redux state
- * 
+ *
  */
 
 import React, { Component } from 'react';
@@ -56,7 +56,16 @@ export class ConnectedLayers extends Component {
     );
   }
   render() {
-    const { mapId, layers, currentRegion, preparedLayers, auth, hyperLink, sector } = this.props;
+    const {
+      mapId,
+      layers,
+      currentRegion,
+      preparedLayers,
+      auth,
+      hyperLink,
+      sector,
+      openGroups,
+    } = this.props;
     let layerKeys;
     let layerObj;
     let layerItem = [];
@@ -97,7 +106,7 @@ export class ConnectedLayers extends Component {
           const LocalAuthConfig = JSON.parse(localStorage.getItem('authConfig'));
           users = authConfigs.LAYERS && authConfigs.LAYERS[activeId]; // list of users with access to the layer
           authConfigs.LAYERS = authConfigs.LAYERS || LocalAuthConfig.LAYERS;
-          users = authConfigs.LAYERS[activeId]; 
+          users = authConfigs.LAYERS[activeId];
           // list of users with access to the layer
           // check if logged in user exists in the list of users
           // who have access to the layer
@@ -116,14 +125,16 @@ export class ConnectedLayers extends Component {
           }
         } else {
           Object.keys(layer).forEach((d, i) => {
+            const parent = Object.values(layers.find(l => l[d]))[0].parent;
             layerItem = layerItem.concat([
               <li>
                 <a
                   key={`${d}-${i}-link`}
-                  className={ hyperLink &&
-                    sector &&
-                    hyperLink[d] && hyperLink[d].parentCategory &&
-                    hyperLink[d] && hyperLink[d].parentCategory === sector ? `sub-category hyperlink`: 'sub-category'}
+                  className={
+                    (hyperLink && hyperLink[`${parent} ${d}`])
+                      ? `sub-category hyperlink`
+                      : 'sub-category'
+                  }
                   onClick={e => this.toggleSubMenu(e, d, layer[d].count)}
                 >
                   {d}
@@ -133,26 +144,23 @@ export class ConnectedLayers extends Component {
                     }`}
                   />
                 </a>
-                {hyperLink &&
-                  sector &&
-                  hyperLink[d] && hyperLink[d].parentCategory &&
-                  hyperLink[d] && hyperLink[d].parentCategory === sector ? (
+                {   (hyperLink && hyperLink[`${parent} ${d}`]) ? (
                   <span className="sub-category-links">
                     <a
-                      href={hyperLink[d] && hyperLink[d].link}
+                      href={(hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].link)}
                       target="_blank"
                       className="glyphicon glyphicon-list-alt hyperlink"
                     ></a>
-                    {
-                    hyperLink[d] && hyperLink[d].description ? (
+                    {(hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].description) ? (
                       <div className="description">
-                                  <span className="glyphicon glyphicon-info-sign" />
-                      <p>{hyperLink[d] && hyperLink[d].description }</p>
+                        <span className="glyphicon glyphicon-info-sign" />
+                        <p>{hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].description}</p>
                       </div>
-                    ) : ''
-                    }
+                    ) : (
+                      ''
+                    )}
                   </span>
-                  ) : null}
+                ) : null}
               </li>,
               this.isGroupOpen(layer[d].count, d) ? (
                 <ConnectedLayers
@@ -165,6 +173,7 @@ export class ConnectedLayers extends Component {
                   currentRegion={currentRegion}
                   preparedLayers={preparedLayers}
                   auth={this.props.auth}
+                  hyperLink={hyperLink}
                 />
               ) : null,
             ]);
@@ -181,6 +190,6 @@ ConnectedLayers.propTypes = {
   layers: PropTypes.arrayOf(PropTypes.any).isRequired,
   preparedLayers: PropTypes.arrayOf(PropTypes.any),
   currentRegion: PropTypes.string,
-  auth: PropTypes.object
+  auth: PropTypes.object,
 };
 export default connect(mapStateToProps)(ConnectedLayers);
