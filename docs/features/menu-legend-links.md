@@ -18,11 +18,12 @@ The `link` and `description` fields are optional one can be provided another omm
 
 ```
 #### Sub-Sector level spec
-The `parentCategory` is used to identify the sub-sector based on what sector the sub-sector is tied too. This helps when we have same sub-sector names in different sectors.
+The `parent category` is used to identify the sub-sector based on parent sector/sub-sector. The parent category should be appended before sector/sub-sector key inside hyperlink property. This helps when we have same sub-sector names in different sectors.
+
+BRCis II is the parent in this case
 ```
-"Output Indicators": {
+"BRCiS II Output Indicators": {
         "link": "https://gisida.com",
-        "parentCategory": "BRCiS II",
         "description": "desc"
       }
 ```
