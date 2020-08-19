@@ -1,63 +1,24 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Actions } from 'gisida';
+import { Actions, buildCategories } from 'gisida';
 import Layers from '../Layers/Layers';
 import SearchBar from '../Searchbar/SearchBar';
 import ConnectedLayers from '../Layers/ConnectedLayers';
 import './Menu.scss';
 import memoize from 'memoize-one';
 import { debounce } from 'lodash';
-import { getSharedLayersFromURL, getMenuGroupMapLayers } from '../../utils';
+import { getSharedLayersFromURL, getCategoryForLayers } from '../../utils';
 
 const mapStateToProps = (state, ownProps) => {
   const { mapId } = ownProps;
   const MAP = state[mapId] || { layers: {} };
   const { LAYERS, AUTH, APP, VIEW } = state;
   let categories;
-  // let layers;
-  const { NULL_LAYER_TEXT } = APP;
-  if (Object.keys(LAYERS.groups).length) {
-    const groupMapper = (layer, group) => {
-      if (typeof layer === 'string') {
-        return MAP.layers[layer];
-      }
-
-      const subGroup = {};
-      Object.keys(layer).forEach(l => {
-        subGroup[l] = {
-          category: l,
-          layers: layer[l].map((groupObjects) => groupMapper(groupObjects, l)).filter(l => typeof l !== 'undefined'),
-          parent: group
-        };
-      });
-      return subGroup;
-    };
-    // build list of LAYERS.categories populated with layers from MAP.layers
-    categories = Object.keys(LAYERS.groups).map(group => {
-      return {
-        category: group,
-        layers: LAYERS.groups[group].map((groupObjects) => groupMapper(groupObjects, group)).filter(l => typeof l !== 'undefined'),
-      };
-    });
-  } else if (Object.keys(MAP.layers).length) {
-    categories = {};
-    let category;
-
-    Object.keys(MAP.layers).forEach(l => {
-      if (MAP.layers[l].category) {
-        category = MAP.layers[l].category;
-        if (!categories[category]) {
-          categories[category] = {
-            category,
-            layers: [],
-          };
-        }
-        categories[category].layers.push(MAP.layers[l]);
-      }
-    });
-    categories = Object.keys(categories).map(c => categories[c]);
+  if (Object.keys(LAYERS.groups).length && MAP || Object.keys(MAP.layers).length) {
+    categories = buildCategories(LAYERS, MAP); 
   }
+  const { NULL_LAYER_TEXT } = APP;
 
   // Get current region
   const currentRegion =
@@ -159,63 +120,13 @@ class Menu extends Component {
     const { categories } = this.props;
 
     if (layersToOpenCategory && categories) {
-      layersToOpenCategory
-        .filter(l => !l.isCatOpen)
-        .forEach(sharedLayer => {
-          let i = 0;
-          /**
-           * A layer belongs to only one category. So if we found its
-           * category, use this flag to break from the loop
-           */
-          let catFound = false;
-
-          while (!catFound && i < categories.length) {
-            const category = categories[i];
-            let j = 0;
-
-            while (!catFound && j < category.layers.length) {
-              const layer = category.layers[j];
-
-              if (!layer.id) {
-                /**
-                 * This is a group. So continue checking down the hierarchy
-                 * for visible layers
-                 */
-                const groupNames = Object.keys(layer);
-                let k = 0;
-
-                while (!catFound && k < groupNames.length) {
-                  const groupName = groupNames[k];
-
-                  const children = layer[groupName].layers;
-                  const groupMapLayerIds = getMenuGroupMapLayers(groupName, children);
-
-                  if (
-                    groupMapLayerIds.indexOf(sharedLayer.id) >= 0 ||
-                    groupMapLayerIds.indexOf(`${sharedLayer.id}.json`) >= 0
-                  ) {
-                    this.openCategoryForSharedLayer(category.category, sharedLayer.id);
-                    catFound = true;
-                  }
-
-                  k += 1;
-                } // group while
-              } else {
-                // This category has one level only
-                if (layer.id === sharedLayer.id || layer.id === `${sharedLayer.id}.json`) {
-                  this.openCategoryForSharedLayer(category.category, sharedLayer.id);
-                  catFound = true;
-                }
-              }
-
-              j += 1;
-            } // category layers while
-
-            i += 1;
-          } // categories while
-        });
+        const { categories } = this.props;
+        const layers = getCategoryForLayers(layersToOpenCategory, categories)
+        layers.forEach(e => {
+          this.openCategoryForSharedLayer(e.category, e.layerId);
+        })
+      }
     }
-  }
 
   /**
    * Toggle a category for a shared layer and update category
@@ -252,7 +163,6 @@ class Menu extends Component {
   toggleCategory(categoryName) {
     const { openCategories } = this.props;
     const index = openCategories.indexOf(categoryName);
-
     this.props.dispatch(Actions.toggleCategories(this.props.mapId, categoryName, index));
   }
 
