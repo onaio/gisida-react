@@ -267,26 +267,26 @@ export function getSharedLayersFromURL(mapId) {
  * @param {*} groupName Name of the group which we want to target
  * @param {*} children Children of the group which we want to target
  */
-export function getMenuGroupMapLayers(groupName, children) {
-  const subGroups = children.filter(child => !child.id);
+// export function getMenuGroupMapLayers(groupName, children) {
+//   const subGroups = children.filter(child => !child.id);
 
-  if (subGroups.length) {
-    let visibleLayerIds = [];
+//   if (subGroups.length) {
+//     let visibleLayerIds = [];
 
-    subGroups.forEach(sg => {
-      Object.keys(sg).forEach(key => {
-        const subGroupVisibleLayerIds = getMenuGroupMapLayers(groupName, sg[key].layers);
-        visibleLayerIds = [...visibleLayerIds, ...subGroupVisibleLayerIds];
-      });
-    });
+//     subGroups.forEach(sg => {
+//       Object.keys(sg).forEach(key => {
+//         const subGroupVisibleLayerIds = getMenuGroupMapLayers(groupName, sg[key].layers);
+//         visibleLayerIds = [...visibleLayerIds, ...subGroupVisibleLayerIds];
+//       });
+//     });
 
-    // Return all layer Ids of the nested subgroups
-    return visibleLayerIds;
-  } else {
-    // Return the Ids of layers for the group
-    return children.map(child => child.id);
-  }
-}
+//     // Return all layer Ids of the nested subgroups
+//     return visibleLayerIds;
+//   } else {
+//     // Return the Ids of layers for the group
+//     return children.map(child => child.id);
+//   }
+// }
 
 /**
  * Return true if a menu group has any visible map layer, false otherwiise.
@@ -368,4 +368,91 @@ export function getSharedStyleFromURL(mapId) {
   const style = getURLSearchParams().get(`${mapId}-${QUERY_PARAM_STYLE}`);
 
   return style ? +style : null;
+}
+
+export function getCategoryForLayers(layersToOpenCategory, categories) {
+  const  getMenuGroupMapLayers = (groupName, children) => {
+    const subGroups = children.filter(child => !child.id);
+  
+    if (subGroups.length) {
+      let visibleLayerIds = [];
+  
+      subGroups.forEach(sg => {
+        Object.keys(sg).forEach(key => {
+          const subGroupVisibleLayerIds = getMenuGroupMapLayers(groupName, sg[key].layers);
+          visibleLayerIds = [...visibleLayerIds, ...subGroupVisibleLayerIds];
+        });
+      });
+  
+      // Return all layer Ids of the nested subgroups
+      return visibleLayerIds;
+    } else {
+      // Return the Ids of layers for the group
+      return children.map(child => child.id);
+    }
+  }
+  const layerCategory = [];
+  if (layersToOpenCategory && categories) {
+    layersToOpenCategory
+      .filter(l => !l.isCatOpen)
+      .forEach(sharedLayer => {
+        let i = 0;
+        /**
+         * A layer belongs to only one category. So if we found its
+         * category, use this flag to break from the loop
+         */
+        const catFound = false;
+
+        while (!catFound && i < categories.length) {
+          const category = categories[i];
+          let j = 0;
+
+          while (!catFound && j < category.layers.length) {
+            const layer = category.layers[j];
+
+            if (!layer.id) {
+              /**
+               * This is a group. So continue checking down the hierarchy
+               * for visible layers
+               */
+              const groupNames = Object.keys(layer);
+              let k = 0;
+
+              while (!catFound && k < groupNames.length) {
+                const groupName = groupNames[k];
+
+                const children = layer[groupName].layers;
+                const groupMapLayerIds = getMenuGroupMapLayers(groupName, children);
+
+                if (
+                  groupMapLayerIds.indexOf(sharedLayer.id) >= 0 ||
+                  groupMapLayerIds.indexOf(`${sharedLayer.id}.json`) >= 0
+                ) {
+                    layerCategory.push({
+                        layerId: sharedLayer.id,
+                        categoryName: category.category
+                    })
+                }
+
+                k += 1;
+              } // group while
+            } else {
+              // This category has one level only
+              // eslint-disable-next-line no-lonely-if
+              if (layer.id === sharedLayer.id || layer.id === `${sharedLayer.id}.json`) {
+                layerCategory.push({
+                    layerId: sharedLayer.id,
+                    categoryName: category.category
+                })
+              }
+            }
+
+            j += 1;
+          } // category layers while
+
+          i += 1;
+        } // categories while
+      });
+  }
+  return layerCategory
 }

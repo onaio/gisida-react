@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
 import { connect } from 'react-redux';
 import { Actions } from 'gisida';
+import { menuGroupHasVisibleLayers } from '../../utils';
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId];
   const { mapId, layers, currentRegion, preparedLayers } = ownProps;
@@ -21,6 +22,28 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 export class ConnectedLayers extends Component {
+
+  componentDidUpdate(prevProps) {
+    if (JSON.stringify(this.props.layers) !== JSON.stringify(prevProps.layers)) {
+      /** Check if updated children down the hierarchy have
+       * layers which are a visible. If so open the group
+       */
+      this.props.layers.forEach(layer => {
+        if (!layer.id) {
+          Object.keys(layer).forEach(groupName => {
+            const children = layer[groupName].layers;
+            const groupCount = layer[groupName].count;
+            if (
+              !this.isGroupOpen(groupCount, groupName) &&
+              menuGroupHasVisibleLayers(groupName, children)
+            ) {
+              this.toggleGroup(groupName, groupCount);
+            }
+          });
+        }
+      });
+    }
+  }
   /**
    * Toggle open and close a menu group
    * @param {Object} e Event
@@ -29,6 +52,13 @@ export class ConnectedLayers extends Component {
    */
   toggleSubMenu(e, layer, groupCount) {
     e.preventDefault();
+    this.toggleGroup(layer, groupCount);
+  }
+  /**
+   * @param {Object} layer Group to be toggled
+   * @param {number} groupCount Group count
+   */
+  toggleGroup(layer, groupCount) {
     const { openGroups } = this.props;
     let index = -1;
     let count = 0;
@@ -42,6 +72,7 @@ export class ConnectedLayers extends Component {
     }
     this.props.dispatch(Actions.toggleGroups(this.props.mapId, layer, index, false, groupCount));
   }
+
   /**
    * Get the group open state
    * @param {number} groupCount Group count
