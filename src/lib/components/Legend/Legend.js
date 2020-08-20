@@ -35,7 +35,6 @@ const mapStateToProps = (state, ownProps) => {
     showFilterPanel: MAP.showFilterPanel,
     primarySubLayer: MAP.primarySubLayer,
     mapStateToUrl: APP.mapStateToUrl,
-    closedLegendLayerId: MAP.closedLegendLayerId,
   };
 };
 
@@ -46,30 +45,19 @@ export class Legend extends React.Component {
       setPrimary: false,
       primaryLayer: this.props.primaryLayer,
       timeSeriesObj: undefined,
-      closedLayer: false,
     };
   }
   shouldComponentUpdate(nextProps) {
-    const { layerObj, timeSeriesObj, closedLegendLayerId } = nextProps;
-    if (this.props.closedLegendLayerId !== closedLegendLayerId) {
-      this.setState({
-        closedLayer: true,
-      });
-    } else if (
-      (this.props.closedLegendLayerId === closedLegendLayerId || !closedLegendLayerId) &&
-      this.state.closedLayer
-    ) {
-      this.setState({
-        closedLayer: false,
-      });
-    }
+    const { layerObj, timeSeriesObj} = nextProps;
     return (((this.props.layerObj && this.props.layerObj.categories) ||
       (layerObj && layerObj.categories)) &&
       layerObj !== this.props.layerObj) ||
       (((this.props.timeSeriesObj && this.props.timeSeriesObj.categories) ||
         (timeSeriesObj && timeSeriesObj.categories)) &&
         timeSeriesObj !== this.props.timeSeriesObj) ||
-        (closedLegendLayerId !== this.props.closedLegendLayerId)
+        (this.props.activeLayerIds && 
+        this.props.activeLayerIds.length !== nextProps.activeLayerIds &&
+        nextProps.activeLayerIds.length)
       ? true
       : false;
   }
@@ -141,7 +129,7 @@ export class Legend extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { primaryLayer, layers, mapId, dispatch, closedLegendLayerId } = this.props;
+    const { primaryLayer, layers} = this.props;
     if (
       primaryLayer !== prevProps.primaryLayer &&
       layers &&
@@ -158,7 +146,6 @@ export class Legend extends React.Component {
     const targetLayer = e.target.getAttribute('data-close-layer');
     const { mapId, layer, layerObj } = this.props;
     this.props.dispatch(Actions.toggleLayer(mapId, targetLayer || layerObj.id || layer.id));
-    this.props.dispatch(Actions.setClosedLegendLayer(mapId, targetLayer));
   }
   onUpdatePrimaryLayer(e) {
     if (
@@ -237,7 +224,6 @@ export class Legend extends React.Component {
     const legendItems = [];
     latestTimestamp = latestTimestamp ? <span>Timestamp: {latestTimestamp}</span> : null;
     const legendLink = combinedLinks(legendDescription, legendHyperlink);
-    let closeLegendStatus = false;
     let primaryLegend;
     let layer;
     let exportLink = (
@@ -1028,15 +1014,6 @@ export class Legend extends React.Component {
     legendItems.unshift(primaryLegend);
     const showLoader = legendLayers.length > 0 ? legendItems.length !== legendLayers.length : false;
     let poppedLegendItemList;
-    if (
-      this.props.closedLegendLayerId &&
-      this.state.closedLayer &&
-      Object.keys(legendItems).length > 1
-    ) {
-      poppedLegendItemList = legendItems.filter(
-        d => d.props['data-layer'] !== this.props.closedLegendLayerId
-      );
-    }
     return (
       <div>
         <div
