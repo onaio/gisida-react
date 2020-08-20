@@ -31,7 +31,5 @@ BRCis II is the parent in this case
 The following specification should drive information and  icons.
 
 ```
-    "legendHyperlink": "https://www.com",
     "legendDescription": "desc",
-    "legendHyperlinkText": "report"
 ```
