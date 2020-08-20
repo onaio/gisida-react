@@ -208,11 +208,10 @@ export class Legend extends React.Component {
     
     /** Build timestamp */
     latestTimestamp = buildTimestamp(layerObj);
-    const legendHyperlink = layerObj['legendHyperlink'] ? buildHyperLink(layerObj) : null;
     const legendDescription = layerObj['legendDescription'] ? buildDescription(layerObj) : null;
     const legendItems = [];
     latestTimestamp = latestTimestamp ? <span>Timestamp: {latestTimestamp}</span> : null;
-    const legendLink = combinedLinks(legendDescription, legendHyperlink);
+    const legendLink = combinedLinks(legendDescription);
     let primaryLegend;
     let layer;
     let exportLink = (
