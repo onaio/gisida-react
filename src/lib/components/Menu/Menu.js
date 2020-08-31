@@ -11,12 +11,12 @@ import { debounce } from 'lodash';
 import { getSharedLayersFromURL, getCategoryForLayers } from '../../utils';
 
 const mapStateToProps = (state, ownProps) => {
-  const { mapId } = ownProps;
+  const { mapId, categoriesProp } = ownProps;
   const MAP = state[mapId] || { layers: {} };
   const { LAYERS, AUTH, APP, VIEW } = state;
   let categories;
   if (Object.keys(LAYERS.groups).length && MAP || Object.keys(MAP.layers).length) {
-    categories = buildCategories(LAYERS, MAP); 
+    categories = categoriesProp || buildCategories(LAYERS, MAP); 
   }
   const { NULL_LAYER_TEXT } = APP;
 
@@ -104,12 +104,12 @@ class Menu extends Component {
       this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop;
     }
     const { sharedLayers } = this.state;
-
-    if (sharedLayers.filter(l => !l.isCatOpen).length) {
+    const sharedLayersIds = sharedLayers.filter(l => !l.isCatOpen).map(sl => sl.id);
+    if (sharedLayersIds.length) {
       /** If there are any shared layers whose category we haven't open,
        * open them
        */
-      this.openCategoryForLayers(sharedLayers);
+      this.openCategoryForLayers(sharedLayersIds);
     }
   }
 

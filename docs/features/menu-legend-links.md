@@ -30,6 +30,35 @@ BRCis II is the parent in this case
 #### Legend (layer level) spec
 The following specification should drive information and  icons.
 
+"legendDescription": "desc"
+
 ```
-    "legendDescription": "desc",
+{
+  "APP": {
+    "mapConfig": {
+      "container": "map",
+      "style": "mapbox://styles/mapbox/light-v9",
+      "center": [
+        36.25
+        0.34
+      ],
+      "zoom": 6
+    },
+    "accessToken": "<mapbox-studio-access-token>",
+    "appIcon": "/img/gisida-logo.png",
+    "appName": "GISIDA EXAMPLE",
+    "appColor": "darkslategrey",
+  },
+  "STYLES": [
+    {
+      "label": "Light",
+      "style": "mapbox://styles/mapbox/light-v9"
+    }
+  ],
+  "LAYERS": [
+    "ken-health-sites",
+  ],
+  "legendDescription": "desc"
+}
+    
 ```

@@ -222,6 +222,7 @@ class Map extends Component {
     });
     /** Inestigate why fill layer picks one feature object which is not what we desire */
     const feature = features[0];
+    debugger;
     if (!feature) return false;
     const activeLayerObj = layersObj.find(l => l.id === feature.layer.id);
     /**

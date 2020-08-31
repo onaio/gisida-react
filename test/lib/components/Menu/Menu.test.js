@@ -2,19 +2,21 @@ import React from 'react';
 import Menu from '../../../../src/lib/components/Menu/Menu.js'
 import { shallow, mount } from 'enzyme';
 import configureStore from 'redux-mock-store';
-import { layer1 } from '../../../fixtures/defaultLayers.js';
-import { Actions } from 'gisida';
+import { layer1, layer2 } from '../../../fixtures/defaultLayers.js';
+import { categories } from '../../../../src/lib/tests/fixtures.js';
+import { Actions, buildCategories } from 'gisida';
 import { Provider } from 'react-redux';
+import toJson from 'enzyme-to-json';
 
 const initialState = {
     LAYERS: {groups: {} },
     APP: {loaded: true },
     categories: [],
     "map-1": {
-        layers: { education: {...layer1} },
-        openCategories: ["Severity of needs"],
-        primaryLayer: layer1.id,
-        visibleLayerId: layer1.id
+        layers: { Regionboundaries: {...layer2} },
+        openCategories: ["Boundaries"],
+        primaryLayer: layer2.id,
+        visibleLayerId: layer2.id
     },
     REGIONS: [ ],
     VIEW: {
@@ -23,10 +25,13 @@ const initialState = {
 }
 
 const mockStore = configureStore()
-const props = { mapId: 'map-1', menuId: 'menu-1'}
+const module = require('gisida');
+module.buildCategories = jest.fn();
+console.log('categories', categories);
+const props = { mapId: 'map-1', menuId: 'menu-1', categoriesProp: categories }
 const groups = {
-    "Severity of needs": [
-        { Education: ["education"] }
+    "Boundaries": [
+        { Regionboundaries: ["regionboundaries"] }
     ]
 }
 
@@ -52,6 +57,7 @@ describe('Menu Component', () => {
         );
         // test snapshots
         expect(wrapper.find('Menu').props()).toMatchSnapshot('Menu props');
+        expect(toJson(wrapper)).toMatchSnapshot('HELLO');
         expect(wrapper.find('Layers').length).toEqual(1)
 
         // test onToggleMenu
@@ -66,7 +72,7 @@ describe('Menu Component', () => {
         wrapper.find('li.sector').at(0).find('a').simulate('click');
         expect(toggleCategoriesAction).toHaveBeenCalledWith(props.mapId, 'Regions', -1);
         wrapper.find('li.sector').at(1).find('a').simulate('click');
-        expect(toggleCategoriesAction).toHaveBeenCalledWith(props.mapId, 'Severity of needs', 0);
+        expect(toggleCategoriesAction).toHaveBeenCalledWith(props.mapId, 'Boundaries & Labels', 0);
         expect(toggleCategoriesAction).toHaveBeenCalledTimes(2); 
 
         // test onRegionClick

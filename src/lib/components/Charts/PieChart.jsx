@@ -31,6 +31,7 @@ class PieChart extends React.Component {
       doubleChart,
       chartIcon,                                                                                                                                     
     } = this.props;
+    console.log(seriesData);
     const chartImage = chartIcon === 'Community' ? 'community.png' : 'police.png';
     this.state = {
       chart: {
@@ -96,17 +97,17 @@ class PieChart extends React.Component {
               fontFamily: '\'Montserrat\', sans-serif',
             },
           },
-          showInLegend: showInLegend || false,
+          showInLegend: showInLegend || true,
         },
       },
       legend: legendOptions || {
-        enabled: false,
+        enabled: true,
       },
       series: [{
         name: seriesName,
         colorByPoint: true,
         innerSize: donut ? `${donut}%` : '0%',
-        data: seriesData,
+        data: seriesData.data,
       }],
       credits: {
         enabled: false,
@@ -119,6 +120,7 @@ class PieChart extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    debugger
     const {
       seriesName,
       seriesData,
@@ -128,8 +130,8 @@ class PieChart extends React.Component {
       titleOptions,
       donut,
     } = nextProps;
-
-    if (isNewSeriesData(this.state.series[0].data, seriesData)) {
+    debugger;
+    if (isNewSeriesData(this.state.series[0].data, seriesData.data)) {
       if (this.chart) {
         this.chart.destroy();
       }
@@ -146,7 +148,7 @@ class PieChart extends React.Component {
           name: seriesName,
           colorByPoint: true,
           innerSize: donut ? `${donut}%` : '0%',
-          data: nextProps.seriesData,
+          data: nextProps.seriesData.data,
         }],
       }, () => {
         this.chart = Highcharts.chart(this.chartEl, this.state);
@@ -161,6 +163,7 @@ class PieChart extends React.Component {
   }
 
   render() {
+    debugger;
     return <div ref={(el) => { this.chartEl = el; }} />;
   }
 }

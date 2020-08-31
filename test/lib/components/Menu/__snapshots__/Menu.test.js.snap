@@ -1,14 +1,1646 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Menu Component Menu component renders correctly with all props: HELLO 1`] = `
+<Connect(Menu)
+  categoriesProp={
+    Array [
+      Object {
+        "category": "Boundaries & Labels",
+        "layers": Array [
+          Object {
+            "Place Labels": Object {
+              "category": "Place Labels",
+              "count": 0,
+              "layers": Array [
+                Object {
+                  "category": "Place Labels",
+                  "id": "region-labels",
+                  "label": "Region labels",
+                  "layout": Object {
+                    "text-field": "{region}",
+                    "text-size": 14,
+                    "text-transform": "uppercase",
+                  },
+                  "loaded": false,
+                  "minZoom": 0,
+                  "paint": Object {
+                    "text-color": "#000",
+                    "text-halo-blur": 1,
+                    "text-halo-color": "#fff",
+                    "text-halo-width": 1.3,
+                  },
+                  "source": Object {
+                    "data": "data/ipc_regions_centroid.geojson",
+                    "type": "geojson",
+                  },
+                  "type": "symbol",
+                  "visible": false,
+                },
+                Object {
+                  "category": "Place Labels",
+                  "id": "district-labels",
+                  "label": "District labels",
+                  "layout": Object {
+                    "text-field": "{name}",
+                    "text-offset": Array [
+                      0,
+                      2,
+                    ],
+                    "text-size": 12,
+                  },
+                  "loaded": false,
+                  "minZoom": 5.5,
+                  "paint": Object {
+                    "text-color": "#000",
+                    "text-halo-blur": 1,
+                    "text-halo-color": "#fff",
+                    "text-halo-width": 1.3,
+                  },
+                  "source": Object {
+                    "data": "data/ipc_distrtics_centroids.geojson",
+                    "type": "geojson",
+                  },
+                  "type": "symbol",
+                  "visible": false,
+                },
+                Object {
+                  "category": "Place Labels",
+                  "id": "banadir-labels",
+                  "label": "Banadir labels",
+                  "layout": Object {
+                    "text-field": "{district_name}",
+                    "text-offset": Array [
+                      0,
+                      2,
+                    ],
+                    "text-size": 12,
+                  },
+                  "loaded": false,
+                  "location": Object {
+                    "center": Object {
+                      "lat": 2.047033986,
+                      "lng": 45.33207821,
+                    },
+                    "zoom": 12.624128925301363,
+                  },
+                  "minZoom": 5.5,
+                  "paint": Object {
+                    "text-color": "#000",
+                    "text-halo-blur": 1,
+                    "text-halo-color": "#fff",
+                    "text-halo-width": 1.3,
+                  },
+                  "source": Object {
+                    "data": "data/banadir_districts.geojson",
+                    "type": "geojson",
+                  },
+                  "type": "symbol",
+                  "visible": false,
+                },
+              ],
+              "parent": "Boundaries & Labels",
+            },
+          },
+          Object {
+            "Boundaries": Object {
+              "category": "Boundaries",
+              "count": 1,
+              "layers": Array [
+                Object {
+                  "category": "Boundaries",
+                  "filters": Object {},
+                  "id": "regionboundaries",
+                  "isChartMin": true,
+                  "isLoading": false,
+                  "label": "Regionboundaries",
+                  "legendBottom": 40,
+                  "loaded": true,
+                  "paint": Object {
+                    "line-color": "#444",
+                    "line-opacity": 0.6,
+                    "line-width": 2,
+                  },
+                  "source": Object {
+                    "layer": "som_adm_1-6k13xf",
+                    "type": "vector",
+                    "url": "mapbox://ona.bnc2rzsw",
+                  },
+                  "styleSpec": Object {
+                    "id": "regionboundaries",
+                    "layout": Object {},
+                    "paint": Object {
+                      "line-color": "#444",
+                      "line-opacity": 0.6,
+                      "line-width": 2,
+                    },
+                    "source": Object {
+                      "type": "vector",
+                      "url": "mapbox://ona.bnc2rzsw",
+                    },
+                    "source-layer": "som_adm_1-6k13xf",
+                    "type": "line",
+                    "visible": true,
+                  },
+                  "type": "line",
+                  "visible": true,
+                },
+                Object {
+                  "category": "Boundaries",
+                  "filters": Object {},
+                  "id": "district-boundaries",
+                  "isChartMin": true,
+                  "isLoading": false,
+                  "label": "Districts boundaries",
+                  "legendBottom": 40,
+                  "loaded": true,
+                  "paint": Object {
+                    "line-color": "#444",
+                    "line-opacity": 0.6,
+                    "line-width": 1,
+                  },
+                  "source": Object {
+                    "layer": "som_adm_2-0j5bly",
+                    "type": "vector",
+                    "url": "mapbox://ona.6gl2shzi",
+                  },
+                  "styleSpec": Object {
+                    "id": "district-boundaries",
+                    "layout": Object {},
+                    "paint": Object {
+                      "line-color": "#444",
+                      "line-opacity": 0.6,
+                      "line-width": 1,
+                    },
+                    "source": Object {
+                      "type": "vector",
+                      "url": "mapbox://ona.6gl2shzi",
+                    },
+                    "source-layer": "som_adm_2-0j5bly",
+                    "type": "line",
+                    "visible": true,
+                  },
+                  "type": "line",
+                  "visible": true,
+                },
+              ],
+              "parent": "Boundaries & Labels",
+            },
+          },
+        ],
+      },
+    ]
+  }
+  mapId="map-1"
+  menuId="menu-1"
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <Menu
+    LAYERS={
+      Object {
+        "groups": Object {
+          "Boundaries": Array [
+            Object {
+              "Regionboundaries": Array [
+                "regionboundaries",
+              ],
+            },
+          ],
+        },
+      }
+    }
+    categories={
+      Array [
+        Object {
+          "category": "Boundaries & Labels",
+          "layers": Array [
+            Object {
+              "Place Labels": Object {
+                "category": "Place Labels",
+                "count": 0,
+                "layers": Array [
+                  Object {
+                    "category": "Place Labels",
+                    "id": "region-labels",
+                    "label": "Region labels",
+                    "layout": Object {
+                      "text-field": "{region}",
+                      "text-size": 14,
+                      "text-transform": "uppercase",
+                    },
+                    "loaded": false,
+                    "minZoom": 0,
+                    "paint": Object {
+                      "text-color": "#000",
+                      "text-halo-blur": 1,
+                      "text-halo-color": "#fff",
+                      "text-halo-width": 1.3,
+                    },
+                    "source": Object {
+                      "data": "data/ipc_regions_centroid.geojson",
+                      "type": "geojson",
+                    },
+                    "type": "symbol",
+                    "visible": false,
+                  },
+                  Object {
+                    "category": "Place Labels",
+                    "id": "district-labels",
+                    "label": "District labels",
+                    "layout": Object {
+                      "text-field": "{name}",
+                      "text-offset": Array [
+                        0,
+                        2,
+                      ],
+                      "text-size": 12,
+                    },
+                    "loaded": false,
+                    "minZoom": 5.5,
+                    "paint": Object {
+                      "text-color": "#000",
+                      "text-halo-blur": 1,
+                      "text-halo-color": "#fff",
+                      "text-halo-width": 1.3,
+                    },
+                    "source": Object {
+                      "data": "data/ipc_distrtics_centroids.geojson",
+                      "type": "geojson",
+                    },
+                    "type": "symbol",
+                    "visible": false,
+                  },
+                  Object {
+                    "category": "Place Labels",
+                    "id": "banadir-labels",
+                    "label": "Banadir labels",
+                    "layout": Object {
+                      "text-field": "{district_name}",
+                      "text-offset": Array [
+                        0,
+                        2,
+                      ],
+                      "text-size": 12,
+                    },
+                    "loaded": false,
+                    "location": Object {
+                      "center": Object {
+                        "lat": 2.047033986,
+                        "lng": 45.33207821,
+                      },
+                      "zoom": 12.624128925301363,
+                    },
+                    "minZoom": 5.5,
+                    "paint": Object {
+                      "text-color": "#000",
+                      "text-halo-blur": 1,
+                      "text-halo-color": "#fff",
+                      "text-halo-width": 1.3,
+                    },
+                    "source": Object {
+                      "data": "data/banadir_districts.geojson",
+                      "type": "geojson",
+                    },
+                    "type": "symbol",
+                    "visible": false,
+                  },
+                ],
+                "parent": "Boundaries & Labels",
+              },
+            },
+            Object {
+              "Boundaries": Object {
+                "category": "Boundaries",
+                "count": 1,
+                "layers": Array [
+                  Object {
+                    "category": "Boundaries",
+                    "filters": Object {},
+                    "id": "regionboundaries",
+                    "isChartMin": true,
+                    "isLoading": false,
+                    "label": "Regionboundaries",
+                    "legendBottom": 40,
+                    "loaded": true,
+                    "paint": Object {
+                      "line-color": "#444",
+                      "line-opacity": 0.6,
+                      "line-width": 2,
+                    },
+                    "source": Object {
+                      "layer": "som_adm_1-6k13xf",
+                      "type": "vector",
+                      "url": "mapbox://ona.bnc2rzsw",
+                    },
+                    "styleSpec": Object {
+                      "id": "regionboundaries",
+                      "layout": Object {},
+                      "paint": Object {
+                        "line-color": "#444",
+                        "line-opacity": 0.6,
+                        "line-width": 2,
+                      },
+                      "source": Object {
+                        "type": "vector",
+                        "url": "mapbox://ona.bnc2rzsw",
+                      },
+                      "source-layer": "som_adm_1-6k13xf",
+                      "type": "line",
+                      "visible": true,
+                    },
+                    "type": "line",
+                    "visible": true,
+                  },
+                  Object {
+                    "category": "Boundaries",
+                    "filters": Object {},
+                    "id": "district-boundaries",
+                    "isChartMin": true,
+                    "isLoading": false,
+                    "label": "Districts boundaries",
+                    "legendBottom": 40,
+                    "loaded": true,
+                    "paint": Object {
+                      "line-color": "#444",
+                      "line-opacity": 0.6,
+                      "line-width": 1,
+                    },
+                    "source": Object {
+                      "layer": "som_adm_2-0j5bly",
+                      "type": "vector",
+                      "url": "mapbox://ona.6gl2shzi",
+                    },
+                    "styleSpec": Object {
+                      "id": "district-boundaries",
+                      "layout": Object {},
+                      "paint": Object {
+                        "line-color": "#444",
+                        "line-opacity": 0.6,
+                        "line-width": 1,
+                      },
+                      "source": Object {
+                        "type": "vector",
+                        "url": "mapbox://ona.6gl2shzi",
+                      },
+                      "source-layer": "som_adm_2-0j5bly",
+                      "type": "line",
+                      "visible": true,
+                    },
+                    "type": "line",
+                    "visible": true,
+                  },
+                ],
+                "parent": "Boundaries & Labels",
+              },
+            },
+          ],
+        },
+      ]
+    }
+    categoriesProp={
+      Array [
+        Object {
+          "category": "Boundaries & Labels",
+          "layers": Array [
+            Object {
+              "Place Labels": Object {
+                "category": "Place Labels",
+                "count": 0,
+                "layers": Array [
+                  Object {
+                    "category": "Place Labels",
+                    "id": "region-labels",
+                    "label": "Region labels",
+                    "layout": Object {
+                      "text-field": "{region}",
+                      "text-size": 14,
+                      "text-transform": "uppercase",
+                    },
+                    "loaded": false,
+                    "minZoom": 0,
+                    "paint": Object {
+                      "text-color": "#000",
+                      "text-halo-blur": 1,
+                      "text-halo-color": "#fff",
+                      "text-halo-width": 1.3,
+                    },
+                    "source": Object {
+                      "data": "data/ipc_regions_centroid.geojson",
+                      "type": "geojson",
+                    },
+                    "type": "symbol",
+                    "visible": false,
+                  },
+                  Object {
+                    "category": "Place Labels",
+                    "id": "district-labels",
+                    "label": "District labels",
+                    "layout": Object {
+                      "text-field": "{name}",
+                      "text-offset": Array [
+                        0,
+                        2,
+                      ],
+                      "text-size": 12,
+                    },
+                    "loaded": false,
+                    "minZoom": 5.5,
+                    "paint": Object {
+                      "text-color": "#000",
+                      "text-halo-blur": 1,
+                      "text-halo-color": "#fff",
+                      "text-halo-width": 1.3,
+                    },
+                    "source": Object {
+                      "data": "data/ipc_distrtics_centroids.geojson",
+                      "type": "geojson",
+                    },
+                    "type": "symbol",
+                    "visible": false,
+                  },
+                  Object {
+                    "category": "Place Labels",
+                    "id": "banadir-labels",
+                    "label": "Banadir labels",
+                    "layout": Object {
+                      "text-field": "{district_name}",
+                      "text-offset": Array [
+                        0,
+                        2,
+                      ],
+                      "text-size": 12,
+                    },
+                    "loaded": false,
+                    "location": Object {
+                      "center": Object {
+                        "lat": 2.047033986,
+                        "lng": 45.33207821,
+                      },
+                      "zoom": 12.624128925301363,
+                    },
+                    "minZoom": 5.5,
+                    "paint": Object {
+                      "text-color": "#000",
+                      "text-halo-blur": 1,
+                      "text-halo-color": "#fff",
+                      "text-halo-width": 1.3,
+                    },
+                    "source": Object {
+                      "data": "data/banadir_districts.geojson",
+                      "type": "geojson",
+                    },
+                    "type": "symbol",
+                    "visible": false,
+                  },
+                ],
+                "parent": "Boundaries & Labels",
+              },
+            },
+            Object {
+              "Boundaries": Object {
+                "category": "Boundaries",
+                "count": 1,
+                "layers": Array [
+                  Object {
+                    "category": "Boundaries",
+                    "filters": Object {},
+                    "id": "regionboundaries",
+                    "isChartMin": true,
+                    "isLoading": false,
+                    "label": "Regionboundaries",
+                    "legendBottom": 40,
+                    "loaded": true,
+                    "paint": Object {
+                      "line-color": "#444",
+                      "line-opacity": 0.6,
+                      "line-width": 2,
+                    },
+                    "source": Object {
+                      "layer": "som_adm_1-6k13xf",
+                      "type": "vector",
+                      "url": "mapbox://ona.bnc2rzsw",
+                    },
+                    "styleSpec": Object {
+                      "id": "regionboundaries",
+                      "layout": Object {},
+                      "paint": Object {
+                        "line-color": "#444",
+                        "line-opacity": 0.6,
+                        "line-width": 2,
+                      },
+                      "source": Object {
+                        "type": "vector",
+                        "url": "mapbox://ona.bnc2rzsw",
+                      },
+                      "source-layer": "som_adm_1-6k13xf",
+                      "type": "line",
+                      "visible": true,
+                    },
+                    "type": "line",
+                    "visible": true,
+                  },
+                  Object {
+                    "category": "Boundaries",
+                    "filters": Object {},
+                    "id": "district-boundaries",
+                    "isChartMin": true,
+                    "isLoading": false,
+                    "label": "Districts boundaries",
+                    "legendBottom": 40,
+                    "loaded": true,
+                    "paint": Object {
+                      "line-color": "#444",
+                      "line-opacity": 0.6,
+                      "line-width": 1,
+                    },
+                    "source": Object {
+                      "layer": "som_adm_2-0j5bly",
+                      "type": "vector",
+                      "url": "mapbox://ona.6gl2shzi",
+                    },
+                    "styleSpec": Object {
+                      "id": "district-boundaries",
+                      "layout": Object {},
+                      "paint": Object {
+                        "line-color": "#444",
+                        "line-opacity": 0.6,
+                        "line-width": 1,
+                      },
+                      "source": Object {
+                        "type": "vector",
+                        "url": "mapbox://ona.6gl2shzi",
+                      },
+                      "source-layer": "som_adm_2-0j5bly",
+                      "type": "line",
+                      "visible": true,
+                    },
+                    "type": "line",
+                    "visible": true,
+                  },
+                ],
+                "parent": "Boundaries & Labels",
+              },
+            },
+          ],
+        },
+      ]
+    }
+    currentRegion="reg2"
+    dispatch={[Function]}
+    loaded={true}
+    mapId="map-1"
+    mapTargetId=""
+    menuId="sector-menu-1"
+    openCategories={
+      Array [
+        "Boundaries",
+      ]
+    }
+    preparedLayers={
+      Object {
+        "Regionboundaries": Object {
+          "category": "Boundaries",
+          "filters": Object {},
+          "id": "regionboundaries",
+          "isChartMin": true,
+          "isLoading": false,
+          "label": "Regionboundaries",
+          "legendBottom": 40,
+          "loaded": true,
+          "paint": Object {
+            "line-color": "#444",
+            "line-opacity": 0.6,
+            "line-width": 2,
+          },
+          "source": Object {
+            "layer": "som_adm_1-6k13xf",
+            "type": "vector",
+            "url": "mapbox://ona.bnc2rzsw",
+          },
+          "styleSpec": Object {
+            "id": "regionboundaries",
+            "layout": Object {},
+            "paint": Object {
+              "line-color": "#444",
+              "line-opacity": 0.6,
+              "line-width": 2,
+            },
+            "source": Object {
+              "type": "vector",
+              "url": "mapbox://ona.bnc2rzsw",
+            },
+            "source-layer": "som_adm_1-6k13xf",
+            "type": "line",
+            "visible": true,
+          },
+          "type": "line",
+          "visible": true,
+        },
+      }
+    }
+    regions={
+      Array [
+        Object {
+          "current": false,
+          "name": "reg1",
+        },
+        Object {
+          "current": true,
+          "name": "reg2",
+        },
+      ]
+    }
+    showMap={false}
+    store={
+      Object {
+        "clearActions": [Function],
+        "dispatch": [Function],
+        "getActions": [Function],
+        "getState": [Function],
+        "replaceReducer": [Function],
+        "subscribe": [Function],
+      }
+    }
+    storeSubscription={
+      Subscription {
+        "listeners": Object {
+          "clear": [Function],
+          "get": [Function],
+          "notify": [Function],
+          "subscribe": [Function],
+        },
+        "onStateChange": [Function],
+        "parentSub": undefined,
+        "store": Object {
+          "clearActions": [Function],
+          "dispatch": [Function],
+          "getActions": [Function],
+          "getState": [Function],
+          "replaceReducer": [Function],
+          "subscribe": [Function],
+        },
+        "unsubscribe": [Function],
+      }
+    }
+  >
+    <div>
+      <div>
+        <div
+          className="menu-wrapper top"
+          id="map-1-menu-wrapper"
+          onScroll={[Function]}
+          style={
+            Object {
+              "marginTop": 0,
+            }
+          }
+        >
+          <a
+            className="open-btn"
+            onClick={[Function]}
+            style={
+              Object {
+                "display": "block",
+              }
+            }
+          >
+            <span
+              className="glyphicon glyphicon-menu-hamburger"
+            />
+          </a>
+          <div
+            className="sectors-menu"
+            id="map-1-menu"
+            style={
+              Object {
+                "display": "none",
+              }
+            }
+          >
+            <a
+              className="close-btn"
+              onClick={[Function]}
+            >
+              <span
+                className="glyphicon glyphicon-remove"
+              />
+            </a>
+            <ul
+              className="sectors"
+            >
+              <li
+                className="sector"
+              >
+                <a
+                  onClick={[Function]}
+                >
+                  Regions
+                  <span
+                    className="caret"
+                  />
+                </a>
+                <ul
+                  className="layers"
+                >
+                  <li
+                    className="region map-1"
+                    key="reg1"
+                  >
+                    <input
+                      checked={false}
+                      id="reg1"
+                      key="reg1"
+                      name="region"
+                      onChange={[Function]}
+                      type="radio"
+                      value="reg1"
+                    />
+                    <label
+                      htmlFor="reg1"
+                    >
+                      reg1
+                    </label>
+                  </li>
+                  <li
+                    className="region map-1"
+                    key="reg2"
+                  >
+                    <input
+                      checked={true}
+                      id="reg2"
+                      key="reg2"
+                      name="region"
+                      onChange={[Function]}
+                      type="radio"
+                      value="reg2"
+                    />
+                    <label
+                      htmlFor="reg2"
+                    >
+                      reg2
+                    </label>
+                  </li>
+                </ul>
+              </li>
+              <li
+                className="sector"
+                key="0"
+              >
+                <a
+                  className="sector"
+                  onClick={[Function]}
+                >
+                  Boundaries & Labels
+                  <span
+                    className="category glyphicon glyphicon-chevron-right"
+                  />
+                   
+                    
+                </a>
+                <ul />
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Menu>
+</Connect(Menu)>
+`;
+
+exports[`Menu Component Menu component renders correctly with all props: LAYERS 1`] = `
+<Connect(Menu)
+  categoriesProp={
+    Array [
+      Object {
+        "category": "Boundaries & Labels",
+        "layers": Array [
+          Object {
+            "Place Labels": Object {
+              "category": "Place Labels",
+              "count": 0,
+              "layers": Array [
+                Object {
+                  "category": "Place Labels",
+                  "id": "region-labels",
+                  "label": "Region labels",
+                  "layout": Object {
+                    "text-field": "{region}",
+                    "text-size": 14,
+                    "text-transform": "uppercase",
+                  },
+                  "loaded": false,
+                  "minZoom": 0,
+                  "paint": Object {
+                    "text-color": "#000",
+                    "text-halo-blur": 1,
+                    "text-halo-color": "#fff",
+                    "text-halo-width": 1.3,
+                  },
+                  "source": Object {
+                    "data": "data/ipc_regions_centroid.geojson",
+                    "type": "geojson",
+                  },
+                  "type": "symbol",
+                  "visible": false,
+                },
+                Object {
+                  "category": "Place Labels",
+                  "id": "district-labels",
+                  "label": "District labels",
+                  "layout": Object {
+                    "text-field": "{name}",
+                    "text-offset": Array [
+                      0,
+                      2,
+                    ],
+                    "text-size": 12,
+                  },
+                  "loaded": false,
+                  "minZoom": 5.5,
+                  "paint": Object {
+                    "text-color": "#000",
+                    "text-halo-blur": 1,
+                    "text-halo-color": "#fff",
+                    "text-halo-width": 1.3,
+                  },
+                  "source": Object {
+                    "data": "data/ipc_distrtics_centroids.geojson",
+                    "type": "geojson",
+                  },
+                  "type": "symbol",
+                  "visible": false,
+                },
+                Object {
+                  "category": "Place Labels",
+                  "id": "banadir-labels",
+                  "label": "Banadir labels",
+                  "layout": Object {
+                    "text-field": "{district_name}",
+                    "text-offset": Array [
+                      0,
+                      2,
+                    ],
+                    "text-size": 12,
+                  },
+                  "loaded": false,
+                  "location": Object {
+                    "center": Object {
+                      "lat": 2.047033986,
+                      "lng": 45.33207821,
+                    },
+                    "zoom": 12.624128925301363,
+                  },
+                  "minZoom": 5.5,
+                  "paint": Object {
+                    "text-color": "#000",
+                    "text-halo-blur": 1,
+                    "text-halo-color": "#fff",
+                    "text-halo-width": 1.3,
+                  },
+                  "source": Object {
+                    "data": "data/banadir_districts.geojson",
+                    "type": "geojson",
+                  },
+                  "type": "symbol",
+                  "visible": false,
+                },
+              ],
+              "parent": "Boundaries & Labels",
+            },
+          },
+          Object {
+            "Boundaries": Object {
+              "category": "Boundaries",
+              "count": 1,
+              "layers": Array [
+                Object {
+                  "category": "Boundaries",
+                  "filters": Object {},
+                  "id": "regionboundaries",
+                  "isChartMin": true,
+                  "isLoading": false,
+                  "label": "Regionboundaries",
+                  "legendBottom": 40,
+                  "loaded": true,
+                  "paint": Object {
+                    "line-color": "#444",
+                    "line-opacity": 0.6,
+                    "line-width": 2,
+                  },
+                  "source": Object {
+                    "layer": "som_adm_1-6k13xf",
+                    "type": "vector",
+                    "url": "mapbox://ona.bnc2rzsw",
+                  },
+                  "styleSpec": Object {
+                    "id": "regionboundaries",
+                    "layout": Object {},
+                    "paint": Object {
+                      "line-color": "#444",
+                      "line-opacity": 0.6,
+                      "line-width": 2,
+                    },
+                    "source": Object {
+                      "type": "vector",
+                      "url": "mapbox://ona.bnc2rzsw",
+                    },
+                    "source-layer": "som_adm_1-6k13xf",
+                    "type": "line",
+                    "visible": true,
+                  },
+                  "type": "line",
+                  "visible": true,
+                },
+                Object {
+                  "category": "Boundaries",
+                  "filters": Object {},
+                  "id": "district-boundaries",
+                  "isChartMin": true,
+                  "isLoading": false,
+                  "label": "Districts boundaries",
+                  "legendBottom": 40,
+                  "loaded": true,
+                  "paint": Object {
+                    "line-color": "#444",
+                    "line-opacity": 0.6,
+                    "line-width": 1,
+                  },
+                  "source": Object {
+                    "layer": "som_adm_2-0j5bly",
+                    "type": "vector",
+                    "url": "mapbox://ona.6gl2shzi",
+                  },
+                  "styleSpec": Object {
+                    "id": "district-boundaries",
+                    "layout": Object {},
+                    "paint": Object {
+                      "line-color": "#444",
+                      "line-opacity": 0.6,
+                      "line-width": 1,
+                    },
+                    "source": Object {
+                      "type": "vector",
+                      "url": "mapbox://ona.6gl2shzi",
+                    },
+                    "source-layer": "som_adm_2-0j5bly",
+                    "type": "line",
+                    "visible": true,
+                  },
+                  "type": "line",
+                  "visible": true,
+                },
+              ],
+              "parent": "Boundaries & Labels",
+            },
+          },
+        ],
+      },
+    ]
+  }
+  mapId="map-1"
+  menuId="menu-1"
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <Menu
+    LAYERS={
+      Object {
+        "groups": Object {
+          "Boundaries": Array [
+            Object {
+              "Regionboundaries": Array [
+                "regionboundaries",
+              ],
+            },
+          ],
+        },
+      }
+    }
+    categories={
+      Array [
+        Object {
+          "category": "Boundaries & Labels",
+          "layers": Array [
+            Object {
+              "Place Labels": Object {
+                "category": "Place Labels",
+                "count": 0,
+                "layers": Array [
+                  Object {
+                    "category": "Place Labels",
+                    "id": "region-labels",
+                    "label": "Region labels",
+                    "layout": Object {
+                      "text-field": "{region}",
+                      "text-size": 14,
+                      "text-transform": "uppercase",
+                    },
+                    "loaded": false,
+                    "minZoom": 0,
+                    "paint": Object {
+                      "text-color": "#000",
+                      "text-halo-blur": 1,
+                      "text-halo-color": "#fff",
+                      "text-halo-width": 1.3,
+                    },
+                    "source": Object {
+                      "data": "data/ipc_regions_centroid.geojson",
+                      "type": "geojson",
+                    },
+                    "type": "symbol",
+                    "visible": false,
+                  },
+                  Object {
+                    "category": "Place Labels",
+                    "id": "district-labels",
+                    "label": "District labels",
+                    "layout": Object {
+                      "text-field": "{name}",
+                      "text-offset": Array [
+                        0,
+                        2,
+                      ],
+                      "text-size": 12,
+                    },
+                    "loaded": false,
+                    "minZoom": 5.5,
+                    "paint": Object {
+                      "text-color": "#000",
+                      "text-halo-blur": 1,
+                      "text-halo-color": "#fff",
+                      "text-halo-width": 1.3,
+                    },
+                    "source": Object {
+                      "data": "data/ipc_distrtics_centroids.geojson",
+                      "type": "geojson",
+                    },
+                    "type": "symbol",
+                    "visible": false,
+                  },
+                  Object {
+                    "category": "Place Labels",
+                    "id": "banadir-labels",
+                    "label": "Banadir labels",
+                    "layout": Object {
+                      "text-field": "{district_name}",
+                      "text-offset": Array [
+                        0,
+                        2,
+                      ],
+                      "text-size": 12,
+                    },
+                    "loaded": false,
+                    "location": Object {
+                      "center": Object {
+                        "lat": 2.047033986,
+                        "lng": 45.33207821,
+                      },
+                      "zoom": 12.624128925301363,
+                    },
+                    "minZoom": 5.5,
+                    "paint": Object {
+                      "text-color": "#000",
+                      "text-halo-blur": 1,
+                      "text-halo-color": "#fff",
+                      "text-halo-width": 1.3,
+                    },
+                    "source": Object {
+                      "data": "data/banadir_districts.geojson",
+                      "type": "geojson",
+                    },
+                    "type": "symbol",
+                    "visible": false,
+                  },
+                ],
+                "parent": "Boundaries & Labels",
+              },
+            },
+            Object {
+              "Boundaries": Object {
+                "category": "Boundaries",
+                "count": 1,
+                "layers": Array [
+                  Object {
+                    "category": "Boundaries",
+                    "filters": Object {},
+                    "id": "regionboundaries",
+                    "isChartMin": true,
+                    "isLoading": false,
+                    "label": "Regionboundaries",
+                    "legendBottom": 40,
+                    "loaded": true,
+                    "paint": Object {
+                      "line-color": "#444",
+                      "line-opacity": 0.6,
+                      "line-width": 2,
+                    },
+                    "source": Object {
+                      "layer": "som_adm_1-6k13xf",
+                      "type": "vector",
+                      "url": "mapbox://ona.bnc2rzsw",
+                    },
+                    "styleSpec": Object {
+                      "id": "regionboundaries",
+                      "layout": Object {},
+                      "paint": Object {
+                        "line-color": "#444",
+                        "line-opacity": 0.6,
+                        "line-width": 2,
+                      },
+                      "source": Object {
+                        "type": "vector",
+                        "url": "mapbox://ona.bnc2rzsw",
+                      },
+                      "source-layer": "som_adm_1-6k13xf",
+                      "type": "line",
+                      "visible": true,
+                    },
+                    "type": "line",
+                    "visible": true,
+                  },
+                  Object {
+                    "category": "Boundaries",
+                    "filters": Object {},
+                    "id": "district-boundaries",
+                    "isChartMin": true,
+                    "isLoading": false,
+                    "label": "Districts boundaries",
+                    "legendBottom": 40,
+                    "loaded": true,
+                    "paint": Object {
+                      "line-color": "#444",
+                      "line-opacity": 0.6,
+                      "line-width": 1,
+                    },
+                    "source": Object {
+                      "layer": "som_adm_2-0j5bly",
+                      "type": "vector",
+                      "url": "mapbox://ona.6gl2shzi",
+                    },
+                    "styleSpec": Object {
+                      "id": "district-boundaries",
+                      "layout": Object {},
+                      "paint": Object {
+                        "line-color": "#444",
+                        "line-opacity": 0.6,
+                        "line-width": 1,
+                      },
+                      "source": Object {
+                        "type": "vector",
+                        "url": "mapbox://ona.6gl2shzi",
+                      },
+                      "source-layer": "som_adm_2-0j5bly",
+                      "type": "line",
+                      "visible": true,
+                    },
+                    "type": "line",
+                    "visible": true,
+                  },
+                ],
+                "parent": "Boundaries & Labels",
+              },
+            },
+          ],
+        },
+      ]
+    }
+    categoriesProp={
+      Array [
+        Object {
+          "category": "Boundaries & Labels",
+          "layers": Array [
+            Object {
+              "Place Labels": Object {
+                "category": "Place Labels",
+                "count": 0,
+                "layers": Array [
+                  Object {
+                    "category": "Place Labels",
+                    "id": "region-labels",
+                    "label": "Region labels",
+                    "layout": Object {
+                      "text-field": "{region}",
+                      "text-size": 14,
+                      "text-transform": "uppercase",
+                    },
+                    "loaded": false,
+                    "minZoom": 0,
+                    "paint": Object {
+                      "text-color": "#000",
+                      "text-halo-blur": 1,
+                      "text-halo-color": "#fff",
+                      "text-halo-width": 1.3,
+                    },
+                    "source": Object {
+                      "data": "data/ipc_regions_centroid.geojson",
+                      "type": "geojson",
+                    },
+                    "type": "symbol",
+                    "visible": false,
+                  },
+                  Object {
+                    "category": "Place Labels",
+                    "id": "district-labels",
+                    "label": "District labels",
+                    "layout": Object {
+                      "text-field": "{name}",
+                      "text-offset": Array [
+                        0,
+                        2,
+                      ],
+                      "text-size": 12,
+                    },
+                    "loaded": false,
+                    "minZoom": 5.5,
+                    "paint": Object {
+                      "text-color": "#000",
+                      "text-halo-blur": 1,
+                      "text-halo-color": "#fff",
+                      "text-halo-width": 1.3,
+                    },
+                    "source": Object {
+                      "data": "data/ipc_distrtics_centroids.geojson",
+                      "type": "geojson",
+                    },
+                    "type": "symbol",
+                    "visible": false,
+                  },
+                  Object {
+                    "category": "Place Labels",
+                    "id": "banadir-labels",
+                    "label": "Banadir labels",
+                    "layout": Object {
+                      "text-field": "{district_name}",
+                      "text-offset": Array [
+                        0,
+                        2,
+                      ],
+                      "text-size": 12,
+                    },
+                    "loaded": false,
+                    "location": Object {
+                      "center": Object {
+                        "lat": 2.047033986,
+                        "lng": 45.33207821,
+                      },
+                      "zoom": 12.624128925301363,
+                    },
+                    "minZoom": 5.5,
+                    "paint": Object {
+                      "text-color": "#000",
+                      "text-halo-blur": 1,
+                      "text-halo-color": "#fff",
+                      "text-halo-width": 1.3,
+                    },
+                    "source": Object {
+                      "data": "data/banadir_districts.geojson",
+                      "type": "geojson",
+                    },
+                    "type": "symbol",
+                    "visible": false,
+                  },
+                ],
+                "parent": "Boundaries & Labels",
+              },
+            },
+            Object {
+              "Boundaries": Object {
+                "category": "Boundaries",
+                "count": 1,
+                "layers": Array [
+                  Object {
+                    "category": "Boundaries",
+                    "filters": Object {},
+                    "id": "regionboundaries",
+                    "isChartMin": true,
+                    "isLoading": false,
+                    "label": "Regionboundaries",
+                    "legendBottom": 40,
+                    "loaded": true,
+                    "paint": Object {
+                      "line-color": "#444",
+                      "line-opacity": 0.6,
+                      "line-width": 2,
+                    },
+                    "source": Object {
+                      "layer": "som_adm_1-6k13xf",
+                      "type": "vector",
+                      "url": "mapbox://ona.bnc2rzsw",
+                    },
+                    "styleSpec": Object {
+                      "id": "regionboundaries",
+                      "layout": Object {},
+                      "paint": Object {
+                        "line-color": "#444",
+                        "line-opacity": 0.6,
+                        "line-width": 2,
+                      },
+                      "source": Object {
+                        "type": "vector",
+                        "url": "mapbox://ona.bnc2rzsw",
+                      },
+                      "source-layer": "som_adm_1-6k13xf",
+                      "type": "line",
+                      "visible": true,
+                    },
+                    "type": "line",
+                    "visible": true,
+                  },
+                  Object {
+                    "category": "Boundaries",
+                    "filters": Object {},
+                    "id": "district-boundaries",
+                    "isChartMin": true,
+                    "isLoading": false,
+                    "label": "Districts boundaries",
+                    "legendBottom": 40,
+                    "loaded": true,
+                    "paint": Object {
+                      "line-color": "#444",
+                      "line-opacity": 0.6,
+                      "line-width": 1,
+                    },
+                    "source": Object {
+                      "layer": "som_adm_2-0j5bly",
+                      "type": "vector",
+                      "url": "mapbox://ona.6gl2shzi",
+                    },
+                    "styleSpec": Object {
+                      "id": "district-boundaries",
+                      "layout": Object {},
+                      "paint": Object {
+                        "line-color": "#444",
+                        "line-opacity": 0.6,
+                        "line-width": 1,
+                      },
+                      "source": Object {
+                        "type": "vector",
+                        "url": "mapbox://ona.6gl2shzi",
+                      },
+                      "source-layer": "som_adm_2-0j5bly",
+                      "type": "line",
+                      "visible": true,
+                    },
+                    "type": "line",
+                    "visible": true,
+                  },
+                ],
+                "parent": "Boundaries & Labels",
+              },
+            },
+          ],
+        },
+      ]
+    }
+    currentRegion="reg2"
+    dispatch={[Function]}
+    loaded={true}
+    mapId="map-1"
+    mapTargetId=""
+    menuId="sector-menu-1"
+    openCategories={
+      Array [
+        "Boundaries",
+      ]
+    }
+    preparedLayers={
+      Object {
+        "Regionboundaries": Object {
+          "category": "Boundaries",
+          "filters": Object {},
+          "id": "regionboundaries",
+          "isChartMin": true,
+          "isLoading": false,
+          "label": "Regionboundaries",
+          "legendBottom": 40,
+          "loaded": true,
+          "paint": Object {
+            "line-color": "#444",
+            "line-opacity": 0.6,
+            "line-width": 2,
+          },
+          "source": Object {
+            "layer": "som_adm_1-6k13xf",
+            "type": "vector",
+            "url": "mapbox://ona.bnc2rzsw",
+          },
+          "styleSpec": Object {
+            "id": "regionboundaries",
+            "layout": Object {},
+            "paint": Object {
+              "line-color": "#444",
+              "line-opacity": 0.6,
+              "line-width": 2,
+            },
+            "source": Object {
+              "type": "vector",
+              "url": "mapbox://ona.bnc2rzsw",
+            },
+            "source-layer": "som_adm_1-6k13xf",
+            "type": "line",
+            "visible": true,
+          },
+          "type": "line",
+          "visible": true,
+        },
+      }
+    }
+    regions={
+      Array [
+        Object {
+          "current": false,
+          "name": "reg1",
+        },
+        Object {
+          "current": true,
+          "name": "reg2",
+        },
+      ]
+    }
+    showMap={false}
+    store={
+      Object {
+        "clearActions": [Function],
+        "dispatch": [Function],
+        "getActions": [Function],
+        "getState": [Function],
+        "replaceReducer": [Function],
+        "subscribe": [Function],
+      }
+    }
+    storeSubscription={
+      Subscription {
+        "listeners": Object {
+          "clear": [Function],
+          "get": [Function],
+          "notify": [Function],
+          "subscribe": [Function],
+        },
+        "onStateChange": [Function],
+        "parentSub": undefined,
+        "store": Object {
+          "clearActions": [Function],
+          "dispatch": [Function],
+          "getActions": [Function],
+          "getState": [Function],
+          "replaceReducer": [Function],
+          "subscribe": [Function],
+        },
+        "unsubscribe": [Function],
+      }
+    }
+  >
+    <div>
+      <div>
+        <div
+          className="menu-wrapper top"
+          id="map-1-menu-wrapper"
+          onScroll={[Function]}
+          style={
+            Object {
+              "marginTop": 0,
+            }
+          }
+        >
+          <a
+            className="open-btn"
+            onClick={[Function]}
+            style={
+              Object {
+                "display": "block",
+              }
+            }
+          >
+            <span
+              className="glyphicon glyphicon-menu-hamburger"
+            />
+          </a>
+          <div
+            className="sectors-menu"
+            id="map-1-menu"
+            style={
+              Object {
+                "display": "none",
+              }
+            }
+          >
+            <a
+              className="close-btn"
+              onClick={[Function]}
+            >
+              <span
+                className="glyphicon glyphicon-remove"
+              />
+            </a>
+            <ul
+              className="sectors"
+            >
+              <li
+                className="sector"
+              >
+                <a
+                  onClick={[Function]}
+                >
+                  Regions
+                  <span
+                    className="caret"
+                  />
+                </a>
+                <ul
+                  className="layers"
+                >
+                  <li
+                    className="region map-1"
+                    key="reg1"
+                  >
+                    <input
+                      checked={false}
+                      id="reg1"
+                      key="reg1"
+                      name="region"
+                      onChange={[Function]}
+                      type="radio"
+                      value="reg1"
+                    />
+                    <label
+                      htmlFor="reg1"
+                    >
+                      reg1
+                    </label>
+                  </li>
+                  <li
+                    className="region map-1"
+                    key="reg2"
+                  >
+                    <input
+                      checked={true}
+                      id="reg2"
+                      key="reg2"
+                      name="region"
+                      onChange={[Function]}
+                      type="radio"
+                      value="reg2"
+                    />
+                    <label
+                      htmlFor="reg2"
+                    >
+                      reg2
+                    </label>
+                  </li>
+                </ul>
+              </li>
+              <li
+                className="sector"
+                key="0"
+              >
+                <a
+                  className="sector"
+                  onClick={[Function]}
+                >
+                  Boundaries & Labels
+                  <span
+                    className="category glyphicon glyphicon-chevron-right"
+                  />
+                   
+                    
+                </a>
+                <ul />
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Menu>
+</Connect(Menu)>
+`;
+
 exports[`Menu Component Menu component renders correctly with all props: Menu props 1`] = `
 Object {
   "AUTH": undefined,
   "LAYERS": Object {
     "groups": Object {
-      "Severity of needs": Array [
+      "Boundaries": Array [
         Object {
-          "Education": Array [
-            "education",
+          "Regionboundaries": Array [
+            "regionboundaries",
           ],
         },
       ],
@@ -16,164 +1648,371 @@ Object {
   },
   "categories": Array [
     Object {
-      "category": "Severity of needs",
+      "category": "Boundaries & Labels",
       "layers": Array [
         Object {
-          "Education": Object {
-            "category": "Education",
+          "Place Labels": Object {
+            "category": "Place Labels",
             "count": 0,
             "layers": Array [
               Object {
-                "aggregate": Object {
-                  "accepted-filter-values": Array [
-                    "all",
-                    "all",
-                  ],
-                  "date-by": "submission/reporting_period",
-                  "date-parse": Object {
-                    "chunk": 0,
-                    "split": " to ",
-                  },
-                  "extraProps": Array [
-                    "total_15_18_adolscent",
-                    "total_15_18_adolscent_girls",
-                    "total_15_18_adolscent_boys",
-                    "rc_rep/rc_boys_cal3",
-                    "rc_rep/rc_girls_cal3",
-                    "rc_rep/total3",
-                    "submission/location_type",
-                    "reporter/reporter_org",
-                    "Settlement",
-                    "submission/reporting_period",
-                    "New_Camp_S",
-                    "New_Camp_N",
-                    "Upazila",
-                  ],
-                  "filter": Array [
-                    "reporter/reporter_org",
-                    "Upazila",
-                  ],
-                  "filter-label": Array [
-                    "Partner",
-                    "Upazila",
-                  ],
-                  "filter-type": Array [
-                    "stops",
-                    "stops",
-                  ],
-                  "group-by": "submission/rc_loc",
-                  "timeseries": Object {
-                    "field": "period",
-                    "type": "cumulative",
-                  },
-                  "type": "sum",
+                "category": "Place Labels",
+                "id": "region-labels",
+                "label": "Region labels",
+                "layout": Object {
+                  "text-field": "{region}",
+                  "text-size": 14,
+                  "text-transform": "uppercase",
                 },
-                "categories": Object {
-                  "breaks": "yes",
-                  "clusters": 7,
-                  "color": "RdPu",
-                },
-                "category": "Education",
-                "credit": "Adolescents (15-18 years) enrolled in non-formal/formal education.",
-                "data-parse": Object {
-                  "submission/rc_loc": Object {
-                    "key": Object {
-                      "CXB-201": "Camp 1E",
-                      "CXB-202": "Camp 1W",
-                    },
-                    "new-prop-name": "parsedUID",
-                  },
-                  "submission/reporting_period": Object {
-                    "key": Object {
-                      "t_A17-F18": "August 2017 to February 2018",
-                      "t_jan": "January 1 to January 31",
-                    },
-                    "type": "single",
-                  },
-                },
-                "detail-view": Object {
-                  "UID": "SSID",
-                  "basic-info": Array [
-                    Object {
-                      "alt": "GPS coordinates",
-                      "icon": "screenshot",
-                      "value": Object {
-                        "join": ", ",
-                        "prop": Array [
-                          "longitude",
-                          "latitude",
-                        ],
-                      },
-                    },
-                    Object {
-                      "alt": "Reporter Org",
-                      "icon": "user",
-                      "value": "reporter/reporter_org",
-                    },
-                  ],
-                  "sub-title": Object {
-                    "prop": "New_Camp_N",
-                  },
-                  "title": Object {
-                    "prop": "Site_name",
-                  },
-                },
-                "id": "education",
-                "label": "RC - Adolescents (15-18 years) enrolled in non-formal/formal education",
-                "labels": Object {
-                  "coordinates": Array [
-                    "longitude",
-                    "latitude",
-                  ],
-                  "data": "data/180320_Outline_Rohingya_refugee_camps_sites_centroids.csv",
-                  "height": 30,
-                  "join": Array [
-                    "New_Camp_S",
-                    "submission/rc_loc",
-                  ],
-                  "label": "<b> {{total_15_18_adolscent}} </b>",
-                  "minZoom": 4.5,
-                  "width": 30,
-                },
-                "loaded": true,
-                "popup": Object {
-                  "body": "<p style=text-align:left;> <b>Girls:</b> {{total_15_18_adolscent_girls}} <br> <b>Boys:</b> {{total_15_18_adolscent_boys}}<span style=float:right;>",
-                  "header": "parsedUID",
-                },
-                "property": "total_15_18_adolscent",
-                "rohingyaIndicators": Object {
-                  "location_type": "submission/location_type",
-                  "rc_boys": "rc_rep/rc_boys_cal3",
-                  "rc_girls": "rc_rep/rc_girls_cal3",
-                  "rc_total": "rc_rep/total3",
+                "loaded": false,
+                "minZoom": 0,
+                "paint": Object {
+                  "text-color": "#000",
+                  "text-halo-blur": 1,
+                  "text-halo-color": "#fff",
+                  "text-halo-width": 1.3,
                 },
                 "source": Object {
-                  "data": Array [
-                    315361,
-                    "/data/180320_Outline_Rohingya_refugee_camps_sites_centroids.csv",
-                  ],
-                  "join": Array [
-                    "SSID",
-                    "submission/rc_loc",
-                    "New_Camp_S",
-                  ],
-                  "layer": "180528_outline_rohingya_refug-c2ep2k",
-                  "relation": Object {
-                    "key": Array [
-                      "vector",
-                      "many",
-                      "one",
-                    ],
-                    "type": "one-to-many",
-                  },
-                  "type": "vector",
-                  "url": "mapbox://ona.5t6fsdlt",
+                  "data": "data/ipc_regions_centroid.geojson",
+                  "type": "geojson",
                 },
-                "type": "fill",
+                "type": "symbol",
+                "visible": false,
+              },
+              Object {
+                "category": "Place Labels",
+                "id": "district-labels",
+                "label": "District labels",
+                "layout": Object {
+                  "text-field": "{name}",
+                  "text-offset": Array [
+                    0,
+                    2,
+                  ],
+                  "text-size": 12,
+                },
+                "loaded": false,
+                "minZoom": 5.5,
+                "paint": Object {
+                  "text-color": "#000",
+                  "text-halo-blur": 1,
+                  "text-halo-color": "#fff",
+                  "text-halo-width": 1.3,
+                },
+                "source": Object {
+                  "data": "data/ipc_distrtics_centroids.geojson",
+                  "type": "geojson",
+                },
+                "type": "symbol",
+                "visible": false,
+              },
+              Object {
+                "category": "Place Labels",
+                "id": "banadir-labels",
+                "label": "Banadir labels",
+                "layout": Object {
+                  "text-field": "{district_name}",
+                  "text-offset": Array [
+                    0,
+                    2,
+                  ],
+                  "text-size": 12,
+                },
+                "loaded": false,
+                "location": Object {
+                  "center": Object {
+                    "lat": 2.047033986,
+                    "lng": 45.33207821,
+                  },
+                  "zoom": 12.624128925301363,
+                },
+                "minZoom": 5.5,
+                "paint": Object {
+                  "text-color": "#000",
+                  "text-halo-blur": 1,
+                  "text-halo-color": "#fff",
+                  "text-halo-width": 1.3,
+                },
+                "source": Object {
+                  "data": "data/banadir_districts.geojson",
+                  "type": "geojson",
+                },
+                "type": "symbol",
                 "visible": false,
               },
             ],
-            "parent": "Severity of needs",
+            "parent": "Boundaries & Labels",
+          },
+        },
+        Object {
+          "Boundaries": Object {
+            "category": "Boundaries",
+            "count": 1,
+            "layers": Array [
+              Object {
+                "category": "Boundaries",
+                "filters": Object {},
+                "id": "regionboundaries",
+                "isChartMin": true,
+                "isLoading": false,
+                "label": "Regionboundaries",
+                "legendBottom": 40,
+                "loaded": true,
+                "paint": Object {
+                  "line-color": "#444",
+                  "line-opacity": 0.6,
+                  "line-width": 2,
+                },
+                "source": Object {
+                  "layer": "som_adm_1-6k13xf",
+                  "type": "vector",
+                  "url": "mapbox://ona.bnc2rzsw",
+                },
+                "styleSpec": Object {
+                  "id": "regionboundaries",
+                  "layout": Object {},
+                  "paint": Object {
+                    "line-color": "#444",
+                    "line-opacity": 0.6,
+                    "line-width": 2,
+                  },
+                  "source": Object {
+                    "type": "vector",
+                    "url": "mapbox://ona.bnc2rzsw",
+                  },
+                  "source-layer": "som_adm_1-6k13xf",
+                  "type": "line",
+                  "visible": true,
+                },
+                "type": "line",
+                "visible": true,
+              },
+              Object {
+                "category": "Boundaries",
+                "filters": Object {},
+                "id": "district-boundaries",
+                "isChartMin": true,
+                "isLoading": false,
+                "label": "Districts boundaries",
+                "legendBottom": 40,
+                "loaded": true,
+                "paint": Object {
+                  "line-color": "#444",
+                  "line-opacity": 0.6,
+                  "line-width": 1,
+                },
+                "source": Object {
+                  "layer": "som_adm_2-0j5bly",
+                  "type": "vector",
+                  "url": "mapbox://ona.6gl2shzi",
+                },
+                "styleSpec": Object {
+                  "id": "district-boundaries",
+                  "layout": Object {},
+                  "paint": Object {
+                    "line-color": "#444",
+                    "line-opacity": 0.6,
+                    "line-width": 1,
+                  },
+                  "source": Object {
+                    "type": "vector",
+                    "url": "mapbox://ona.6gl2shzi",
+                  },
+                  "source-layer": "som_adm_2-0j5bly",
+                  "type": "line",
+                  "visible": true,
+                },
+                "type": "line",
+                "visible": true,
+              },
+            ],
+            "parent": "Boundaries & Labels",
+          },
+        },
+      ],
+    },
+  ],
+  "categoriesProp": Array [
+    Object {
+      "category": "Boundaries & Labels",
+      "layers": Array [
+        Object {
+          "Place Labels": Object {
+            "category": "Place Labels",
+            "count": 0,
+            "layers": Array [
+              Object {
+                "category": "Place Labels",
+                "id": "region-labels",
+                "label": "Region labels",
+                "layout": Object {
+                  "text-field": "{region}",
+                  "text-size": 14,
+                  "text-transform": "uppercase",
+                },
+                "loaded": false,
+                "minZoom": 0,
+                "paint": Object {
+                  "text-color": "#000",
+                  "text-halo-blur": 1,
+                  "text-halo-color": "#fff",
+                  "text-halo-width": 1.3,
+                },
+                "source": Object {
+                  "data": "data/ipc_regions_centroid.geojson",
+                  "type": "geojson",
+                },
+                "type": "symbol",
+                "visible": false,
+              },
+              Object {
+                "category": "Place Labels",
+                "id": "district-labels",
+                "label": "District labels",
+                "layout": Object {
+                  "text-field": "{name}",
+                  "text-offset": Array [
+                    0,
+                    2,
+                  ],
+                  "text-size": 12,
+                },
+                "loaded": false,
+                "minZoom": 5.5,
+                "paint": Object {
+                  "text-color": "#000",
+                  "text-halo-blur": 1,
+                  "text-halo-color": "#fff",
+                  "text-halo-width": 1.3,
+                },
+                "source": Object {
+                  "data": "data/ipc_distrtics_centroids.geojson",
+                  "type": "geojson",
+                },
+                "type": "symbol",
+                "visible": false,
+              },
+              Object {
+                "category": "Place Labels",
+                "id": "banadir-labels",
+                "label": "Banadir labels",
+                "layout": Object {
+                  "text-field": "{district_name}",
+                  "text-offset": Array [
+                    0,
+                    2,
+                  ],
+                  "text-size": 12,
+                },
+                "loaded": false,
+                "location": Object {
+                  "center": Object {
+                    "lat": 2.047033986,
+                    "lng": 45.33207821,
+                  },
+                  "zoom": 12.624128925301363,
+                },
+                "minZoom": 5.5,
+                "paint": Object {
+                  "text-color": "#000",
+                  "text-halo-blur": 1,
+                  "text-halo-color": "#fff",
+                  "text-halo-width": 1.3,
+                },
+                "source": Object {
+                  "data": "data/banadir_districts.geojson",
+                  "type": "geojson",
+                },
+                "type": "symbol",
+                "visible": false,
+              },
+            ],
+            "parent": "Boundaries & Labels",
+          },
+        },
+        Object {
+          "Boundaries": Object {
+            "category": "Boundaries",
+            "count": 1,
+            "layers": Array [
+              Object {
+                "category": "Boundaries",
+                "filters": Object {},
+                "id": "regionboundaries",
+                "isChartMin": true,
+                "isLoading": false,
+                "label": "Regionboundaries",
+                "legendBottom": 40,
+                "loaded": true,
+                "paint": Object {
+                  "line-color": "#444",
+                  "line-opacity": 0.6,
+                  "line-width": 2,
+                },
+                "source": Object {
+                  "layer": "som_adm_1-6k13xf",
+                  "type": "vector",
+                  "url": "mapbox://ona.bnc2rzsw",
+                },
+                "styleSpec": Object {
+                  "id": "regionboundaries",
+                  "layout": Object {},
+                  "paint": Object {
+                    "line-color": "#444",
+                    "line-opacity": 0.6,
+                    "line-width": 2,
+                  },
+                  "source": Object {
+                    "type": "vector",
+                    "url": "mapbox://ona.bnc2rzsw",
+                  },
+                  "source-layer": "som_adm_1-6k13xf",
+                  "type": "line",
+                  "visible": true,
+                },
+                "type": "line",
+                "visible": true,
+              },
+              Object {
+                "category": "Boundaries",
+                "filters": Object {},
+                "id": "district-boundaries",
+                "isChartMin": true,
+                "isLoading": false,
+                "label": "Districts boundaries",
+                "legendBottom": 40,
+                "loaded": true,
+                "paint": Object {
+                  "line-color": "#444",
+                  "line-opacity": 0.6,
+                  "line-width": 1,
+                },
+                "source": Object {
+                  "layer": "som_adm_2-0j5bly",
+                  "type": "vector",
+                  "url": "mapbox://ona.6gl2shzi",
+                },
+                "styleSpec": Object {
+                  "id": "district-boundaries",
+                  "layout": Object {},
+                  "paint": Object {
+                    "line-color": "#444",
+                    "line-opacity": 0.6,
+                    "line-width": 1,
+                  },
+                  "source": Object {
+                    "type": "vector",
+                    "url": "mapbox://ona.6gl2shzi",
+                  },
+                  "source-layer": "som_adm_2-0j5bly",
+                  "type": "line",
+                  "visible": true,
+                },
+                "type": "line",
+                "visible": true,
+              },
+            ],
+            "parent": "Boundaries & Labels",
           },
         },
       ],
@@ -192,157 +2031,46 @@ Object {
   "menuScroll": undefined,
   "noLayerText": undefined,
   "openCategories": Array [
-    "Severity of needs",
+    "Boundaries",
   ],
   "preparedLayers": Object {
-    "education": Object {
-      "aggregate": Object {
-        "accepted-filter-values": Array [
-          "all",
-          "all",
-        ],
-        "date-by": "submission/reporting_period",
-        "date-parse": Object {
-          "chunk": 0,
-          "split": " to ",
-        },
-        "extraProps": Array [
-          "total_15_18_adolscent",
-          "total_15_18_adolscent_girls",
-          "total_15_18_adolscent_boys",
-          "rc_rep/rc_boys_cal3",
-          "rc_rep/rc_girls_cal3",
-          "rc_rep/total3",
-          "submission/location_type",
-          "reporter/reporter_org",
-          "Settlement",
-          "submission/reporting_period",
-          "New_Camp_S",
-          "New_Camp_N",
-          "Upazila",
-        ],
-        "filter": Array [
-          "reporter/reporter_org",
-          "Upazila",
-        ],
-        "filter-label": Array [
-          "Partner",
-          "Upazila",
-        ],
-        "filter-type": Array [
-          "stops",
-          "stops",
-        ],
-        "group-by": "submission/rc_loc",
-        "timeseries": Object {
-          "field": "period",
-          "type": "cumulative",
-        },
-        "type": "sum",
-      },
-      "categories": Object {
-        "breaks": "yes",
-        "clusters": 7,
-        "color": "RdPu",
-      },
-      "category": "Education",
-      "credit": "Adolescents (15-18 years) enrolled in non-formal/formal education.",
-      "data-parse": Object {
-        "submission/rc_loc": Object {
-          "key": Object {
-            "CXB-201": "Camp 1E",
-            "CXB-202": "Camp 1W",
-          },
-          "new-prop-name": "parsedUID",
-        },
-        "submission/reporting_period": Object {
-          "key": Object {
-            "t_A17-F18": "August 2017 to February 2018",
-            "t_jan": "January 1 to January 31",
-          },
-          "type": "single",
-        },
-      },
-      "detail-view": Object {
-        "UID": "SSID",
-        "basic-info": Array [
-          Object {
-            "alt": "GPS coordinates",
-            "icon": "screenshot",
-            "value": Object {
-              "join": ", ",
-              "prop": Array [
-                "longitude",
-                "latitude",
-              ],
-            },
-          },
-          Object {
-            "alt": "Reporter Org",
-            "icon": "user",
-            "value": "reporter/reporter_org",
-          },
-        ],
-        "sub-title": Object {
-          "prop": "New_Camp_N",
-        },
-        "title": Object {
-          "prop": "Site_name",
-        },
-      },
-      "id": "education",
-      "label": "RC - Adolescents (15-18 years) enrolled in non-formal/formal education",
-      "labels": Object {
-        "coordinates": Array [
-          "longitude",
-          "latitude",
-        ],
-        "data": "data/180320_Outline_Rohingya_refugee_camps_sites_centroids.csv",
-        "height": 30,
-        "join": Array [
-          "New_Camp_S",
-          "submission/rc_loc",
-        ],
-        "label": "<b> {{total_15_18_adolscent}} </b>",
-        "minZoom": 4.5,
-        "width": 30,
-      },
+    "Regionboundaries": Object {
+      "category": "Boundaries",
+      "filters": Object {},
+      "id": "regionboundaries",
+      "isChartMin": true,
+      "isLoading": false,
+      "label": "Regionboundaries",
+      "legendBottom": 40,
       "loaded": true,
-      "popup": Object {
-        "body": "<p style=text-align:left;> <b>Girls:</b> {{total_15_18_adolscent_girls}} <br> <b>Boys:</b> {{total_15_18_adolscent_boys}}<span style=float:right;>",
-        "header": "parsedUID",
-      },
-      "property": "total_15_18_adolscent",
-      "rohingyaIndicators": Object {
-        "location_type": "submission/location_type",
-        "rc_boys": "rc_rep/rc_boys_cal3",
-        "rc_girls": "rc_rep/rc_girls_cal3",
-        "rc_total": "rc_rep/total3",
+      "paint": Object {
+        "line-color": "#444",
+        "line-opacity": 0.6,
+        "line-width": 2,
       },
       "source": Object {
-        "data": Array [
-          315361,
-          "/data/180320_Outline_Rohingya_refugee_camps_sites_centroids.csv",
-        ],
-        "join": Array [
-          "SSID",
-          "submission/rc_loc",
-          "New_Camp_S",
-        ],
-        "layer": "180528_outline_rohingya_refug-c2ep2k",
-        "relation": Object {
-          "key": Array [
-            "vector",
-            "many",
-            "one",
-          ],
-          "type": "one-to-many",
-        },
+        "layer": "som_adm_1-6k13xf",
         "type": "vector",
-        "url": "mapbox://ona.5t6fsdlt",
+        "url": "mapbox://ona.bnc2rzsw",
       },
-      "type": "fill",
-      "visible": false,
+      "styleSpec": Object {
+        "id": "regionboundaries",
+        "layout": Object {},
+        "paint": Object {
+          "line-color": "#444",
+          "line-opacity": 0.6,
+          "line-width": 2,
+        },
+        "source": Object {
+          "type": "vector",
+          "url": "mapbox://ona.bnc2rzsw",
+        },
+        "source-layer": "som_adm_1-6k13xf",
+        "type": "line",
+        "visible": true,
+      },
+      "type": "line",
+      "visible": true,
     },
   },
   "regions": Array [
@@ -402,154 +2130,43 @@ Object {
   "mapId": "map-1",
   "openCategoryForLayers": [Function],
   "preparedLayers": Object {
-    "education": Object {
-      "aggregate": Object {
-        "accepted-filter-values": Array [
-          "all",
-          "all",
-        ],
-        "date-by": "submission/reporting_period",
-        "date-parse": Object {
-          "chunk": 0,
-          "split": " to ",
-        },
-        "extraProps": Array [
-          "total_15_18_adolscent",
-          "total_15_18_adolscent_girls",
-          "total_15_18_adolscent_boys",
-          "rc_rep/rc_boys_cal3",
-          "rc_rep/rc_girls_cal3",
-          "rc_rep/total3",
-          "submission/location_type",
-          "reporter/reporter_org",
-          "Settlement",
-          "submission/reporting_period",
-          "New_Camp_S",
-          "New_Camp_N",
-          "Upazila",
-        ],
-        "filter": Array [
-          "reporter/reporter_org",
-          "Upazila",
-        ],
-        "filter-label": Array [
-          "Partner",
-          "Upazila",
-        ],
-        "filter-type": Array [
-          "stops",
-          "stops",
-        ],
-        "group-by": "submission/rc_loc",
-        "timeseries": Object {
-          "field": "period",
-          "type": "cumulative",
-        },
-        "type": "sum",
-      },
-      "categories": Object {
-        "breaks": "yes",
-        "clusters": 7,
-        "color": "RdPu",
-      },
-      "category": "Education",
-      "credit": "Adolescents (15-18 years) enrolled in non-formal/formal education.",
-      "data-parse": Object {
-        "submission/rc_loc": Object {
-          "key": Object {
-            "CXB-201": "Camp 1E",
-            "CXB-202": "Camp 1W",
-          },
-          "new-prop-name": "parsedUID",
-        },
-        "submission/reporting_period": Object {
-          "key": Object {
-            "t_A17-F18": "August 2017 to February 2018",
-            "t_jan": "January 1 to January 31",
-          },
-          "type": "single",
-        },
-      },
-      "detail-view": Object {
-        "UID": "SSID",
-        "basic-info": Array [
-          Object {
-            "alt": "GPS coordinates",
-            "icon": "screenshot",
-            "value": Object {
-              "join": ", ",
-              "prop": Array [
-                "longitude",
-                "latitude",
-              ],
-            },
-          },
-          Object {
-            "alt": "Reporter Org",
-            "icon": "user",
-            "value": "reporter/reporter_org",
-          },
-        ],
-        "sub-title": Object {
-          "prop": "New_Camp_N",
-        },
-        "title": Object {
-          "prop": "Site_name",
-        },
-      },
-      "id": "education",
-      "label": "RC - Adolescents (15-18 years) enrolled in non-formal/formal education",
-      "labels": Object {
-        "coordinates": Array [
-          "longitude",
-          "latitude",
-        ],
-        "data": "data/180320_Outline_Rohingya_refugee_camps_sites_centroids.csv",
-        "height": 30,
-        "join": Array [
-          "New_Camp_S",
-          "submission/rc_loc",
-        ],
-        "label": "<b> {{total_15_18_adolscent}} </b>",
-        "minZoom": 4.5,
-        "width": 30,
-      },
+    "Regionboundaries": Object {
+      "category": "Boundaries",
+      "filters": Object {},
+      "id": "regionboundaries",
+      "isChartMin": true,
+      "isLoading": false,
+      "label": "Regionboundaries",
+      "legendBottom": 40,
       "loaded": true,
-      "popup": Object {
-        "body": "<p style=text-align:left;> <b>Girls:</b> {{total_15_18_adolscent_girls}} <br> <b>Boys:</b> {{total_15_18_adolscent_boys}}<span style=float:right;>",
-        "header": "parsedUID",
-      },
-      "property": "total_15_18_adolscent",
-      "rohingyaIndicators": Object {
-        "location_type": "submission/location_type",
-        "rc_boys": "rc_rep/rc_boys_cal3",
-        "rc_girls": "rc_rep/rc_girls_cal3",
-        "rc_total": "rc_rep/total3",
+      "paint": Object {
+        "line-color": "#444",
+        "line-opacity": 0.6,
+        "line-width": 2,
       },
       "source": Object {
-        "data": Array [
-          315361,
-          "/data/180320_Outline_Rohingya_refugee_camps_sites_centroids.csv",
-        ],
-        "join": Array [
-          "SSID",
-          "submission/rc_loc",
-          "New_Camp_S",
-        ],
-        "layer": "180528_outline_rohingya_refug-c2ep2k",
-        "relation": Object {
-          "key": Array [
-            "vector",
-            "many",
-            "one",
-          ],
-          "type": "one-to-many",
-        },
+        "layer": "som_adm_1-6k13xf",
         "type": "vector",
-        "url": "mapbox://ona.5t6fsdlt",
+        "url": "mapbox://ona.bnc2rzsw",
       },
-      "type": "fill",
-      "visible": false,
+      "styleSpec": Object {
+        "id": "regionboundaries",
+        "layout": Object {},
+        "paint": Object {
+          "line-color": "#444",
+          "line-opacity": 0.6,
+          "line-width": 2,
+        },
+        "source": Object {
+          "type": "vector",
+          "url": "mapbox://ona.bnc2rzsw",
+        },
+        "source-layer": "som_adm_1-6k13xf",
+        "type": "line",
+        "visible": true,
+      },
+      "type": "line",
+      "visible": true,
     },
   },
   "searchBarColor": undefined,

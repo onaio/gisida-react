@@ -129,51 +129,6 @@ describe('getMenuGroupVisibleLayers', () => {
   });
 });
 
-describe('getMenuGroupMapLayers', () => {
-  it('returns all layer ids for a group without subgroups', () => {
-    const groupName = 'UNICEF';
-    const children = [fixtures.mapLayer1, fixtures.mapLayer2];
-
-    expect(utils.getMenuGroupMapLayers(groupName, children)).toEqual([
-      fixtures.mapLayer1.id,
-      fixtures.mapLayer2.id,
-    ]);
-  });
-
-  it('returns returns all layer Ids for a group with subgroups', () => {
-    const groupName = 'WASH';
-    const children = [
-      {
-        UNICEF: {
-          category: 'UNICEF',
-          layers: [fixtures.mapLayer1, fixtures.mapLayer2],
-        },
-        Cluster: {
-          category: 'Cluster',
-          layers: [
-            {
-              Province: {
-                category: 'Province',
-                layers: [fixtures.mapLayer3],
-              },
-              District: {
-                category: 'District',
-                layers: [fixtures.mapLayer4],
-              },
-            },
-          ],
-        },
-      },
-    ];
-    expect(utils.getMenuGroupMapLayers(groupName, children)).toEqual([
-      fixtures.mapLayer1.id,
-      fixtures.mapLayer2.id,
-      fixtures.mapLayer3.id,
-      fixtures.mapLayer4.id,
-    ]);
-  });
-});
-
 describe('menuGroupHasVisibleLayers', () => {
   it('returns true if a group with no subgroups has visible layers', () => {
     const groupName = 'UNICEF';
@@ -332,5 +287,13 @@ describe('getSharedStyleFromURL', () => {
       search: '?map-1-layers=layer-1&map-1-style=something',
     });
     expect(utils.getSharedStyleFromURL('map-1')).toEqual(NaN);
+  });
+});
+
+describe('getCategoryForLayers', () => {
+  it('Return categories for layers', () => {
+    expect(utils.getCategoryForLayers(['banadir-labels'], fixtures.categories)).toEqual([
+      {"categoryName": "Boundaries & Labels", "layerId": "banadir-labels"}
+    ]);
   });
 });
