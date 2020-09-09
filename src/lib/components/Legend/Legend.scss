@@ -229,9 +229,7 @@
 .legend-row {
   &:not(.primary) {
     cursor: pointer;
-    & > * {
-      display: none;
-    }
+
     b {
       display: inline-block;
       font-weight: normal;
