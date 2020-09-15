@@ -367,69 +367,74 @@ export const getMenuGroupMapLayers = (groupName, children) => {
     // Return the Ids of layers for the group
     return children.map(child => child.id);
   }
-}
+};
+
+/**
+ * Get which category each layer id in the given array belongs to
+ * @param {*} layersToOpenCategory The array of layer ids to get category for
+ * @param {*} categories All categories
+ */
 export function getCategoryForLayers(layersToOpenCategory, categories) {
   const layerCategory = [];
   if (layersToOpenCategory && categories) {
-    layersToOpenCategory
-      .forEach(sharedLayer => {
-        let i = 0;
-        /**
-         * A layer belongs to only one category. So if we found its
-         * category, use this flag to break from the loop
-         */
-        const catFound = false;
+    layersToOpenCategory.forEach(sharedLayer => {
+      let i = 0;
+      /**
+       * A layer belongs to only one category. So if we found its
+       * category, use this flag to break from the loop
+       */
+      const catFound = false;
 
-        while (!catFound && i < categories.length) {
-          const category = categories[i];
-          let j = 0;
+      while (!catFound && i < categories.length) {
+        const category = categories[i];
+        let j = 0;
 
-          while (!catFound && j < category.layers.length) {
-            const layer = category.layers[j];
+        while (!catFound && j < category.layers.length) {
+          const layer = category.layers[j];
 
-            if (!layer.id) {
-              /**
-               * This is a group. So continue checking down the hierarchy
-               * for visible layers
-               */
-              const groupNames = Object.keys(layer);
-              let k = 0;
+          if (!layer.id) {
+            /**
+             * This is a group. So continue checking down the hierarchy
+             * for visible layers
+             */
+            const groupNames = Object.keys(layer);
+            let k = 0;
 
-              while (!catFound && k < groupNames.length) {
-                const groupName = groupNames[k];
+            while (!catFound && k < groupNames.length) {
+              const groupName = groupNames[k];
 
-                const children = layer[groupName].layers;
-                const groupMapLayerIds = getMenuGroupMapLayers(groupName, children);
+              const children = layer[groupName].layers;
+              const groupMapLayerIds = getMenuGroupMapLayers(groupName, children);
 
-                if (
-                  groupMapLayerIds.indexOf(sharedLayer) >= 0 ||
-                  groupMapLayerIds.indexOf(`${sharedLayer}.json`) >= 0
-                ) {
-                    layerCategory.push({
-                        layerId: sharedLayer,
-                        categoryName: category.category
-                    })
-                }
-
-                k += 1;
-              } // group while
-            } else {
-              // This category has one level only
-              // eslint-disable-next-line no-lonely-if
-              if (layer.id === sharedLayer || layer.id === `${sharedLayer}.json`) {
+              if (
+                groupMapLayerIds.indexOf(sharedLayer) >= 0 ||
+                groupMapLayerIds.indexOf(`${sharedLayer}.json`) >= 0
+              ) {
                 layerCategory.push({
-                    layerId: sharedLayer,
-                    categoryName: category.category
-                })
+                  layerId: sharedLayer,
+                  categoryName: category.category,
+                });
               }
+
+              k += 1;
+            } // group while
+          } else {
+            // This category has one level only
+            // eslint-disable-next-line no-lonely-if
+            if (layer.id === sharedLayer || layer.id === `${sharedLayer}.json`) {
+              layerCategory.push({
+                layerId: sharedLayer,
+                categoryName: category.category,
+              });
             }
+          }
 
-            j += 1;
-          } // category layers while
+          j += 1;
+        } // category layers while
 
-          i += 1;
-        } // categories while
-      });
+        i += 1;
+      } // categories while
+    });
   }
-  return layerCategory
+  return layerCategory;
 }

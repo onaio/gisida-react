@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Actions, buildCategories } from 'gisida';
+import { Actions } from 'gisida';
 import Layers from '../Layers/Layers';
 import SearchBar from '../Searchbar/SearchBar';
 import ConnectedLayers from '../Layers/ConnectedLayers';
@@ -11,13 +11,9 @@ import { debounce } from 'lodash';
 import { getSharedLayersFromURL, getCategoryForLayers } from '../../utils';
 
 const mapStateToProps = (state, ownProps) => {
-  const { mapId, categoriesProp } = ownProps;
+  const { mapId } = ownProps;
   const MAP = state[mapId] || { layers: {} };
-  const { LAYERS, AUTH, APP, VIEW } = state;
-  let categories;
-  if (Object.keys(LAYERS.groups).length && MAP || Object.keys(MAP.layers).length) {
-    categories = categoriesProp || buildCategories(LAYERS, MAP); 
-  }
+  const { LAYERS, AUTH, APP, VIEW, CATEGORIES } = state;
   const { NULL_LAYER_TEXT } = APP;
 
   // Get current region
@@ -27,7 +23,7 @@ const mapStateToProps = (state, ownProps) => {
       : '';
   return {
     mapId,
-    categories,
+    categories: CATEGORIES,
     // layers, // todo - support layers without categories
     LAYERS,
     AUTH,
@@ -64,6 +60,7 @@ class Menu extends Component {
       searching: false,
       searchResults: [],
       sharedLayers,
+      categories: [],
     };
 
     /**
@@ -120,13 +117,13 @@ class Menu extends Component {
     const { categories } = this.props;
 
     if (layersToOpenCategory && categories) {
-        const { categories } = this.props;
-        const layers = getCategoryForLayers(layersToOpenCategory, categories)
-        layers.forEach(e => {
-          this.openCategoryForSharedLayer(e.category, e.layerId);
-        })
-      }
+      const { categories } = this.props;
+      const layers = getCategoryForLayers(layersToOpenCategory, categories);
+      layers.forEach(e => {
+        this.openCategoryForSharedLayer(e.category, e.layerId);
+      });
     }
+  }
 
   /**
    * Toggle a category for a shared layer and update category
@@ -415,6 +412,7 @@ class Menu extends Component {
     } = this.props;
     const childrenPositionClass = childrenPosition || 'top';
     const marginTop = hasNavBar ? '-80px' : 0;
+
     return (
       <div>
         <div>

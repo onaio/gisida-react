@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
 import { menuGroupHasVisibleLayers } from '../../utils';
-import { DATA_NOT_AVAILABLE } from '../../constants'
+import { DATA_NOT_AVAILABLE } from '../../constants';
 
 export class Layers extends Component {
   constructor(props) {
@@ -15,7 +15,7 @@ export class Layers extends Component {
             if (layer[l].layers.length) {
               groups[l] = { isOpen: menuGroupHasVisibleLayers(l, layer[l].layers) };
             } else {
-              groups[l] = { isOpen: false }
+              groups[l] = { isOpen: false };
             }
           });
         }
@@ -53,7 +53,16 @@ export class Layers extends Component {
   }
 
   render() {
-    const { mapId, hyperLink, sector, layers, currentRegion, preparedLayers, auth, noLayerText } = this.props;
+    const {
+      mapId,
+      hyperLink,
+      sector,
+      layers,
+      currentRegion,
+      preparedLayers,
+      auth,
+      noLayerText,
+    } = this.props;
     let layerKeys;
     let layerObj;
     let layerItem = [];
@@ -83,7 +92,8 @@ export class Layers extends Component {
 
     layers.forEach(layer => {
       if (
-        (!currentRegion || (layer.region && layer.region === currentRegion)) &&
+        (!currentRegion ||
+          (preparedLayers[layer.id].region && preparedLayers[layer.id].region === currentRegion)) &&
         !subLayerIds.includes(layer.id)
       ) {
         if (layer.id && (!auth || !auth.authConfigs)) {
