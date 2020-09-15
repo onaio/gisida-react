@@ -22,7 +22,6 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 export class ConnectedLayers extends Component {
-
   componentDidUpdate(prevProps) {
     if (JSON.stringify(this.props.layers) !== JSON.stringify(prevProps.layers)) {
       /** Check if updated children down the hierarchy have
@@ -87,16 +86,7 @@ export class ConnectedLayers extends Component {
     );
   }
   render() {
-    const {
-      mapId,
-      layers,
-      currentRegion,
-      preparedLayers,
-      auth,
-      hyperLink,
-      sector,
-      openGroups,
-    } = this.props;
+    const { mapId, layers, currentRegion, preparedLayers, auth, hyperLink } = this.props;
     let layerKeys;
     let layerObj;
     let layerItem = [];
@@ -115,7 +105,8 @@ export class ConnectedLayers extends Component {
     }
     layers.forEach(layer => {
       if (
-        (!currentRegion || (layer.region && layer.region === currentRegion)) &&
+        (!currentRegion ||
+          (preparedLayers[layer.id].region && preparedLayers[layer.id].region === currentRegion)) &&
         !subLayerIds.includes(layer.id)
       ) {
         if (layer.id && (!auth || !auth.authConfigs)) {
@@ -162,7 +153,7 @@ export class ConnectedLayers extends Component {
                 <a
                   key={`${d}-${i}-link`}
                   className={
-                    (hyperLink && hyperLink[`${parent} ${d}`])
+                    hyperLink && hyperLink[`${parent} ${d}`]
                       ? `sub-category hyperlink`
                       : 'sub-category'
                   }
@@ -175,17 +166,19 @@ export class ConnectedLayers extends Component {
                     }`}
                   />
                 </a>
-                {   (hyperLink && hyperLink[`${parent} ${d}`]) ? (
+                {hyperLink && hyperLink[`${parent} ${d}`] ? (
                   <span className="sub-category-links">
                     <a
-                      href={(hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].link)}
+                      href={hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].link}
                       target="_blank"
                       className="glyphicon glyphicon-list-alt hyperlink"
                     ></a>
-                    {(hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].description) ? (
+                    {hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].description ? (
                       <div className="description">
                         <span className="glyphicon glyphicon-info-sign" />
-                        <p>{hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].description}</p>
+                        <p>
+                          {hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].description}
+                        </p>
                       </div>
                     ) : (
                       ''
