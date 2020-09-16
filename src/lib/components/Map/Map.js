@@ -31,7 +31,6 @@ import {
   HIGHLIGHT_PAINT,
   VECTOR_PROP,
   CATEGORICAL,
-  MAP_2,
 } from '../../constants';
 
 const mapStateToProps = (state, ownProps) => {
@@ -1090,7 +1089,7 @@ class Map extends Component {
      * Workaround to resolve the very slow loading time when map-2 is present
      * We wait until map-1 is loaded before loading map-2
      */
-    if (this.props.mapId === MAP_2 && !this.props.isMap1Loaded) {
+    if (this.props.mapId !== MAP_1 && !this.props.isMap1Loaded) {
       return null;
     }
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility

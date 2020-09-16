@@ -8,7 +8,6 @@ export const HIGHLIGHT_FILTER_PROPERTY = 'highlight-filter-property';
 export const DASH_HIGHLIGHT = '-highlight';
 export const HIGHLIGHT = 'highlight';
 export const MAP_1 = 'map-1';
-export const MAP_2 = 'map-2';
 export const ACTIVE_LAYER_SUPERSET_LINK = 'activeLayerSupersetLink';
 export const CHART = 'chart';
 export const METRIC = 'metric';
