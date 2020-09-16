@@ -24,7 +24,6 @@ const mapStateToProps = (state, ownProps) => {
   return {
     mapId,
     categories: CATEGORIES,
-    // layers, // todo - support layers without categories
     LAYERS,
     AUTH,
     menuId: 'sector-menu-1',
@@ -180,39 +179,6 @@ class Menu extends Component {
   };
 
   /**
-   * Modify a group by giving its group and nested groups a count (or ID)
-   * This will make sure when we toggle a group, another group with the
-   * exact same name is not toggled. The array of open groups is stored as an
-   * array of group names in the store. Another implementaion would to give each group a random number but
-   * this means different menu instances will have groups that have different Ids which we do not
-   * want (We would like menu instances under the same map ID to behave the same. If say I open a group in one
-   * menu, it should appear open in another other). A contigous int counter is
-   * therefore used to ensure the counter for a group in different menu instances is the same,
-   * and also, groups in the same menu instances do not share a count.
-   * @param {Object} layer Category layer
-   * @param {number} groupCounter Group counter (or ID) that will give each group a number
-   * @returns {Object} Modified layer and current group counter increment
-   */
-  insertGroupCount(layer, groupCounter) {
-    Object.keys(layer).forEach(key => {
-      layer[key].count = groupCounter;
-      groupCounter += 1;
-
-      layer[key].layers.forEach(keyLayer => {
-        if (!keyLayer.id) {
-          // Layer has no id so this is a group
-          keyLayer = this.insertGroupCount(keyLayer, groupCounter);
-        }
-      });
-    });
-
-    return {
-      layer,
-      groupCounter,
-    };
-  }
-
-  /**
    * this update state of searching to false
    */
   searchResultClick() {
@@ -253,28 +219,6 @@ class Menu extends Component {
       this.setState({ searching: inputPresent });
     }
   }
-
-  /**
-   * Generic function to modify categories. If you need to modify/extend categories,
-   * do it here
-   * @param {array} categories Menu categories and their subgroups and layers
-   * @returns {array} Extended/Modified categories
-   */
-  parseCategories = memoize(categories => {
-    let groupCounter = 0;
-    categories.forEach(category => {
-      category.layers.forEach(layer => {
-        if (!layer.id) {
-          // Layer has no id, so it's a group, give it a count (or an ID)
-          const obj = this.insertGroupCount(layer, groupCounter);
-          layer = obj.layer;
-          groupCounter = obj.groupCounter;
-        }
-      });
-    });
-
-    return categories;
-  });
 
   /**
    * Check if a user has permission to access layer
@@ -399,7 +343,7 @@ class Menu extends Component {
     const children = React.Children.map(this.props.children, child => {
       return React.cloneElement(child, { mapId });
     });
-    const categories = this.parseCategories(this.getAccessibleCategories(this.props.categories));
+    const categories = this.getAccessibleCategories(this.props.categories);
     const {
       regions,
       currentRegion,
