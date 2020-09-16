@@ -58,7 +58,7 @@ export class Layer extends Component {
           type="checkbox"
           data-layer={layer.id}
           onChange={e => this.onLayerToggle(layer)}
-          checked={MAP.layers[layer.id]}
+          checked={MAP.layers[layer.id].visible}
         />
         <label htmlFor={`${layer.id}-${mapId}`}>{layer.label}</label>
       </li>
