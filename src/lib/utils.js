@@ -378,7 +378,7 @@ export function getSharedStyleFromURL(mapId) {
 export function getCategoryForLayers(layersToOpenCategory, categories) {
   const layerCategory = [];
 
-  layersToOpenCategory.forEach(sharedLayer => {
+  layersToOpenCategory.forEach(layerToOpenCategory => {
     let i = 0;
     /**
      * A layer belongs to only one category. So if we found its
@@ -408,11 +408,11 @@ export function getCategoryForLayers(layersToOpenCategory, categories) {
             const groupMapLayerIds = getMenuGroupMapLayers(groupName, children);
 
             if (
-              groupMapLayerIds.indexOf(sharedLayer) >= 0 ||
-              groupMapLayerIds.indexOf(`${sharedLayer}.json`) >= 0
+              groupMapLayerIds.indexOf(layerToOpenCategory) >= 0 ||
+              groupMapLayerIds.indexOf(`${layerToOpenCategory}.json`) >= 0
             ) {
               layerCategory.push({
-                layerId: sharedLayer,
+                layerId: layerToOpenCategory,
                 categoryName: category.category,
               });
             }
@@ -422,9 +422,9 @@ export function getCategoryForLayers(layersToOpenCategory, categories) {
         } else {
           // This category has one level only
           // eslint-disable-next-line no-lonely-if
-          if (layer.id === sharedLayer || layer.id === `${sharedLayer}.json`) {
+          if (layer.id === layerToOpenCategory || layer.id === `${layerToOpenCategory}.json`) {
             layerCategory.push({
-              layerId: sharedLayer,
+              layerId: layerToOpenCategory,
               categoryName: category.category,
             });
           }
