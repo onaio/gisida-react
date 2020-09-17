@@ -6,9 +6,9 @@ import Layers from '../Layers/Layers';
 import SearchBar from '../Searchbar/SearchBar';
 import ConnectedLayers from '../Layers/ConnectedLayers';
 import './Menu.scss';
-import memoize from 'memoize-one';
 import { debounce } from 'lodash';
 import { getSharedLayersFromURL, getCategoryForLayers } from '../../utils';
+import { getAccessibleCategories } from './utils';
 
 const mapStateToProps = (state, ownProps) => {
   const { mapId } = ownProps;
@@ -95,7 +95,7 @@ class Menu extends Component {
     this.delayedMenuScrollCallback(event);
   };
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     if (this.props.showMap && this.props.showMap !== prevProps.showMap && this.props.menuScroll) {
       this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop;
     }
@@ -106,6 +106,14 @@ class Menu extends Component {
        * open them
        */
       this.openCategoryForLayers(sharedLayers);
+    }
+
+    /** Filter which categories the user has access to */
+    if (!prevState.categories.length && this.props.categories.length) {
+      const { userInfo, authConfigs } = this.props.AUTH;
+      this.setState({
+        categories: getAccessibleCategories(this.props.categories, authConfigs, userInfo),
+      });
     }
   }
 
@@ -220,122 +228,8 @@ class Menu extends Component {
     }
   }
 
-  /**
-   * Check if a user has permission to access layer
-   * @param {Object} authConfigs - Authentication configurations
-   * @param {Object} userInfo - User details
-   */
-  canAccessLayer(layer, authConfigs, userInfo) {
-    const LocalAuthConfig = JSON.parse(localStorage.getItem('authConfig'));
-    // list of users with access to the layer
-    const users = authConfigs && authConfigs.LAYERS && authConfigs.LAYERS[layer.id];
-    authConfigs.LAYERS = authConfigs.LAYERS || LocalAuthConfig.LAYERS;
-
-    return (
-      (users && userInfo && users.includes(userInfo.username)) ||
-      (authConfigs.LAYERS &&
-        authConfigs.LAYERS.ALL &&
-        authConfigs.LAYERS.ALL.includes(userInfo.username))
-    );
-  }
-
-  /**
-   * Return an accesible group layer. If the layer has no accessible children
-   * return false, else return the modified layer with the accessible children
-   * @param {Object} layer - Group layer
-   * @param {Object} authConfigs - Authentication configurations
-   * @param {Object} userInfo - Auth user details
-   */
-  getAccessibleGroupLayer(layer, authConfigs, userInfo) {
-    const layerKeys = Object.keys(layer);
-    const accessibleKeys = [];
-
-    layerKeys.forEach(key => {
-      const accessibleKeySubLayers = [];
-
-      layer[key].layers.forEach(subLayer => {
-        if (!subLayer.id) {
-          const groupSubLayer = this.getAccessibleGroupLayer(subLayer, authConfigs, userInfo);
-
-          if (groupSubLayer) {
-            accessibleKeySubLayers.push(groupSubLayer);
-          }
-        } else {
-          if (this.canAccessLayer(subLayer, authConfigs, userInfo)) {
-            accessibleKeySubLayers.push(subLayer);
-          }
-        }
-      });
-
-      if (accessibleKeySubLayers.length > 0) {
-        // Modify sublayers, only return those which user has access to
-        layer[key].layers = accessibleKeySubLayers;
-        accessibleKeys.push(key);
-      }
-    });
-
-    layerKeys.forEach(key => {
-      if (!accessibleKeys.includes(key) && layer[key].layers.length) {
-        // Delete key if key is not in accessible keys
-        delete layer[key];
-      }
-    });
-
-    // Now get the final keys. If keys exist, return modified layer
-    if (Object.keys(layer).length > 0) {
-      return layer;
-    }
-
-    return false;
-  }
-
-  /**
-   * Get which categories and their groups and nested groups user has
-   * permission to view
-   * @returns {array} Filtered categories
-   */
-  getAccessibleCategories = memoize(categories => {
-    if (!this.props.AUTH) {
-      // If no authenitcation, then all categories are accessible.
-      return categories;
-    }
-
-    const filteredCategories = [];
-    const { userInfo, authConfigs } = this.props.AUTH;
-    categories.forEach(category => {
-      let accesibleLayers = [];
-
-      category.layers.forEach(layer => {
-        if (!authConfigs || !authConfigs.LAYERS) {
-          // If auth exists but authconfigs have not loaded. Bug should be fixed from ONA data and gisida core
-          accesibleLayers.push(layer);
-        } else if (!layer.id) {
-          const groupLayer = this.getAccessibleGroupLayer(layer, authConfigs, userInfo);
-
-          if (groupLayer) {
-            accesibleLayers.push(groupLayer);
-          }
-        } else {
-          if (this.canAccessLayer(layer, authConfigs, userInfo)) {
-            accesibleLayers.push(layer);
-          }
-        }
-      });
-
-      if (accesibleLayers.length > 0) {
-        // Modify category layers with the new updated layers
-        category.layers = accesibleLayers;
-        filteredCategories.push(category);
-      }
-    });
-
-    return filteredCategories;
-  });
-
   render() {
-    if (!this.props.categories) return null;
-
-    const { searching, searchResults } = this.state;
+    const { searching, searchResults, categories } = this.state;
     const { disableDefault, showSearchBar, hyperLink } = this.props;
     if (disableDefault) return this.props.children || null;
 
@@ -343,7 +237,6 @@ class Menu extends Component {
     const children = React.Children.map(this.props.children, child => {
       return React.cloneElement(child, { mapId });
     });
-    const categories = this.getAccessibleCategories(this.props.categories);
     const {
       regions,
       currentRegion,
