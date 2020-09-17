@@ -50,8 +50,6 @@ export class ConnectedLayers extends Component {
    * @param {string} parent parent of layer to be toggled
    */
   toggleSubMenu(e, layer, parent) {
-    console.log('layer', layer);
-    console.log('parent', parent);
     e.preventDefault();
     this.toggleGroup(layer, parent);
   }
