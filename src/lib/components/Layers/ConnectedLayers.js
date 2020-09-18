@@ -148,6 +148,11 @@ export class ConnectedLayers extends Component {
         } else {
           Object.keys(layer).forEach((d, i) => {
             const parent = Object.values(layers.find(l => l[d]))[0].parent;
+            const descStyle =  !(hyperLink && hyperLink[`${parent} ${d}`] &&
+             hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].link) ?
+             {
+              marginLeft: "45px"
+             } : null;
             layerItem = layerItem.concat([
               <li>
                 <a
@@ -168,13 +173,14 @@ export class ConnectedLayers extends Component {
                 </a>
                 {hyperLink && hyperLink[`${parent} ${d}`] ? (
                   <span className="sub-category-links">
-                    <a
+                    { hyperLink && hyperLink[`${parent} ${d}`] &&
+                     hyperLink[`${parent} ${d}`].link ? (<a
                       href={hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].link}
                       target="_blank"
                       className="glyphicon glyphicon-list-alt hyperlink"
-                    ></a>
+                    ></a>) : null}
                     {hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].description ? (
-                      <div className="description">
+                      <div className="description" style={descStyle}>
                         <span className="glyphicon glyphicon-info-sign" />
                         <p>
                           {hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].description}

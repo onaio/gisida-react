@@ -439,12 +439,20 @@ class Menu extends Component {
                       <li />
                     )}
                     {(categories && categories.length) > 0 ? (
-                      categories.map((category, i) => (
+                      categories.map((category, i) => {
+                        const descriptionStyle = !(hyperLink && hyperLink[category.category] &&
+                         hyperLink[category.category].link) ? {
+                          marginLeft: "33px"
+                        } : null;
+                        return(
                         <li
                           className={`${
                             hyperLink &&
                             hyperLink[category.category] &&
-                            hyperLink[category.category].link
+                            hyperLink[category.category].link ||
+                            hyperLink &&
+                            hyperLink[category.category] &&
+                            hyperLink[category.category].description
                               ? 'sector hyperlink'
                               : 'sector'
                           }`}
@@ -454,7 +462,10 @@ class Menu extends Component {
                             className={`${
                               hyperLink &&
                               hyperLink[category.category] &&
-                              hyperLink[category.category].link
+                              hyperLink[category.category].link ||
+                              hyperLink &&
+                              hyperLink[category.category] &&
+                              hyperLink[category.category].description
                                 ? 'sector hyperlink'
                                 : 'sector'
                             }`}
@@ -474,20 +485,20 @@ class Menu extends Component {
                           </a>
                           {hyperLink &&
                           hyperLink[category.category] &&
-                          hyperLink[category.category].link ? (
+                          hyperLink[category.category].link ||
+                          hyperLink &&
+                          hyperLink[category.category] &&
+                          hyperLink[category.category].description ? (
                             <span className="links">
-                              <a
+                              {hyperLink[category.category].link ? (
+                                <a
                                 href={hyperLink[category.category].link}
                                 target="_blank"
                                 className="glyphicon glyphicon-list-alt hyperlink"
                               ></a>
+                              ): null}
                               {hyperLink[category.category].description ? (
-                                //    <a
-                                //    href={hyperLink[category.category].description}
-                                //    target="_blank"
-                                //    className="glyphicon glyphicon-file hyperlink"
-                                //  ></a>
-                                <div className="description">
+                                <div className="description" style={descriptionStyle}>
                                   <span className="glyphicon glyphicon-info-sign" />
                                   <p>{hyperLink[category.category].description}</p>
                                 </div>
@@ -525,7 +536,7 @@ class Menu extends Component {
                             <ul />
                           )}
                         </li>
-                      ))
+                      )})
                     ) : (
                       <li></li>
                     )}
