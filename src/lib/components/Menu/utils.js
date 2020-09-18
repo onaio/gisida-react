@@ -1,7 +1,8 @@
 import memoize from 'memoize-one';
 
 /**
- * Check if a user has permission to access layer
+ * Returns true if a user has permission to access layer, false otherwise
+ * @param {string} layerId the layer name/id
  * @param {Object} authConfigs - Authentication configurations
  * @param {Object} userInfo - User details
  */
@@ -19,7 +20,7 @@ export const canAccessLayer = (layerId, authConfigs, userInfo) => {
 
 /**
  * Return an accesible group layer. If the layer has no accessible children
- * return false, else return the modified layer with the accessible children
+ * return false, else return the accessible children
  * @param {Object} layer - Group layer
  * @param {Object} authConfigs - Authentication configurations
  * @param {Object} userInfo - Auth user details
@@ -64,6 +65,9 @@ export const getAccessibleGroupLayer = (layer, authConfigs, userInfo) => {
 /**
  * Get which categories and their groups and nested groups user has
  * permission to view
+ * @param {array} categories array of categories to filter
+ * @param {Object} authConfigs - Authentication configurations
+ * @param {Object} userInfo - Auth user details
  * @returns {array} Filtered categories
  */
 export const getAccessibleCategories = memoize((categories, authConfigs, userInfo) => {

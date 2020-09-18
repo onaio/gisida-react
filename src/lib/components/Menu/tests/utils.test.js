@@ -179,4 +179,9 @@ describe('components/Menu/utils/getAccessibleCategories', () => {
       },
     ]);
   });
+
+  it('returns all categories if authConfigs and userInfo absent', () => {
+    const categories = [category1, category2];
+    expect(getAccessibleCategories(categories)).toEqual(categories);
+  });
 });
