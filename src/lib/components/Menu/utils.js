@@ -25,10 +25,9 @@ export const canAccessLayer = (layerId, authConfigs, userInfo) => {
  * @param {Object} userInfo - Auth user details
  */
 export const getAccessibleGroupLayer = (layer, authConfigs, userInfo) => {
-  const layerKeys = Object.keys(layer);
-  const accessibleKeys = [];
+  const accesibleGroup = {};
 
-  layerKeys.forEach(key => {
+  Object.keys(layer).forEach(key => {
     const accessibleKeySubLayers = [];
 
     layer[key].layers.forEach(subLayer => {
@@ -46,22 +45,17 @@ export const getAccessibleGroupLayer = (layer, authConfigs, userInfo) => {
     });
 
     if (accessibleKeySubLayers.length > 0) {
-      // Modify sublayers, only return those which user has access to
-      layer[key].layers = accessibleKeySubLayers;
-      accessibleKeys.push(key);
+      // Return sub layers which user has access to
+      accesibleGroup[key] = {
+        ...layer[key],
+        layers: accessibleKeySubLayers,
+      };
     }
   });
 
-  layerKeys.forEach(key => {
-    if (!accessibleKeys.includes(key) && layer[key].layers.length) {
-      // Delete key if key is not in accessible keys
-      delete layer[key];
-    }
-  });
-
-  // Now get the final keys. If keys exist, return modified layer
-  if (Object.keys(layer).length > 0) {
-    return layer;
+  // If user can access any layer with the group, return the group
+  if (Object.keys(accesibleGroup).length > 0) {
+    return accesibleGroup;
   }
 
   return false;
