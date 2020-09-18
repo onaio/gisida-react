@@ -296,7 +296,7 @@ export function getMenuGroupMapLayers(groupName, children) {
  * @param {*} groupName Name of the group which we want to target
  * @param {*} children Children of the group which we want to target
  */
-export function menuGroupHasVisibleLayers(groupName, children) {
+export function menuGroupHasVisibleLayers(groupName, children, activeLayerIds) {
   const subGroups = children.filter(child => !child.id);
 
   if (subGroups.length) {
@@ -312,7 +312,7 @@ export function menuGroupHasVisibleLayers(groupName, children) {
       while (!hasVisibleLayers && j < subGroupKeys.length) {
         const key = subGroupKeys[j];
 
-        if (menuGroupHasVisibleLayers(groupName, subGroup[key].layers)) {
+        if (menuGroupHasVisibleLayers(groupName, subGroup[key].layers, activeLayerIds)) {
           hasVisibleLayers = true;
         }
 
@@ -330,7 +330,7 @@ export function menuGroupHasVisibleLayers(groupName, children) {
     while (!hasVisibleChildren && m < children.length) {
       const child = children[m];
 
-      if (child.visible) {
+      if (activeLayerIds.includes(child.id)) {
         hasVisibleChildren = true;
       }
 

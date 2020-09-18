@@ -109,12 +109,13 @@ class Menu extends Component {
     }
 
     /** Filter which categories the user has access to */
-    if (!prevState.categories.length && this.props.categories.length) {
-      const { userInfo, authConfigs } = this.props.AUTH;
-      this.setState({
-        categories: getAccessibleCategories(this.props.categories, authConfigs, userInfo),
-      });
-    }
+    // if (!this.state.categories.length && this.props.categories.length) {
+    //   debugger
+    //   const { userInfo, authConfigs } = this.props.AUTH;
+    //   this.setState({
+    //     categories: getAccessibleCategories(this.props.categories, authConfigs, userInfo),
+    //   });
+    // }
   }
 
   /**
@@ -229,10 +230,11 @@ class Menu extends Component {
   }
 
   render() {
-    const { searching, searchResults, categories } = this.state;
+    const { searching, searchResults} = this.state;
     const { disableDefault, showSearchBar, hyperLink } = this.props;
     if (disableDefault) return this.props.children || null;
-
+    const { userInfo, authConfigs } = this.props.AUTH;
+    const categories = getAccessibleCategories(this.props.categories, authConfigs, userInfo);
     const { mapId } = this.props;
     const children = React.Children.map(this.props.children, child => {
       return React.cloneElement(child, { mapId });
@@ -249,7 +251,6 @@ class Menu extends Component {
     } = this.props;
     const childrenPositionClass = childrenPosition || 'top';
     const marginTop = hasNavBar ? '-80px' : 0;
-
     return (
       <div>
         <div>

@@ -19,30 +19,11 @@ const mapStateToProps = (state, ownProps) => {
     layers,
     currentRegion,
     preparedLayers,
+    activeLayerIds: MAP.activeLayerIds,
+    openCategories: MAP.openCategories,
   };
 };
 export class ConnectedLayers extends Component {
-  componentDidUpdate(prevProps) {
-    if (JSON.stringify(this.props.layers) !== JSON.stringify(prevProps.layers)) {
-      /** Check if updated children down the hierarchy have
-       * layers which are a visible. If so open the group
-       */
-      this.props.layers.forEach(layer => {
-        if (!layer.id) {
-          Object.keys(layer).forEach(groupName => {
-            const children = layer[groupName].layers;
-            const parent = layer[groupName].parent;
-            if (
-              !this.isGroupOpen(groupName, parent) &&
-              menuGroupHasVisibleLayers(groupName, children)
-            ) {
-              this.toggleGroup(groupName, parent);
-            }
-          });
-        }
-      });
-    }
-  }
   /**
    * Toggle open and close a menu group
    * @param {Object} e Event
@@ -51,6 +32,7 @@ export class ConnectedLayers extends Component {
    */
   toggleSubMenu(e, layer, parent) {
     e.preventDefault();
+    debugger;
     this.toggleGroup(layer, parent);
   }
   /**
@@ -85,8 +67,32 @@ export class ConnectedLayers extends Component {
         .length
     );
   }
+  /**
+   * 
+   * @param {Object} layers Map layers
+   * @param {Array} activeLayerIds visible map layers
+   */
+  openGroupForVisibleLayers(layers, activeLayerIds) {
+    layers.forEach(layer => {
+      if (!layer.id) {
+        Object.keys(layer).forEach(groupName => {
+          const children = layer[groupName].layers;
+          const parent = layer[groupName].parent;
+          if (
+            !this.isGroupOpen(groupName, parent) &&
+            menuGroupHasVisibleLayers(groupName, children, activeLayerIds)
+          ) {
+            this.toggleGroup(groupName, parent);
+          }
+        });
+      }
+    });
+  }
   render() {
-    const { mapId, layers, currentRegion, preparedLayers, auth, hyperLink } = this.props;
+    const { mapId, layers, currentRegion, preparedLayers, auth, hyperLink, activeLayerIds } = this.props;
+    if (activeLayerIds) {
+      this.openGroupForVisibleLayers(layers, activeLayerIds);
+    }
     let layerKeys;
     let layerObj;
     let layerItem = [];
