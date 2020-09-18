@@ -31,12 +31,12 @@ export class ConnectedLayers extends Component {
         if (!layer.id) {
           Object.keys(layer).forEach(groupName => {
             const children = layer[groupName].layers;
-            const groupCount = layer[groupName].count;
+            const parent = layer[groupName].parent;
             if (
-              !this.isGroupOpen(groupCount, groupName) &&
+              !this.isGroupOpen(groupName, parent) &&
               menuGroupHasVisibleLayers(groupName, children)
             ) {
-              this.toggleGroup(groupName, groupCount);
+              this.toggleGroup(groupName, parent);
             }
           });
         }
@@ -46,42 +46,42 @@ export class ConnectedLayers extends Component {
   /**
    * Toggle open and close a menu group
    * @param {Object} e Event
-   * @param {Object} layer Group to be toggled
-   * @param {number} groupCount Group count
+   * @param {string} layer layer to be toggled
+   * @param {string} parent parent of layer to be toggled
    */
-  toggleSubMenu(e, layer, groupCount) {
+  toggleSubMenu(e, layer, parent) {
     e.preventDefault();
-    this.toggleGroup(layer, groupCount);
+    this.toggleGroup(layer, parent);
   }
   /**
-   * @param {Object} layer Group to be toggled
-   * @param {number} groupCount Group count
+   * @param {string} layer layer to be toggled
+   * @param {string} parent parent of layer to be toggled
    */
-  toggleGroup(layer, groupCount) {
+  toggleGroup(layer, parent) {
     const { openGroups } = this.props;
     let index = -1;
-    let count = 0;
+    let i = 0;
     let found = false;
-    while (!found && count < openGroups.length) {
-      if (openGroups[count].count === groupCount && openGroups[count].group === layer) {
-        index = count;
+    while (!found && i < openGroups.length) {
+      if (openGroups[i].parent === parent && openGroups[i].group === layer) {
+        index = i;
         found = true;
       }
-      count += 1;
+      i += 1;
     }
-    this.props.dispatch(Actions.toggleGroups(this.props.mapId, layer, index, false, groupCount));
+    this.props.dispatch(Actions.toggleGroups(this.props.mapId, layer, index, false, parent));
   }
 
   /**
    * Get the group open state
-   * @param {number} groupCount Group count
-   * @param {string} groupName Group name
+   * @param {string} groupName name of the group
+   * @param {string} parent parent of the group
    * @returns {boolean} Whether the group is open or not
    */
-  isGroupOpen(groupCount, groupName) {
+  isGroupOpen(groupName, parent) {
     return (
       this.props.openGroups &&
-      this.props.openGroups.filter(group => group.count === groupCount && group.group === groupName)
+      this.props.openGroups.filter(group => group.parent === parent && group.group === groupName)
         .length
     );
   }
@@ -162,12 +162,12 @@ export class ConnectedLayers extends Component {
                       ? `sub-category hyperlink`
                       : 'sub-category'
                   }
-                  onClick={e => this.toggleSubMenu(e, d, layer[d].count)}
+                  onClick={e => this.toggleSubMenu(e, d, layer[d].parent)}
                 >
                   {d}
                   <span
                     className={`category glyphicon glyphicon-chevron-${
-                      this.isGroupOpen(layer[d].count, d) ? 'down' : 'right'
+                      this.isGroupOpen(d, layer[d].parent) ? 'down' : 'right'
                     }`}
                   />
                 </a>
@@ -192,7 +192,7 @@ export class ConnectedLayers extends Component {
                   </span>
                 ) : null}
               </li>,
-              this.isGroupOpen(layer[d].count, d) ? (
+              this.isGroupOpen(d, layer[d].parent) ? (
                 <ConnectedLayers
                   openGroups={this.props.openGroups}
                   dispatch={this.props.dispatch}
