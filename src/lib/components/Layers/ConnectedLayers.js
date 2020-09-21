@@ -32,7 +32,6 @@ export class ConnectedLayers extends Component {
    */
   toggleSubMenu(e, layer, parent) {
     e.preventDefault();
-    debugger;
     this.toggleGroup(layer, parent);
   }
   /**
