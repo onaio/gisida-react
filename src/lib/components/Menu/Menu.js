@@ -13,7 +13,7 @@ import { getAccessibleCategories } from './utils';
 const mapStateToProps = (state, ownProps) => {
   const { mapId } = ownProps;
   const MAP = state[mapId] || { layers: {} };
-  const { LAYERS, AUTH, APP, VIEW, CATEGORIES } = state;
+  const { AUTH, APP, VIEW, CATEGORIES } = state;
   const { NULL_LAYER_TEXT } = APP;
 
   // Get current region
@@ -24,7 +24,6 @@ const mapStateToProps = (state, ownProps) => {
   return {
     mapId,
     categories: CATEGORIES,
-    LAYERS,
     AUTH,
     menuId: 'sector-menu-1',
     mapTargetId: '',
@@ -95,7 +94,18 @@ class Menu extends Component {
     this.delayedMenuScrollCallback(event);
   };
 
-  componentDidUpdate(prevProps, prevState) {
+  static getDerivedStateFromProps(nextProps, prevState) {
+    /** Filter which categories the user has access to */
+    if (prevState.categories.length !== nextProps.categories.length && nextProps.AUTH) {
+      const { userInfo, authConfigs } = nextProps.AUTH;
+
+      return { categories: getAccessibleCategories(nextProps.categories, authConfigs, userInfo) };
+    }
+
+    return null;
+  }
+
+  componentDidUpdate(prevProps) {
     if (this.props.showMap && this.props.showMap !== prevProps.showMap && this.props.menuScroll) {
       this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop;
     }
@@ -107,15 +117,6 @@ class Menu extends Component {
        */
       this.openCategoryForLayers(sharedLayers);
     }
-
-    /** Filter which categories the user has access to */
-    // if (!this.state.categories.length && this.props.categories.length) {
-    //   debugger
-    //   const { userInfo, authConfigs } = this.props.AUTH;
-    //   this.setState({
-    //     categories: getAccessibleCategories(this.props.categories, authConfigs, userInfo),
-    //   });
-    // }
   }
 
   /**
@@ -230,11 +231,9 @@ class Menu extends Component {
   }
 
   render() {
-    const { searching, searchResults} = this.state;
+    const { searching, searchResults, categories } = this.state;
     const { disableDefault, showSearchBar, hyperLink } = this.props;
     if (disableDefault) return this.props.children || null;
-    const { userInfo, authConfigs } = this.props.AUTH;
-    const categories = getAccessibleCategories(this.props.categories, authConfigs, userInfo);
     const { mapId } = this.props;
     const children = React.Children.map(this.props.children, child => {
       return React.cloneElement(child, { mapId });
@@ -253,100 +252,104 @@ class Menu extends Component {
     const marginTop = hasNavBar ? '-80px' : 0;
     return (
       <div>
-        <div>
-          {this.props.loaded ? (
-            // Menu Wrapper
-            <div
-              onScroll={this.handleScroll}
-              ref={this.menuWrapper}
-              id={`${mapId}-menu-wrapper`}
-              className={`menu-wrapper ${childrenPositionClass}`}
-              style={{ marginTop }}
+        {this.props.loaded ? (
+          // Menu Wrapper
+          <div
+            onScroll={this.handleScroll}
+            ref={this.menuWrapper}
+            id={`${mapId}-menu-wrapper`}
+            className={`menu-wrapper ${childrenPositionClass}`}
+            style={{ marginTop }}
+          >
+            {/* Open menu button */}
+            <a
+              onClick={e => this.onToggleMenu(e)}
+              className="open-btn"
+              style={{ display: this.props.menuIsOpen ? 'none' : 'block' }}
             >
-              {/* Open menu button */}
-              <a
-                onClick={e => this.onToggleMenu(e)}
-                className="open-btn"
-                style={{ display: this.props.menuIsOpen ? 'none' : 'block' }}
-              >
-                <span className="glyphicon glyphicon-menu-hamburger"></span>
+              <span className="glyphicon glyphicon-menu-hamburger"></span>
+            </a>
+            {/* Menu */}
+            <div
+              id={`${mapId}-menu`}
+              className="sectors-menu"
+              style={{ display: this.props.menuIsOpen ? 'block' : 'none' }}
+            >
+              {/* Close menu button */}
+              <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
+                <span className="glyphicon glyphicon-remove"></span>
               </a>
-              {/* Menu */}
-              <div
-                id={`${mapId}-menu`}
-                className="sectors-menu"
-                style={{ display: this.props.menuIsOpen ? 'block' : 'none' }}
-              >
-                {/* Close menu button */}
-                <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
-                  <span className="glyphicon glyphicon-remove"></span>
-                </a>
 
-                {/* Children Elements (top) */}
-                {children && childrenPosition !== 'bottom' ? children : ''}
+              {/* Children Elements (top) */}
+              {children && childrenPosition !== 'bottom' ? children : ''}
 
-                {/* search bar */}
-                {showSearchBar ? (
-                  <div style={{ height: '70px' }}>
-                    <SearchBar
-                      handleSearchInput={this.handleSearchInput}
-                      searching={searching}
-                      handleSearchClick={this.handleSearchClick}
-                      searchResultClick={this.searchResultClick}
-                      mapId={mapId}
-                      openCategoryForLayers={this.openCategoryForLayers}
-                    />
-                  </div>
-                ) : null}
+              {/* search bar */}
+              {showSearchBar ? (
+                <div style={{ height: '70px' }}>
+                  <SearchBar
+                    handleSearchInput={this.handleSearchInput}
+                    searching={searching}
+                    handleSearchClick={this.handleSearchClick}
+                    searchResultClick={this.searchResultClick}
+                    mapId={mapId}
+                    openCategoryForLayers={this.openCategoryForLayers}
+                  />
+                </div>
+              ) : null}
 
-                {/* Menu List*/}
-                {!searching ? (
-                  <ul className="sectors">
-                    {regions && regions.length ? (
-                      <li className="sector">
-                        <a onClick={e => this.onCategoryClick(e, 'Regions')}>
-                          Regions
-                          <span className="caret" />
-                        </a>
-                        <ul className="layers">
-                          {regions && regions.length ? (
-                            regions.map((region, i) => (
-                              <li className={`region ${mapId}`} key={region.name}>
-                                <input
-                                  id={region.name}
-                                  key={region.name}
-                                  name="region"
-                                  type="radio"
-                                  value={region.name}
-                                  checked={!!region.current}
-                                  onChange={e => this.onRegionClick(e)}
-                                />
-                                <label htmlFor={region.name}>{region.name}</label>
-                              </li>
-                            ))
-                          ) : (
-                            <li></li>
-                          )}
-                        </ul>
-                      </li>
-                    ) : (
-                      <li />
-                    )}
-                    {(categories && categories.length) > 0 ? (
-                      categories.map((category, i) => {
-                        const descriptionStyle = !(hyperLink && hyperLink[category.category] &&
-                         hyperLink[category.category].link) ? {
-                          marginLeft: "33px"
-                        } : null;
-                        return(
+              {/* Menu List*/}
+              {!searching ? (
+                <ul className="sectors">
+                  {regions && regions.length ? (
+                    <li className="sector">
+                      <a onClick={e => this.onCategoryClick(e, 'Regions')}>
+                        Regions
+                        <span className="caret" />
+                      </a>
+                      <ul className="layers">
+                        {regions && regions.length ? (
+                          regions.map((region, i) => (
+                            <li className={`region ${mapId}`} key={region.name}>
+                              <input
+                                id={region.name}
+                                key={region.name}
+                                name="region"
+                                type="radio"
+                                value={region.name}
+                                checked={!!region.current}
+                                onChange={e => this.onRegionClick(e)}
+                              />
+                              <label htmlFor={region.name}>{region.name}</label>
+                            </li>
+                          ))
+                        ) : (
+                          <li></li>
+                        )}
+                      </ul>
+                    </li>
+                  ) : (
+                    <li />
+                  )}
+                  {(categories && categories.length) > 0 ? (
+                    categories.map((category, i) => {
+                      const descriptionStyle = !(
+                        hyperLink &&
+                        hyperLink[category.category] &&
+                        hyperLink[category.category].link
+                      )
+                        ? {
+                            marginLeft: '33px',
+                          }
+                        : null;
+                      return (
                         <li
                           className={`${
-                            hyperLink &&
-                            hyperLink[category.category] &&
-                            hyperLink[category.category].link ||
-                            hyperLink &&
-                            hyperLink[category.category] &&
-                            hyperLink[category.category].description
+                            (hyperLink &&
+                              hyperLink[category.category] &&
+                              hyperLink[category.category].link) ||
+                            (hyperLink &&
+                              hyperLink[category.category] &&
+                              hyperLink[category.category].description)
                               ? 'sector hyperlink'
                               : 'sector'
                           }`}
@@ -354,12 +357,12 @@ class Menu extends Component {
                         >
                           <a
                             className={`${
-                              hyperLink &&
-                              hyperLink[category.category] &&
-                              hyperLink[category.category].link ||
-                              hyperLink &&
-                              hyperLink[category.category] &&
-                              hyperLink[category.category].description
+                              (hyperLink &&
+                                hyperLink[category.category] &&
+                                hyperLink[category.category].link) ||
+                              (hyperLink &&
+                                hyperLink[category.category] &&
+                                hyperLink[category.category].description)
                                 ? 'sector hyperlink'
                                 : 'sector'
                             }`}
@@ -377,20 +380,20 @@ class Menu extends Component {
                             />{' '}
                             &nbsp;&nbsp;
                           </a>
-                          {hyperLink &&
-                          hyperLink[category.category] &&
-                          hyperLink[category.category].link ||
-                          hyperLink &&
-                          hyperLink[category.category] &&
-                          hyperLink[category.category].description ? (
+                          {(hyperLink &&
+                            hyperLink[category.category] &&
+                            hyperLink[category.category].link) ||
+                          (hyperLink &&
+                            hyperLink[category.category] &&
+                            hyperLink[category.category].description) ? (
                             <span className="links">
                               {hyperLink[category.category].link ? (
                                 <a
-                                href={hyperLink[category.category].link}
-                                target="_blank"
-                                className="glyphicon glyphicon-list-alt hyperlink"
-                              ></a>
-                              ): null}
+                                  href={hyperLink[category.category].link}
+                                  target="_blank"
+                                  className="glyphicon glyphicon-list-alt hyperlink"
+                                ></a>
+                              ) : null}
                               {hyperLink[category.category].description ? (
                                 <div className="description" style={descriptionStyle}>
                                   <span className="glyphicon glyphicon-info-sign" />
@@ -430,29 +433,29 @@ class Menu extends Component {
                             <ul />
                           )}
                         </li>
-                      )})
-                    ) : (
-                      <li></li>
-                    )}
-                  </ul>
-                ) : searchResults.length ? (
-                  <ul className="sectors">{searchResults}</ul>
-                ) : (
-                  <ul className="sectors">
-                    <li className="no-search-results">
-                      <b>No results found</b>
-                    </li>
-                  </ul>
-                )}
+                      );
+                    })
+                  ) : (
+                    <li></li>
+                  )}
+                </ul>
+              ) : searchResults.length ? (
+                <ul className="sectors">{searchResults}</ul>
+              ) : (
+                <ul className="sectors">
+                  <li className="no-search-results">
+                    <b>No results found</b>
+                  </li>
+                </ul>
+              )}
 
-                {/* Children Elements (top) */}
-                {children && childrenPosition === 'bottom' ? children : ''}
-              </div>
+              {/* Children Elements (top) */}
+              {children && childrenPosition === 'bottom' ? children : ''}
             </div>
-          ) : (
-            ''
-          )}
-        </div>
+          </div>
+        ) : (
+          ''
+        )}
       </div>
     );
   }

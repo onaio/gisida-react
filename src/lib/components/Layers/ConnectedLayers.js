@@ -68,7 +68,7 @@ export class ConnectedLayers extends Component {
     );
   }
   /**
-   * 
+   *
    * @param {Object} layers Map layers
    * @param {Array} activeLayerIds visible map layers
    */
@@ -89,7 +89,15 @@ export class ConnectedLayers extends Component {
     });
   }
   render() {
-    const { mapId, layers, currentRegion, preparedLayers, auth, hyperLink, activeLayerIds } = this.props;
+    const {
+      mapId,
+      layers,
+      currentRegion,
+      preparedLayers,
+      auth,
+      hyperLink,
+      activeLayerIds,
+    } = this.props;
     if (activeLayerIds) {
       this.openGroupForVisibleLayers(layers, activeLayerIds);
     }
@@ -154,11 +162,16 @@ export class ConnectedLayers extends Component {
         } else {
           Object.keys(layer).forEach((d, i) => {
             const parent = Object.values(layers.find(l => l[d]))[0].parent;
-            const descStyle =  !(hyperLink && hyperLink[`${parent} ${d}`] &&
-             hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].link) ?
-             {
-              marginLeft: "45px"
-             } : null;
+            const descStyle = !(
+              hyperLink &&
+              hyperLink[`${parent} ${d}`] &&
+              hyperLink[`${parent} ${d}`] &&
+              hyperLink[`${parent} ${d}`].link
+            )
+              ? {
+                  marginLeft: '45px',
+                }
+              : null;
             layerItem = layerItem.concat([
               <li>
                 <a
@@ -179,12 +192,15 @@ export class ConnectedLayers extends Component {
                 </a>
                 {hyperLink && hyperLink[`${parent} ${d}`] ? (
                   <span className="sub-category-links">
-                    { hyperLink && hyperLink[`${parent} ${d}`] &&
-                     hyperLink[`${parent} ${d}`].link ? (<a
-                      href={hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].link}
-                      target="_blank"
-                      className="glyphicon glyphicon-list-alt hyperlink"
-                    ></a>) : null}
+                    {hyperLink &&
+                    hyperLink[`${parent} ${d}`] &&
+                    hyperLink[`${parent} ${d}`].link ? (
+                      <a
+                        href={hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].link}
+                        target="_blank"
+                        className="glyphicon glyphicon-list-alt hyperlink"
+                      ></a>
+                    ) : null}
                     {hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].description ? (
                       <div className="description" style={descStyle}>
                         <span className="glyphicon glyphicon-info-sign" />
