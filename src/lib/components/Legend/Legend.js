@@ -9,6 +9,7 @@ import Parser from 'html-react-parser';
 import './Legend.scss';
 
 const mapStateToProps = (state, ownProps) => {
+  const { hasNavBar } = ownProps;
   const mapId = ownProps.mapId || 'map-1';
   const MAP = state[ownProps.mapId] || { layers: {}, timeseries: {} };
   const APP = state['APP'];
@@ -18,7 +19,7 @@ const mapStateToProps = (state, ownProps) => {
     MAP.layers[MAP.primarySubLayer].parent
       ? MAP.primarySubLayer
       : null;
-      
+
   return {
     LOC: state.LOC,
     APP,
@@ -35,6 +36,7 @@ const mapStateToProps = (state, ownProps) => {
     showFilterPanel: MAP.showFilterPanel,
     primarySubLayer: MAP.primarySubLayer,
     mapStateToUrl: APP.mapStateToUrl,
+    hasNavBar,
   };
 };
 
@@ -48,14 +50,14 @@ export class Legend extends React.Component {
     };
   }
   shouldComponentUpdate(nextProps) {
-    const { layerObj, timeSeriesObj} = nextProps;
+    const { layerObj, timeSeriesObj } = nextProps;
     return (((this.props.layerObj && this.props.layerObj.categories) ||
       (layerObj && layerObj.categories)) &&
       layerObj !== this.props.layerObj) ||
       (((this.props.timeSeriesObj && this.props.timeSeriesObj.categories) ||
         (timeSeriesObj && timeSeriesObj.categories)) &&
         timeSeriesObj !== this.props.timeSeriesObj) ||
-        (this.props.activeLayerIds && 
+      (this.props.activeLayerIds &&
         this.props.activeLayerIds.length !== nextProps.activeLayerIds &&
         nextProps.activeLayerIds.length)
       ? true
@@ -129,7 +131,7 @@ export class Legend extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { primaryLayer, layers} = this.props;
+    const { primaryLayer, layers } = this.props;
     if (
       primaryLayer !== prevProps.primaryLayer &&
       layers &&
@@ -374,10 +376,12 @@ export class Legend extends React.Component {
               if (showBoth && hasShape) {
                 background.push(
                   <li className="layer-symbols" key={index}>
-                    {layer.categories.img ? <img
-                    className="legend-icon"
-                    src={`/assets/img/${layer.categories.shape[index]}.svg`}
-                  /> : null }
+                    {layer.categories.img ? (
+                      <img
+                        className="legend-icon"
+                        src={`/assets/img/${layer.categories.shape[index]}.svg`}
+                      />
+                    ) : null}
                     <ul className="legend bar-color" key={index}>
                       <li
                         style={{
@@ -394,10 +398,12 @@ export class Legend extends React.Component {
               } else if (hasShape && !showBoth) {
                 background.push(
                   <li className="layer-symbols" key={index}>
-                    {layer.categories.img ? <img
-                      className="legend-icon"
-                      src={`/assets/img/${layer.categories.shape[index]}.svg`}
-                /> : null }
+                    {layer.categories.img ? (
+                      <img
+                        className="legend-icon"
+                        src={`/assets/img/${layer.categories.shape[index]}.svg`}
+                      />
+                    ) : null}
                     {layer.categories.label[index]}
                   </li>
                 );
@@ -433,8 +439,8 @@ export class Legend extends React.Component {
               <span
                 onClick={e => this.onCloseClick(e)}
                 data-close-layer={`${layer.id}`}
-                className="glyphicon glyphicon-remove close">
-              </span>
+                className="glyphicon glyphicon-remove close"
+              ></span>
               <b>{layer.label}</b>
               <div className={`${hasShape ? 'legend-shapes' : 'legend-fill'} ${legendClass}`}>
                 <ul>{background}</ul>
@@ -525,11 +531,11 @@ export class Legend extends React.Component {
               onClick={e => this.onUpdatePrimaryLayer(e)}
               key={l}
             >
-               <span
+              <span
                 onClick={e => this.onCloseClick(e)}
                 data-close-layer={`${layer.id}`}
-                className="glyphicon glyphicon-remove close">
-               </span>
+                className="glyphicon glyphicon-remove close"
+              ></span>
               <b>{layer.label}</b>
               <div className={`${'legend-fill'} ${legendClass}`}>
                 <ul>{background}</ul>
@@ -634,11 +640,11 @@ export class Legend extends React.Component {
               key={l}
               onClick={e => this.onUpdatePrimaryLayer(e)}
             >
-               <span
+              <span
                 onClick={e => this.onCloseClick(e)}
                 data-close-layer={`${layer.id}`}
-                className="glyphicon glyphicon-remove close">
-              </span>
+                className="glyphicon glyphicon-remove close"
+              ></span>
               <b>{layer.label}</b>
               <ul className="legend-limit" style={legendLimitStyle}>
                 <li
@@ -679,11 +685,11 @@ export class Legend extends React.Component {
             key={l}
             onClick={e => this.onUpdatePrimaryLayer(e)}
           >
-             <span
+            <span
               onClick={e => this.onCloseClick(e)}
               data-close-layer={`${layer.id}`}
-              className="glyphicon glyphicon-remove close">
-             </span>
+              className="glyphicon glyphicon-remove close"
+            ></span>
             <b>{layer.label}</b>
             <div className="legend-symbols">{quantiles}</div>
             <span>{Parser(layer.credit)}</span>
@@ -711,10 +717,12 @@ export class Legend extends React.Component {
           if (showBoth && hasShape) {
             background.push(
               <li className="layer-symbols" key={index}>
-               {layer.categories.img ? <img
-                  className="legend-icon"
-                  src={`/assets/img/${layer.categories.shape[index]}.svg`}
-                /> : null }
+                {layer.categories.img ? (
+                  <img
+                    className="legend-icon"
+                    src={`/assets/img/${layer.categories.shape[index]}.svg`}
+                  />
+                ) : null}
                 <ul className="legend bar-color" key={index}>
                   <li
                     style={{
@@ -731,10 +739,12 @@ export class Legend extends React.Component {
           } else {
             background.push(
               <li className="layer-symbols" key={index}>
-                {layer.categories.img ? <img
-                  className="legend-icon"
-                  src={`/assets/img/${layer.categories.shape[index]}.svg`}
-                /> : null }
+                {layer.categories.img ? (
+                  <img
+                    className="legend-icon"
+                    src={`/assets/img/${layer.categories.shape[index]}.svg`}
+                  />
+                ) : null}
                 {layer.categories.label[index]}
               </li>
             );
@@ -752,8 +762,8 @@ export class Legend extends React.Component {
             <span
               onClick={e => this.onCloseClick(e)}
               data-close-layer={`${layer.id}`}
-              className="glyphicon glyphicon-remove close">
-            </span>
+              className="glyphicon glyphicon-remove close"
+            ></span>
             <b>{layer.label}</b>
             <div className="legend-shapes">
               <ul style={{ left: '0' }}>{background}</ul>
@@ -780,7 +790,7 @@ export class Legend extends React.Component {
         });
 
         const legendClass = layer.categories ? 'legend-label' : '';
-        
+
         legendItems.unshift(
           <div
             id={`legend-${layer.id}-${mapId}`}
@@ -789,11 +799,11 @@ export class Legend extends React.Component {
             onClick={e => this.onUpdatePrimaryLayer(e)}
             key={l}
           >
-             <span
+            <span
               onClick={e => this.onCloseClick(e)}
               data-close-layer={`${layer.id}`}
-              className="glyphicon glyphicon-remove close">
-            </span>
+              className="glyphicon glyphicon-remove close"
+            ></span>
             <b>{layer.label}</b>
             <div className={`legend-fill ${legendClass}`}>
               <ul>{background}</ul>
@@ -878,8 +888,8 @@ export class Legend extends React.Component {
             <span
               onClick={e => this.onCloseClick(e)}
               data-close-layer={`${layer.id}`}
-              className="glyphicon glyphicon-remove close">
-            </span>
+              className="glyphicon glyphicon-remove close"
+            ></span>
             <b>{layer.label}</b>
             <div className={`${'legend-fill'} ${legendClass}`}>
               <ul>{background}</ul>
@@ -982,11 +992,11 @@ export class Legend extends React.Component {
             key={l}
             onClick={e => this.onUpdatePrimaryLayer(e)}
           >
-             <span
+            <span
               onClick={e => this.onCloseClick(e)}
               data-close-layer={`${layer.id}`}
-              className="glyphicon glyphicon-remove close">
-             </span>
+              className="glyphicon glyphicon-remove close"
+            ></span>
             <b>{layer.label}</b>
             <ul className="legend-limit" style={legendLimitStyle}>
               <li id={`first-limit-${layer.id}`} className={`${mapId}`} style={leftListLimitStyle}>
@@ -1018,7 +1028,10 @@ export class Legend extends React.Component {
       <div>
         <div
           className={`legend ${mapId}`}
-          style={{ right: this.props.showFilterPanel ? '30px' : '20px' }}
+          style={{
+            right: this.props.showFilterPanel ? '30px' : '20px',
+            bottom: this.props.hasNavBar ? '100px' : '40px',
+          }}
         >
           {showLoader && (
             <div className="legend-row">
