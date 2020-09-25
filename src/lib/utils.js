@@ -295,6 +295,7 @@ export function getMenuGroupMapLayers(groupName, children) {
  * checking other children once it finds the first open child.
  * @param {*} groupName Name of the group which we want to target
  * @param {*} children Children of the group which we want to target
+ * @param {*} activeLayerIds an array of active layer ids for the map
  */
 export function menuGroupHasVisibleLayers(groupName, children, activeLayerIds) {
   const subGroups = children.filter(child => !child.id);

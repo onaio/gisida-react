@@ -1,5 +1,6 @@
 import * as utils from '../utils';
 import * as fixtures from './fixtures';
+import { category1, category2 } from '../components/Menu/tests/fixtures';
 import Router from '../routes/router';
 
 describe('formatNum', () => {
@@ -174,71 +175,37 @@ describe('getMenuGroupMapLayers', () => {
   });
 });
 
-describe('menuGroupHasVisibleLayers', () => {
+describe('utils/menuGroupHasVisibleLayers', () => {
   it('returns true if a group with no subgroups has visible layers', () => {
-    const groupName = 'UNICEF';
-    const children = [fixtures.mapLayer1, fixtures.mapLayer2];
+    const groupName = 'Place Labels';
+    const group = category1.layers[0][groupName];
 
-    expect(utils.menuGroupHasVisibleLayers(groupName, children)).toEqual(true);
+    expect(utils.menuGroupHasVisibleLayers(groupName, group.layers, ['region-labels'])).toEqual(
+      true
+    );
   });
 
   it('returns true if a group with subgroups has visible layers', () => {
-    const groupName = 'WASH';
-    const children = [
-      {
-        UNICEF: {
-          category: 'UNICEF',
-          layers: [fixtures.mapLayer1, fixtures.mapLayer2],
-        },
-        Cluster: {
-          category: 'Cluster',
-          layers: [
-            {
-              Province: {
-                category: 'Province',
-                layers: [fixtures.mapLayer3],
-              },
-              District: {
-                category: 'District',
-                layers: [fixtures.mapLayer4],
-              },
-            },
-          ],
-        },
-      },
-    ];
-    expect(utils.menuGroupHasVisibleLayers(groupName, children)).toEqual(true);
+    const groupName = 'WFP, BRCiS, and CASH Consortium';
+    const group = category2.layers[0][groupName];
+
+    expect(
+      utils.menuGroupHasVisibleLayers(groupName, group.layers, ['coverage-analysis-district'])
+    ).toEqual(true);
   });
 
-  it('it false if a group with no subgroups has no visible layers', () => {
-    const groupName = 'UNICEF';
-    const children = [fixtures.mapLayer2];
+  it('it returns false if a group with no subgroups has no visible layers', () => {
+    const groupName = 'Place Labels';
+    const group = category1.layers[0][groupName];
 
-    expect(utils.menuGroupHasVisibleLayers(groupName, children)).toEqual(false);
+    expect(utils.menuGroupHasVisibleLayers(groupName, group.layers, [])).toEqual(false);
   });
 
   it('returns false if a group with subgroups has no visible layers', () => {
-    const groupName = 'WASH';
-    const children = [
-      {
-        UNICEF: {
-          category: 'UNICEF',
-          layers: [fixtures.mapLayer2],
-        },
-        Cluster: {
-          category: 'Cluster',
-          layers: [
-            {
-              District: {
-                category: 'District',
-                layers: [fixtures.mapLayer4],
-              },
-            },
-          ],
-        },
-      },
-    ];
-    expect(utils.menuGroupHasVisibleLayers(groupName, children)).toEqual(false);
+    const groupName = 'WFP, BRCiS, and CASH Consortium';
+    const group = category2.layers[0][groupName];
+
+    expect(utils.menuGroupHasVisibleLayers(groupName, group.layers, [])).toEqual(false);
   });
 });
 
