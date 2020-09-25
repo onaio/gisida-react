@@ -312,6 +312,7 @@ export class Filter extends Component {
 
     let filterOptions;
     if (nextProps.timeseriesObj && layerObj.aggregate && layerObj.aggregate.timeseries) {
+      
       filterOptions = generateFilterOptions(timeseriesObj);
     } else if (!timeseriesObj && filterState && filterState.filterOptions) {
       filterOptions = filterState.filterOptions;
@@ -443,10 +444,9 @@ export class Filter extends Component {
     dispatch(Actions.setLayerFilter(mapId, layerId, null));
 
     // Update FILTER state
-
     const filterState = {
-      filterOptions,
-      filters: this.buildFiltersMap(filterOptions),
+      filterOptions: this.props.FILTER[layerId].filterOptions,
+      filters: this.buildFiltersMap(this.props.FILTER[layerId].filterOptions),
       aggregate: {
         ...(oldLayerObj && oldLayerObj.aggregate),
       },
