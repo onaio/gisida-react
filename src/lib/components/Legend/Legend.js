@@ -1027,11 +1027,8 @@ export class Legend extends React.Component {
     return (
       <div>
         <div
-          className={`legend ${mapId}`}
-          style={{
-            right: this.props.showFilterPanel ? '30px' : '20px',
-            bottom: this.props.hasNavBar ? '100px' : '40px',
-          }}
+          className={this.props.hasNavBar ? `legend ${mapId} bottom` : `legend ${mapId}`}
+          
         >
           {showLoader && (
             <div className="legend-row">

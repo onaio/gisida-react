@@ -1,8 +1,8 @@
 .legend {
   position: absolute;
-  bottom: 40px;
   right: 20px;
   width: 320px;
+  bottom: 40px;
   background-color: #f7f6ef;
   z-index: 1000;
   color: #555;
@@ -91,7 +91,9 @@
     }
   }
 }
-
+.legend.bottom {
+  bottom: 100px !important;
+}
 .circle-legend {
   background-color: #f7f6ef;
   border-radius: 3px;
