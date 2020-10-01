@@ -40,7 +40,8 @@ const mapStateToProps = (state, ownProps) => {
     legendInfoText: APP.legendInfoText,
     menuScroll: MAP.menuScroll, // Set's scroll position to zero when loading superset Menu component
     showMap: VIEW.showMap, // A flag to determine map/superset view
-    noLayerText: NULL_LAYER_TEXT, // Text to be displayed when a category has no layer pulled from config file
+    noLayerText: NULL_LAYER_TEXT, // Text to be displayed when a category has no layer pulle d from config file
+    activeLayerIds: MAP.activeLayerIds, // list of layer id's for all visible layers
   };
 };
 
@@ -247,6 +248,7 @@ class Menu extends Component {
       hasNavBar,
       useConnectedLayers,
       AUTH,
+      activeLayerIds
     } = this.props;
     const childrenPositionClass = childrenPosition || 'top';
     const marginTop = hasNavBar ? '-80px' : 0;
@@ -415,6 +417,7 @@ class Menu extends Component {
                               auth={AUTH}
                               sector={category.category}
                               hyperLink={hyperLink}
+                              activeLayerIds={activeLayerIds}
                             />
                           ) : this.props.openCategories &&
                             this.props.openCategories.includes(category.category) &&

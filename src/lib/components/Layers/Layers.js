@@ -13,7 +13,7 @@ export class Layers extends Component {
         if (!layer.id) {
           Object.keys(layer).forEach(l => {
             if (layer[l].layers.length) {
-              groups[l] = { isOpen: menuGroupHasVisibleLayers(l, layer[l].layers) };
+              groups[l] = { isOpen: menuGroupHasVisibleLayers(l, layer[l].layers, this.props.activeLayerIds) };
             } else {
               groups[l] = { isOpen: false };
             }
@@ -34,7 +34,7 @@ export class Layers extends Component {
           Object.keys(layer).forEach(groupName => {
             const children = layer[groupName].layers;
 
-            if (menuGroupHasVisibleLayers(groupName, children) && !this.state[groupName].isOpen) {
+            if (menuGroupHasVisibleLayers(groupName, children, this.props.activeLayerIds) && !this.state[groupName].isOpen) {
               this.setState({
                 [groupName]: { isOpen: true },
               });
@@ -158,6 +158,7 @@ export class Layers extends Component {
                   preparedLayers={preparedLayers}
                   auth={this.props.auth}
                   noLayerText={noLayerText}
+                  activeLayerIds={this.props.activeLayerIds}
                 />
               ) : null,
             ]);
