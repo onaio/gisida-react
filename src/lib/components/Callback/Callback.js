@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Actions, SupAuth, history } from 'gisida';
 import { getURLSearchParams } from '../../utils';
 import Cookie from 'js-cookie';
+import superset from '@onaio/superset-connector';
 
 class Callback extends Component {
   constructor(props) {
@@ -26,10 +27,33 @@ class Callback extends Component {
   }
 
   async authorizeUser(APP) {
-    const { dispatch } = this.props;
+    const { dispatch, supersetOnlyLogin } = this.props;
     const { AUTH } = this.props.global;
     const accessToken = this.getAccessToken();
+    debugger;
+    
     const { isAuth, authConfig, user } = await SupAuth.authorizeUser(APP, AUTH, accessToken);
+    debugger;
+    if (supersetOnlyLogin && accessToken) {
+      localStorage.setItem('expiry_time', this.getExpiryTime());
+      const config = {
+        token: accessToken,
+        base: APP.supersetBase,
+      }
+      superset.authZ(config, result => {
+				// Notifications to be added in the future
+				if (result.status === 200) {
+          console.log('User logged in to superset');
+          return this.history.push({
+            pathname: '/',
+            search: getURLSearchParams().toString(),
+          });
+				} else {
+          console.log('User not logged in to superset');
+          
+				}
+			});
+    }
 
     if (isAuth && authConfig) {
       localStorage.setItem('expiry_time', this.getExpiryTime());
@@ -37,13 +61,13 @@ class Callback extends Component {
       dispatch(Actions.receiveToken(accessToken));
       dispatch(Actions.receiveLogin(user));
       dispatch(Actions.getAuthConfigs(authConfig));
+      return this.history.push({
+        pathname: '/',
+        search: getURLSearchParams().toString(),
+      });
     }
 
-    // Redirect to home and preserve any query params (shared layers and style)
-    return this.history.push({
-      pathname: '/',
-      search: getURLSearchParams().toString(),
-    });
+    // Redirect to home and preserve any query params (shared layers and style
   }
 
   getParameterByName(name) {
