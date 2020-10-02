@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, SupAuth, history } from 'gisida';
 import { getURLSearchParams } from '../../utils';
+import { supersetLogin } from './utils';
 import Cookie from 'js-cookie';
-import superset from '@onaio/superset-connector';
 
 class Callback extends Component {
   constructor(props) {
@@ -30,29 +30,15 @@ class Callback extends Component {
     const { dispatch, supersetOnlyLogin } = this.props;
     const { AUTH } = this.props.global;
     const accessToken = this.getAccessToken();
-    debugger;
     
     const { isAuth, authConfig, user } = await SupAuth.authorizeUser(APP, AUTH, accessToken);
-    debugger;
     if (supersetOnlyLogin && accessToken) {
       localStorage.setItem('expiry_time', this.getExpiryTime());
       const config = {
         token: accessToken,
-        base: APP.supersetBase,
-      }
-      superset.authZ(config, result => {
-				// Notifications to be added in the future
-				if (result.status === 200) {
-          console.log('User logged in to superset');
-          return this.history.push({
-            pathname: '/',
-            search: getURLSearchParams().toString(),
-          });
-				} else {
-          console.log('User not logged in to superset');
-          
-				}
-			});
+        base: APP.supersetBaseClient || APP.supersetBase,
+      }  
+      supersetLogin(config, this.history, n=10);
     }
 
     if (isAuth && authConfig) {
