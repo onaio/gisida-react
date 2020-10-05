@@ -74,6 +74,7 @@
   },
   "dependencies": {
     "@onaio/gatekeeper": "^0.0.20",
+    "@onaio/superset-connector": "^0.0.13",
     "ansi-regex": "^3.0.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "camelcase": "^4.1.0",

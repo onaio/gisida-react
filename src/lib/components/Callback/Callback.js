@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Actions, SupAuth, history } from 'gisida';
 import { getURLSearchParams } from '../../utils';
+import { supersetLogin } from './utils';
 import Cookie from 'js-cookie';
 
 class Callback extends Component {
@@ -29,7 +30,16 @@ class Callback extends Component {
     const { dispatch } = this.props;
     const { AUTH } = this.props.global;
     const accessToken = this.getAccessToken();
+    
     const { isAuth, authConfig, user } = await SupAuth.authorizeUser(APP, AUTH, accessToken);
+    if (APP.supersetOnlyLogin && accessToken) {
+      localStorage.setItem('expiry_time', this.getExpiryTime());
+      const config = {
+        token: accessToken,
+        base: APP.supersetBaseClient || APP.supersetBase,
+      }  
+      supersetLogin(config, this.history);
+    }
 
     if (isAuth && authConfig) {
       localStorage.setItem('expiry_time', this.getExpiryTime());
@@ -37,13 +47,13 @@ class Callback extends Component {
       dispatch(Actions.receiveToken(accessToken));
       dispatch(Actions.receiveLogin(user));
       dispatch(Actions.getAuthConfigs(authConfig));
+      return this.history.push({
+        pathname: '/',
+        search: getURLSearchParams().toString(),
+      });
     }
 
-    // Redirect to home and preserve any query params (shared layers and style)
-    return this.history.push({
-      pathname: '/',
-      search: getURLSearchParams().toString(),
-    });
+    // Redirect to home and preserve any query params (shared layers and style
   }
 
   getParameterByName(name) {
