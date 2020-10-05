@@ -27,18 +27,18 @@ class Callback extends Component {
   }
 
   async authorizeUser(APP) {
-    const { dispatch, supersetOnlyLogin } = this.props;
+    const { dispatch } = this.props;
     const { AUTH } = this.props.global;
     const accessToken = this.getAccessToken();
     
     const { isAuth, authConfig, user } = await SupAuth.authorizeUser(APP, AUTH, accessToken);
-    if (supersetOnlyLogin && accessToken) {
+    if (APP.supersetOnlyLogin && accessToken) {
       localStorage.setItem('expiry_time', this.getExpiryTime());
       const config = {
         token: accessToken,
         base: APP.supersetBaseClient || APP.supersetBase,
       }  
-      supersetLogin(config, this.history, n=10);
+      supersetLogin(config, this.history);
     }
 
     if (isAuth && authConfig) {
