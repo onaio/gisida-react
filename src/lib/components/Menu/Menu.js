@@ -9,6 +9,7 @@ import './Menu.scss';
 import { debounce } from 'lodash';
 import { getSharedLayersFromURL, getCategoryForLayers } from '../../utils';
 import { getAccessibleCategories } from './utils';
+import { HyperLink } from '../HyperLink/HyperLink';
 
 const mapStateToProps = (state, ownProps) => {
   const { mapId } = ownProps;
@@ -248,7 +249,7 @@ class Menu extends Component {
       hasNavBar,
       useConnectedLayers,
       AUTH,
-      activeLayerIds
+      activeLayerIds,
     } = this.props;
     const childrenPositionClass = childrenPosition || 'top';
     const marginTop = hasNavBar ? '-80px' : 0;
@@ -334,43 +335,37 @@ class Menu extends Component {
                   )}
                   {(categories && categories.length) > 0 ? (
                     categories.map((category, i) => {
-                      const descriptionStyle = !(
+                      const link =
                         hyperLink &&
                         hyperLink[category.category] &&
-                        hyperLink[category.category].link
-                      )
+                        hyperLink[category.category].link;
+
+                      const description =
+                        hyperLink &&
+                        hyperLink[category.category] &&
+                        hyperLink[category.category].description;
+                        
+                      const descriptionStyle = !link
                         ? {
                             marginLeft: '33px',
                           }
                         : null;
+
                       return (
                         <li
-                          className={`${
-                            (hyperLink &&
-                              hyperLink[category.category] &&
-                              hyperLink[category.category].link) ||
-                            (hyperLink &&
-                              hyperLink[category.category] &&
-                              hyperLink[category.category].description)
-                              ? 'sector hyperlink'
-                              : 'sector'
-                          }`}
+                          className={`${link || description ? 'sector hyperlink' : 'sector'}`}
                           key={i}
                         >
                           <a
-                            className={`${
-                              (hyperLink &&
-                                hyperLink[category.category] &&
-                                hyperLink[category.category].link) ||
-                              (hyperLink &&
-                                hyperLink[category.category] &&
-                                hyperLink[category.category].description)
-                                ? 'sector hyperlink'
-                                : 'sector'
-                            }`}
+                            className={`${link || description ? 'sector hyperlink' : 'sector'}`}
                             onClick={e => this.onCategoryClick(e, category.category)}
                           >
                             {category.category}
+                            <HyperLink
+                              link={link}
+                              description={description}
+                              descriptionStyle={descriptionStyle}
+                            />
                             <span
                               className={
                                 'category glyphicon ' +
@@ -382,30 +377,11 @@ class Menu extends Component {
                             />{' '}
                             &nbsp;&nbsp;
                           </a>
-                          {(hyperLink &&
-                            hyperLink[category.category] &&
-                            hyperLink[category.category].link) ||
-                          (hyperLink &&
-                            hyperLink[category.category] &&
-                            hyperLink[category.category].description) ? (
-                            <span className="links">
-                              {hyperLink[category.category].link ? (
-                                <a
-                                  href={hyperLink[category.category].link}
-                                  target="_blank"
-                                  className="glyphicon glyphicon-list-alt hyperlink"
-                                ></a>
-                              ) : null}
-                              {hyperLink[category.category].description ? (
-                                <div className="description" style={descriptionStyle}>
-                                  <span className="glyphicon glyphicon-info-sign" />
-                                  <p>{hyperLink[category.category].description}</p>
-                                </div>
-                              ) : (
-                                ''
-                              )}
-                            </span>
-                          ) : null}
+                          <HyperLink
+                              link={link}
+                              description={description}
+                              descriptionStyle={descriptionStyle}
+                          />
                           {this.props.openCategories &&
                           this.props.openCategories.includes(category.category) &&
                           !useConnectedLayers ? (

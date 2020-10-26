@@ -63,13 +63,8 @@ describe('Menu Component', () => {
       .find('a')
       .simulate('click');
     expect(toggleCategoriesAction).toHaveBeenCalledWith(props.mapId, 'Regions', -1);
-    wrapper
-      .find('li.sector')
-      .at(1)
-      .find('a')
-      .simulate('click');
-    expect(toggleCategoriesAction).toHaveBeenCalledWith(props.mapId, 'Boundaries & Labels', -1);
-    expect(toggleCategoriesAction).toHaveBeenCalledTimes(2);
+    expect(toggleCategoriesAction).toHaveBeenCalledWith(props.mapId, 'Regions', -1);
+    expect(toggleCategoriesAction).toHaveBeenCalledTimes(1);
 
     // test onRegionClick
     const changeRegionAction = jest.spyOn(Actions, 'changeRegion');

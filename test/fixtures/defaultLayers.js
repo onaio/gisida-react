@@ -147,4 +147,42 @@ export const layer1 = {
     "id": "education",
     "loaded": true
 }
-        
+
+export const layer2 = {
+    "label": "Regionboundaries",
+    "source": {
+      "type": "vector",
+      "layer": "som_adm_1-6k13xf",
+      "url": "mapbox://ona.bnc2rzsw"
+    },
+    "type": "line",
+    "paint": {
+      "line-width": 2,
+      "line-color": "#444",
+      "line-opacity": 0.6
+    },
+    "visible": true,
+    "category": "Boundaries",
+    "id": "regionboundaries",
+    "loaded": true,
+    "isLoading": false,
+    "filters": {},
+    "isChartMin": true,
+    "legendBottom": 40,
+    "styleSpec": {
+      "id": "regionboundaries",
+      "type": "line",
+      "visible": true,
+      "source": {
+        "type": "vector",
+        "url": "mapbox://ona.bnc2rzsw"
+      },
+      "layout": {},
+      "paint": {
+        "line-width": 2,
+        "line-color": "#444",
+        "line-opacity": 0.6
+      },
+      "source-layer": "som_adm_1-6k13xf"
+    }
+  }
