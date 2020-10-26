@@ -218,7 +218,6 @@ export class Legend extends React.Component {
       return false;
     }
     let latestTimestamp;
-
     /** Build timestamp */
     latestTimestamp = buildTimestamp(layerObj);
     const legendHyperlink = layerObj['legendHyperlink'] ? buildHyperLink(layerObj) : null;
@@ -790,7 +789,6 @@ export class Legend extends React.Component {
         });
 
         const legendClass = layer.categories ? 'legend-label' : '';
-
         legendItems.unshift(
           <div
             id={`legend-${layer.id}-${mapId}`}
@@ -1023,7 +1021,6 @@ export class Legend extends React.Component {
 
     legendItems.unshift(primaryLegend);
     const showLoader = legendLayers.length > 0 ? legendItems.length !== legendLayers.length : false;
-    let poppedLegendItemList;
     return (
       <div>
         <div
@@ -1035,7 +1032,7 @@ export class Legend extends React.Component {
               <b>Loading...</b>
             </div>
           )}
-          {poppedLegendItemList || legendItems}
+          {legendItems}
         </div>
       </div>
     );
