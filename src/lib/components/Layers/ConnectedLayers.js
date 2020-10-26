@@ -10,6 +10,8 @@ import Layer from '../Layer/Layer';
 import { connect } from 'react-redux';
 import { Actions } from 'gisida';
 import { menuGroupHasVisibleLayers } from '../../utils';
+import { HyperLink } from '../HyperLink/HyperLink';
+
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId];
   const { mapId, layers, currentRegion, preparedLayers } = ownProps;
@@ -161,12 +163,15 @@ export class ConnectedLayers extends Component {
         } else {
           Object.keys(layer).forEach((d, i) => {
             const parent = Object.values(layers.find(l => l[d]))[0].parent;
-            const descStyle = !(
-              hyperLink &&
-              hyperLink[`${parent} ${d}`] &&
-              hyperLink[`${parent} ${d}`] &&
-              hyperLink[`${parent} ${d}`].link
-            )
+            const link = hyperLink &&
+            hyperLink[`${parent}-${d}`] &&
+            hyperLink[`${parent}-${d}`].link;
+
+            const description = hyperLink &&
+            hyperLink[`${parent}-${d}`] &&
+            hyperLink[`${parent}-${d}`].description;
+         
+            const descStyle = !link
               ? {
                   marginLeft: '45px',
                 }
@@ -176,7 +181,7 @@ export class ConnectedLayers extends Component {
                 <a
                   key={`${d}-${i}-link`}
                   className={
-                    hyperLink && hyperLink[`${parent} ${d}`]
+                    hyperLink && hyperLink[`${parent}-${d}`]
                       ? `sub-category hyperlink`
                       : 'sub-category'
                   }
@@ -189,29 +194,13 @@ export class ConnectedLayers extends Component {
                     }`}
                   />
                 </a>
-                {hyperLink && hyperLink[`${parent} ${d}`] ? (
-                  <span className="sub-category-links">
-                    {hyperLink &&
-                    hyperLink[`${parent} ${d}`] &&
-                    hyperLink[`${parent} ${d}`].link ? (
-                      <a
-                        href={hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].link}
-                        target="_blank"
-                        className="glyphicon glyphicon-list-alt hyperlink"
-                      ></a>
-                    ) : null}
-                    {hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].description ? (
-                      <div className="description" style={descStyle}>
-                        <span className="glyphicon glyphicon-info-sign" />
-                        <p>
-                          {hyperLink[`${parent} ${d}`] && hyperLink[`${parent} ${d}`].description}
-                        </p>
-                      </div>
-                    ) : (
-                      ''
-                    )}
-                  </span>
-                ) : null}
+                {hyperLink && hyperLink[`${parent}-${d}`] ? (
+                  <HyperLink
+                    link={link}
+                    description={description}
+                    descriptionStyle={descStyle}
+                    spanClassName='sub-category-links'
+                  />) : null}
               </li>,
               this.isGroupOpen(d, layer[d].parent) ? (
                 <ConnectedLayers

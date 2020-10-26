@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
 import { menuGroupHasVisibleLayers } from '../../utils';
 import { DATA_NOT_AVAILABLE } from '../../constants';
+import { HyperLink } from '../HyperLink/HyperLink';
 
 export class Layers extends Component {
   constructor(props) {
@@ -124,30 +125,42 @@ export class Layers extends Component {
           }
         } else {
           Object.keys(layer).forEach((d, i) => {
+            /** get the parent of the  sub category */
+            const parent = Object.values(layers.find(l => l[d]))[0].parent;
+            const { link, description } = hyperLink &&
+            hyperLink[`${parent}-${d}`] &&
+            hyperLink[`${parent}-${d}`] &&
+            hyperLink[`${parent}-${d}`]
+            const descStyle = !link
+              ? {
+                  marginLeft: '45px',
+                }
+              : null;
             layerItem = layerItem.concat([
               <li key={i}>
                 <a
                   key={`${d}-${i}-link`}
-                  className="sub-category"
+                  className={
+                    hyperLink && hyperLink[`${parent}-${d}`]
+                      ? `sub-category hyperlink`
+                      : 'sub-category'
+                  }
                   onClick={e => this.toggleSubMenu(e, d)}
                 >
                   {d}
-                  {hyperLink &&
-                  sector &&
-                  hyperLink[d].parentCategory &&
-                  hyperLink[d].parentCategory === sector ? (
-                    <a
-                      href={hyperLink[d].link}
-                      target="_blank"
-                      className="glyphicon glyphicon-info-sign hyperlink"
-                    ></a>
-                  ) : null}
                   <span
                     className={`category glyphicon glyphicon-chevron-${
                       this.state[d].isOpen ? 'down' : 'right'
                     }`}
                   />
                 </a>
+                {hyperLink && hyperLink[`${parent}-${d}`] ? (
+                  <HyperLink
+                    link={link}
+                    description={description}
+                    descriptionStyle={descStyle}
+                    spanClassName='sub-category-links'
+                  />) : null}
               </li>,
               this.state[d].isOpen ? (
                 <Layers

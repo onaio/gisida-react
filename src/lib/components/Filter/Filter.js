@@ -312,7 +312,6 @@ export class Filter extends Component {
 
     let filterOptions;
     if (nextProps.timeseriesObj && layerObj.aggregate && layerObj.aggregate.timeseries) {
-      
       filterOptions = generateFilterOptions(timeseriesObj);
     } else if (!timeseriesObj && filterState && filterState.filterOptions) {
       filterOptions = filterState.filterOptions;
