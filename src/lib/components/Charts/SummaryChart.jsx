@@ -57,6 +57,7 @@ const mapStateToProps = (state, ownProps) => {
       showMinimize: true,
       primaryLayer: MAP.primaryLayer,
       menuIsOpen: MAP.menuIsOpen,
+      hasNavBar: ownProps.hasNavBar,
     };
   } else return { showMinimize: false };
 };
@@ -350,6 +351,7 @@ class SummaryChart extends React.Component {
               chartSpec={charts[c].spec}
               isPrimary={false}
               locations={locations}
+              hasNavBar={this.props.hasNavBar}
             />
           );
           break;
@@ -383,6 +385,7 @@ class SummaryChart extends React.Component {
               calcChartWidth={SummaryChart.calcChartWidth}
               locations={locations}
               isPrimary
+              hasNavBar={this.props.hasNavBar}
             >
               {sumCharts.length ? (
                 <button

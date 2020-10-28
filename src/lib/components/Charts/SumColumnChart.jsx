@@ -169,7 +169,7 @@ class SumColumnChart extends React.Component {
           width: containerWidth,
           height: containerHeight,
           right: containerRight,
-          bottom: '0px',
+          bottom: `${this.props.hasNavBar ? '60px' : 0}`,
         }}
       >
         {!isPrimary && chartSpec.title ? (<h6>{chartSpec.title}</h6>) : ''}
