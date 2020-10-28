@@ -440,3 +440,34 @@ export function getCategoryForLayers(layersToOpenCategory, categories) {
 
   return layerCategory;
 }
+/**
+ * Returns Various types of layers. This guides the legend building process
+ * @param {Object} layer 
+ */
+
+export function isCircleLayer(layer) {
+  return (
+    layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible
+  );
+}
+
+export function isSymbolLayer(layer) {
+  return (
+    layer && layer.credit && layer.categories && (layer.categories.shape || layer.categories.labelShape)  && layer.type !== 'circle'
+  );
+}
+
+export function isFillLayerNoBreaks(layer) {
+  return layer && layer.credit && layer.categories && layer.categories.breaks === 'no';
+}
+
+export function isFillLayerWithBreaks(layer) {
+  return (
+    layer &&
+    layer.credit &&
+    layer.type !== 'chart' &&
+    layer.type !== 'circle' &&
+    layer.categories &&
+    layer.categories.breaks === 'yes'
+  );
+}
