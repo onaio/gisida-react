@@ -1,6 +1,5 @@
 
 import React from 'react';
-import './HyperLink.scss';
 import PropTypes from 'prop-types';
 
 export const HyperLink = (props) => {
