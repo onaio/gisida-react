@@ -283,15 +283,6 @@ export class Filter extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // if (
-    //   nextProps.layerObj &&
-    //   nextProps.layerObj.aggregate.filter &&
-    //   !Object.keys(nextProps.FILTER).length
-    // ) {
-    //   this.props.dispatch(
-    //     Actions.filtersUpdated(nextProps.mapId, nextProps.layerObj && nextProps.layerObj.id)
-    //   );
-    // }
     if (
       !nextProps.layerObj ||
       (nextProps.layerObj &&
