@@ -13,28 +13,24 @@ const mapStateToProps = (state, ownProps) => {
   return {
     APP,
     LOC,
-    timeSeriesObj: MAP.timeseries[MAP.visibleLayerId],
-    timeseries: MAP.timeseries,
-    layers: MAP.layers,
-    primaryLayer: MAP.primaryLayer,
-    activeLayerIds: MAP.activeLayerIds,
+    MAP,
   };
 };
 
 export class Layer extends Component {
   onLayerToggle = layer => {
     // dispatch toggle layer action
-    const { mapId, APP, LOC } = this.props;
+    const { mapId, APP, LOC, MAP } = this.props;
     if (!mapId) {
       return null;
     }
     // mapstatetorurl is being set on the site config
     if (APP.mapStateToUrl) {
-    pushLayerToURL(layer, mapId);
-  }
+      pushLayerToURL(layer, mapId);
+    }
     this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
     const { center, zoom } = lngLat(LOC, APP);
-    if (layer.zoomOnToggle && layer.visible) {
+    if (MAP.layers[layer.id].zoomOnToggle && MAP.layers[layer.id].visible) {
       window.maps.forEach(e => {
         e.easeTo({
           center,
@@ -43,14 +39,15 @@ export class Layer extends Component {
       });
     }
     // Prepare layer if layer had not been loaded
-    if (!layer.loaded && !layer.isLoading) {
-      prepareLayer(mapId, layer, this.props.dispatch);
+    if (!MAP.layers[layer.id].loaded && !MAP.layers[layer.id].isLoading) {
+      prepareLayer(mapId, MAP.layers[layer.id], this.props.dispatch);
     }
   };
 
   render() {
     const layer = this.props.layer;
     const mapId = this.props.mapId;
+    const { MAP } = this.props;
     if (!mapId) {
       return null;
     }
@@ -61,7 +58,7 @@ export class Layer extends Component {
           type="checkbox"
           data-layer={layer.id}
           onChange={e => this.onLayerToggle(layer)}
-          checked={!!layer.visible}
+          checked={MAP.layers[layer.id].visible}
         />
         <label htmlFor={`${layer.id}-${mapId}`}>{layer.label}</label>
       </li>

@@ -1,0 +1,481 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Menu Component Menu component renders correctly with all props 1`] = `
+<Connect(Menu)
+  mapId="map-1"
+  menuId="menu-1"
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <Menu
+    categories={
+      Array [
+        Object {
+          "category": "Boundaries & Labels",
+          "layers": Array [
+            Object {
+              "Place Labels": Object {
+                "category": "Place Labels",
+                "layers": Array [
+                  Object {
+                    "category": "Place Labels",
+                    "id": "region-labels",
+                    "label": "Region labels",
+                  },
+                  Object {
+                    "category": "Place Labels",
+                    "id": "district-labels",
+                    "label": "District labels",
+                  },
+                  Object {
+                    "category": "Place Labels",
+                    "id": "banadir-labels",
+                    "label": "Banadir labels",
+                  },
+                ],
+                "parent": "Boundaries & Labels",
+              },
+            },
+            Object {
+              "Boundaries": Object {
+                "category": "Boundaries",
+                "layers": Array [
+                  Object {
+                    "category": "Boundaries",
+                    "id": "region-boundaries",
+                    "label": "Region boundaries",
+                  },
+                  Object {
+                    "category": "Boundaries",
+                    "id": "district-boundaries",
+                    "label": "Districts boundaries",
+                  },
+                ],
+                "parent": "Boundaries & Labels",
+              },
+            },
+          ],
+        },
+      ]
+    }
+    currentRegion="reg2"
+    dispatch={[Function]}
+    loaded={true}
+    mapId="map-1"
+    mapTargetId=""
+    menuId="sector-menu-1"
+    openCategories={
+      Array [
+        "Boundaries",
+      ]
+    }
+    preparedLayers={
+      Object {
+        "Regionboundaries": Object {
+          "category": "Boundaries",
+          "filters": Object {},
+          "id": "regionboundaries",
+          "isChartMin": true,
+          "isLoading": false,
+          "label": "Regionboundaries",
+          "legendBottom": 40,
+          "loaded": true,
+          "paint": Object {
+            "line-color": "#444",
+            "line-opacity": 0.6,
+            "line-width": 2,
+          },
+          "source": Object {
+            "layer": "som_adm_1-6k13xf",
+            "type": "vector",
+            "url": "mapbox://ona.bnc2rzsw",
+          },
+          "styleSpec": Object {
+            "id": "regionboundaries",
+            "layout": Object {},
+            "paint": Object {
+              "line-color": "#444",
+              "line-opacity": 0.6,
+              "line-width": 2,
+            },
+            "source": Object {
+              "type": "vector",
+              "url": "mapbox://ona.bnc2rzsw",
+            },
+            "source-layer": "som_adm_1-6k13xf",
+            "type": "line",
+            "visible": true,
+          },
+          "type": "line",
+          "visible": true,
+        },
+      }
+    }
+    regions={
+      Array [
+        Object {
+          "current": false,
+          "name": "reg1",
+        },
+        Object {
+          "current": true,
+          "name": "reg2",
+        },
+      ]
+    }
+    showMap={false}
+    store={
+      Object {
+        "clearActions": [Function],
+        "dispatch": [Function],
+        "getActions": [Function],
+        "getState": [Function],
+        "replaceReducer": [Function],
+        "subscribe": [Function],
+      }
+    }
+    storeSubscription={
+      Subscription {
+        "listeners": Object {
+          "clear": [Function],
+          "get": [Function],
+          "notify": [Function],
+          "subscribe": [Function],
+        },
+        "onStateChange": [Function],
+        "parentSub": undefined,
+        "store": Object {
+          "clearActions": [Function],
+          "dispatch": [Function],
+          "getActions": [Function],
+          "getState": [Function],
+          "replaceReducer": [Function],
+          "subscribe": [Function],
+        },
+        "unsubscribe": [Function],
+      }
+    }
+  >
+    <div>
+      <div
+        className="menu-wrapper top"
+        id="map-1-menu-wrapper"
+        onScroll={[Function]}
+        style={
+          Object {
+            "marginTop": 0,
+          }
+        }
+      >
+        <a
+          className="open-btn"
+          onClick={[Function]}
+          style={
+            Object {
+              "display": "block",
+            }
+          }
+        >
+          <span
+            className="glyphicon glyphicon-menu-hamburger"
+          />
+        </a>
+        <div
+          className="sectors-menu"
+          id="map-1-menu"
+          style={
+            Object {
+              "display": "none",
+            }
+          }
+        >
+          <a
+            className="close-btn"
+            onClick={[Function]}
+          >
+            <span
+              className="glyphicon glyphicon-remove"
+            />
+          </a>
+          <ul
+            className="sectors"
+          >
+            <li
+              className="sector"
+            >
+              <a
+                onClick={[Function]}
+              >
+                Regions
+                <span
+                  className="caret"
+                />
+              </a>
+              <ul
+                className="layers"
+              >
+                <li
+                  className="region map-1"
+                  key="reg1"
+                >
+                  <input
+                    checked={false}
+                    id="reg1"
+                    key="reg1"
+                    name="region"
+                    onChange={[Function]}
+                    type="radio"
+                    value="reg1"
+                  />
+                  <label
+                    htmlFor="reg1"
+                  >
+                    reg1
+                  </label>
+                </li>
+                <li
+                  className="region map-1"
+                  key="reg2"
+                >
+                  <input
+                    checked={true}
+                    id="reg2"
+                    key="reg2"
+                    name="region"
+                    onChange={[Function]}
+                    type="radio"
+                    value="reg2"
+                  />
+                  <label
+                    htmlFor="reg2"
+                  >
+                    reg2
+                  </label>
+                </li>
+              </ul>
+            </li>
+            <li />
+          </ul>
+        </div>
+      </div>
+    </div>
+  </Menu>
+</Connect(Menu)>
+`;
+
+exports[`Menu Component Menu component renders correctly with all props: Menu props 1`] = `
+Object {
+  "AUTH": undefined,
+  "activeLayerIds": undefined,
+  "categories": Array [
+    Object {
+      "category": "Boundaries & Labels",
+      "layers": Array [
+        Object {
+          "Place Labels": Object {
+            "category": "Place Labels",
+            "layers": Array [
+              Object {
+                "category": "Place Labels",
+                "id": "region-labels",
+                "label": "Region labels",
+              },
+              Object {
+                "category": "Place Labels",
+                "id": "district-labels",
+                "label": "District labels",
+              },
+              Object {
+                "category": "Place Labels",
+                "id": "banadir-labels",
+                "label": "Banadir labels",
+              },
+            ],
+            "parent": "Boundaries & Labels",
+          },
+        },
+        Object {
+          "Boundaries": Object {
+            "category": "Boundaries",
+            "layers": Array [
+              Object {
+                "category": "Boundaries",
+                "id": "region-boundaries",
+                "label": "Region boundaries",
+              },
+              Object {
+                "category": "Boundaries",
+                "id": "district-boundaries",
+                "label": "Districts boundaries",
+              },
+            ],
+            "parent": "Boundaries & Labels",
+          },
+        },
+      ],
+    },
+  ],
+  "currentRegion": "reg2",
+  "dispatch": [Function],
+  "hyperLink": undefined,
+  "infoText": undefined,
+  "legendInfoText": undefined,
+  "loaded": true,
+  "mapId": "map-1",
+  "mapTargetId": "",
+  "menuId": "sector-menu-1",
+  "menuIsOpen": undefined,
+  "menuScroll": undefined,
+  "noLayerText": undefined,
+  "openCategories": Array [
+    "Boundaries",
+  ],
+  "preparedLayers": Object {
+    "Regionboundaries": Object {
+      "category": "Boundaries",
+      "filters": Object {},
+      "id": "regionboundaries",
+      "isChartMin": true,
+      "isLoading": false,
+      "label": "Regionboundaries",
+      "legendBottom": 40,
+      "loaded": true,
+      "paint": Object {
+        "line-color": "#444",
+        "line-opacity": 0.6,
+        "line-width": 2,
+      },
+      "source": Object {
+        "layer": "som_adm_1-6k13xf",
+        "type": "vector",
+        "url": "mapbox://ona.bnc2rzsw",
+      },
+      "styleSpec": Object {
+        "id": "regionboundaries",
+        "layout": Object {},
+        "paint": Object {
+          "line-color": "#444",
+          "line-opacity": 0.6,
+          "line-width": 2,
+        },
+        "source": Object {
+          "type": "vector",
+          "url": "mapbox://ona.bnc2rzsw",
+        },
+        "source-layer": "som_adm_1-6k13xf",
+        "type": "line",
+        "visible": true,
+      },
+      "type": "line",
+      "visible": true,
+    },
+  },
+  "regions": Array [
+    Object {
+      "current": false,
+      "name": "reg1",
+    },
+    Object {
+      "current": true,
+      "name": "reg2",
+    },
+  ],
+  "showMap": false,
+  "showSearchBar": undefined,
+  "store": Object {
+    "clearActions": [Function],
+    "dispatch": [Function],
+    "getActions": [Function],
+    "getState": [Function],
+    "replaceReducer": [Function],
+    "subscribe": [Function],
+  },
+  "storeSubscription": Subscription {
+    "listeners": Object {
+      "clear": [Function],
+      "get": [Function],
+      "notify": [Function],
+      "subscribe": [Function],
+    },
+    "onStateChange": [Function],
+    "parentSub": undefined,
+    "store": Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    },
+    "unsubscribe": [Function],
+  },
+}
+`;
+
+exports[`Menu Component Renders correctly when search bar is active: search bar on 1`] = `
+Object {
+  "APP": Object {
+    "appColor": "red",
+    "loaded": true,
+    "searchBar": true,
+  },
+  "LOC": undefined,
+  "appColor": "red",
+  "dispatch": [Function],
+  "handleSearchClick": [Function],
+  "handleSearchInput": [Function],
+  "mapId": "map-1",
+  "openCategoryForLayers": [Function],
+  "preparedLayers": Object {
+    "Regionboundaries": Object {
+      "category": "Boundaries",
+      "filters": Object {},
+      "id": "regionboundaries",
+      "isChartMin": true,
+      "isLoading": false,
+      "label": "Regionboundaries",
+      "legendBottom": 40,
+      "loaded": true,
+      "paint": Object {
+        "line-color": "#444",
+        "line-opacity": 0.6,
+        "line-width": 2,
+      },
+      "source": Object {
+        "layer": "som_adm_1-6k13xf",
+        "type": "vector",
+        "url": "mapbox://ona.bnc2rzsw",
+      },
+      "styleSpec": Object {
+        "id": "regionboundaries",
+        "layout": Object {},
+        "paint": Object {
+          "line-color": "#444",
+          "line-opacity": 0.6,
+          "line-width": 2,
+        },
+        "source": Object {
+          "type": "vector",
+          "url": "mapbox://ona.bnc2rzsw",
+        },
+        "source-layer": "som_adm_1-6k13xf",
+        "type": "line",
+        "visible": true,
+      },
+      "type": "line",
+      "visible": true,
+    },
+  },
+  "searchBarColor": undefined,
+  "searchResultClick": [Function],
+  "searching": false,
+}
+`;

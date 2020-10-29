@@ -1,14 +1,21 @@
 .legend {
   position: absolute;
-  bottom: 40px;
   right: 20px;
   width: 320px;
+  bottom: 40px;
   background-color: #f7f6ef;
   z-index: 1000;
   color: #555;
   font-size: 11px;
   font-family: 'Montserrat', sans-serif;
   line-height: 1.2;
+  .close {
+    position: absolute;
+    top: 9px;
+    right: -19px;
+    color: #555 !important;
+    font-size: 11px;
+  }
   .legend-row {
     padding: 15px;
     position: relative;
@@ -25,8 +32,68 @@
   [data-visible='false'] {
     display: none;
   }
-}
+  .combinedLinks {
+    a {
+      color: grey;
+      font-size: 18px;
+      h5 {
+        text-decoration: none;
+        display: inline-block;
+      }
+      &:hover {
+        color: #2d2d2d
+      }
+    }
+    .description {
+      display: inline-block;
+      top: 4px;
+      right: 5px;
+      font-size: 18px;
+      text-align: right;
+      color: #ccc;
 
+      span {
+        cursor: pointer;
+        top: 3px;
+      }
+
+      p {
+        display: none;
+        position: absolute;
+        right: 26.4em;
+        text-align: left;
+        padding: 6px 10px;
+        background-color: #333;
+        color: #eee;
+        font-size: 11px;
+        line-height: 1.5;
+        width: 250px;
+
+        &:before {
+          content: '';
+          height: 0;
+          width: 0;
+          position: absolute;
+          top: 186px;
+          right: 0;
+          border-left: 7px solid transparent;
+          border-right: 7px solid transparent;
+          border-top: 11px solid #333;
+        }
+      }
+
+      &:hover {
+        color: #333;
+        p {
+          display: block;
+        }
+      }
+    }
+  }
+}
+.legend.bottom {
+  bottom: 100px !important;
+}
 .circle-legend {
   background-color: #f7f6ef;
   border-radius: 3px;
