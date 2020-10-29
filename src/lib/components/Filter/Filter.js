@@ -283,15 +283,6 @@ export class Filter extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // if (
-    //   nextProps.layerObj &&
-    //   nextProps.layerObj.aggregate.filter &&
-    //   !Object.keys(nextProps.FILTER).length
-    // ) {
-    //   this.props.dispatch(
-    //     Actions.filtersUpdated(nextProps.mapId, nextProps.layerObj && nextProps.layerObj.id)
-    //   );
-    // }
     if (
       !nextProps.layerObj ||
       (nextProps.layerObj &&
@@ -443,10 +434,9 @@ export class Filter extends Component {
     dispatch(Actions.setLayerFilter(mapId, layerId, null));
 
     // Update FILTER state
-
     const filterState = {
-      filterOptions,
-      filters: this.buildFiltersMap(filterOptions),
+      filterOptions: this.props.FILTER[layerId].filterOptions,
+      filters: this.buildFiltersMap(this.props.FILTER[layerId].filterOptions),
       aggregate: {
         ...(oldLayerObj && oldLayerObj.aggregate),
       },

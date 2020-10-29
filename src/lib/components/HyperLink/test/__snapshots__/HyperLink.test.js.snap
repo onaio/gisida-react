@@ -1,0 +1,66 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/HyperLink Matches props snapshot 1`] = `
+<HyperLink
+  description="hello"
+  descriptionStyle={
+    Object {
+      "marginLeft": "45px",
+    }
+  }
+  link="https://hello.com"
+  spanClassName="sub-category"
+>
+  <span
+    className="sub-category"
+  >
+    <a
+      className="glyphicon glyphicon-list-alt hyperlink"
+      href="https://hello.com"
+      target="_blank"
+    />
+    <div
+      className="description"
+      style={
+        Object {
+          "marginLeft": "45px",
+        }
+      }
+    >
+      <span
+        className="glyphicon glyphicon-info-sign"
+      />
+      <p>
+        hello
+      </p>
+    </div>
+  </span>
+</HyperLink>
+`;
+
+exports[`components/HyperLink renders without crashing 1`] = `
+<span
+  className="sub-category"
+>
+  <a
+    className="glyphicon glyphicon-list-alt hyperlink"
+    href="https://hello.com"
+    target="_blank"
+  />
+  <div
+    className="description"
+    style={
+      Object {
+        "marginLeft": "45px",
+      }
+    }
+  >
+    <span
+      className="glyphicon glyphicon-info-sign"
+    />
+    <p>
+      hello
+    </p>
+  </div>
+</span>
+`;
