@@ -131,7 +131,7 @@ class Menu extends Component {
       const { categories } = this.props;
       const layers = getCategoryForLayers(layersToOpenCategory, categories);
       layers.forEach(e => {
-        this.openCategoryForSharedLayer(e.category, e.layerId);
+        this.openCategoryForSharedLayer(e.category || e.categoryName, e.layerId);
       });
     }
   }
@@ -202,13 +202,13 @@ class Menu extends Component {
    * @param {Array} searchResults - array of search results
    * @param {string} input - user search input
    */
-  handleSearchInput(searchResults, input) {
-    const { searching } = this.state;
-    this.setState({ searchResults: [] });
+  handleSearchInput(searchResults, input, parentThis=this.state) {
+    const { searching } = parentThis.state;
+    parentThis.setState({ searchResults: [] });
     if (!input) {
-      return searching ? this.setState({ searching: false }) : null;
+      return searching ? parentThis.setState({ searching: false }) : null;
     }
-    this.setState({
+    parentThis.setState({
       searchResults,
       searching: true,
     });
@@ -296,6 +296,7 @@ class Menu extends Component {
                     searchResultClick={this.searchResultClick}
                     mapId={mapId}
                     openCategoryForLayers={this.openCategoryForLayers}
+                    parentState={this}
                   />
                 </div>
               ) : null}

@@ -41,11 +41,7 @@ class SearchBar extends Component {
 
     // open menu when layer is loaded visibility is turned on
     if (selectedLayerId && preparedLayers[selectedLayerId].visible) {
-      const toOpenLayer = {
-        id: selectedLayerId,
-        isCatOpen: false,
-      };
-      openCategoryForLayers([toOpenLayer]);
+      openCategoryForLayers([selectedLayerId]);
       this.setState({selectedLayerId: null});
     }
   }
@@ -104,7 +100,7 @@ class SearchBar extends Component {
    */
   handleSearchInput(e) {
     this.setState({inputText: e.target.value})
-    const { handleSearchInput, preparedLayers } = this.props;
+    const { handleSearchInput, preparedLayers, parentState } = this.props;
     let input = e.target.value;
     input = input.replace(/\s+/g, ' ')
     input = input.trimStart()
@@ -118,7 +114,7 @@ class SearchBar extends Component {
           )
         }
     })
-    handleSearchInput(searchResults, input);
+    handleSearchInput(searchResults, input, parentState);
   }
 
   /**
