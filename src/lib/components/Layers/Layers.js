@@ -127,10 +127,13 @@ export class Layers extends Component {
           Object.keys(layer).forEach((d, i) => {
             /** get the parent of the  sub category */
             const parent = Object.values(layers.find(l => l[d]))[0].parent;
-            const { link, description } = hyperLink &&
+            const link = hyperLink &&
             hyperLink[`${parent}-${d}`] &&
+            hyperLink[`${parent}-${d}`].link;
+
+            const description = hyperLink &&
             hyperLink[`${parent}-${d}`] &&
-            hyperLink[`${parent}-${d}`]
+            hyperLink[`${parent}-${d}`].description;
             const descStyle = !link
               ? {
                   marginLeft: '45px',
