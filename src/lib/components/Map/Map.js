@@ -542,7 +542,8 @@ class Map extends Component {
             this.map.getLayer(layer.id) &&
             layer.filters &&
             layer.filters.highlight &&
-            nextProps.primaryLayer !== this.props.primaryLayer
+            nextProps.primaryLayer !== this.props.primaryLayer &&
+            !layer.visible
           ) {
             /**
              * Remove Nutrition sites layer & Highlight layer on map
@@ -552,7 +553,7 @@ class Map extends Component {
               this.map.removeSource(id);
             });
           } else if (this.map.getLayer(layer.id) && nextProps.MAP.reloadLayerId === layer.id) {
-            // 1) remove layer and source
+            // 1) remove layer and source 
             let doUpdateTsLayer =
               nextProps.layerObj.aggregate && nextProps.layerObj.aggregate.timeseries
                 ? true
