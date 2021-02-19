@@ -37,6 +37,7 @@ const mapStateToProps = (state, ownProps) => {
     noLayerText: NULL_LAYER_TEXT,
     showSearchBar: APP.searchBar,
     hyperLink: APP.hyperLink,
+    highlightText: APP.highlightText,
     infoText: APP.infoText,
     legendInfoText: APP.legendInfoText,
     menuScroll: MAP.menuScroll, // Set's scroll position to zero when loading superset Menu component
@@ -202,7 +203,7 @@ class Menu extends Component {
    * @param {Array} searchResults - array of search results
    * @param {string} input - user search input
    */
-  handleSearchInput(searchResults, input, parentThis=this.state) {
+  handleSearchInput(searchResults, input, parentThis = this.state) {
     const { searching } = parentThis.state;
     parentThis.setState({ searchResults: [] });
     if (!input) {
@@ -234,7 +235,7 @@ class Menu extends Component {
 
   render() {
     const { searching, searchResults, categories } = this.state;
-    const { disableDefault, showSearchBar, hyperLink } = this.props;
+    const { disableDefault, showSearchBar, hyperLink, highlightText } = this.props;
     if (disableDefault) return this.props.children || null;
     const { mapId } = this.props;
     const children = React.Children.map(this.props.children, child => {
@@ -345,7 +346,15 @@ class Menu extends Component {
                         hyperLink &&
                         hyperLink[category.category] &&
                         hyperLink[category.category].description;
-                        
+                      const highlightTextColor =
+                        highlightText &&
+                        highlightText[category.category] &&
+                        highlightText[category.category].color;
+                      const highlightTextBreak =
+                        highlightText &&
+                        highlightText[category.category] &&
+                        highlightText[category.category].break;
+                      
                       const descriptionStyle = !link
                         ? {
                             marginLeft: '33px',
@@ -356,10 +365,12 @@ class Menu extends Component {
                         <li
                           className={`${link || description ? 'sector hyperlink' : 'sector'}`}
                           key={i}
+                          style={highlightTextBreak ? {marginTop: '20%'}: {}}
                         >
                           <a
                             className={`${link || description ? 'sector hyperlink' : 'sector'}`}
                             onClick={e => this.onCategoryClick(e, category.category)}
+                            style={ highlightTextColor ? {color: highlightTextColor}: {}}
                           >
                             {category.category}
                             <HyperLink
@@ -379,9 +390,9 @@ class Menu extends Component {
                             &nbsp;&nbsp;
                           </a>
                           <HyperLink
-                              link={link}
-                              description={description}
-                              descriptionStyle={descriptionStyle}
+                            link={link}
+                            description={description}
+                            descriptionStyle={descriptionStyle}
                           />
                           {this.props.openCategories &&
                           this.props.openCategories.includes(category.category) &&
@@ -412,7 +423,7 @@ class Menu extends Component {
                           ) : (
                             <ul />
                           )}
-                        </li>
+                        </li> 
                       );
                     })
                   ) : (
