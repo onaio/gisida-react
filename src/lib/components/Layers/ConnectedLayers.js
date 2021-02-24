@@ -11,6 +11,7 @@ import { connect } from 'react-redux';
 import { Actions } from 'gisida';
 import { menuGroupHasVisibleLayers } from '../../utils';
 import { HyperLink } from '../HyperLink/HyperLink';
+import { Link } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const MAP = state[ownProps.mapId];
@@ -178,7 +179,7 @@ export class ConnectedLayers extends Component {
               : null;
             layerItem = layerItem.concat([
               <li>
-                <a
+                <Link
                   key={`${d}-${i}-link`}
                   className={
                     hyperLink && hyperLink[`${parent}-${d}`]
@@ -193,7 +194,7 @@ export class ConnectedLayers extends Component {
                       this.isGroupOpen(d, layer[d].parent) ? 'down' : 'right'
                     }`}
                   />
-                </a>
+                </Link>
                 {hyperLink && hyperLink[`${parent}-${d}`] ? (
                   <HyperLink
                     link={link}
