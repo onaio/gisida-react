@@ -6,7 +6,6 @@ exports[`Menu Component SearchBar component renders correctly 1`] = `
   handleSearchInput={[MockFunction]}
   mapId="map-1"
   openCategoryForSharedLayers={[MockFunction]}
-  parentState={Object {}}
   searchResultClick={[MockFunction]}
   searching={false}
   store={
@@ -34,7 +33,6 @@ exports[`Menu Component SearchBar component renders correctly 1`] = `
     handleSearchInput={[MockFunction]}
     mapId="map-1"
     openCategoryForSharedLayers={[MockFunction]}
-    parentState={Object {}}
     preparedLayers={
       Object {
         "education": Object {

@@ -477,5 +477,12 @@ Object {
   "searchBarColor": undefined,
   "searchResultClick": [Function],
   "searching": false,
+  "setState": [Function],
+  "state": Object {
+    "categories": Array [],
+    "searchResults": Array [],
+    "searching": false,
+    "sharedLayers": Array [],
+  },
 }
 `;
