@@ -68,6 +68,7 @@ exports[`Menu Component Menu component renders correctly with all props 1`] = `
     }
     currentRegion="reg2"
     dispatch={[Function]}
+    hasNavBar={false}
     loaded={true}
     mapId="map-1"
     mapTargetId=""
@@ -325,6 +326,7 @@ Object {
   ],
   "currentRegion": "reg2",
   "dispatch": [Function],
+  "hasNavBar": false,
   "highlightText": undefined,
   "hyperLink": undefined,
   "infoText": undefined,

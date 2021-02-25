@@ -30,7 +30,7 @@ const mapStateToProps = (state, ownProps) => {
     mapTargetId: '',
     regions: state.REGIONS,
     currentRegion: currentRegion,
-    loaded,
+    loaded: state.APP.loaded,
     preparedLayers: MAP.layers,
     menuIsOpen: MAP.menuIsOpen,
     openCategories: MAP.openCategories,
