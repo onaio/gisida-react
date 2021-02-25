@@ -205,6 +205,7 @@ export class Legend extends React.Component {
       layers,
       primaryLayer,
       activeLayerIds,
+      mapStateToUrl
     } = this.props;
 
     if (!layerObj) {
@@ -1053,13 +1054,14 @@ export class Legend extends React.Component {
     }
 
     legendItems.unshift(primaryLegend);
-    const showLoader = legendLayers.length > 0 ? legendItems.length !== legendLayers.length : false;
+    const showLoader = legendLayers.length > 0 && mapStateToUrl ? legendItems.length !== legendLayers.length : false;
     return (
       <div>
         <div
           className={this.props.hasNavBar ? `legend ${mapId} bottom` : `legend ${mapId}`}
           
         >
+
           {showLoader && (
             <div className="legend-row">
               <b>Loading...</b>

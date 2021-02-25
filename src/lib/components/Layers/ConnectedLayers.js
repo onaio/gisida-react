@@ -122,7 +122,7 @@ export class ConnectedLayers extends Component {
       if (
         (!currentRegion ||
           (preparedLayers[layer.id].region && preparedLayers[layer.id].region === currentRegion)) &&
-        !subLayerIds.includes(layer.id)
+        !subLayerIds.includes(layer.id) && !(subLayerIds.map(httpLayers => httpLayers.includes(layer.id)).includes(true))
       ) {
         if (layer.id && (!auth || !auth.authConfigs)) {
           if (this.props.layerItem) {
