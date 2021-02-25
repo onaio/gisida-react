@@ -65,14 +65,15 @@ const exportPresetKey = {
 
 const mapStateToProps = (state, ownProps) => {
   const { APP } = state;
+  const { mapConfig, hasNavBar } = APP;
   const mapId = ownProps.mapId || 'map-1';
   const MAP = state[mapId] || { blockLoad: true };
 
   return {
     MAP,
-    config: APP.mapConfig,
+    config: mapConfig,
     map: mapId === 'map-1' ? window.maps[0] : window.maps[1],
-    hasNavBar: ownProps.hasNavBar,
+    hasNavBar,
   };
 };
 

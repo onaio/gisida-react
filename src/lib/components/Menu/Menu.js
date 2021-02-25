@@ -30,7 +30,7 @@ const mapStateToProps = (state, ownProps) => {
     mapTargetId: '',
     regions: state.REGIONS,
     currentRegion: currentRegion,
-    loaded: state.APP.loaded,
+    loaded,
     preparedLayers: MAP.layers,
     menuIsOpen: MAP.menuIsOpen,
     openCategories: MAP.openCategories,
@@ -458,6 +458,10 @@ Menu.propTypes = {
   hasNavBar: PropTypes.bool, // Pass true if app has a navbar
   layerItem: PropTypes.element, // Custom layer list item. Use in place of components/Layer/Layer
   useConnectedLayers: PropTypes.bool, // If true, use components/Layers/ConnectedLayers
+};
+
+Menu.defaultProps = {
+  hasNavBar: false,
 };
 
 export default connect(mapStateToProps)(Menu);

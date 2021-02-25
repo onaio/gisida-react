@@ -75,7 +75,6 @@ const mapStateToProps = (state, ownProps) => {
     showFilterPanel: !!MAP.showFilterPanel,
     activeLayers,
     handlers: ownProps.handlers,
-    hasNavBar: ownProps.hasNavBar,
     hasDataView,
   };
 };
@@ -1093,7 +1092,7 @@ class Map extends Component {
       return null;
     }
     // todo - move this in to this.props.MAP.sidebarOffset for extensibility
-    const { detailView, layerObj, timeSeriesObj, showDetailView } = this.props;
+    const { detailView, layerObj, timeSeriesObj, showDetailView, APP } = this.props;
     const join =
       layerObj &&
       ((layerObj[DETAIL_VIEW] && layerObj[DETAIL_VIEW].join) ||
@@ -1147,7 +1146,6 @@ class Map extends Component {
               {React.Children.map(this.props.children, child => {
                 return React.cloneElement(child, {
                   mapId: this.props.mapId,
-                  hasNavBar: this.props.hasNavBar,
                 });
               })}
             </div>
@@ -1159,7 +1157,6 @@ class Map extends Component {
 }
 
 Map.propTypes = {
-  hasNavBar: PropTypes.bool,
   mapId: PropTypes.string,
   APP: PropTypes.object,
   STYLES: PropTypes.array,
