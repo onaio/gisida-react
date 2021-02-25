@@ -1037,6 +1037,9 @@ class Map extends Component {
         if (this.props.layers[id].layers) {
           for (let sl = 0; sl < this.props.layers[id].layers.length; sl += 1) {
             slId = this.props.layers[id].layers[sl];
+            if (slId.includes('http')) {
+              slId = slId.split('/').slice(-1).pop()
+            }
             if (this.props.layers[slId].labels) {
               hasLabel = slId;
               break;

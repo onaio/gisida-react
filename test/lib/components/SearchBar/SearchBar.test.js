@@ -54,11 +54,11 @@ describe('Menu Component', () => {
     
     // search input not found
     wrapper.find('input').simulate('change', { target: { value: 'test search' }});
-    expect(props.handleSearchInput).toHaveBeenLastCalledWith([], 'test search')
+    expect(props.handleSearchInput).toHaveBeenLastCalledWith([], 'test search', undefined, undefined)
 
     // search input available
     wrapper.find('input').simulate('change', { target: { value: 'enrolled' }});
-    expect(props.handleSearchInput).toHaveBeenLastCalledWith(expect.any(Array), 'enrolled');
+    expect(props.handleSearchInput).toHaveBeenLastCalledWith(expect.any(Array), 'enrolled', undefined, undefined);
 
     // click cancel button
     wrapper.find('.fa-times').simulate('click')
