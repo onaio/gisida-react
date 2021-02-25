@@ -103,7 +103,7 @@ class SearchBar extends Component {
    */
   handleSearchInput(e) {
     this.setState({ inputText: e.target.value });
-    const { handleSearchInput, preparedLayers, parentState } = this.props;
+    const { handleSearchInput, preparedLayers, state, setState} = this.props;
     let input = e.target.value;
     input = input.replace(/\s+/g, ' ');
     input = input.trimStart();
@@ -119,7 +119,7 @@ class SearchBar extends Component {
         );
       }
     });
-    handleSearchInput(searchResults, input, parentState);
+    handleSearchInput(searchResults, input, state, setState);
   }
 
   /**

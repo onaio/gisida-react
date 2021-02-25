@@ -203,13 +203,13 @@ class Menu extends Component {
    * @param {Array} searchResults - array of search results
    * @param {string} input - user search input
    */
-  handleSearchInput(searchResults, input, parentThis = this.state) {
-    const { searching } = parentThis.state;
-    parentThis.setState({ searchResults: [] });
+  handleSearchInput(searchResults, input, state, setState) {
+    const { searching } = state;
+    setState({ searchResults: [] });
     if (!input) {
-      return searching ? parentThis.setState({ searching: false }) : null;
+      return searching ? setState({ searching: false }) : null;
     }
-    parentThis.setState({
+    setState({
       searchResults,
       searching: true,
     });
@@ -297,7 +297,8 @@ class Menu extends Component {
                     searchResultClick={this.searchResultClick}
                     mapId={mapId}
                     openCategoryForLayers={this.openCategoryForLayers}
-                    parentState={this}
+                    state={this.state}
+                    setState={this.setState.bind(this)}
                   />
                 </div>
               ) : null}
