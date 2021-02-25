@@ -325,6 +325,7 @@ Object {
   ],
   "currentRegion": "reg2",
   "dispatch": [Function],
+  "highlightText": undefined,
   "hyperLink": undefined,
   "infoText": undefined,
   "legendInfoText": undefined,
