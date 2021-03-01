@@ -33,7 +33,6 @@ const initialState = {
   },
   APP,
   LOC: {},
-  // MAP: {layers: [{}, {}]}
 };
 
 const mockStore = configureStore();

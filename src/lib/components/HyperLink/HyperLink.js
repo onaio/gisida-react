@@ -1,7 +1,13 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-
+/**
+ * 
+ * @param {object} props 
+ * To provide more context on the various layer groupings on the menu
+ * This component is responsible for rendering links and description icons
+ * on the menu
+ */
 export const HyperLink = (props) => {
 
   const { link, description, spanClassName, descriptionStyle } = props;
