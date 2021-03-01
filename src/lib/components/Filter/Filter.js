@@ -1,14 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import {
-  Actions,
-  generateFilterOptions,
-  generateFilterOptionsPrev,
-  buildFilterState,
-  clearFilterState,
-  lngLat,
-} from 'gisida';
+import { Actions, generateFilterOptions, buildFilterState, clearFilterState, lngLat } from 'gisida';
 import { buildLayersObj } from '../../utils';
 import FilterSelector from './FilterSelector';
 import FilterSelectorPrev from './FilterSelectorPrev';
@@ -81,26 +74,6 @@ export class Filter extends Component {
     let filter;
     let f;
     let o;
-
-    // todo - use this again to sort options
-    // const optionSort = (a, b) => {
-    //   if (typeof a === 'string' && typeof b === 'string') {
-    //     if (a.toUpperCase() < b.toUpperCase()) {
-    //       return -1;
-    //     }
-    //     if (a.toUpperCase() > b.toUpperCase()) {
-    //       return 1;
-    //     }
-    //   } else {
-    //     if (a < b) {
-    //       return -1;
-    //     }
-    //     if (a > b) {
-    //       return -1;
-    //     }
-    //   }
-    //   return 0;
-    // };
 
     // loop over all filters and build filter state from prevFilters or clean
     for (f = 0; f < filterKeys.length; f += 1) {
@@ -269,7 +242,6 @@ export class Filter extends Component {
 
   handleFilterClick() {
     const { dispatch, mapId, layerId, APP, LOC, layerObj } = this.props;
-    // const availableMaps = ['map-1', 'map-2'];
     const { center, zoom } = lngLat(LOC, APP);
     window.maps.forEach(e => {
       if (layerObj && !layerObj.location) {
@@ -330,10 +302,6 @@ export class Filter extends Component {
     // determine whether to update the compnent state
     const doUpdate =
       (layerId !== this.state.layerId && filterOptions && Object.keys(filterOptions).length > 0) ||
-      // (nextProps.layerObj &&
-      //   nextProps.layerObj.aggregate &&
-      //   nextProps.layerObj.aggregate.filter &&
-      //   !this.state.filters) ||
       (filterState && filterState.doUpdate) ||
       (timeseriesObj &&
         timeseriesObj.temporalIndex !==
@@ -356,10 +324,6 @@ export class Filter extends Component {
   }
   onCloseClick = e => {
     e.preventDefault();
-    //TODO dispach close action
-    // this.setState({
-    //   showFilterModal: false,
-    // });
   };
 
   onFilterItemClick = (e, filterKey) => {
@@ -368,7 +332,6 @@ export class Filter extends Component {
       const { filters } = this.state;
       const nextFilters = filters;
       nextFilters[filterKey].isOpen = !filters[filterKey].isOpen;
-      // nextFilters[filterKey].doAdvFiltering = false;
       this.setState({
         filters: nextFilters,
       });
@@ -708,7 +671,6 @@ export class Filter extends Component {
         isOpen: true,
         doAdvFiltering: e.target.getAttribute('data-type') === 'advanced-filter',
       }),
-      // queries: null,
     });
     this.setState({
       filters: {
@@ -721,7 +683,6 @@ export class Filter extends Component {
   clearAllFiltersSearch = e => {
     this.searchEl.value = '';
     this.allFiltersSearch(e);
-    // this.onClearClick(e, isFilterable);
   };
 
   allFiltersSearch = e => {
@@ -784,29 +745,14 @@ export class Filter extends Component {
 
     for (let f = 0; f < filterKeys.length; f += 1) {
       filterKey = filterKeys[f];
-      // if (filterKey === clickedFilterKey) continue;
       filter = filters[filterKey];
       aggregate.filter[f] = filterKey;
       aggregate['accepted-filter-values'][f] =
         filter.queriedOptionKeys && filter.queriedOptionKeys.length
           ? [...new Set(filter.queriedOptionKeys)]
           : [];
-      // aggregate['sub-filter'][f] = '';
-      // aggregate['accepted-sub-filter-values'][f] = '';
       aggregate['filter-label'][f] = filter.label || '';
 
-      // keys = Object.keys(filters[filterKey]);
-      // for (let k = 0; k < keys.length; k += 1) {
-      //   if (keys[k] !== 'label' && keys[k] !== 'filterValues') {
-      //     aggregate['sub-filter'][f] = keys[k];
-      //     aggregate['accepted-sub-filter-values'][f] = [];
-      //   }
-      // }
-      // if (filter.dataType === 'quantitative') {
-      // aggregate['accepted-filter-values'][f] =
-      // filter.queriedOptionKeys.length ?
-      // filter.queriedOptionKeys : 'quant';
-      // } else
       if (filter.isFiltered && filter.dataType === 'ordinal') {
         options = filter.options;
         optionKeys = Object.keys(options);
@@ -823,10 +769,7 @@ export class Filter extends Component {
         if (optionKeys.length === aggregate['accepted-filter-values'][f].length) {
           aggregate['accepted-filter-values'][f] = filter.filterType === 'multi' ? 'multi' : 'all';
         }
-        // } else if (dataType === 'quantitative') {
-        //   aggregate['accepted-filter-values'][f] = filter.isFiltered ?
       } else if (!filter.isFiltered) {
-        // if (filters[filterKey].isOriginal) {
         aggregate['accepted-filter-values'][f] =
           filter.dataType === 'ordinal'
             ? filter.filterType === 'multi'
@@ -834,24 +777,6 @@ export class Filter extends Component {
               : 'all'
             : 'quant';
       }
-
-      // if (typeof aggregate['accepted-sub-filter-values'][f] === 'string') {
-      //   continue;
-      // }
-
-      // options = filters[filterKey][aggregate['sub-filter'][f]];
-      // optionKeys = Object.keys(options);
-      // for (let o = 0; o < optionKeys.length; o += 1) {
-      //   optionKey = optionKeys[o];
-      //  if (options[optionKey].enabled) {
-      //  aggregate['accepted-sub-filter-values'][f].push(optionKey);
-      //  }
-      // }
-      // if (optionKeys.length === aggregate['accepted-sub-filter-values'][f].length) {
-      //   aggregate['accepted-sub-filter-values'][f] = 'all';
-      // } else if (!optionKeys.length) {
-      //   aggregate['accepted-sub-filter-values'][f] = 'all';
-      // }
     }
 
     const { layerObj } = this.props;
@@ -943,9 +868,6 @@ export class Filter extends Component {
         isFiltered = true;
         nextFilter.isFiltered = true;
       }
-      // if (nextFilter.isFiltered) {
-      //   isFiltered = true;
-      // }
     }
 
     if (
