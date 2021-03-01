@@ -1,5 +1,7 @@
 # Menu/legend info Links
-gisida-react menu component builds menu items/sections based on json spec provided on clients site-config file. Menu/legend info links feature seeks to give context of the selected layer, menu sections and subsections. The links can be added by adding links and descriptions to layer/siteconfig as shown below.    
+gisida-react menu component builds menu items/sections based on json spec provided on clients site-config file. Menu/legend info links feature seeks to give context of the selected layer, menu sections and subsections. The links can be added by adding links and descriptions to layer/siteconfig as shown below. 
+
+![alt text](https://raw.githubusercontent.com/onaio/gisida-react/staging/public/assets/img/hyperlink-icon.png)
 
 ## Usage and expected behaviour
 
