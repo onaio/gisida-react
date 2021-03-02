@@ -358,9 +358,9 @@ export class Legend extends React.Component {
           let hasShape;
           hasShape = layer.categories && layer.categories.shape && layer.categories.shape.length;
           const shapeAndBar = layer.categories && layer.categories.shapeAndBar;
-          const fillWidth = (
-            100 / layer.categories && layer.categories.color && layer.categories.color.filter(c => c !== 'transparent').length
-          ).toString();
+          const fillWidth = Array.isArray(layer.categories.color) ? (
+            100 / (layer.categories.color.filter(c => c !== 'transparent')).length
+          ).toString() : null;
           const textColor = layer.categories && layer.categories['text-color'];
           /**
            * Add multiple shapes and labels
@@ -485,9 +485,9 @@ export class Legend extends React.Component {
                 if (category.credit) {
                   fillCredit = Parser(category.credit);
                 }
-                let fillWidth = (
-                  100 / category.color.filter(c => c !== 'transparent').length
-                ).toString();
+                let fillWidth = Array.isArray(layer.categories.color) ? (
+                  100 / (layer.categories.color.filter(c => c !== 'transparent')).length
+                ).toString() : null;
                 category.color.forEach((color, index) => {
                   background.push(
                     <li
@@ -724,9 +724,9 @@ export class Legend extends React.Component {
               : 'background:';
           const styleString = `${style}: ${color}`;
           const showBoth = shapeAndBar && shapeAndBar.length && shapeAndBar[index] === 'yes';
-          const fillWidth = (
-            100 / layer.categories.color.filter(c => c !== 'transparent').length
-          ).toString();
+          const fillWidth = Array.isArray(layer.categories.color) ? (
+            100 / (layer.categories.color.filter(c => c !== 'transparent')).length
+          ).toString() : null;
           const textColor = layer.categories && layer.categories['text-color'];
 
           if (showBoth && hasShape) {
@@ -790,9 +790,9 @@ export class Legend extends React.Component {
           </div>
         );
       } else if (fillLayerNoBreaks && !layer.parent) {
-        const fillWidth = (
-          100 / layer.categories.color.filter(c => c !== 'transparent').length
-        ).toString();
+        const fillWidth = Array.isArray(layer.categories.color) ? (
+          100 / (layer.categories.color.filter(c => c !== 'transparent')).length
+        ).toString() : null;
         if (layer.categories.labelShape) {
           layer.categories.labelShape.forEach((labelShape, index) => {
             background.push(
@@ -857,9 +857,9 @@ export class Legend extends React.Component {
               if (category.credit) {
                 fillCredit = Parser(category.credit);
               }
-              let fillWidth = (
-                100 / category.color.filter(c => c !== 'transparent').length
-              ).toString();
+              let fillWidth = Array.isArray(layer.categories.color) ? (
+                100 / (layer.categories.color.filter(c => c !== 'transparent')).length
+              ).toString() : null;
               category.color.forEach((color, index) => {
                 background.push(
                   <li

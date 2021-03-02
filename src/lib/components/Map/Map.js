@@ -94,6 +94,7 @@ class Map extends Component {
       }),
       sharedStyleLoaded: false,
       sharedStyle: utils.getSharedStyleFromURL(mapId),
+      layerStyleLoaded: false,
     };
   }
 
@@ -116,6 +117,9 @@ class Map extends Component {
         if (mapIcons) {
           mapIcons.forEach(element => {
             this.map.loadImage(element.imageUrl, (error, res) => {
+              if (error) {
+                return false;
+              }
               this.map.addImage(element.id, res);
             });
           });
@@ -420,12 +424,15 @@ class Map extends Component {
     const primaryLayer = nextProps.MAP.primaryLayer;
     const activeLayerId = nextProps.MAP.activeLayerId;
     const showLayerSuperset = nextProps.VIEW.showLayerSuperset;
-
+    const layerStyles = nextProps.APP.layerStyles;
     const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES || [];
     const regions = nextProps.REGIONS;
     const mapId = nextProps.mapId;
     mapConfig.container = mapId;
+    let layerStyleIndex;
+
+    const { sharedStyle, sharedStyleLoaded, layerStyleLoaded } = this.state;
 
     if (this.props.hasDataView && this.map && showLayerSuperset) {
       if (layers && layers[primaryLayer] && layers[primaryLayer].location) {
@@ -434,12 +441,10 @@ class Map extends Component {
         this.dataViewMapReset(mapConfig, this.map);
       }
     }
-
     // Check if map is initialized.
     /** If there is a a style from URL, initialize map with that style, else
      * initialize with the default style
      */
-    const { sharedStyle, sharedStyleLoaded } = this.state;
 
     if ((!utils.usesIE() || mapboxgl.supported()) && !nextProps.MAP.blockLoad) {
       if (sharedStyle !== null && styles[sharedStyle] && this.props.STYLES) {
@@ -476,11 +481,33 @@ class Map extends Component {
 
     // Check if rendererd map has finished loading
     if (isLoaded) {
+      /*
+      Render style on a specific layer
+      The layer specific style is driven by layerStyles config provided on the site-config
+      */
+      if (layerStyles) {
+        layerStyleIndex =
+          layerStyles.find(layerStyle => layerStyle.name === primaryLayer) &&
+          layerStyles.find(layerStyle => layerStyle.name === primaryLayer).styleIndex;
+        if (layerStyleIndex && styles[layerStyleIndex] && !layerStyleLoaded) {
+          this.props.dispatch(Actions.changeStyle(mapId, styles[layerStyleIndex].url));
+          this.setState({
+            layerStyleLoaded: !this.state.layerStyleLoaded,
+          });
+        } else if (!layerStyleIndex && layerStyleLoaded) {
+          this.props.dispatch(Actions.changeStyle(mapId, styles[0].url));
+          this.setState({
+            layerStyleLoaded: !this.state.layerStyleLoaded,
+          });
+        }
+      }
       // Set current style (basemap)
       styles.forEach(style => {
         if (style[mapId] && style[mapId].current && this.props.MAP.currentStyle !== currentStyle) {
           this.map.setStyle(style.url);
-          pushStyleToURL(styles, style, mapId);
+          if (nextProps.mapStateToProps) {
+            pushStyleToURL(styles, style, mapId);
+          }
         }
       });
       // Zoom to current region (center and zoom)
@@ -498,9 +525,16 @@ class Map extends Component {
       if (this.props.MAP.reloadLayers !== reloadLayers) {
         Object.keys(layers).forEach(key => {
           const layer = layers[key];
-          // Add layer to map if visible
+          // Investigate alternative to the arbitrary delay
+          // Add layer to map if visible and basemap/style is loaded else delay
           if (!this.map.getLayer(layer.id) && layer.visible && layer.styleSpec) {
-            this.map.addLayer({ ...layer.styleSpec });
+            if (this.map.isStyleLoaded()) {
+              this.map.addLayer({ ...layer.styleSpec });
+            } else {
+              setTimeout(() => {
+                this.map.addLayer({ ...layer.styleSpec });
+              }, 1000);
+            }
 
             // if layer has a highlight layer
             if (layer.filters && layer.filters.highlight) {
@@ -667,7 +701,6 @@ class Map extends Component {
         layers,
         showDetailView,
       } = this.props;
-
       if (this.props.hasDataView && this.map && VIEW.showLayerSuperset) {
         if (layers && layers[primaryLayer] && layers[primaryLayer].location) {
           this.map.easeTo(layers[primaryLayer].location);

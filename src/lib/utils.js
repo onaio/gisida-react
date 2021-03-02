@@ -447,7 +447,7 @@ export function getCategoryForLayers(layersToOpenCategory, categories) {
 
 export function isCircleLayer(layer) {
   return (
-    layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible
+    layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible && layer.categories.breaks !== "no"
   );
 }
 

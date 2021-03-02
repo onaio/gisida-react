@@ -10,6 +10,7 @@ import { debounce } from 'lodash';
 import { getSharedLayersFromURL, getCategoryForLayers } from '../../utils';
 import { getAccessibleCategories } from './utils';
 import { HyperLink } from '../HyperLink/HyperLink';
+import { Link } from "react-router-dom";
 
 const mapStateToProps = (state, ownProps) => {
   const { mapId } = ownProps;
@@ -266,13 +267,13 @@ class Menu extends Component {
             style={{ marginTop }}
           >
             {/* Open menu button */}
-            <a
+            <Link
               onClick={e => this.onToggleMenu(e)}
               className="open-btn"
               style={{ display: this.props.menuIsOpen ? 'none' : 'block' }}
             >
               <span className="glyphicon glyphicon-menu-hamburger"></span>
-            </a>
+            </Link>
             {/* Menu */}
             <div
               id={`${mapId}-menu`}
@@ -280,9 +281,9 @@ class Menu extends Component {
               style={{ display: this.props.menuIsOpen ? 'block' : 'none' }}
             >
               {/* Close menu button */}
-              <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
+              <Link className="close-btn" onClick={e => this.onToggleMenu(e)}>
                 <span className="glyphicon glyphicon-remove"></span>
-              </a>
+              </Link>
 
               {/* Children Elements (top) */}
               {children && childrenPosition !== 'bottom' ? children : ''}
@@ -308,10 +309,10 @@ class Menu extends Component {
                 <ul className="sectors">
                   {regions && regions.length ? (
                     <li className="sector">
-                      <a onClick={e => this.onCategoryClick(e, 'Regions')}>
+                      <Link onClick={e => this.onCategoryClick(e, 'Regions')}>
                         Regions
                         <span className="caret" />
-                      </a>
+                      </Link>
                       <ul className="layers">
                         {regions && regions.length ? (
                           regions.map((region, i) => (
@@ -368,7 +369,7 @@ class Menu extends Component {
                           key={i}
                           style={highlightTextBreak ? {marginTop: '20%'}: {}}
                         >
-                          <a
+                          <Link
                             className={`${link || description ? 'sector hyperlink' : 'sector'}`}
                             onClick={e => this.onCategoryClick(e, category.category)}
                             style={ highlightTextColor ? {color: highlightTextColor}: {}}
@@ -389,7 +390,7 @@ class Menu extends Component {
                               }
                             />{' '}
                             &nbsp;&nbsp;
-                          </a>
+                          </Link>
                           <HyperLink
                             link={link}
                             description={description}
