@@ -3,21 +3,26 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Actions, formatNum, hexToRgbA, generateStops } from 'gisida';
-import { buildLayersObj } from '../../utils';
+import { buildLayersObj, isCircleLayer, isFillLayerNoBreaks, isFillLayerWithBreaks, isSymbolLayer } from '../../utils';
+import { buildTimestamp, buildHyperLink, buildDescription, combinedLinks } from '../Legend/Utils';
 import Parser from 'html-react-parser';
 import './Legend.scss';
 
 const mapStateToProps = (state, ownProps) => {
+  const { hasNavBar } = ownProps;
   const mapId = ownProps.mapId || 'map-1';
   const MAP = state[ownProps.mapId] || { layers: {}, timeseries: {} };
-
+  const APP = state['APP'];
   let subLayerCheck =
     MAP.primaryLayer === MAP.layers &&
     MAP.layers[MAP.primarySubLayer] &&
     MAP.layers[MAP.primarySubLayer].parent
       ? MAP.primarySubLayer
       : null;
+
   return {
+    LOC: state.LOC,
+    APP,
     timeseries: MAP.timeseries,
     layerObj: MAP.layers[MAP.primaryLayer],
     timeSeriesObj: MAP.timeseries[subLayerCheck || MAP.primaryLayer],
@@ -30,6 +35,8 @@ const mapStateToProps = (state, ownProps) => {
     primaryLayer: MAP.primaryLayer,
     showFilterPanel: MAP.showFilterPanel,
     primarySubLayer: MAP.primarySubLayer,
+    mapStateToUrl: APP.mapStateToUrl,
+    hasNavBar,
   };
 };
 
@@ -44,17 +51,27 @@ export class Legend extends React.Component {
   }
   shouldComponentUpdate(nextProps) {
     const { layerObj, timeSeriesObj } = nextProps;
-    return (((this.props.layerObj && this.props.layerObj.categories) ||
+    /**
+     * Update component when categories are built and the nextprops layerobj don't 
+     * match current props layerObj same for the timeseriesObj
+     * Not certain why this work in some cases when checking for activelayerIds alone
+     * Check if activelayerIds has changed too
+     */
+    return ((
       (layerObj && layerObj.categories)) &&
       layerObj !== this.props.layerObj) ||
-      (((this.props.timeSeriesObj && this.props.timeSeriesObj.categories) ||
+      ((
         (timeSeriesObj && timeSeriesObj.categories)) &&
-        timeSeriesObj !== this.props.timeSeriesObj)
+        timeSeriesObj !== this.props.timeSeriesObj) ||
+      (this.props.activeLayerIds &&
+        this.props.activeLayerIds.length !== nextProps.activeLayerIds &&
+        nextProps.activeLayerIds.length)
       ? true
       : false;
   }
   componentWillReceiveProps(nextProps) {
     const { layerObj } = nextProps;
+    /** generate stops if timeseriesObj has been updated */
     if (
       nextProps.timeSeriesObj &&
       this.props.timeSeriesObj !== nextProps.timeSeriesObj &&
@@ -63,11 +80,11 @@ export class Legend extends React.Component {
       layerObj.property
     ) {
       const { timeSeriesObj, dispatch } = nextProps;
-
       const stops = generateStops(
         timeSeriesObj,
         timeSeriesObj.layerObj.aggregate.timeseries.field,
-        dispatch
+        dispatch,
+        timeSeriesObj.temporalIndex
       );
       if (
         timeSeriesObj &&
@@ -104,14 +121,17 @@ export class Legend extends React.Component {
         const stops = generateStops(
           timeSeriesObj,
           timeSeriesObj.layerObj.aggregate.timeseries.field,
-          this.props.dispatch
+          this.props.dispatch,
+          timeSeriesObj.temporalIndex
         );
 
         timeSeriesObj.newBreaks = stops[3];
         timeSeriesObj.newColors = [
           ...new Set(timeSeriesObj.colorStops[timeSeriesObj.temporalIndex].map(d => d[1])),
         ];
-
+        /**
+         * Set the next timeseriesObj to state
+         */
         this.setState({
           timeSeriesObj: nextProps.timeSeriesObj,
         });
@@ -120,7 +140,7 @@ export class Legend extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { primaryLayer, layers, mapId, dispatch } = this.props;
+    const { primaryLayer, layers } = this.props;
     if (
       primaryLayer !== prevProps.primaryLayer &&
       layers &&
@@ -132,12 +152,27 @@ export class Legend extends React.Component {
       });
     }
   }
-
+  /**
+   * Handler responsible for closing the Legend and toggling off the layer 
+   * @param {event} 
+   */
+  onCloseClick(e) {
+    e.stopPropagation();
+    const targetLayer = e.target.getAttribute('data-close-layer');
+    const { mapId, layer, layerObj } = this.props;
+    this.props.dispatch(Actions.toggleLayer(mapId, targetLayer || layerObj.id || layer.id));
+  }
+  /**
+   * Works in the event many layers have been selected on the map.
+   * Allows switching primary layer in a stacked fashion 
+   * @param {event} e 
+   */
   onUpdatePrimaryLayer(e) {
-    if (e.target.getAttribute('data-download') !== 'download') {
-      e.preventDefault();
-    }
-    if (e.target.getAttribute('data-credit') !== 'credit') {
+    if (
+      e.target.getAttribute('data-download') !== 'download' &&
+      e.target.getAttribute('data-link') !== 'resourceLink' &&
+      e.target.getAttribute('data-credit') !== 'credit'
+    ) {
       e.preventDefault();
     }
     const { dispatch, mapId } = this.props;
@@ -148,42 +183,19 @@ export class Legend extends React.Component {
       return layer.replace('.json', '');
     };
     const targetLayerPageUrl = removeJsonExtensions(targetLayer);
-    let pageURL = `${window.location.href.replace(
-      `${targetLayerPageUrl},`,
-      ''
-    )},${targetLayerPageUrl}`;
+    if (this.props.mapStateToUrl) {
+      let pageURL = `${window.location.href.replace(
+        `${targetLayerPageUrl},`,
+        ''
+      )},${targetLayerPageUrl}`;
 
-    history.replaceState('', '', pageURL);
+      history.replaceState('', '', pageURL);
+    }
     // dispatch primary layer id
     dispatch(Actions.updatePrimaryLayer(mapId, targetLayer));
   }
 
-  isCircleLayer(layer) {
-    return (
-      layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible
-    );
-  }
-
-  isSymboLayer(layer) {
-    return (
-      layer && layer.credit && layer.categories && layer.categories.shape && layer.type !== 'circle'
-    );
-  }
-
-  isFillLayerNoBreaks(layer) {
-    return layer && layer.credit && layer.categories && layer.categories.breaks === 'no';
-  }
-
-  isFillLayerWithBreaks(layer) {
-    return (
-      layer &&
-      layer.credit &&
-      layer.type !== 'chart' &&
-      layer.type !== 'circle' &&
-      layer.categories &&
-      layer.categories.breaks === 'yes'
-    );
-  }
+  
   render() {
     const {
       layerObj,
@@ -193,24 +205,19 @@ export class Legend extends React.Component {
       layers,
       primaryLayer,
       activeLayerIds,
+      mapStateToUrl
     } = this.props;
 
     if (!layerObj) {
       return false;
     }
     let latestTimestamp;
-    if (
-      layerObj['timestamp'] &&
-      Array.isArray(layerObj.source.data.features || layerObj.source.data) &&
-      (layerObj.source.data.features || layerObj.source.data).length > 1
-    ) {
-      latestTimestamp = (layerObj.source.data.features || layerObj.source.data)
-        .map(d => (d.properties && d.properties[layerObj['timestamp']]) || d[layerObj['timestamp']])
-        .sort()
-        .reverse()[0];
-    }
+    /** Build timestamp */
+    latestTimestamp = buildTimestamp(layerObj);
+    const legendDescription = layerObj['legendDescription'] ? buildDescription(layerObj) : null;
     const legendItems = [];
     latestTimestamp = latestTimestamp ? <span>Timestamp: {latestTimestamp}</span> : null;
+    const legendLink = combinedLinks(legendDescription);
     let primaryLegend;
     let layer;
     let exportLink = (
@@ -222,7 +229,6 @@ export class Legend extends React.Component {
         download
       ></a>
     );
-
     let activeLegendLayer;
     for (let a = activeLayerIds.length - 1; a >= 0; a -= 1) {
       if (layers[activeLayerIds[a]] && layers[activeLayerIds[a]].credit) {
@@ -240,18 +246,18 @@ export class Legend extends React.Component {
     }
     const legendLayers = this.props.layersData.filter(
       layer =>
-        this.isCircleLayer(layer) ||
-        this.isSymboLayer(layer) ||
-        this.isFillLayerNoBreaks(layer) ||
-        this.isFillLayerWithBreaks(layer)
+        isCircleLayer(layer) ||
+        isSymbolLayer(layer) ||
+        isFillLayerNoBreaks(layer) ||
+        isFillLayerWithBreaks(layer)
     );
 
     for (let l = 0; l < this.props.layersData.length; l += 1) {
       layer = this.props.layersData[l];
-      const circleLayerType = this.isCircleLayer(layer);
-      const symbolLayer = this.isSymboLayer(layer);
-      const fillLayerNoBreaks = this.isFillLayerNoBreaks(layer);
-      const fillLayerWithBreaks = this.isFillLayerWithBreaks(layer);
+      const circleLayerType = isCircleLayer(layer);
+      const symbolLayer = isSymbolLayer(layer);
+      const fillLayerNoBreaks = isFillLayerNoBreaks(layer);
+      const fillLayerWithBreaks = isFillLayerWithBreaks(layer);
       const multipleLegends = layer && layer.credit && Array.isArray(layer.categories);
       const activeLayerSelected = activeLegendLayer === layer.id ? 'primary' : '';
 
@@ -334,10 +340,16 @@ export class Legend extends React.Component {
               key={l}
               onClick={e => this.onUpdatePrimaryLayer(e)}
             >
+              <span
+                onClick={e => this.onCloseClick(e)}
+                data-close-layer={`${layer.id}`}
+                className="glyphicon glyphicon-remove close"
+              ></span>
               <b>{layer.label}</b>
               <div className="legend-symbols">{quantiles}</div>
               <span>{Parser(layer.credit)}</span>
               {layerObj.exportLink ? exportLink : ''}
+              {legendLink}
               {latestTimestamp}
             </div>
           );
@@ -347,19 +359,42 @@ export class Legend extends React.Component {
           hasShape = layer.categories && layer.categories.shape && layer.categories.shape.length;
           const shapeAndBar = layer.categories && layer.categories.shapeAndBar;
           const fillWidth = (
-            100 / layer.categories.color.filter(c => c !== 'transparent').length
+            100 / layer.categories && layer.categories.color && layer.categories.color.filter(c => c !== 'transparent').length
           ).toString();
           const textColor = layer.categories && layer.categories['text-color'];
+          /**
+           * Add multiple shapes and labels
+           */
+          if (layer.categories.labelShape) {
+          layer.categories.labelShape.forEach((labelShape, index) => {
+            background.push(
+              <li className="layer-symbols" key={index}>
+                {labelShape.shape ? (
+                  <img
+                    className="legend-icon"
+                    src={`/assets/img/${labelShape.shape}.svg`}
+                  />
+                ) : null}
+                {labelShape.label}
+              </li>
+            );
+            if (labelShape.break) {
+              background.push(<hr/>);
+            }
+          });
+        } else {
           layer.categories.color.forEach((color, index) => {
             const showBoth = shapeAndBar && shapeAndBar.length && shapeAndBar[index] === 'yes';
             if (color !== 'transparent') {
               if (showBoth && hasShape) {
                 background.push(
                   <li className="layer-symbols" key={index}>
-                    <img
-                      className="legend-icon"
-                      src={`/assets/img/${layer.categories.shape[index]}.svg`}
-                    />
+                    {layer.categories.img ? (
+                      <img
+                        className="legend-icon"
+                        src={`/assets/img/${layer.categories.shape[index]}.svg`}
+                      />
+                    ) : null}
                     <ul className="legend bar-color" key={index}>
                       <li
                         style={{
@@ -376,10 +411,12 @@ export class Legend extends React.Component {
               } else if (hasShape && !showBoth) {
                 background.push(
                   <li className="layer-symbols" key={index}>
-                    <img
-                      className="legend-icon"
-                      src={`/assets/img/${layer.categories.shape[index]}.svg`}
-                    />
+                    {layer.categories.img ? (
+                      <img
+                        className="legend-icon"
+                        src={`/assets/img/${layer.categories.shape[index]}.svg`}
+                      />
+                    ) : null}
                     {layer.categories.label[index]}
                   </li>
                 );
@@ -398,7 +435,8 @@ export class Legend extends React.Component {
                 );
               }
             }
-          });
+          }); 
+        }
           const legendClass = layer.categories ? 'legend-label' : '';
           const circleQuantiles = quantiles ? (
             <div className="legend-symbols">{quantiles}</div>
@@ -412,12 +450,18 @@ export class Legend extends React.Component {
               onClick={e => this.onUpdatePrimaryLayer(e)}
               key={l}
             >
+              <span
+                onClick={e => this.onCloseClick(e)}
+                data-close-layer={`${layer.id}`}
+                className="glyphicon glyphicon-remove close"
+              ></span>
               <b>{layer.label}</b>
-              <div className={`${hasShape ? 'legend-shapes' : 'legend-fill'} ${legendClass}`}>
+              <div className={`${hasShape || layer.categories.labelShape ? 'legend-shapes' : 'legend-fill'} ${legendClass}`}>
                 <ul>{background}</ul>
               </div>
               {circleQuantiles}
               <span>{Parser(layer.credit)}</span>
+              {legendLink}
               {latestTimestamp}
             </div>
           );
@@ -501,6 +545,11 @@ export class Legend extends React.Component {
               onClick={e => this.onUpdatePrimaryLayer(e)}
               key={l}
             >
+              <span
+                onClick={e => this.onCloseClick(e)}
+                data-close-layer={`${layer.id}`}
+                className="glyphicon glyphicon-remove close"
+              ></span>
               <b>{layer.label}</b>
               <div className={`${'legend-fill'} ${legendClass}`}>
                 <ul>{background}</ul>
@@ -511,6 +560,7 @@ export class Legend extends React.Component {
               {circleCredit}
               <span>{Parser(layer.credit)}</span>
               {layerObj.exportLink ? exportLink : ''}
+              {legendLink}
               {latestTimestamp}
             </div>
           );
@@ -568,12 +618,10 @@ export class Legend extends React.Component {
               : layerObj && layerObj.stops && layerObj.stops[0][0]
               ? [...new Set(layerObj.stops[0][0].map(d => d[1]))]
               : [...new Set(layer.colorStops.map(d => d[1]))];
-
           activeColors.forEach((color, index, activeColors) => {
             const stopsIndex = layerStops ? layerStops.indexOf(color) : -1;
             if (stopsIndex !== -1) {
               const firstVal = stopsIndex ? stopsBreak[stopsIndex - 1] : 0;
-
               if (Object.is(activeColors.length - 1, index)) {
                 // execute last item logic
                 lastVal = lastBreaks;
@@ -606,6 +654,11 @@ export class Legend extends React.Component {
               key={l}
               onClick={e => this.onUpdatePrimaryLayer(e)}
             >
+              <span
+                onClick={e => this.onCloseClick(e)}
+                data-close-layer={`${layer.id}`}
+                className="glyphicon glyphicon-remove close"
+              ></span>
               <b>{layer.label}</b>
               <ul className="legend-limit" style={legendLimitStyle}>
                 <li
@@ -630,6 +683,7 @@ export class Legend extends React.Component {
               </div>
               <span>{Parser(layer.credit)}</span>
               {this.props.layerObj.exportLink ? exportLink : ''}
+              {legendLink}
               {latestTimestamp}
             </div>
           );
@@ -645,10 +699,16 @@ export class Legend extends React.Component {
             key={l}
             onClick={e => this.onUpdatePrimaryLayer(e)}
           >
+            <span
+              onClick={e => this.onCloseClick(e)}
+              data-close-layer={`${layer.id}`}
+              className="glyphicon glyphicon-remove close"
+            ></span>
             <b>{layer.label}</b>
             <div className="legend-symbols">{quantiles}</div>
             <span>{Parser(layer.credit)}</span>
             {layerObj.exportLink ? exportLink : ''}
+            {legendLink}
             {latestTimestamp}
           </div>
         );
@@ -668,13 +728,16 @@ export class Legend extends React.Component {
             100 / layer.categories.color.filter(c => c !== 'transparent').length
           ).toString();
           const textColor = layer.categories && layer.categories['text-color'];
+
           if (showBoth && hasShape) {
             background.push(
               <li className="layer-symbols" key={index}>
-                <img
-                  className="legend-icon"
-                  src={`/assets/img/${layer.categories.shape[index]}.svg`}
-                />
+                {layer.categories.img ? (
+                  <img
+                    className="legend-icon"
+                    src={`/assets/img/${layer.categories.shape[index]}.svg`}
+                  />
+                ) : null}
                 <ul className="legend bar-color" key={index}>
                   <li
                     style={{
@@ -691,11 +754,12 @@ export class Legend extends React.Component {
           } else {
             background.push(
               <li className="layer-symbols" key={index}>
-                <img
-                  className="legend-icon"
-                  src={`/assets/img/${layer.categories.shape[index]}.svg`}
-                  style={{ styleString }}
-                />
+                {layer.categories.img ? (
+                  <img
+                    className="legend-icon"
+                    src={`/assets/img/${layer.categories.shape[index]}.svg`}
+                  />
+                ) : null}
                 {layer.categories.label[index]}
               </li>
             );
@@ -710,12 +774,18 @@ export class Legend extends React.Component {
             onClick={e => this.onUpdatePrimaryLayer(e)}
             key={l}
           >
+            <span
+              onClick={e => this.onCloseClick(e)}
+              data-close-layer={`${layer.id}`}
+              className="glyphicon glyphicon-remove close"
+            ></span>
             <b>{layer.label}</b>
             <div className="legend-shapes">
               <ul style={{ left: '0' }}>{background}</ul>
             </div>
             <span>{Parser(layer.credit)}</span>
             {layerObj.exportLink ? exportLink : ''}
+            {legendLink}
             {latestTimestamp}
           </div>
         );
@@ -723,7 +793,25 @@ export class Legend extends React.Component {
         const fillWidth = (
           100 / layer.categories.color.filter(c => c !== 'transparent').length
         ).toString();
-
+        if (layer.categories.labelShape) {
+          layer.categories.labelShape.forEach((labelShape, index) => {
+            background.push(
+              <li className="layer-symbols" key={index}>
+                {labelShape.shape ? (
+                  <img
+                    className="legend-icon"
+                    src={`/assets/img/${labelShape.shape}.svg`}
+                  />
+                ) : null}
+                {labelShape.label}
+                <br/>
+              </li>
+            );
+            if (labelShape.break) {
+              background.push(<hr/>);
+            }
+          });
+        } else {
         layer.categories.color.forEach((color, index) => {
           if (color !== 'transparent') {
             background.push(
@@ -733,7 +821,7 @@ export class Legend extends React.Component {
             );
           }
         });
-
+      }
         const legendClass = layer.categories ? 'legend-label' : '';
         legendItems.unshift(
           <div
@@ -743,12 +831,18 @@ export class Legend extends React.Component {
             onClick={e => this.onUpdatePrimaryLayer(e)}
             key={l}
           >
+            <span
+              onClick={e => this.onCloseClick(e)}
+              data-close-layer={`${layer.id}`}
+              className="glyphicon glyphicon-remove close"
+            ></span>
             <b>{layer.label}</b>
             <div className={`legend-fill ${legendClass}`}>
               <ul>{background}</ul>
             </div>
             <span>{Parser(layer.credit)}</span>
             {layerObj.exportLink ? exportLink : ''}
+            {legendLink}
             {latestTimestamp}
           </div>
         );
@@ -823,6 +917,11 @@ export class Legend extends React.Component {
             onClick={e => this.onUpdatePrimaryLayer(e)}
             key={l}
           >
+            <span
+              onClick={e => this.onCloseClick(e)}
+              data-close-layer={`${layer.id}`}
+              className="glyphicon glyphicon-remove close"
+            ></span>
             <b>{layer.label}</b>
             <div className={`${'legend-fill'} ${legendClass}`}>
               <ul>{background}</ul>
@@ -832,6 +931,7 @@ export class Legend extends React.Component {
             {circleQuantiles}
             {circleCredit}
             <span>{Parser(layer.credit)}</span>
+            {legendLink}
             {latestTimestamp}
           </div>
         );
@@ -888,12 +988,10 @@ export class Legend extends React.Component {
             : layerObj && layerObj.stops && layerObj.stops[0][0]
             ? [...new Set(layerObj.stops[0][0].map(d => d[1]))]
             : [...new Set(layer.colorStops.map(d => d[1]))];
-
         activeColors.forEach((color, index, activeColors) => {
           const stopsIndex = layerStops ? layerStops.indexOf(color) : -1;
           if (stopsIndex !== -1) {
             const firstVal = stopsIndex ? stopsBreak && stopsBreak[stopsIndex - 1] : 0;
-
             if (Object.is(activeColors.length - 1, index)) {
               // execute last item logic
               lastVal = lastBreaks;
@@ -926,6 +1024,11 @@ export class Legend extends React.Component {
             key={l}
             onClick={e => this.onUpdatePrimaryLayer(e)}
           >
+            <span
+              onClick={e => this.onCloseClick(e)}
+              data-close-layer={`${layer.id}`}
+              className="glyphicon glyphicon-remove close"
+            ></span>
             <b>{layer.label}</b>
             <ul className="legend-limit" style={legendLimitStyle}>
               <li id={`first-limit-${layer.id}`} className={`${mapId}`} style={leftListLimitStyle}>
@@ -942,6 +1045,7 @@ export class Legend extends React.Component {
             </div>
             <span>{Parser(layer.credit)}</span>
             {layerObj.exportLink ? exportLink : ''}
+            {legendLink}
             {latestTimestamp}
           </div>
         );
@@ -950,14 +1054,14 @@ export class Legend extends React.Component {
     }
 
     legendItems.unshift(primaryLegend);
-    const showLoader = legendLayers.length > 0 ? legendItems.length !== legendLayers.length : false;
-
+    const showLoader = legendLayers.length > 0 && mapStateToUrl ? legendItems.length !== legendLayers.length : false;
     return (
       <div>
         <div
-          className={`legend ${mapId}`}
-          style={{ right: this.props.showFilterPanel ? '30px' : '20px' }}
+          className={this.props.hasNavBar ? `legend ${mapId} bottom` : `legend ${mapId}`}
+          
         >
+
           {showLoader && (
             <div className="legend-row">
               <b>Loading...</b>

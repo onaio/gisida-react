@@ -371,9 +371,6 @@ export class Export extends Component {
     const { map, config } = this.state;
     // move the map container element back to where it came from
     $('#exportEl .mapboxgl-canvas-container').insertBefore(`#${mapId} .mapboxgl-control-container`);
-    // remove fixed hight and width styling
-    $(`#${mapId}.mapboxgl-map`).removeAttr('style');
-    // restore the map controls
     map.addControl(map.controls);
     // resize the map to it's containers new size
     map.resize();

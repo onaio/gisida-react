@@ -295,8 +295,9 @@ export function getMenuGroupMapLayers(groupName, children) {
  * checking other children once it finds the first open child.
  * @param {*} groupName Name of the group which we want to target
  * @param {*} children Children of the group which we want to target
+ * @param {*} activeLayerIds an array of active layer ids for the map
  */
-export function menuGroupHasVisibleLayers(groupName, children) {
+export function menuGroupHasVisibleLayers(groupName, children, activeLayerIds) {
   const subGroups = children.filter(child => !child.id);
 
   if (subGroups.length) {
@@ -312,7 +313,7 @@ export function menuGroupHasVisibleLayers(groupName, children) {
       while (!hasVisibleLayers && j < subGroupKeys.length) {
         const key = subGroupKeys[j];
 
-        if (menuGroupHasVisibleLayers(groupName, subGroup[key].layers)) {
+        if (menuGroupHasVisibleLayers(groupName, subGroup[key].layers, activeLayerIds)) {
           hasVisibleLayers = true;
         }
 
@@ -330,7 +331,7 @@ export function menuGroupHasVisibleLayers(groupName, children) {
     while (!hasVisibleChildren && m < children.length) {
       const child = children[m];
 
-      if (child.visible) {
+      if (activeLayerIds.includes(child.id)) {
         hasVisibleChildren = true;
       }
 
@@ -368,4 +369,105 @@ export function getSharedStyleFromURL(mapId) {
   const style = getURLSearchParams().get(`${mapId}-${QUERY_PARAM_STYLE}`);
 
   return style ? +style : null;
+}
+
+/**
+ * Get which category each layer id in the given array belongs to
+ * @param {*} layersToOpenCategory The array of layer ids to get category for
+ * @param {*} categories All categories
+ */
+export function getCategoryForLayers(layersToOpenCategory, categories) {
+  const layerCategory = [];
+
+  layersToOpenCategory.forEach(layerToOpenCategory => {
+    let i = 0;
+    /**
+     * A layer belongs to only one category. So if we found its
+     * category, use this flag to break from the loop
+     */
+    const catFound = false;
+
+    while (!catFound && i < categories.length) {
+      const category = categories[i];
+      let j = 0;
+
+      while (!catFound && j < category.layers.length) {
+        const layer = category.layers[j];
+
+        if (!layer.id) {
+          /**
+           * This is a group. So continue checking down the hierarchy
+           * for visible layers
+           */
+          const groupNames = Object.keys(layer);
+          let k = 0;
+
+          while (!catFound && k < groupNames.length) {
+            const groupName = groupNames[k];
+
+            const children = layer[groupName].layers;
+            const groupMapLayerIds = getMenuGroupMapLayers(groupName, children);
+
+            if (
+              groupMapLayerIds.indexOf(layerToOpenCategory) >= 0 ||
+              groupMapLayerIds.indexOf(`${layerToOpenCategory}.json`) >= 0
+            ) {
+              layerCategory.push({
+                layerId: layerToOpenCategory,
+                categoryName: category.category,
+              });
+            }
+
+            k += 1;
+          } // group while
+        } else {
+          // This category has one level only
+          // eslint-disable-next-line no-lonely-if
+          if (layer.id === layerToOpenCategory || layer.id === `${layerToOpenCategory}.json`) {
+            layerCategory.push({
+              layerId: layerToOpenCategory,
+              categoryName: category.category,
+            });
+          }
+        }
+
+        j += 1;
+      } // category layers while
+
+      i += 1;
+    } // categories while
+  });
+
+  return layerCategory;
+}
+/**
+ * Returns Various types of layers. This guides the legend building process
+ * @param {Object} layer 
+ */
+
+export function isCircleLayer(layer) {
+  return (
+    layer && layer.credit && layer.type === 'circle' && !layer.categories.shape && layer.visible
+  );
+}
+
+export function isSymbolLayer(layer) {
+  return (
+    layer && layer.credit && layer.categories && (layer.categories.shape || layer.categories.labelShape)  && layer.type !== 'circle'
+  );
+}
+
+export function isFillLayerNoBreaks(layer) {
+  return layer && layer.credit && layer.categories && layer.categories.breaks === 'no';
+}
+
+export function isFillLayerWithBreaks(layer) {
+  return (
+    layer &&
+    layer.credit &&
+    layer.type !== 'chart' &&
+    layer.type !== 'circle' &&
+    layer.categories &&
+    layer.categories.breaks === 'yes'
+  );
 }

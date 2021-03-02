@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Layer from '../Layer/Layer';
 import { menuGroupHasVisibleLayers } from '../../utils';
-import { DATA_NOT_AVAILABLE } from '../../constants'
+import { DATA_NOT_AVAILABLE } from '../../constants';
+import { HyperLink } from '../HyperLink/HyperLink';
 
 export class Layers extends Component {
   constructor(props) {
@@ -13,9 +14,9 @@ export class Layers extends Component {
         if (!layer.id) {
           Object.keys(layer).forEach(l => {
             if (layer[l].layers.length) {
-              groups[l] = { isOpen: menuGroupHasVisibleLayers(l, layer[l].layers) };
+              groups[l] = { isOpen: menuGroupHasVisibleLayers(l, layer[l].layers, this.props.activeLayerIds) };
             } else {
-              groups[l] = { isOpen: false }
+              groups[l] = { isOpen: false };
             }
           });
         }
@@ -34,7 +35,7 @@ export class Layers extends Component {
           Object.keys(layer).forEach(groupName => {
             const children = layer[groupName].layers;
 
-            if (menuGroupHasVisibleLayers(groupName, children) && !this.state[groupName].isOpen) {
+            if (menuGroupHasVisibleLayers(groupName, children, this.props.activeLayerIds) && !this.state[groupName].isOpen) {
               this.setState({
                 [groupName]: { isOpen: true },
               });
@@ -53,7 +54,16 @@ export class Layers extends Component {
   }
 
   render() {
-    const { mapId, layers, currentRegion, preparedLayers, auth, noLayerText } = this.props;
+    const {
+      mapId,
+      hyperLink,
+      sector,
+      layers,
+      currentRegion,
+      preparedLayers,
+      auth,
+      noLayerText,
+    } = this.props;
     let layerKeys;
     let layerObj;
     let layerItem = [];
@@ -83,8 +93,9 @@ export class Layers extends Component {
 
     layers.forEach(layer => {
       if (
-        (!currentRegion || (layer.region && layer.region === currentRegion)) &&
-        !subLayerIds.includes(layer.id)
+        (!currentRegion ||
+          (preparedLayers[layer.id].region && preparedLayers[layer.id].region === currentRegion)) &&
+        !subLayerIds.includes(layer.id) && !(subLayerIds.map(httpLayers => httpLayers.includes(layer.id)).includes(true))
       ) {
         if (layer.id && (!auth || !auth.authConfigs)) {
           layerItem.push(<Layer key={layer.id} mapId={mapId} layer={layer} />);
@@ -114,11 +125,29 @@ export class Layers extends Component {
           }
         } else {
           Object.keys(layer).forEach((d, i) => {
+            /** get the parent of the  sub category */
+            const parent = Object.values(layers.find(l => l[d]))[0].parent;
+            const link = hyperLink &&
+            hyperLink[`${parent}-${d}`] &&
+            hyperLink[`${parent}-${d}`].link;
+
+            const description = hyperLink &&
+            hyperLink[`${parent}-${d}`] &&
+            hyperLink[`${parent}-${d}`].description;
+            const descStyle = !link
+              ? {
+                  marginLeft: '45px',
+                }
+              : null;
             layerItem = layerItem.concat([
               <li key={i}>
                 <a
                   key={`${d}-${i}-link`}
-                  className="sub-category"
+                  className={
+                    hyperLink && hyperLink[`${parent}-${d}`]
+                      ? `sub-category hyperlink`
+                      : 'sub-category'
+                  }
                   onClick={e => this.toggleSubMenu(e, d)}
                 >
                   {d}
@@ -128,6 +157,13 @@ export class Layers extends Component {
                     }`}
                   />
                 </a>
+                {hyperLink && hyperLink[`${parent}-${d}`] ? (
+                  <HyperLink
+                    link={link}
+                    description={description}
+                    descriptionStyle={descStyle}
+                    spanClassName='sub-category-links'
+                  />) : null}
               </li>,
               this.state[d].isOpen ? (
                 <Layers
@@ -138,6 +174,7 @@ export class Layers extends Component {
                   preparedLayers={preparedLayers}
                   auth={this.props.auth}
                   noLayerText={noLayerText}
+                  activeLayerIds={this.props.activeLayerIds}
                 />
               ) : null,
             ]);

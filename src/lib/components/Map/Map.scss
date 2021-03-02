@@ -71,3 +71,11 @@
   
     }
   }
+
+.mapboxgl-map
+.mapboxgl-popup
+.mapboxgl-popup-content
+ul.commaSeparatedList {
+  max-height: 150px;
+  overflow-y: scroll;
+}

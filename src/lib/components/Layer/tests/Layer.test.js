@@ -14,6 +14,22 @@ const mapId = 'map-1';
 const initialState = {
   'map-1': {
     timeseries: {},
+    layers: {
+      'sample-layer': {
+        label: 'Boundaries',
+        source: {
+          type: 'vector',
+          layer: 'som_adm_2-0j5bly',
+          url: 'mapbox://ona.6gl2shzi',
+        },
+        type: 'line',
+        paint: { 'line-width': 1, 'line-color': '#444', 'line-opacity': 0.6 },
+        visible: true,
+        category: 'Boundaries and Place Labels',
+        id: 'sample-layer',
+        zoomOnToggle: true,
+      },
+    },
   },
   APP,
   LOC: {},
@@ -22,12 +38,6 @@ const initialState = {
 const mockStore = configureStore();
 
 describe('Layer', () => {
-  it('component renderes correctly', () => {
-    shallow(<Layer layer={layerObj} mapId={mapId} />);
-    const wrapper = mount(<Layer mapId={mapId} layer={layerObj} />);
-    expect(toJson(wrapper)).toMatchSnapshot();
-  });
-
   it('components functions are called as expected with store', () => {
     const store = mockStore(initialState);
     layerObj['zoomOnToggle'] = true;

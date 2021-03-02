@@ -6,58 +6,16 @@ import Layers from '../Layers/Layers';
 import SearchBar from '../Searchbar/SearchBar';
 import ConnectedLayers from '../Layers/ConnectedLayers';
 import './Menu.scss';
-import memoize from 'memoize-one';
 import { debounce } from 'lodash';
-import { getSharedLayersFromURL, getMenuGroupMapLayers } from '../../utils';
+import { getSharedLayersFromURL, getCategoryForLayers } from '../../utils';
+import { getAccessibleCategories } from './utils';
+import { HyperLink } from '../HyperLink/HyperLink';
 
 const mapStateToProps = (state, ownProps) => {
   const { mapId } = ownProps;
   const MAP = state[mapId] || { layers: {} };
-  const { LAYERS, AUTH, APP, VIEW } = state;
-  const { hasNavBar, searchBar, loaded, NULL_LAYER_TEXT } = APP;
-  let categories;
-  // let layers;
-  if (Object.keys(LAYERS.groups).length) {
-    const groupMapper = layer => {
-      if (typeof layer === 'string') {
-        return MAP.layers[layer];
-      }
-
-      const subGroup = {};
-      Object.keys(layer).forEach(l => {
-        subGroup[l] = {
-          category: l,
-          layers: layer[l].map(groupMapper).filter(l => typeof l !== 'undefined'),
-        };
-      });
-      return subGroup;
-    };
-    // build list of LAYERS.categories populated with layers from MAP.layers
-    categories = Object.keys(LAYERS.groups).map(group => {
-      return {
-        category: group,
-        layers: LAYERS.groups[group].map(groupMapper).filter(l => typeof l !== 'undefined'),
-      };
-    });
-  } else if (Object.keys(MAP.layers).length) {
-    categories = {};
-    let category;
-
-    Object.keys(MAP.layers).forEach(l => {
-      if (MAP.layers[l].category) {
-        category = MAP.layers[l].category;
-        if (!categories[category]) {
-          categories[category] = {
-            category,
-            layers: [],
-          };
-        }
-        categories[category].layers.push(MAP.layers[l]);
-      }
-    });
-
-    categories = Object.keys(categories).map(c => categories[c]);
-  }
+  const { AUTH, APP, VIEW, CATEGORIES } = state;
+  const { NULL_LAYER_TEXT } = APP;
 
   // Get current region
   const currentRegion =
@@ -66,24 +24,26 @@ const mapStateToProps = (state, ownProps) => {
       : '';
   return {
     mapId,
-    categories,
-    // layers, // todo - support layers without categories
-    LAYERS,
+    categories: CATEGORIES,
     AUTH,
     menuId: 'sector-menu-1',
     mapTargetId: '',
     regions: state.REGIONS,
     currentRegion: currentRegion,
-    loaded,
+    loaded: state.APP.loaded,
     preparedLayers: MAP.layers,
     menuIsOpen: MAP.menuIsOpen,
     openCategories: MAP.openCategories,
     noLayerText: NULL_LAYER_TEXT,
-    showSearchBar: searchBar,
+    showSearchBar: APP.searchBar,
+    hyperLink: APP.hyperLink,
+    highlightText: APP.highlightText,
+    infoText: APP.infoText,
+    legendInfoText: APP.legendInfoText,
     menuScroll: MAP.menuScroll, // Set's scroll position to zero when loading superset Menu component
     showMap: VIEW.showMap, // A flag to determine map/superset view
-    noLayerText: NULL_LAYER_TEXT, // Text to be displayed when a category has no layer pulled from config file,
-    hasNavBar,
+    noLayerText: NULL_LAYER_TEXT, // Text to be displayed when a category has no layer pulle d from config file
+    activeLayerIds: MAP.activeLayerIds, // list of layer id's for all visible layers
   };
 };
 
@@ -101,6 +61,7 @@ class Menu extends Component {
       searching: false,
       searchResults: [],
       sharedLayers,
+      categories: [],
     };
 
     /**
@@ -136,6 +97,17 @@ class Menu extends Component {
     this.delayedMenuScrollCallback(event);
   };
 
+  static getDerivedStateFromProps(nextProps, prevState) {
+    /** Filter which categories the user has access to */
+    if (prevState.categories.length !== nextProps.categories.length && nextProps.AUTH) {
+      const { userInfo, authConfigs } = nextProps.AUTH;
+
+      return { categories: getAccessibleCategories(nextProps.categories, authConfigs, userInfo) };
+    }
+
+    return null;
+  }
+
   componentDidUpdate(prevProps) {
     if (this.props.showMap && this.props.showMap !== prevProps.showMap && this.props.menuScroll) {
       this.menuWrapper.current.scrollTop = this.props.menuScroll.scrollTop;
@@ -157,61 +129,11 @@ class Menu extends Component {
     const { categories } = this.props;
 
     if (layersToOpenCategory && categories) {
-      layersToOpenCategory
-        .filter(l => !l.isCatOpen)
-        .forEach(sharedLayer => {
-          let i = 0;
-          /**
-           * A layer belongs to only one category. So if we found its
-           * category, use this flag to break from the loop
-           */
-          let catFound = false;
-
-          while (!catFound && i < categories.length) {
-            const category = categories[i];
-            let j = 0;
-
-            while (!catFound && j < category.layers.length) {
-              const layer = category.layers[j];
-
-              if (!layer.id) {
-                /**
-                 * This is a group. So continue checking down the hierarchy
-                 * for visible layers
-                 */
-                const groupNames = Object.keys(layer);
-                let k = 0;
-
-                while (!catFound && k < groupNames.length) {
-                  const groupName = groupNames[k];
-
-                  const children = layer[groupName].layers;
-                  const groupMapLayerIds = getMenuGroupMapLayers(groupName, children);
-
-                  if (
-                    groupMapLayerIds.indexOf(sharedLayer.id) >= 0 ||
-                    groupMapLayerIds.indexOf(`${sharedLayer.id}.json`) >= 0
-                  ) {
-                    this.openCategoryForSharedLayer(category.category, sharedLayer.id);
-                    catFound = true;
-                  }
-
-                  k += 1;
-                } // group while
-              } else {
-                // This category has one level only
-                if (layer.id === sharedLayer.id || layer.id === `${sharedLayer.id}.json`) {
-                  this.openCategoryForSharedLayer(category.category, sharedLayer.id);
-                  catFound = true;
-                }
-              }
-
-              j += 1;
-            } // category layers while
-
-            i += 1;
-          } // categories while
-        });
+      const { categories } = this.props;
+      const layers = getCategoryForLayers(layersToOpenCategory, categories);
+      layers.forEach(e => {
+        this.openCategoryForSharedLayer(e.category || e.categoryName, e.layerId);
+      });
     }
   }
 
@@ -250,7 +172,6 @@ class Menu extends Component {
   toggleCategory(categoryName) {
     const { openCategories } = this.props;
     const index = openCategories.indexOf(categoryName);
-
     this.props.dispatch(Actions.toggleCategories(this.props.mapId, categoryName, index));
   }
 
@@ -271,39 +192,6 @@ class Menu extends Component {
   };
 
   /**
-   * Modify a group by giving its group and nested groups a count (or ID)
-   * This will make sure when we toggle a group, another group with the
-   * exact same name is not toggled. The array of open groups is stored as an
-   * array of group names in the store. Another implementaion would to give each group a random number but
-   * this means different menu instances will have groups that have different Ids which we do not
-   * want (We would like menu instances under the same map ID to behave the same. If say I open a group in one
-   * menu, it should appear open in another other). A contigous int counter is
-   * therefore used to ensure the counter for a group in different menu instances is the same,
-   * and also, groups in the same menu instances do not share a count.
-   * @param {Object} layer Category layer
-   * @param {number} groupCounter Group counter (or ID) that will give each group a number
-   * @returns {Object} Modified layer and current group counter increment
-   */
-  insertGroupCount(layer, groupCounter) {
-    Object.keys(layer).forEach(key => {
-      layer[key].count = groupCounter;
-      groupCounter += 1;
-
-      layer[key].layers.forEach(keyLayer => {
-        if (!keyLayer.id) {
-          // Layer has no id so this is a group
-          keyLayer = this.insertGroupCount(keyLayer, groupCounter);
-        }
-      });
-    });
-
-    return {
-      layer,
-      groupCounter,
-    };
-  }
-
-  /**
    * this update state of searching to false
    */
   searchResultClick() {
@@ -315,13 +203,13 @@ class Menu extends Component {
    * @param {Array} searchResults - array of search results
    * @param {string} input - user search input
    */
-  handleSearchInput(searchResults, input) {
-    const { searching } = this.state;
-    this.setState({ searchResults: [] });
+  handleSearchInput(searchResults, input, state, setState) {
+    const { searching } = state;
+    setState({ searchResults: [] });
     if (!input) {
-      return searching ? this.setState({ searching: false }) : null;
+      return searching ? setState({ searching: false }) : null;
     }
-    this.setState({
+    setState({
       searchResults,
       searching: true,
     });
@@ -345,153 +233,14 @@ class Menu extends Component {
     }
   }
 
-  /**
-   * Generic function to modify categories. If you need to modify/extend categories,
-   * do it here
-   * @param {array} categories Menu categories and their subgroups and layers
-   * @returns {array} Extended/Modified categories
-   */
-  parseCategories = memoize(categories => {
-    let groupCounter = 0;
-    categories.forEach(category => {
-      category.layers.forEach(layer => {
-        if (!layer.id) {
-          // Layer has no id, so it's a group, give it a count (or an ID)
-          const obj = this.insertGroupCount(layer, groupCounter);
-          layer = obj.layer;
-          groupCounter = obj.groupCounter;
-        }
-      });
-    });
-
-    return categories;
-  });
-
-  /**
-   * Check if a user has permission to access layer
-   * @param {Object} authConfigs - Authentication configurations
-   * @param {Object} userInfo - User details
-   */
-  canAccessLayer(layer, authConfigs, userInfo) {
-    const LocalAuthConfig = JSON.parse(localStorage.getItem('authConfig'));
-    // list of users with access to the layer
-    const users = authConfigs && authConfigs.LAYERS && authConfigs.LAYERS[layer.id];
-    authConfigs.LAYERS = authConfigs.LAYERS || LocalAuthConfig.LAYERS;
-
-    return (
-      (users && userInfo && users.includes(userInfo.username)) ||
-      (authConfigs.LAYERS &&
-        authConfigs.LAYERS.ALL &&
-        authConfigs.LAYERS.ALL.includes(userInfo.username))
-    );
-  }
-
-  /**
-   * Return an accesible group layer. If the layer has no accessible children
-   * return false, else return the modified layer with the accessible children
-   * @param {Object} layer - Group layer
-   * @param {Object} authConfigs - Authentication configurations
-   * @param {Object} userInfo - Auth user details
-   */
-  getAccessibleGroupLayer(layer, authConfigs, userInfo) {
-    const layerKeys = Object.keys(layer);
-    const accessibleKeys = [];
-
-    layerKeys.forEach(key => {
-      const accessibleKeySubLayers = [];
-
-      layer[key].layers.forEach(subLayer => {
-        if (!subLayer.id) {
-          const groupSubLayer = this.getAccessibleGroupLayer(subLayer, authConfigs, userInfo);
-
-          if (groupSubLayer) {
-            accessibleKeySubLayers.push(groupSubLayer);
-          }
-        } else {
-          if (this.canAccessLayer(subLayer, authConfigs, userInfo)) {
-            accessibleKeySubLayers.push(subLayer);
-          }
-        }
-      });
-
-      if (accessibleKeySubLayers.length > 0) {
-        // Modify sublayers, only return those which user has access to
-        layer[key].layers = accessibleKeySubLayers;
-        accessibleKeys.push(key);
-      }
-    });
-
-    layerKeys.forEach(key => {
-      if (!accessibleKeys.includes(key) && layer[key].layers.length) {
-        // Delete key if key is not in accessible keys
-        delete layer[key];
-      }
-    });
-
-    // Now get the final keys. If keys exist, return modified layer
-    if (Object.keys(layer).length > 0) {
-      return layer;
-    }
-
-    return false;
-  }
-
-  /**
-   * Get which categories and their groups and nested groups user has
-   * permission to view
-   * @returns {array} Filtered categories
-   */
-  getAccessibleCategories = memoize(categories => {
-    if (!this.props.AUTH) {
-      // If no authenitcation, then all categories are accessible.
-      return categories;
-    }
-
-    const filteredCategories = [];
-    const { userInfo, authConfigs } = this.props.AUTH;
-    categories.forEach(category => {
-      let accesibleLayers = [];
-
-      category.layers.forEach(layer => {
-        if (!authConfigs || !authConfigs.LAYERS) {
-          // If auth exists but authconfigs have not loaded. Bug should be fixed from ONA data and gisida core
-          accesibleLayers.push(layer);
-        } else if (!layer.id) {
-          const groupLayer = this.getAccessibleGroupLayer(layer, authConfigs, userInfo);
-
-          if (groupLayer) {
-            accesibleLayers.push(groupLayer);
-          }
-        } else {
-          if (this.canAccessLayer(layer, authConfigs, userInfo)) {
-            accesibleLayers.push(layer);
-          }
-        }
-      });
-
-      if (accesibleLayers.length > 0) {
-        // Modify category layers with the new updated layers
-        category.layers = accesibleLayers;
-        filteredCategories.push(category);
-      }
-    });
-
-    return filteredCategories;
-  });
-
   render() {
-    if (!this.props.categories) return null;
-
-    const { searching, searchResults } = this.state;
-    const { disableDefault, showSearchBar } = this.props;
-
+    const { searching, searchResults, categories } = this.state;
+    const { disableDefault, showSearchBar, hyperLink, highlightText } = this.props;
     if (disableDefault) return this.props.children || null;
-
     const { mapId } = this.props;
     const children = React.Children.map(this.props.children, child => {
       return React.cloneElement(child, { mapId });
     });
-    const categories = this.parseCategories(this.getAccessibleCategories(this.props.categories));
     const {
       regions,
       currentRegion,
@@ -501,96 +250,135 @@ class Menu extends Component {
       hasNavBar,
       useConnectedLayers,
       AUTH,
+      activeLayerIds,
     } = this.props;
     const childrenPositionClass = childrenPosition || 'top';
     const marginTop = hasNavBar ? '-80px' : 0;
-
     return (
       <div>
-        <div>
-          {this.props.loaded ? (
-            // Menu Wrapper
-            <div
-              onScroll={this.handleScroll}
-              ref={this.menuWrapper}
-              id={`${mapId}-menu-wrapper`}
-              className={`menu-wrapper ${childrenPositionClass}`}
-              style={{ marginTop }}
+        {this.props.loaded ? (
+          // Menu Wrapper
+          <div
+            onScroll={this.handleScroll}
+            ref={this.menuWrapper}
+            id={`${mapId}-menu-wrapper`}
+            className={`menu-wrapper ${childrenPositionClass}`}
+            style={{ marginTop }}
+          >
+            {/* Open menu button */}
+            <a
+              onClick={e => this.onToggleMenu(e)}
+              className="open-btn"
+              style={{ display: this.props.menuIsOpen ? 'none' : 'block' }}
             >
-              {/* Open menu button */}
-              <a
-                onClick={e => this.onToggleMenu(e)}
-                className="open-btn"
-                style={{ display: this.props.menuIsOpen ? 'none' : 'block' }}
-              >
-                <span className="glyphicon glyphicon-menu-hamburger"></span>
+              <span className="glyphicon glyphicon-menu-hamburger"></span>
+            </a>
+            {/* Menu */}
+            <div
+              id={`${mapId}-menu`}
+              className="sectors-menu"
+              style={{ display: this.props.menuIsOpen ? 'block' : 'none' }}
+            >
+              {/* Close menu button */}
+              <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
+                <span className="glyphicon glyphicon-remove"></span>
               </a>
-              {/* Menu */}
-              <div
-                id={`${mapId}-menu`}
-                className="sectors-menu"
-                style={{ display: this.props.menuIsOpen ? 'block' : 'none' }}
-              >
-                {/* Close menu button */}
-                <a className="close-btn" onClick={e => this.onToggleMenu(e)}>
-                  <span className="glyphicon glyphicon-remove"></span>
-                </a>
 
-                {/* Children Elements (top) */}
-                {children && childrenPosition !== 'bottom' ? children : ''}
+              {/* Children Elements (top) */}
+              {children && childrenPosition !== 'bottom' ? children : ''}
 
-                {/* search bar */}
-                {showSearchBar ? (
-                  <div style={{ height: '70px' }}>
-                    <SearchBar
-                      handleSearchInput={this.handleSearchInput}
-                      searching={searching}
-                      handleSearchClick={this.handleSearchClick}
-                      searchResultClick={this.searchResultClick}
-                      mapId={mapId}
-                      openCategoryForLayers={this.openCategoryForLayers}
-                    />
-                  </div>
-                ) : null}
+              {/* search bar */}
+              {showSearchBar ? (
+                <div style={{ height: '70px' }}>
+                  <SearchBar
+                    handleSearchInput={this.handleSearchInput}
+                    searching={searching}
+                    handleSearchClick={this.handleSearchClick}
+                    searchResultClick={this.searchResultClick}
+                    mapId={mapId}
+                    openCategoryForLayers={this.openCategoryForLayers}
+                    state={this.state}
+                    setState={this.setState.bind(this)}
+                  />
+                </div>
+              ) : null}
 
-                {/* Menu List*/}
-                {!searching ? (
-                  <ul className="sectors">
-                    {regions && regions.length ? (
-                      <li className="sector">
-                        <a onClick={e => this.onCategoryClick(e, 'Regions')}>
-                          Regions
-                          <span className="caret" />
-                        </a>
-                        <ul className="layers">
-                          {regions && regions.length ? (
-                            regions.map((region, i) => (
-                              <li className={`region ${mapId}`} key={region.name}>
-                                <input
-                                  id={region.name}
-                                  key={region.name}
-                                  name="region"
-                                  type="radio"
-                                  value={region.name}
-                                  checked={!!region.current}
-                                  onChange={e => this.onRegionClick(e)}
-                                />
-                                <label htmlFor={region.name}>{region.name}</label>
-                              </li>
-                            ))
-                          ) : (
-                            <li></li>
-                          )}
-                        </ul>
-                      </li>
-                    ) : (
-                      <li />
-                    )}
-                    {(categories && categories.length) > 0 ? (
-                      categories.map((category, i) => (
-                        <li className="sector" key={i}>
-                          <a onClick={e => this.onCategoryClick(e, category.category)}>
+              {/* Menu List*/}
+              {!searching ? (
+                <ul className="sectors">
+                  {regions && regions.length ? (
+                    <li className="sector">
+                      <a onClick={e => this.onCategoryClick(e, 'Regions')}>
+                        Regions
+                        <span className="caret" />
+                      </a>
+                      <ul className="layers">
+                        {regions && regions.length ? (
+                          regions.map((region, i) => (
+                            <li className={`region ${mapId}`} key={region.name}>
+                              <input
+                                id={region.name}
+                                key={region.name}
+                                name="region"
+                                type="radio"
+                                value={region.name}
+                                checked={!!region.current}
+                                onChange={e => this.onRegionClick(e)}
+                              />
+                              <label htmlFor={region.name}>{region.name}</label>
+                            </li>
+                          ))
+                        ) : (
+                          <li></li>
+                        )}
+                      </ul>
+                    </li>
+                  ) : (
+                    <li />
+                  )}
+                  {(categories && categories.length) > 0 ? (
+                    categories.map((category, i) => {
+                      const link =
+                        hyperLink &&
+                        hyperLink[category.category] &&
+                        hyperLink[category.category].link;
+
+                      const description =
+                        hyperLink &&
+                        hyperLink[category.category] &&
+                        hyperLink[category.category].description;
+                      const highlightTextColor =
+                        highlightText &&
+                        highlightText[category.category] &&
+                        highlightText[category.category].color;
+                      const highlightTextBreak =
+                        highlightText &&
+                        highlightText[category.category] &&
+                        highlightText[category.category].break;
+                      
+                      const descriptionStyle = !link
+                        ? {
+                            marginLeft: '33px',
+                          }
+                        : null;
+
+                      return (
+                        <li
+                          className={`${link || description ? 'sector hyperlink' : 'sector'}`}
+                          key={i}
+                          style={highlightTextBreak ? {marginTop: '20%'}: {}}
+                        >
+                          <a
+                            className={`${link || description ? 'sector hyperlink' : 'sector'}`}
+                            onClick={e => this.onCategoryClick(e, category.category)}
+                            style={ highlightTextColor ? {color: highlightTextColor}: {}}
+                          >
                             {category.category}
+                            <HyperLink
+                              link={link}
+                              description={description}
+                              descriptionStyle={descriptionStyle}
+                            />
                             <span
                               className={
                                 'category glyphicon ' +
@@ -599,8 +387,14 @@ class Menu extends Component {
                                   ? 'glyphicon-chevron-down'
                                   : 'glyphicon-chevron-right')
                               }
-                            />
+                            />{' '}
+                            &nbsp;&nbsp;
                           </a>
+                          <HyperLink
+                            link={link}
+                            description={description}
+                            descriptionStyle={descriptionStyle}
+                          />
                           {this.props.openCategories &&
                           this.props.openCategories.includes(category.category) &&
                           !useConnectedLayers ? (
@@ -610,6 +404,9 @@ class Menu extends Component {
                               currentRegion={currentRegion}
                               preparedLayers={preparedLayers}
                               auth={AUTH}
+                              sector={category.category}
+                              hyperLink={hyperLink}
+                              activeLayerIds={activeLayerIds}
                             />
                           ) : this.props.openCategories &&
                             this.props.openCategories.includes(category.category) &&
@@ -621,34 +418,36 @@ class Menu extends Component {
                               currentRegion={currentRegion}
                               preparedLayers={preparedLayers}
                               auth={AUTH}
+                              sector={category.category}
+                              hyperLink={hyperLink}
                             />
                           ) : (
                             <ul />
                           )}
-                        </li>
-                      ))
-                    ) : (
-                      <li></li>
-                    )}
-                  </ul>
-                ) : searchResults.length ? (
-                  <ul className="sectors">{searchResults}</ul>
-                ) : (
-                  <ul className="sectors">
-                    <li className="no-search-results">
-                      <b>No results found</b>
-                    </li>
-                  </ul>
-                )}
+                        </li> 
+                      );
+                    })
+                  ) : (
+                    <li></li>
+                  )}
+                </ul>
+              ) : searchResults.length ? (
+                <ul className="sectors">{searchResults}</ul>
+              ) : (
+                <ul className="sectors">
+                  <li className="no-search-results">
+                    <b>No results found</b>
+                  </li>
+                </ul>
+              )}
 
-                {/* Children Elements (top) */}
-                {children && childrenPosition === 'bottom' ? children : ''}
-              </div>
+              {/* Children Elements (top) */}
+              {children && childrenPosition === 'bottom' ? children : ''}
             </div>
-          ) : (
-            ''
-          )}
-        </div>
+          </div>
+        ) : (
+          ''
+        )}
       </div>
     );
   }

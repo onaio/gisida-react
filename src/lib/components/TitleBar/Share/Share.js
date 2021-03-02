@@ -15,7 +15,6 @@ const Share = () => {
     el.select();
     document.execCommand('copy');
     el.remove();
-    console.log('Lets make a toast');
     alert('Linked copied');
   };
 
