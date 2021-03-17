@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LanguageSwitcher component renders correctly: Elements snapshot 1`] = `"<a href=\\"#\\" class=\\"dropdown\\"><span class=\\"glyphicon glyphicon-globe\\"></span><div class=\\"dropdown-content\\"><a href=\\"localhost/en\\">English</a><a href=\\"localhost/khmer\\">ជនជាតិខ្មែរ</a></div></a>"`;
+
+exports[`LanguageSwitcher component renders correctly: Text snapshot 1`] = `"Englishជនជាតិខ្មែរ"`;
