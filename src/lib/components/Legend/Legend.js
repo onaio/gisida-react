@@ -359,7 +359,10 @@ export class Legend extends React.Component {
           hasShape = layer.categories && layer.categories.shape && layer.categories.shape.length;
           const shapeAndBar = layer.categories && layer.categories.shapeAndBar;
           const fillWidth = (
-            100 / layer.categories && layer.categories.color && layer.categories.color.filter(c => c !== 'transparent').length
+            100 /
+            (layer.categories &&
+              layer.categories.color &&
+              layer.categories.color.filter(c => c !== 'transparent').length)
           ).toString();
           const textColor = layer.categories && layer.categories['text-color'];
           /**
