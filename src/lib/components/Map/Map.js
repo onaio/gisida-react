@@ -47,8 +47,7 @@ const mapStateToProps = (state, ownProps) => {
   });
 
   MAP.blockLoad = mapId === MAP_1 ? false : !VIEW || !VIEW.splitScreen;
-  const hasDataView = VIEW.hasOwnProperty(ACTIVE_LAYER_SUPERSET_LINK);
-
+  const hasDataView = VIEW && VIEW.hasOwnProperty(ACTIVE_LAYER_SUPERSET_LINK) || false;
   return {
     isMap1Loaded: state[MAP_1].isLoaded,
     mapId,
@@ -419,7 +418,7 @@ class Map extends Component {
     const activeLayerIds = nextProps.activeLayerIds;
     const primaryLayer = nextProps.MAP.primaryLayer;
     const activeLayerId = nextProps.MAP.activeLayerId;
-    const showLayerSuperset = nextProps.VIEW.showLayerSuperset;
+    const showLayerSuperset = nextProps.VIEW && nextProps.VIEW.showLayerSuperset;
 
     const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES || [];
