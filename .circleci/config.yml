@@ -1,37 +1,61 @@
 version: 2
+
+defaults: &defaults
+  working_directory: ~/gisida-react
+  docker:
+    - image: circleci/node:8.15.1
+
 jobs:
-  build:
-    working_directory: ~/gisida-react
-    docker:
-      - image: circleci/node:8.15.1
+  test:
+    <<: *defaults
     steps:
       - checkout
-      - run: 
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run:
           name: Install dependencies
           command: yarn install
-      - run: 
+      - run:
           name: Run tests
           command: yarn test
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
+      - persist_to_workspace:
+          root: ~/gisida-react
+          paths: .
   publish:
-    docker:
-      - image: circleci/node:8.15.1
+    <<: *defaults
     steps:
-      - checkout
-      - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      - run: yarn install
-      - run: yarn build
-      - run: npm publish
+      - attach_workspace:
+          at: ~/gisida-react
+      - run:
+          name: Authenticate with registry
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/gisida-react/.npmrc
+      - run:
+          name: Build package
+          command: yarn build
+      - run:
+          name: Publish package
+          command: npm publish
 workflows:
   version: 2
-  tagged-build:
+  test-publish:
     jobs:
-      - build
+      - test
       - publish:
           requires:
-            - build
+            - test
           filters:
             branches:
-              only: /[0-9]+(\.[0-9]+)*/
+              ignore: /.*/
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
-  
