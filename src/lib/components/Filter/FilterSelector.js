@@ -83,14 +83,14 @@ export class FilterSelector extends Component {
           <li key={i} className={`optionItem${option.count ? '' : ' inactive'}`}>
             <input
               type="checkbox"
-              id={`${optionKeys[i]}-${mapId}`}
+              id={`${filterKey}-${optionKeys[i]}-${mapId}`}
               value={optionKeys[i]}
               checked={option.enabled}
               onChange={(e) => { this.onFilterOptionClick(e, filterKey); }}
             />
             <label
-              htmlFor={`${optionKeys[i]}-${mapId}`}
-              key={optionKeys[i]}
+              htmlFor={`${filterKey}-${optionKeys[i]}-${mapId}`}
+              key={`${filterKey}-${optionKeys[i]}`}
               data-count={option.count}
               className={`optionLabel${option.enabled ? ' enabled' : ''}`}
               onClick={(e) => { catchZeroCountClicks(e); }}
