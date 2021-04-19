@@ -1,14 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import {
-  Actions,
-  generateFilterOptions,
-  generateFilterOptionsPrev,
-  buildFilterState,
-  clearFilterState,
-  lngLat,
-} from 'gisida';
+import { Actions, generateFilterOptions, buildFilterState, clearFilterState, lngLat } from 'gisida';
 import { buildLayersObj } from '../../utils';
 import FilterSelector from './FilterSelector';
 import FilterSelectorPrev from './FilterSelectorPrev';
@@ -312,7 +305,6 @@ export class Filter extends Component {
 
     let filterOptions;
     if (nextProps.timeseriesObj && layerObj.aggregate && layerObj.aggregate.timeseries) {
-      
       filterOptions = generateFilterOptions(timeseriesObj);
     } else if (!timeseriesObj && filterState && filterState.filterOptions) {
       filterOptions = filterState.filterOptions;
@@ -446,7 +438,7 @@ export class Filter extends Component {
     // Update FILTER state
     const filterState = {
       filterOptions: this.props.FILTER[layerId].filterOptions,
-      filters: this.buildFiltersMap(this.props.FILTER[layerId].filterOptions),
+      filters: this.buildFiltersMap(this.props.FILTER[layerId].filterOptions || filterOptions),
       aggregate: {
         ...(oldLayerObj && oldLayerObj.aggregate),
       },
@@ -511,6 +503,8 @@ export class Filter extends Component {
             // loop through option keys
             // check if option is enabled && if optionKey is in select_multiple value
             if (
+              _datum[filterKeys[f]] &&
+              optionKeys[o] &&
               options[optionKeys[o]].enabled &&
               _datum[filterKeys[f]].indexOf(optionKeys[o]) !== -1
             ) {
@@ -865,6 +859,7 @@ export class Filter extends Component {
     }
 
     const { layerObj } = this.props;
+    const layerFilters = this.getLayerFilter(this.state.layerId);
 
     const newLayerObj = {
       aggregate,
@@ -876,7 +871,7 @@ export class Filter extends Component {
       'data-parse': layerObj['data-parse'],
     };
     const newLayerOptions = generateFilterOptions(newLayerObj);
-    const filteredFilters = this.buildFiltersMap(newLayerOptions);
+    const filteredFilters = this.buildFiltersMap(newLayerOptions, layerFilters);
     return this.mergeFilters(filters, filteredFilters, clickedFilterKey);
   };
 
