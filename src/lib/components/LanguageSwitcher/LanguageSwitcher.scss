@@ -1,40 +1,122 @@
 .dropbtn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 16px;
-    font-size: 16px;
-    border: none;
-  }
-  
-  .dropdown {
-    position: relative;
-    display: inline-block;
-    width: 80px;
-    line-height: 3.5;
-    color: #fff;
-    font-size: 20px;
-    text-align: center;
-  }
-  
-  .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f1f1f1;
-    min-width: 110px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-  }
-  
-  .dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
+  background-color: #4caf50;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+}
+
+.language-dropdown {
+  font-size: 18px;
+  text-align: center;
+  width: 34px;
+  background: #fff;
+  z-index: 500;
+  right: 8px;
+  top: 328px;
+  display: block;
+  position: absolute;
+  line-height: 1.8;
+  color: #222;
+  border: 2px solid #cdcdcd;
+  border-radius: 7px;
+}
+
+.language-dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 110px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  right: 0;
+  top: 34px;
+}
+
+.language-dropdown-content span {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 10px;
+}
+
+.language-dropdown-content span:hover {
+  background-color: #ddd;
+  text-decoration: none;
+}
+
+.language-dropdown:hover .language-dropdown-content {
+  display: block;
+}
+
+.language-dropdown:hover .dropbtn {
+  background-color: #3e8e41;
+}
+.summary-language-switcher {
+  display: flex;
+  justify-content: flex-end;
+  padding: 6px;
+}
+.summary-language-switcher select {
+  border-radius: 2px;
+  margin-top: 10px;
+  text-indent: 6px;
+  -o-text-overflow: '';
+  text-overflow: '';
+  width: 9%;
+  height: 30px;
+  font-size: 15px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: transparent
+    url(http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png) no-repeat
+    135px center;
+}
+
+/* Select Wrapper (for befores & afters) */
+
+$select-color: #b6b6b6;
+.custom-select {
+  /* wrapper style */
+  position: relative;
+  display: block;
+  max-width: 400px;
+  min-width: 180px;
+  margin: 5px auto;
+
+  select {
+    /* Select Reset */
+    border: 1px solid $select-color;
+    outline: none;
+    background: transparent;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 0;
+    margin: 0;
     display: block;
-    font-size: 10px;
+    width: 100%;
+    cursor: pointer;
+
+    /* custom select appearance */
+    padding: 12px 55px 15px 15px;
+    font-size: 14px;
   }
-  
-  .dropdown-content a:hover {background-color: #ddd; text-decoration: none;}
-  
-  .dropdown:hover .dropdown-content {display: block;}
-  
-  .dropdown:hover .dropbtn {background-color: #3e8e41;}
+  /* the down arrow */
+  &:after {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 50px;
+    height: 100%;
+    line-height: 50px;
+    content: '\25BC';
+    text-align: center;
+    z-index: -1;
+    background: $select-color;
+    color: #fff;
+    font-size: 18px;
+  }
+}

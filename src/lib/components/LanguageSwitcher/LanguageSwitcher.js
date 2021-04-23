@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Actions } from 'gisida';
 import './LanguageSwitcher.scss';
+import { LANGUAGESWITCHERCONFIGS, SELECT_LANGUAGE } from './constants';
 const mapStateToProps = (state, ownProps) => {
   const { APP, LOC } = state;
   return {
@@ -16,25 +17,53 @@ class LanguageSwitcher extends React.Component {
     super(props);
   }
 
-  onLocationClick(e) {
-    const { dispatch } = this.props;
+  onLanguageClick(e) {
+    const { dispatch, APP } = this.props;
     e.preventDefault();
-    if (e && e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.id) {
-      dispatch(Actions.setLocation(this.props.mapId, e.currentTarget.dataset.id));
-    }
+    const target = APP.mapLanguageTranslation ? e.target.innerText : e.target.value;
+    dispatch(
+      Actions.setLanguage(this.props.mapId, APP[LANGUAGESWITCHERCONFIGS][target])
+    );
   }
 
   render() {
     const { APP } = this.props;
-    return APP["translation"].length ? 
-    (<a href="#" class="dropdown">
-        <span class="glyphicon glyphicon-globe"></span>
-        <div class="dropdown-content">
-            { APP["translation"].map(lingua =>
-                <a href={`${window.location.href.split('/')[2]}/${lingua.param}`}>{lingua.label}</a>
-            )}
+    if (APP[LANGUAGESWITCHERCONFIGS] && Object.keys(APP[LANGUAGESWITCHERCONFIGS]).length) {
+      if (APP.mapLanguageTranslation) {
+        return ( <a href="#" className="language-dropdown">
+          <span className="glyphicon glyphicon-globe"></span>
+          <div className="language-dropdown-content">
+            {Object.keys(APP[LANGUAGESWITCHERCONFIGS]).map(language => (
+              <span
+                onClick={e => {
+                  this.onLanguageClick(e);
+                }}
+              >
+                {language}
+              </span>
+            ))}
+          </div>
+        </a>)
+      }
+      return (
+        <div className="custom-select">
+          <select onChange={e => {
+            this.onLanguageClick(e)
+          }}>
+            <option value='select language'>
+                {SELECT_LANGUAGE}
+            </option>
+          {Object.keys(APP[LANGUAGESWITCHERCONFIGS]).map(language => (
+              <option value={language}>
+                {language}
+              </option>
+            ))}
+          </select>
         </div>
-      </a>) : null;
+      );
+    } else {
+      return null;
+    }
   }
 }
 
