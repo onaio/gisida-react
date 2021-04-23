@@ -2,8 +2,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Actions, formatNum, hexToRgbA, generateStops } from 'gisida';
-import { buildLayersObj, isCircleLayer, isFillLayerNoBreaks, isFillLayerWithBreaks, isSymbolLayer } from '../../utils';
+import { Actions, formatNum, hexToRgbA, generateStops, translationHook } from 'gisida';
+import {
+  buildLayersObj,
+  isCircleLayer,
+  isFillLayerNoBreaks,
+  isFillLayerWithBreaks,
+  isSymbolLayer,
+} from '../../utils';
 import { buildTimestamp, buildHyperLink, buildDescription, combinedLinks } from '../Legend/Utils';
 import Parser from 'html-react-parser';
 import './Legend.scss';
@@ -12,7 +18,7 @@ const mapStateToProps = (state, ownProps) => {
   const { hasNavBar } = ownProps;
   const mapId = ownProps.mapId || 'map-1';
   const MAP = state[ownProps.mapId] || { layers: {}, timeseries: {} };
-  const APP = state['APP'];
+  const { APP, CURRENTLANGUAGE } = state;
   let subLayerCheck =
     MAP.primaryLayer === MAP.layers &&
     MAP.layers[MAP.primarySubLayer] &&
@@ -37,6 +43,8 @@ const mapStateToProps = (state, ownProps) => {
     primarySubLayer: MAP.primarySubLayer,
     mapStateToUrl: APP.mapStateToUrl,
     hasNavBar,
+    currentLanguage: CURRENTLANGUAGE,
+    languageTranslations: APP.languageTranslations,
   };
 };
 
@@ -52,17 +60,13 @@ export class Legend extends React.Component {
   shouldComponentUpdate(nextProps) {
     const { layerObj, timeSeriesObj } = nextProps;
     /**
-     * Update component when categories are built and the nextprops layerobj don't 
+     * Update component when categories are built and the nextprops layerobj don't
      * match current props layerObj same for the timeseriesObj
      * Not certain why this work in some cases when checking for activelayerIds alone
      * Check if activelayerIds has changed too
      */
-    return ((
-      (layerObj && layerObj.categories)) &&
-      layerObj !== this.props.layerObj) ||
-      ((
-        (timeSeriesObj && timeSeriesObj.categories)) &&
-        timeSeriesObj !== this.props.timeSeriesObj) ||
+    return (layerObj && layerObj.categories && layerObj !== this.props.layerObj) ||
+      (timeSeriesObj && timeSeriesObj.categories && timeSeriesObj !== this.props.timeSeriesObj) ||
       (this.props.activeLayerIds &&
         this.props.activeLayerIds.length !== nextProps.activeLayerIds &&
         nextProps.activeLayerIds.length)
@@ -153,8 +157,8 @@ export class Legend extends React.Component {
     }
   }
   /**
-   * Handler responsible for closing the Legend and toggling off the layer 
-   * @param {event} 
+   * Handler responsible for closing the Legend and toggling off the layer
+   * @param {event}
    */
   onCloseClick(e) {
     e.stopPropagation();
@@ -164,8 +168,8 @@ export class Legend extends React.Component {
   }
   /**
    * Works in the event many layers have been selected on the map.
-   * Allows switching primary layer in a stacked fashion 
-   * @param {event} e 
+   * Allows switching primary layer in a stacked fashion
+   * @param {event} e
    */
   onUpdatePrimaryLayer(e) {
     if (
@@ -195,7 +199,6 @@ export class Legend extends React.Component {
     dispatch(Actions.updatePrimaryLayer(mapId, targetLayer));
   }
 
-  
   render() {
     const {
       layerObj,
@@ -205,7 +208,9 @@ export class Legend extends React.Component {
       layers,
       primaryLayer,
       activeLayerIds,
-      mapStateToUrl
+      mapStateToUrl,
+      currentLanguage,
+      languageTranslations,
     } = this.props;
 
     if (!layerObj) {
@@ -254,6 +259,14 @@ export class Legend extends React.Component {
 
     for (let l = 0; l < this.props.layersData.length; l += 1) {
       layer = this.props.layersData[l];
+      /** Overide credit with translatable kind */
+      if (layer.translatableCredit) {
+        layer.credit = (
+          `<b>${translationHook(layer.translatableCredit, languageTranslations, currentLanguage)}</b>`
+        );
+      }
+      layer.label = translationHook(layer.label, languageTranslations, currentLanguage)
+
       const circleLayerType = isCircleLayer(layer);
       const symbolLayer = isSymbolLayer(layer);
       const fillLayerNoBreaks = isFillLayerNoBreaks(layer);
@@ -359,87 +372,83 @@ export class Legend extends React.Component {
           hasShape = layer.categories && layer.categories.shape && layer.categories.shape.length;
           const shapeAndBar = layer.categories && layer.categories.shapeAndBar;
           const fillWidth = (
-            100 /
-            (layer.categories &&
-              layer.categories.color &&
-              layer.categories.color.filter(c => c !== 'transparent').length)
+            100 / layer.categories &&
+            layer.categories.color &&
+            layer.categories.color.filter(c => c !== 'transparent').length
           ).toString();
           const textColor = layer.categories && layer.categories['text-color'];
           /**
            * Add multiple shapes and labels
            */
           if (layer.categories.labelShape) {
-          layer.categories.labelShape.forEach((labelShape, index) => {
-            background.push(
-              <li className="layer-symbols" key={index}>
-                {labelShape.shape ? (
-                  <img
-                    className="legend-icon"
-                    src={`/assets/img/${labelShape.shape}.svg`}
-                  />
-                ) : null}
-                {labelShape.label}
-              </li>
-            );
-            if (labelShape.break) {
-              background.push(<hr/>);
-            }
-          });
-        } else {
-          layer.categories.color.forEach((color, index) => {
-            const showBoth = shapeAndBar && shapeAndBar.length && shapeAndBar[index] === 'yes';
-            if (color !== 'transparent') {
-              if (showBoth && hasShape) {
-                background.push(
-                  <li className="layer-symbols" key={index}>
-                    {layer.categories.img ? (
-                      <img
-                        className="legend-icon"
-                        src={`/assets/img/${layer.categories.shape[index]}.svg`}
-                      />
-                    ) : null}
-                    <ul className="legend bar-color" key={index}>
-                      <li
-                        style={{
-                          background: color,
-                          color: textColor ? textColor : '#fff',
-                          width: `${fillWidth}%`,
-                        }}
-                      >
-                        {layer.categories.label[index]}
-                      </li>
-                    </ul>
-                  </li>
-                );
-              } else if (hasShape && !showBoth) {
-                background.push(
-                  <li className="layer-symbols" key={index}>
-                    {layer.categories.img ? (
-                      <img
-                        className="legend-icon"
-                        src={`/assets/img/${layer.categories.shape[index]}.svg`}
-                      />
-                    ) : null}
-                    {layer.categories.label[index]}
-                  </li>
-                );
-              } else {
-                background.push(
-                  <li
-                    key={index}
-                    style={{
-                      background: color,
-                      color: textColor ? textColor : '#fff',
-                      width: `${fillWidth}%`,
-                    }}
-                  >
-                    {layer.categories.label[index]}
-                  </li>
-                );
+            layer.categories.labelShape.forEach((labelShape, index) => {
+              background.push(
+                <li className="layer-symbols" key={index}>
+                  {labelShape.shape ? (
+                    <img className="legend-icon" src={`/assets/img/${labelShape.shape}.svg`} />
+                  ) : null}
+                  {labelShape.label}
+                </li>
+              );
+              if (labelShape.break) {
+                background.push(<hr />);
               }
-            }
-          }); 
-        }
+            });
+          } else {
+            layer.categories.color.forEach((color, index) => {
+              const showBoth = shapeAndBar && shapeAndBar.length && shapeAndBar[index] === 'yes';
+              if (color !== 'transparent') {
+                if (showBoth && hasShape) {
+                  background.push(
+                    <li className="layer-symbols" key={index}>
+                      {layer.categories.img ? (
+                        <img
+                          className="legend-icon"
+                          src={`/assets/img/${layer.categories.shape[index]}.svg`}
+                        />
+                      ) : null}
+                      <ul className="legend bar-color" key={index}>
+                        <li
+                          style={{
+                            background: color,
+                            color: textColor ? textColor : '#fff',
+                            width: `${fillWidth}%`,
+                          }}
+                        >
+                          {layer.categories.label[index]}
+                        </li>
+                      </ul>
+                    </li>
+                  );
+                } else if (hasShape && !showBoth) {
+                  background.push(
+                    <li className="layer-symbols" key={index}>
+                      {layer.categories.img ? (
+                        <img
+                          className="legend-icon"
+                          src={`/assets/img/${layer.categories.shape[index]}.svg`}
+                        />
+                      ) : null}
+                      {layer.categories.label[index]}
+                    </li>
+                  );
+                } else {
+                  background.push(
+                    <li
+                      key={index}
+                      style={{
+                        background: color,
+                        color: textColor ? textColor : '#fff',
+                        width: `${fillWidth}%`,
+                      }}
+                    >
+                      {layer.categories.label[index]}
+                    </li>
+                  );
+                }
+              }
+            });
+          }
           const legendClass = layer.categories ? 'legend-label' : '';
           const circleQuantiles = quantiles ? (
             <div className="legend-symbols">{quantiles}</div>
@@ -459,7 +468,11 @@ export class Legend extends React.Component {
                 className="glyphicon glyphicon-remove close"
               ></span>
               <b>{layer.label}</b>
-              <div className={`${hasShape || layer.categories.labelShape ? 'legend-shapes' : 'legend-fill'} ${legendClass}`}>
+              <div
+                className={`${
+                  hasShape || layer.categories.labelShape ? 'legend-shapes' : 'legend-fill'
+                } ${legendClass}`}
+              >
                 <ul>{background}</ul>
               </div>
               {circleQuantiles}
@@ -801,30 +814,27 @@ export class Legend extends React.Component {
             background.push(
               <li className="layer-symbols" key={index}>
                 {labelShape.shape ? (
-                  <img
-                    className="legend-icon"
-                    src={`/assets/img/${labelShape.shape}.svg`}
-                  />
+                  <img className="legend-icon" src={`/assets/img/${labelShape.shape}.svg`} />
                 ) : null}
                 {labelShape.label}
-                <br/>
+                <br />
               </li>
             );
             if (labelShape.break) {
-              background.push(<hr/>);
+              background.push(<hr />);
             }
           });
         } else {
-        layer.categories.color.forEach((color, index) => {
-          if (color !== 'transparent') {
-            background.push(
-              <li key={index} style={{ background: color, width: `${fillWidth}%` }}>
-                {layer.categories.label[index]}
-              </li>
-            );
-          }
-        });
-      }
+          layer.categories.color.forEach((color, index) => {
+            if (color !== 'transparent') {
+              background.push(
+                <li key={index} style={{ background: color, width: `${fillWidth}%` }}>
+                  {layer.categories.label[index]}
+                </li>
+              );
+            }
+          });
+        }
         const legendClass = layer.categories ? 'legend-label' : '';
         legendItems.unshift(
           <div
@@ -1057,14 +1067,11 @@ export class Legend extends React.Component {
     }
 
     legendItems.unshift(primaryLegend);
-    const showLoader = legendLayers.length > 0 && mapStateToUrl ? legendItems.length !== legendLayers.length : false;
+    const showLoader =
+      legendLayers.length > 0 && mapStateToUrl ? legendItems.length !== legendLayers.length : false;
     return (
       <div>
-        <div
-          className={this.props.hasNavBar ? `legend ${mapId} bottom` : `legend ${mapId}`}
-          
-        >
-
+        <div className={this.props.hasNavBar ? `legend ${mapId} bottom` : `legend ${mapId}`}>
           {showLoader && (
             <div className="legend-row">
               <b>Loading...</b>
