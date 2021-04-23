@@ -4,7 +4,7 @@ import Layer from '../Layer/Layer';
 import { menuGroupHasVisibleLayers } from '../../utils';
 import { DATA_NOT_AVAILABLE } from '../../constants';
 import { HyperLink } from '../HyperLink/HyperLink';
-
+import { translationHook } from 'gisida';
 export class Layers extends Component {
   constructor(props) {
     super(props);
@@ -63,6 +63,8 @@ export class Layers extends Component {
       preparedLayers,
       auth,
       noLayerText,
+      currentLanguage,
+      languageTranslations
     } = this.props;
     let layerKeys;
     let layerObj;
@@ -98,7 +100,8 @@ export class Layers extends Component {
         !subLayerIds.includes(layer.id) && !(subLayerIds.map(httpLayers => httpLayers.includes(layer.id)).includes(true))
       ) {
         if (layer.id && (!auth || !auth.authConfigs)) {
-          layerItem.push(<Layer key={layer.id} mapId={mapId} layer={layer} />);
+          layerItem.push(<Layer key={layer.id} mapId={mapId} layer={layer} currentLanguage={currentLanguage}
+            languageTranslations={languageTranslations} />);
         } else if (layer.id && auth) {
           const { authConfigs, userInfo } = auth;
           let activeId = layer.id;
@@ -121,7 +124,8 @@ export class Layers extends Component {
               authConfigs.LAYERS.ALL &&
               authConfigs.LAYERS.ALL.includes(userInfo.username))
           ) {
-            layerItem.push(<Layer key={layer.id} mapId={mapId} layer={layer} />);
+            layerItem.push(<Layer key={layer.id} mapId={mapId} layer={layer} currentLanguage={currentLanguage}
+              languageTranslations={languageTranslations} />);
           }
         } else {
           Object.keys(layer).forEach((d, i) => {
@@ -134,6 +138,7 @@ export class Layers extends Component {
             const description = hyperLink &&
             hyperLink[`${parent}-${d}`] &&
             hyperLink[`${parent}-${d}`].description;
+
             const descStyle = !link
               ? {
                   marginLeft: '45px',
@@ -150,7 +155,7 @@ export class Layers extends Component {
                   }
                   onClick={e => this.toggleSubMenu(e, d)}
                 >
-                  {d}
+                  {translationHook(d,languageTranslations, currentLanguage)}
                   <span
                     className={`category glyphicon glyphicon-chevron-${
                       this.state[d].isOpen ? 'down' : 'right'
@@ -175,6 +180,8 @@ export class Layers extends Component {
                   auth={this.props.auth}
                   noLayerText={noLayerText}
                   activeLayerIds={this.props.activeLayerIds}
+                  currentLanguage={currentLanguage}
+                  languageTranslations={languageTranslations}
                 />
               ) : null,
             ]);
