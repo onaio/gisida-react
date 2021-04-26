@@ -2,7 +2,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Actions, formatNum, hexToRgbA, generateStops, translationHook } from 'gisida';
+import {
+  Actions,
+  formatNum,
+  hexToRgbA,
+  generateStops,
+  translationHook,
+  htmlTextTranslations,
+} from 'gisida';
 import {
   buildLayersObj,
   isCircleLayer,
@@ -259,13 +266,16 @@ export class Legend extends React.Component {
 
     for (let l = 0; l < this.props.layersData.length; l += 1) {
       layer = this.props.layersData[l];
-      /** Overide credit with translatable kind */
-      if (layer.translatableCredit) {
-        layer.credit = (
-          `<b>${translationHook(layer.translatableCredit, languageTranslations, currentLanguage)}</b>`
-        );
+      /** Translate htmltext on the legend */
+      if (layer.credit) {
+        layer.credit = `<b>${htmlTextTranslations(
+          layer.credit,
+          false,
+          languageTranslations,
+          currentLanguage
+        )}</b>`;
       }
-      layer.label = translationHook(layer.label, languageTranslations, currentLanguage)
+      layer.label = translationHook(layer.label, languageTranslations, currentLanguage);
 
       const circleLayerType = isCircleLayer(layer);
       const symbolLayer = isSymbolLayer(layer);
