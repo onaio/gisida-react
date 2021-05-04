@@ -141,7 +141,11 @@ export class Filter extends Component {
         if (layerFilters[f] instanceof Array) {
           for (o = 0; o < layerFilters[f].length; o += 1) {
             if (layerFilters[f][o] instanceof Array) {
-              if (layerFilters[f][o][0] === '==') {
+              if (
+                layerFilters[f][o][0] === '==' &&
+                filterMap[filterKey].options &&
+                filterMap[filterKey].options[optionKey]
+              ) {
                 filterKey = layerFilters[f][o][1];
                 optionKey = layerFilters[f][o][2];
                 filterMap[filterKey].options[optionKey].enabled = true;
