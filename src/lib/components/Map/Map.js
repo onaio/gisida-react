@@ -421,6 +421,7 @@ class Map extends Component {
     const primaryLayer = nextProps.MAP.primaryLayer;
     const activeLayerId = nextProps.MAP.activeLayerId;
     const showLayerSuperset = nextProps.VIEW.showLayerSuperset;
+    const timeSeriesObj = nextProps.timeSeriesObj;
 
     const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES || [];
@@ -502,6 +503,11 @@ class Map extends Component {
           // Add layer to map if visible
           if (!this.map.getLayer(layer.id) && layer.visible && layer.styleSpec) {
             this.map.addLayer({ ...layer.styleSpec });
+            if (timeSeriesObj && timeSeriesObj.layerId === key) {
+              this.props.dispatch(
+                Actions.updateTimeseries(mapId, nextProps.timeseries, timeSeriesObj.layerId)
+              );
+            }
 
             // if layer has a highlight layer
             if (layer.filters && layer.filters.highlight) {
@@ -553,7 +559,7 @@ class Map extends Component {
               this.map.removeSource(id);
             });
           } else if (this.map.getLayer(layer.id) && nextProps.MAP.reloadLayerId === layer.id) {
-            // 1) remove layer and source 
+            // 1) remove layer and source
             let doUpdateTsLayer =
               nextProps.layerObj.aggregate && nextProps.layerObj.aggregate.timeseries
                 ? true
