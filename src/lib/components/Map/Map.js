@@ -802,7 +802,7 @@ class Map extends Component {
   }
 
   buildFilters() {
-    const { layerObj, mapId } = this.props;
+    const { layerObj, mapId, timeSeriesObj } = this.props;
     if (!layerObj || !this.map.getLayer(layerObj.id)) {
       return false;
     }
@@ -810,13 +810,15 @@ class Map extends Component {
     this.props.dispatch(Actions.filtersUpdated(mapId));
     const layerId = layerObj.id;
 
+    const isTsFilter = timeSeriesObj && timeSeriesObj.tsFilter;
+
     const filterKeys = Object.keys(layerObj.filters);
     let filter;
     const combinedFilters = [ALL];
 
     // loop through filters object
     for (let f = 0; f < filterKeys.length; f += 1) {
-      filter = layerObj.filters[filterKeys[f]];
+      filter = isTsFilter ? timeSeriesObj[filterKeys[f]] : layerObj.filters[filterKeys[f]];
 
       if (filterKeys[f] === HIGHLIGHT) {
         // handle highlight filter seperately
