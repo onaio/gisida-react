@@ -815,10 +815,16 @@ class Map extends Component {
     const filterKeys = Object.keys(layerObj.filters);
     let filter;
     const combinedFilters = [ALL];
+    if (isTsFilter) {
+      layerObj.filters = {
+        ...layerObj.filters,
+        tsFilter: timeSeriesObj.tsFilter,
+      };
+    }
 
     // loop through filters object
     for (let f = 0; f < filterKeys.length; f += 1) {
-      filter = isTsFilter ? timeSeriesObj[filterKeys[f]] : layerObj.filters[filterKeys[f]];
+      filter = layerObj.filters[filterKeys[f]];
 
       if (filterKeys[f] === HIGHLIGHT) {
         // handle highlight filter seperately
