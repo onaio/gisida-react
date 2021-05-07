@@ -29,6 +29,13 @@ export class Layer extends Component {
       pushLayerToURL(layer, mapId);
     }
     this.props.dispatch(Actions.toggleLayer(mapId, layer.id));
+    if (
+      !MAP.layers[layer.id].visible &&
+      MAP.layers[layer.id].aggregate &&
+      MAP.layers[layer.id].aggregate.timeseries
+    ) {
+      this.props.dispatch(Actions.updateTimeseries(mapId, MAP.timeseries, layer.id));
+    }
     const { center, zoom } = lngLat(LOC, APP);
     if (MAP.layers[layer.id].zoomOnToggle && MAP.layers[layer.id].visible) {
       window.maps.forEach(e => {
