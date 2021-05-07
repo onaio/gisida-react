@@ -135,25 +135,29 @@ class DetailView extends Component {
     } else if (this.props.LOC && this.props.LOC.location) {
       center = Array.isArray(this.props.LOC.location.center)
         ? {
-          lng: this.props.LOC.location.center[0],
-          lat: this.props.LOC.location.center[1],
-        }
+            lng: this.props.LOC.location.center[0],
+            lat: this.props.LOC.location.center[1],
+          }
         : { ...this.props.LOC.location.center };
       zoom = this.props.LOC.location.zoom;
     } else {
       center = Array.isArray(this.props.APP.mapConfig.center)
         ? {
-          lng: this.props.APP.mapConfig.center[0],
-          lat: this.props.APP.mapConfig.center[1],
-        }
+            lng: this.props.APP.mapConfig.center[0],
+            lat: this.props.APP.mapConfig.center[1],
+          }
         : { ...this.props.APP.mapConfig.center };
       zoom = this.props.LOC.location ? this.props.LOC.location.zoom : this.props.APP.mapConfig.zoom;
     }
-    window.maps[0].easeTo({
+    const index = window.maps.map(m => m['_container'].id).indexOf(this.props.mapId);
+    window.maps[index].easeTo({
       center,
       zoom: zoom,
     });
-    buildDetailView(this.props.mapId, null, null, this.props.dispatch);
+    if (window.maps[index].getLayer(`${this.props.layerObj.id}-highlight`)) {
+      window.maps[index].setPaintProperty(`${this.props.layerObj.id}-highlight`, 'icon-opacity', 0);
+    }
+    buildDetailView(this.props.mapId, null, null, this.props.dispatch, this.props.timeSeriesObj);
   }
 
   render() {
@@ -179,25 +183,25 @@ class DetailView extends Component {
               {typeof detail.value !== 'string' && detail.value.parser ? (
                 Parser(detail.value)
               ) : (
-                  <span>{`${
-                    detail.prefix
-                      ? `${detail.prefix}: `
-                      : detail.useAltAsPrefix
-                        ? `${detail.alt}: `
-                        : ''
-                    }${detail.value}${detail.suffix ? `${detail.suffix}` : ''}`}</span>
-                )}
+                <span>{`${
+                  detail.prefix
+                    ? `${detail.prefix}: `
+                    : detail.useAltAsPrefix
+                    ? `${detail.alt}: `
+                    : ''
+                }${detail.value}${detail.suffix ? `${detail.suffix}` : ''}`}</span>
+              )}
             </li>
           ) : (
-              <li key={i}>
-                <b> {`${detail.alt}:`} </b>
-                {typeof detail.value !== 'string' && detail.value.parser ? (
-                  Parser(detail.value)
-                ) : (
-                    <span>{detail.value}</span>
-                  )}
-              </li>
-            )
+            <li key={i}>
+              <b> {`${detail.alt}:`} </b>
+              {typeof detail.value !== 'string' && detail.value.parser ? (
+                Parser(detail.value)
+              ) : (
+                <span>{detail.value}</span>
+              )}
+            </li>
+          )
         );
       }
     }
@@ -245,8 +249,8 @@ class DetailView extends Component {
             )}
           </div>
         ) : (
-            ''
-          )}
+          ''
+        )}
         {this.state.showImageModal ? (
           <div id="image-modal" className="modal">
             <span className="close" onClick={e => this.closeImageModal(e)}>
@@ -256,8 +260,8 @@ class DetailView extends Component {
             <div id="caption">{title}</div>
           </div>
         ) : (
-            ''
-          )}
+          ''
+        )}
       </div>
     );
   }
