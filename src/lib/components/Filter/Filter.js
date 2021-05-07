@@ -23,6 +23,7 @@ const mapStateToProps = (state, ownProps) => {
     MAP,
     mapId,
     oldLayerObj: MAP.oldLayerObjs ? MAP.oldLayerObjs[MAP.primaryLayer] : {},
+    primaryLayer: MAP.primaryLayer,
     isSplitScreen: state.VIEW && state.VIEW.splitScreen,
     FILTER: state.FILTER,
     layerObj: MAP.layers[MAP.filter.layerId],
@@ -33,6 +34,7 @@ const mapStateToProps = (state, ownProps) => {
     showFilterBtn: MAP.filter.layerId && MAP.primaryLayer === MAP.filter.layerId,
     layerData: MAP.layers,
     detailView: MAP.detailView,
+    showDetailView: MAP.detailView && MAP.detailView.model && MAP.detailView.model.UID,
     hasNavBar,
   };
 };
@@ -1006,7 +1008,14 @@ export class Filter extends Component {
     });
   };
   render() {
-    const { isSplitScreen, mapId, layerObj } = this.props;
+    const {
+      isSplitScreen,
+      mapId,
+      layerObj,
+      timeseriesObj,
+      detailView,
+      showDetailView,
+    } = this.props;
     const { filters, isMac, globalSearchField } = this.state;
     const filterIsPrev = layerObj && layerObj.aggregate && layerObj.aggregate.filterIsPrev;
     const filterKeys = filters ? Object.keys(filters) : {};
@@ -1095,12 +1104,28 @@ export class Filter extends Component {
         isClearable = true;
       }
     }
+    const join =
+      layerObj &&
+      ((layerObj['detail-view'] && layerObj['detail-view'].join) ||
+        (layerObj.source && layerObj.source.join));
+    let detailViewProps =
+      join &&
+      showDetailView &&
+      timeseriesObj &&
+      timeseriesObj.data &&
+      timeseriesObj.data.length &&
+      timeseriesObj.data.find(d => (d.properties || d)[join[1]] === detailView.properties[join[0]]);
+
+    const showDetailViewBool =
+      timeseriesObj && timeseriesObj.layerId === this.props.primaryLayer
+        ? detailViewProps && typeof detailViewProps !== undefined
+        : this.props.showDetailView;
 
     const doClear = isFilterable || this.isMapFiltered() || isClearable;
     let sidebarOffset =
       this.props.showFilterPanel && !(layerObj.aggregate && layerObj.aggregate.filterIsPrev)
         ? '260px'
-        : !!this.props.detailView
+        : showDetailViewBool
         ? '355px'
         : '10px';
 
