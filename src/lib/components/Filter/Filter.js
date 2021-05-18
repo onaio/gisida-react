@@ -145,14 +145,20 @@ export class Filter extends Component {
             if (layerFilters[f][o] instanceof Array) {
               if (
                 layerFilters[f][o][0] === '==' &&
-                filterMap[filterKey].options &&
+                filterMap[filterKey] && filterMap[filterKey].options &&
                 filterMap[filterKey].options[optionKey]
               ) {
                 filterKey = layerFilters[f][o][1];
                 optionKey = layerFilters[f][o][2];
-                filterMap[filterKey].options[optionKey].enabled = true;
-                filterMap[filterKey].options[optionKey].hidden = false;
-                if (!filterMap[filterKey]) filterMap[filterKey].isFiltered = true;
+                if (
+                  filterMap[filterKey] &&
+                  filterMap[filterKey].options &&
+                  filterMap[filterKey].options[optionKey]
+                ) {
+                  filterMap[filterKey].options[optionKey].enabled = true;
+                  filterMap[filterKey].options[optionKey].hidden = false;
+                }
+                // if (!filterMap[filterKey]) filterMap[filterKey].isFiltered = true;
               } else {
                 // To DO: handle quant filter expressions
               }
