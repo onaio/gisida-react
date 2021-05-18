@@ -10,7 +10,8 @@ const mapStateToProps = (state, ownProps) => {
   return {
     MAP,
     styles: state.STYLES,
-    showFilterPanel: MAP.showFilterPanel
+    showFilterPanel: MAP.showFilterPanel,
+    activeLayerId: MAP.activeLayerId,
   }
 }
 
@@ -29,8 +30,10 @@ export class StyleSelector extends Component {
   }
 
   changeStyle = (e) => {
+    const { mapId, activeLayerId, dispatch } = this.props;
     const style = e.target.value;
-    this.props.dispatch(Actions.changeStyle(this.props.mapId, style));
+    dispatch(Actions.changeStyle(mapId, style));
+    dispatch(Actions.reloadLayer(mapId, activeLayerId));
   }
 
   render() {

@@ -422,6 +422,7 @@ class Map extends Component {
     const activeLayerId = nextProps.MAP.activeLayerId;
     const showLayerSuperset = nextProps.VIEW.showLayerSuperset;
     const timeSeriesObj = nextProps.timeSeriesObj;
+    const mapStateToUrl = nextProps.mapStateToUrl;
 
     const layers = nextProps.MAP.layers;
     const styles = nextProps.STYLES || [];
@@ -482,7 +483,9 @@ class Map extends Component {
       styles.forEach(style => {
         if (style[mapId] && style[mapId].current && this.props.MAP.currentStyle !== currentStyle) {
           this.map.setStyle(style.url);
-          pushStyleToURL(styles, style, mapId);
+          if (mapStateToUrl) {
+            pushStyleToURL(styles, style, mapId);
+          }
         }
       });
       // Zoom to current region (center and zoom)
@@ -503,6 +506,7 @@ class Map extends Component {
           // Add layer to map if visible
           if (!this.map.getLayer(layer.id) && layer.visible && layer.styleSpec) {
             this.map.addLayer({ ...layer.styleSpec });
+            // Update timeseries layer on next reloadLayers
             if (timeSeriesObj && timeSeriesObj.layerId === key) {
               this.props.dispatch(
                 Actions.updateTimeseries(mapId, nextProps.timeseries, timeSeriesObj.layerId)
@@ -854,7 +858,7 @@ class Map extends Component {
   }
 
   doUpdateTSlayers(prevProps) {
-    const { timeSeriesObj, timeseries, layersObj } = this.props;
+    const { timeSeriesObj, timeseries, layersObj, MAP } = this.props;
 
     // if no timeseries object, don't update the timeseries
     if (!timeSeriesObj) {
@@ -862,6 +866,9 @@ class Map extends Component {
     }
 
     // if timeseries objects' keys don't match, update the timeseries
+    if (timeSeriesObj && prevProps.MAP.currentStyle !== MAP.currentStyle) {
+      return true;
+    } 
     if (
       prevProps.timeseries &&
       Object.keys(prevProps.timeseries).length !== Object.keys(timeseries).length
@@ -896,12 +903,16 @@ class Map extends Component {
 
     return false;
   }
-
+ /**
+  * Utility function sets layout and paint properties based on period matches 
+  * and time slider changes
+  * @param {props} nextProps - new props coming into the component
+  */
   updateTimeseriesLayers(nextProps) {
     const { timeSeriesObj, timeseries, layersObj, FILTER } = nextProps ? nextProps : this.props;
     const timeSeriesLayers = Object.keys(timeseries);
 
-    // determine what the currently timeperiod to see if layers should be hidden
+    // determine  the current timeperiod to see if layers should be hidden
     const currPeriod =
       timeSeriesObj && timeSeriesObj.period && timeSeriesObj.period[timeSeriesObj.temporalIndex];
 
@@ -995,7 +1006,6 @@ class Map extends Component {
               this.map.setPaintProperty(id, CIRCLE_COLOR, newColorStops);
               this.map.setPaintProperty(id, CIRCLE_STROKE_WIDTH, newStrokeStops);
             }
-
             this.map.setPaintProperty(id, paintProperty, newStops);
           }
         }
