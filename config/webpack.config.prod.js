@@ -13,6 +13,7 @@ const Uglify = require('uglifyjs-webpack-plugin');
 const shouldUseSourceMap = false;
 
 module.exports = {
+  target: "node",
   // Don't attempt to continue if there are any errors.
   bail: true,
   // Generate source maps
@@ -22,6 +23,7 @@ module.exports = {
     path: paths.appBuild,
     filename: 'gisida_react.js',
     libraryTarget: 'umd',
+    // libraryTarget: 'commonjs2',
   },
   resolve: {
     extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx'],

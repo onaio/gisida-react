@@ -270,7 +270,6 @@ export class Legend extends React.Component {
       if (layer.credit) {
         layer.credit = `<b>${htmlTextTranslations(
           layer.credit,
-          false,
           languageTranslations,
           currentLanguage
         )}</b>`;
