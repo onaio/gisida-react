@@ -13,7 +13,6 @@ const Uglify = require('uglifyjs-webpack-plugin');
 const shouldUseSourceMap = false;
 
 module.exports = {
-  target: "node",
   // Don't attempt to continue if there are any errors.
   bail: true,
   // Generate source maps
