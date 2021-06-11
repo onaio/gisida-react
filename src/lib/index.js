@@ -26,6 +26,7 @@ import * as constants from './constants';
 import { pushSearchParamsToURL, getURLSearchParams, getCategoryForLayers } from './utils';
 import Share from './components/TitleBar/Share/Share';
 import { pushLayerToURL } from './components/Layer/utils';
+import LanguageSwitcher from './components/LanguageSwitcher/LanguageSwitcher';
 
 export {
   App,
@@ -59,4 +60,5 @@ export {
   isLoggedIn,
   killSession,
   getCategoryForLayers,
+  LanguageSwitcher,
 };

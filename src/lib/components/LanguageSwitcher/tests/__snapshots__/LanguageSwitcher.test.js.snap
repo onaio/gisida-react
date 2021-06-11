@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LanguageSwitcher component renders correctly: Elements snapshot 1`] = `"<div class=\\"custom-select\\"><select><option value=\\"select language\\">Select Language</option><option value=\\"English\\">English</option><option value=\\"ជនជាតិខ្មែរ\\">ជនជាតិខ្មែរ</option></select></div>"`;
+
+exports[`LanguageSwitcher component renders correctly: Text snapshot 1`] = `"Select LanguageEnglishជនជាតិខ្មែរ"`;

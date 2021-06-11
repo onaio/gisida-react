@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Actions } from 'gisida';
+import { Actions, translationHook } from 'gisida';
 import Layers from '../Layers/Layers';
 import SearchBar from '../Searchbar/SearchBar';
 import ConnectedLayers from '../Layers/ConnectedLayers';
@@ -14,7 +14,7 @@ import { HyperLink } from '../HyperLink/HyperLink';
 const mapStateToProps = (state, ownProps) => {
   const { mapId } = ownProps;
   const MAP = state[mapId] || { layers: {} };
-  const { AUTH, APP, VIEW, CATEGORIES } = state;
+  const { AUTH, APP, VIEW, CATEGORIES, CURRENTLANGUAGE } = state;
   const { NULL_LAYER_TEXT } = APP;
 
   // Get current region
@@ -44,6 +44,8 @@ const mapStateToProps = (state, ownProps) => {
     showMap: VIEW.showMap, // A flag to determine map/superset view
     noLayerText: NULL_LAYER_TEXT, // Text to be displayed when a category has no layer pulle d from config file
     activeLayerIds: MAP.activeLayerIds, // list of layer id's for all visible layers
+    currentLanguage: CURRENTLANGUAGE,
+    languageTranslations: APP.languageTranslations,
   };
 };
 
@@ -235,7 +237,14 @@ class Menu extends Component {
 
   render() {
     const { searching, searchResults, categories } = this.state;
-    const { disableDefault, showSearchBar, hyperLink, highlightText } = this.props;
+    const {
+      disableDefault,
+      showSearchBar,
+      hyperLink,
+      highlightText,
+      currentLanguage,
+      languageTranslations,
+    } = this.props;
     if (disableDefault) return this.props.children || null;
     const { mapId } = this.props;
     const children = React.Children.map(this.props.children, child => {
@@ -355,25 +364,24 @@ class Menu extends Component {
                         highlightText &&
                         highlightText[category.category] &&
                         highlightText[category.category].break;
-                      
+
                       const descriptionStyle = !link
                         ? {
                             marginLeft: '33px',
                           }
                         : null;
-
                       return (
                         <li
                           className={`${link || description ? 'sector hyperlink' : 'sector'}`}
                           key={i}
-                          style={highlightTextBreak ? {marginTop: '20%'}: {}}
+                          style={highlightTextBreak ? { marginTop: '20%' } : {}}
                         >
                           <a
                             className={`${link || description ? 'sector hyperlink' : 'sector'}`}
                             onClick={e => this.onCategoryClick(e, category.category)}
-                            style={ highlightTextColor ? {color: highlightTextColor}: {}}
+                            style={highlightTextColor ? { color: highlightTextColor } : {}}
                           >
-                            {category.category}
+                            {translationHook(category.category, languageTranslations, currentLanguage)}
                             <HyperLink
                               link={link}
                               description={description}
@@ -407,6 +415,8 @@ class Menu extends Component {
                               sector={category.category}
                               hyperLink={hyperLink}
                               activeLayerIds={activeLayerIds}
+                              currentLanguage={currentLanguage}
+                              languageTranslations={languageTranslations}
                             />
                           ) : this.props.openCategories &&
                             this.props.openCategories.includes(category.category) &&
@@ -420,11 +430,13 @@ class Menu extends Component {
                               auth={AUTH}
                               sector={category.category}
                               hyperLink={hyperLink}
+                              currentLanguage={currentLanguage}
+                              languageTranslations={languageTranslations}
                             />
                           ) : (
                             <ul />
                           )}
-                        </li> 
+                        </li>
                       );
                     })
                   ) : (

@@ -155,5 +155,8 @@
   "peerDependencies": {
     "react": ">=0.16",
     "react-dom": ">=0.16"
-  }
+  },
+  "browser":{
+    "child_process": false
+    }
 }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Actions, prepareLayer, lngLat } from 'gisida';
+import { Actions, prepareLayer, lngLat, translationHook } from 'gisida';
 import { pushLayerToURL } from './utils';
 
 const mapStateToProps = (state, ownProps) => {
@@ -47,7 +47,7 @@ export class Layer extends Component {
   render() {
     const layer = this.props.layer;
     const mapId = this.props.mapId;
-    const { MAP } = this.props;
+    const { MAP, currentLanguage, languageTranslations } = this.props;
     if (!mapId) {
       return null;
     }
@@ -60,7 +60,7 @@ export class Layer extends Component {
           onChange={e => this.onLayerToggle(layer)}
           checked={MAP.layers[layer.id].visible}
         />
-        <label htmlFor={`${layer.id}-${mapId}`}>{layer.label}</label>
+        <label htmlFor={`${layer.id}-${mapId}`}>{translationHook(layer.label, languageTranslations, currentLanguage)}</label>
       </li>
     );
   }
