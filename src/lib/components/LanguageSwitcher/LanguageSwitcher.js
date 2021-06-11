@@ -28,6 +28,7 @@ class LanguageSwitcher extends React.Component {
 
   render() {
     const { APP } = this.props;
+    const marginRight = window.location.pathname === '/' ? 'auto' : '40px' 
     if (APP[LANGUAGESWITCHERCONFIGS] && Object.keys(APP[LANGUAGESWITCHERCONFIGS]).length) {
       if (APP.mapLanguageTranslation) {
         return ( <a href="#" className="language-dropdown">
@@ -46,7 +47,7 @@ class LanguageSwitcher extends React.Component {
         </a>)
       }
       return (
-        <div className="custom-select">
+        <div className="custom-select" style={{ marginRight: marginRight}}>
           <select onChange={e => {
             this.onLanguageClick(e)
           }}>
