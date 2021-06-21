@@ -725,6 +725,7 @@ class Map extends Component {
         if (layerObj && layerObj[HIGHLIGHT_FILTER_PROPERTY] && this.map.getLayer(layerObj.id)) {
           layerObj.filters.highlight[2] = '';
           layerObj.filters.rHighlight[2] = '';
+          this.props.dispatch(Actions.filtersUpdated(this.props.mapId));
           this.buildFilters(layerObj);
         }
       }
@@ -738,14 +739,22 @@ class Map extends Component {
     // Update Layer Filters
     if (this.map && this.props.layerObj && this.map.getLayer(this.props.layerObj.id)) {
       const { FILTER, primaryLayer } = this.props;
+
       if (
-        this.props.MAP.doApplyFilters ||
-        (FILTER &&
-          FILTER[primaryLayer] &&
-          !FILTER[primaryLayer].doUpdate &&
-          prevProps.FILTER[primaryLayer] &&
-          prevProps.FILTER[primaryLayer].doUpdate)
+        (this.props.MAP.doApplyFilters ||
+          (FILTER &&
+            FILTER[primaryLayer] &&
+            !FILTER[primaryLayer].doUpdate &&
+            prevProps.FILTER[primaryLayer] &&
+            prevProps.FILTER[primaryLayer].doUpdate)) &&
+        !!this.props.layerObj &&
+        !!this.map.getLayer(this.props.layerObj.id)
       ) {
+        this.props.dispatch(Actions.filtersUpdated(this.props.mapId));
+        this.buildFilters();
+      }
+
+      if (FILTER && FILTER[primaryLayer] && FILTER[primaryLayer].isFiltered) {
         this.buildFilters();
       }
     }
@@ -806,12 +815,7 @@ class Map extends Component {
   }
 
   buildFilters() {
-    const { layerObj, mapId, timeSeriesObj } = this.props;
-    if (!layerObj || !this.map.getLayer(layerObj.id)) {
-      return false;
-    }
-
-    this.props.dispatch(Actions.filtersUpdated(mapId));
+    const { layerObj, timeSeriesObj } = this.props;
     const layerId = layerObj.id;
 
     const isTsFilter = timeSeriesObj && timeSeriesObj.tsFilter;
@@ -868,7 +872,7 @@ class Map extends Component {
     // if timeseries objects' keys don't match, update the timeseries
     if (timeSeriesObj && prevProps.MAP.currentStyle !== MAP.currentStyle) {
       return true;
-    } 
+    }
     if (
       prevProps.timeseries &&
       Object.keys(prevProps.timeseries).length !== Object.keys(timeseries).length
@@ -903,11 +907,11 @@ class Map extends Component {
 
     return false;
   }
- /**
-  * Utility function sets layout and paint properties based on period matches 
-  * and time slider changes
-  * @param {props} nextProps - new props coming into the component
-  */
+  /**
+   * Utility function sets layout and paint properties based on period matches
+   * and time slider changes
+   * @param {props} nextProps - new props coming into the component
+   */
   updateTimeseriesLayers(nextProps) {
     const { timeSeriesObj, timeseries, layersObj, FILTER } = nextProps ? nextProps : this.props;
     const timeSeriesLayers = Object.keys(timeseries);
