@@ -22,6 +22,7 @@ module.exports = {
     path: paths.appBuild,
     filename: 'gisida_react.js',
     libraryTarget: 'umd',
+    // libraryTarget: 'commonjs2',
   },
   resolve: {
     extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx'],

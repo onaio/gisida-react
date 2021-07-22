@@ -13,7 +13,7 @@ exports[`/src/lib/components/Login/OnaOauthLogin renders correctly 1`] = `
     >
       <a
         className="btn btn-default center-block btn-block"
-        href="https://api.ona.io/o/authorize/?client_id=client_id&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read%20write&response_type=token&state=abc"
+        href="https://api.ona.io/o/authorize/?client_id=client_id&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&response_type=token&state=abc&scope=read%20write"
       >
         Login
       </a>
@@ -35,7 +35,7 @@ exports[`/src/lib/components/Login/OnaOauthLogin renders default oauth provider 
     >
       <a
         className="btn btn-default center-block btn-block"
-        href="https://api.ona.io/o/authorize/?client_id=client_id&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&scope=read%20write&response_type=token&state=abc"
+        href="https://api.ona.io/o/authorize/?client_id=client_id&redirect_uri=http%3A%2F%2Flocalhost%2Fcallback&response_type=token&state=abc&scope=read%20write"
       >
         Login
       </a>

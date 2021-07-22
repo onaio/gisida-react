@@ -47,7 +47,7 @@ const mapStateToProps = (state, ownProps) => {
   });
 
   MAP.blockLoad = mapId === MAP_1 ? false : !VIEW || !VIEW.splitScreen;
-  const hasDataView = VIEW && VIEW.hasOwnProperty(ACTIVE_LAYER_SUPERSET_LINK) || false;
+  const hasDataView = (VIEW && VIEW.hasOwnProperty(ACTIVE_LAYER_SUPERSET_LINK)) || false;
   return {
     isMap1Loaded: state[MAP_1].isLoaded,
     mapId,
@@ -574,7 +574,13 @@ class Map extends Component {
             });
           }
 
-          if (layer.visible && layer.type === CHART && typeof layer.source.data !== 'string') {
+          if (
+            layer.visible &&
+            layer.type === CHART &&
+            typeof layer.source.data !== 'string' &&
+            layer.source.data &&
+            layer.source.data.type !== 'superset'
+          ) {
             const timefield =
               layer.aggregate && layer.aggregate.timeseries ? layer.aggregate.timeseries.field : '';
             const tsObj = nextProps.timeSeriesObj;
@@ -1037,7 +1043,10 @@ class Map extends Component {
           for (let sl = 0; sl < this.props.layers[id].layers.length; sl += 1) {
             slId = this.props.layers[id].layers[sl];
             if (slId.includes('http')) {
-              slId = slId.split('/').slice(-1).pop()
+              slId = slId
+                .split('/')
+                .slice(-1)
+                .pop();
             }
             if (this.props.layers[slId].labels) {
               hasLabel = slId;
