@@ -610,7 +610,13 @@ class Map extends Component {
             });
           }
 
-          if (layer.visible && layer.type === CHART && typeof layer.source.data !== 'string') {
+          if (
+            layer.visible &&
+            layer.type === CHART &&
+            typeof layer.source.data !== 'string' &&
+            layer.source.data &&
+            layer.source.data.type !== 'superset'
+          ) {
             const timefield =
               layer.aggregate && layer.aggregate.timeseries ? layer.aggregate.timeseries.field : '';
             const tsObj = nextProps.timeSeriesObj;
