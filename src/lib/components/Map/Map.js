@@ -628,7 +628,14 @@ class Map extends Component {
                 data = layer.source.data.filter(d => d[timefield] === period[tsObj.temporalIndex]);
               }
             }
-            addChart(layer, data, this.map, mapId);
+            addChart({
+              ...layer,
+              categories: {
+                ...layer.categories,
+                clusters: data && data.length < layer.categories.clusters ? data.length : layer.categories.clusters
+              }
+             
+            }, data, this.map, mapId);
           } else {
             $(`.marker-chart-${layer.id}-${mapId}`).remove();
           }
